@@ -2,8 +2,9 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { Logo } from "@/components/logo";
-import { AuthMenu } from "@/components/auth-menu";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+
 import { FilmCheckout } from "@/components/film-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
@@ -227,14 +228,8 @@ function FilmPage() {
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <PaymentTestModeBanner />
-      <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
-          </Link>
-          <AuthMenu />
-        </div>
-      </header>
+      <SiteHeader />
+
 
       {/* Cinematic hero */}
       <section className="relative isolate overflow-hidden">
@@ -502,6 +497,8 @@ function FilmPage() {
           </div>
         </div>
       )}
+      <SiteFooter />
     </div>
+
   );
 }
