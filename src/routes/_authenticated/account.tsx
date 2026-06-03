@@ -375,6 +375,7 @@ function AccountPage() {
           </button>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
