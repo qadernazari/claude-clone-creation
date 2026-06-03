@@ -6,6 +6,7 @@ import { Logo } from "../components/logo";
 import { AuthMenu } from "../components/auth-menu";
 import { WelcomeSplash } from "../components/welcome-splash";
 import { FilmsRow } from "../components/films-row";
+import { FeaturedFilm } from "../components/featured-film";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -181,7 +182,9 @@ function Home() {
         </div>
       </section>
 
+      <FeaturedFilm />
       <FilmsRow />
+
 
       {/* Footer */}
       <footer className="hairline border-t">
