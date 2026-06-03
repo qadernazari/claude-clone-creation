@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FilmsSlugRouteImport } from './routes/films.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedWatchSlugRouteImport } from './routes/_authenticated/watch.$slug'
@@ -44,6 +45,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
+  id: '/my-tickets',
+  path: '/my-tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/films/$slug': typeof FilmsSlugRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/my-tickets'
     | '/checkout/return'
     | '/films/$slug'
     | '/admin/categories'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/my-tickets'
     | '/checkout/return'
     | '/films/$slug'
     | '/admin/categories'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/_authenticated/my-tickets'
     | '/checkout/return'
     | '/films/$slug'
     | '/_authenticated/admin/categories'
@@ -199,6 +211,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/checkout/return'
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/my-tickets': {
+      id: '/_authenticated/my-tickets'
+      path: '/my-tickets'
+      fullPath: '/my-tickets'
+      preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -265,11 +284,13 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
   AuthenticatedWatchSlugRoute: typeof AuthenticatedWatchSlugRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
   AuthenticatedWatchSlugRoute: AuthenticatedWatchSlugRoute,
 }
 
@@ -287,13 +308,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

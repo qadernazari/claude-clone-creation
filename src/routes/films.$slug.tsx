@@ -95,6 +95,26 @@ function FilmPage() {
     },
   });
 
+  const { data: activeTicket } = useQuery({
+    queryKey: ["ticket", film.id, user?.id ?? "anon"],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tickets")
+        .select("id, expires_at")
+        .eq("film_id", film.id)
+        .eq("status", "paid")
+        .gt("expires_at", new Date().toISOString())
+        .order("expires_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    refetchInterval: 30_000,
+  });
+
+
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
   const synopsis = fa ? film.synopsis_fa || film.synopsis_en : film.synopsis_en;
@@ -106,17 +126,20 @@ function FilmPage() {
 
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
+    watch: fa ? "تماشای فیلم" : "Watch now",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
     accessNote: fa
       ? `دسترسی ${num(film.ticket_hours)} ساعت پس از خرید`
       : `${film.ticket_hours}-hour access after purchase`,
+    ticketActive: fa ? "بلیط فعال دارید" : "You have an active ticket",
     about: fa ? "درباره فیلم" : "About the film",
     crew: fa ? "عوامل" : "Credits",
     back: fa ? "بازگشت" : "Back",
     contribSoon: fa ? "حمایت به‌زودی فعال می‌شود." : "Contributions coming soon.",
     tomanSoon: fa ? "پرداخت با تومان (زرین‌پال) به‌زودی." : "Toman checkout (ZarinPal) coming soon.",
   };
+
 
   const tomanOnly = region === "iran" && film.price_toman > 0;
   const returnUrl = typeof window !== "undefined"
