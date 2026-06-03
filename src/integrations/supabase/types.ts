@@ -14,16 +14,433 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name_en: string
+          name_fa: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name_en: string
+          name_fa?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name_en?: string
+          name_fa?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      contributions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          film_id: string | null
+          id: string
+          paid_at: string | null
+          provider: string | null
+          provider_ref: string | null
+          status: string
+          supporter: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          film_id?: string | null
+          id?: string
+          paid_at?: string | null
+          provider?: string | null
+          provider_ref?: string | null
+          status?: string
+          supporter?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          film_id?: string | null
+          id?: string
+          paid_at?: string | null
+          provider?: string | null
+          provider_ref?: string | null
+          status?: string
+          supporter?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributions_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          country: string | null
+          created_at: string
+          film_id: string | null
+          id: number
+          session_id: string | null
+          type: string
+          value: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          film_id?: string | null
+          id?: number
+          session_id?: string | null
+          type: string
+          value?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          film_id?: string | null
+          id?: number
+          session_id?: string | null
+          type?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      film_credits: {
+        Row: {
+          credit_type: string
+          film_id: string
+          id: string
+          label_en: string | null
+          label_fa: string | null
+          sort_order: number
+          value_en: string | null
+          value_fa: string | null
+        }
+        Insert: {
+          credit_type: string
+          film_id: string
+          id?: string
+          label_en?: string | null
+          label_fa?: string | null
+          sort_order?: number
+          value_en?: string | null
+          value_fa?: string | null
+        }
+        Update: {
+          credit_type?: string
+          film_id?: string
+          id?: string
+          label_en?: string | null
+          label_fa?: string | null
+          sort_order?: number
+          value_en?: string | null
+          value_fa?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "film_credits_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      films: {
+        Row: {
+          access_mode: string
+          category: string | null
+          cover_url: string | null
+          created_at: string
+          director_en: string | null
+          director_fa: string | null
+          duration_min: number | null
+          id: string
+          poster_gradient: string | null
+          preview_url: string | null
+          price_cents: number
+          price_toman: number
+          slug: string
+          sort_order: number
+          synopsis_en: string | null
+          synopsis_fa: string | null
+          ticket_hours: number
+          title_en: string
+          title_fa: string | null
+          updated_at: string
+          video_url: string | null
+          visibility: string
+          year: number | null
+        }
+        Insert: {
+          access_mode?: string
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          director_en?: string | null
+          director_fa?: string | null
+          duration_min?: number | null
+          id?: string
+          poster_gradient?: string | null
+          preview_url?: string | null
+          price_cents?: number
+          price_toman?: number
+          slug: string
+          sort_order?: number
+          synopsis_en?: string | null
+          synopsis_fa?: string | null
+          ticket_hours?: number
+          title_en: string
+          title_fa?: string | null
+          updated_at?: string
+          video_url?: string | null
+          visibility?: string
+          year?: number | null
+        }
+        Update: {
+          access_mode?: string
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          director_en?: string | null
+          director_fa?: string | null
+          duration_min?: number | null
+          id?: string
+          poster_gradient?: string | null
+          preview_url?: string | null
+          price_cents?: number
+          price_toman?: number
+          slug?: string
+          sort_order?: number
+          synopsis_en?: string | null
+          synopsis_fa?: string | null
+          ticket_hours?: number
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+          video_url?: string | null
+          visibility?: string
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "films_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notify_list: {
+        Row: {
+          created_at: string
+          email_lower: string
+          id: string
+          locale: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_lower: string
+          id?: string
+          locale?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_lower?: string
+          id?: string
+          locale?: string | null
+        }
+        Relationships: []
+      }
+      payment_events: {
+        Row: {
+          id: string
+          provider: string | null
+          received_at: string
+          type: string | null
+        }
+        Insert: {
+          id: string
+          provider?: string | null
+          received_at?: string
+          type?: string | null
+        }
+        Update: {
+          id?: string
+          provider?: string | null
+          received_at?: string
+          type?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          last_active_at: string | null
+          last_ip: string | null
+          locale: string
+          signup_city: string | null
+          signup_country: string | null
+          signup_ip: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          last_active_at?: string | null
+          last_ip?: string | null
+          locale?: string
+          signup_city?: string | null
+          signup_country?: string | null
+          signup_ip?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          last_active_at?: string | null
+          last_ip?: string | null
+          locale?: string
+          signup_city?: string | null
+          signup_country?: string | null
+          signup_ip?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          data: Json
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          data: Json
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tickets: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          expires_at: string | null
+          film_id: string
+          id: string
+          paid_at: string | null
+          provider: string | null
+          provider_ref: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          film_id: string
+          id?: string
+          paid_at?: string | null
+          provider?: string | null
+          provider_ref?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          film_id?: string
+          id?: string
+          paid_at?: string | null
+          provider?: string | null
+          provider_ref?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +567,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
