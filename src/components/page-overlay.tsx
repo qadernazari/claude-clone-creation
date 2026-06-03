@@ -117,23 +117,25 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
         </button>
 
         <div className="overflow-y-auto" onClick={onBodyClick}>
-          {!entry && (
+          {!entry && slug !== "faq" && (
             <div className="p-16 text-center text-cream/50">
               {fa ? "صفحه پیدا نشد" : "Page not found"}
             </div>
           )}
-          {entry && (
+          {(entry || slug === "faq") && (
             <article className={`px-6 py-14 md:px-12 md:py-20 ${fa ? "font-fa" : ""}`}>
-              {entry[fa ? "fa" : "en"].kicker && (
+              {entry?.[fa ? "fa" : "en"].kicker && (
                 <p className="mb-4 text-[11px] uppercase tracking-[0.32em] text-amber">
                   {entry[fa ? "fa" : "en"].kicker}
                 </p>
               )}
-              <h1 className={`text-3xl md:text-5xl leading-tight text-cream-bright ${fa ? "font-fa" : "font-display"}`}>
-                {entry[fa ? "fa" : "en"].title}
-              </h1>
+              {(entry || slug === "faq") && (
+                <h1 className={`text-3xl md:text-5xl leading-tight text-cream-bright ${fa ? "font-fa" : "font-display"}`}>
+                  {entry?.[fa ? "fa" : "en"].title ?? (slug === "faq" ? (fa ? faq?.headingFa ?? "پرسش‌های متداول" : faq?.headingEn ?? "Frequently asked") : "")}
+                </h1>
+              )}
 
-              {entry[fa ? "fa" : "en"].cards && entry[fa ? "fa" : "en"].cards!.length > 0 && (
+              {entry?.[fa ? "fa" : "en"].cards && entry[fa ? "fa" : "en"].cards!.length > 0 && (
                 <div className="mt-10 grid gap-3 sm:grid-cols-3">
                   {entry[fa ? "fa" : "en"].cards!.map((c: PageCard, i) => (
                     <div key={i} className="rounded-xl border border-line bg-bg-1/40 p-5">
@@ -149,16 +151,15 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
                 </div>
               )}
 
-              <div
-                className={`cms-prose mt-10 ${fa ? "font-fa" : ""}`}
-                dangerouslySetInnerHTML={{ __html: entry[fa ? "fa" : "en"].body }}
-              />
+              {entry?.[fa ? "fa" : "en"].body && (
+                <div
+                  className={`cms-prose mt-10 ${fa ? "font-fa" : ""}`}
+                  dangerouslySetInnerHTML={{ __html: entry[fa ? "fa" : "en"].body }}
+                />
+              )}
 
               {slug === "faq" && faq && (
                 <div className="mt-10 space-y-3">
-                  <h2 className={`mb-4 text-2xl text-cream-bright ${fa ? "font-fa" : "font-display"}`}>
-                    {fa ? faq.headingFa : faq.headingEn}
-                  </h2>
                   {(fa ? faq.fa : faq.en).map(([q, a], i) => (
                     <details key={i} className="group rounded-lg border border-line bg-bg-1/30 px-4 py-3">
                       <summary className="cursor-pointer list-none flex justify-between items-center gap-4 text-cream font-medium">
@@ -173,6 +174,7 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
             </article>
           )}
         </div>
+
       </div>
     </div>
   );
