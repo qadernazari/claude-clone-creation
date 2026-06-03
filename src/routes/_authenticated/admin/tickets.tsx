@@ -172,13 +172,20 @@ function TicketsPage() {
     );
   }
 
+  const paidStats = useMemo(() => {
+    const paid = rows.filter((t) => t.status === "paid");
+    const usd = paid.filter((t) => t.currency === "usd").reduce((s, t) => s + t.amount, 0);
+    const toman = paid.filter((t) => t.currency === "toman").reduce((s, t) => s + t.amount, 0);
+    return { count: paid.length, usd, toman };
+  }, [rows]);
+
   return (
     <div className="p-8 max-w-6xl">
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Tickets</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Tickets & Sales</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {total.toLocaleString()} total across the platform.
+            Every ticket purchase across the platform · {total.toLocaleString()} total.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -192,6 +199,26 @@ function TicketsPage() {
           </button>
         </div>
       </header>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="rounded-lg border border-border bg-card/40 p-4">
+          <div className="text-xs text-muted-foreground">Ticket revenue (USD)</div>
+          <div className="mt-1 text-2xl font-semibold tabular-nums">${(paidStats.usd / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/40 p-4">
+          <div className="text-xs text-muted-foreground">درآمد بلیت (تومان)</div>
+          <div className="mt-1 text-2xl font-semibold tabular-nums text-right" dir="rtl">{paidStats.toman.toLocaleString()}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/40 p-4">
+          <div className="text-xs text-muted-foreground">Paid tickets</div>
+          <div className="mt-1 text-2xl font-semibold tabular-nums">{paidStats.count.toLocaleString()}</div>
+        </div>
+        <div className="rounded-lg border border-border bg-card/40 p-4">
+          <div className="text-xs text-muted-foreground">All time</div>
+          <div className="mt-1 text-2xl font-semibold tabular-nums">{total.toLocaleString()}</div>
+        </div>
+      </div>
+
 
       {/* Filters */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
