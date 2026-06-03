@@ -50,6 +50,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as AuthenticatedAdminFilmsFilmIdCreditsRouteImport } from './routes/_authenticated/admin/films.$filmId.credits'
+import { Route as AuthenticatedAdminFilmsFilmIdAnalyticsRouteImport } from './routes/_authenticated/admin/films.$filmId.analytics'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -272,6 +273,12 @@ const AuthenticatedAdminFilmsFilmIdCreditsRoute =
     path: '/$filmId/credits',
     getParentRoute: () => AuthenticatedAdminFilmsRoute,
   } as any)
+const AuthenticatedAdminFilmsFilmIdAnalyticsRoute =
+  AuthenticatedAdminFilmsFilmIdAnalyticsRouteImport.update({
+    id: '/$filmId/analytics',
+    path: '/$filmId/analytics',
+    getParentRoute: () => AuthenticatedAdminFilmsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -313,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/admin/films/$filmId/analytics': typeof AuthenticatedAdminFilmsFilmIdAnalyticsRoute
   '/admin/films/$filmId/credits': typeof AuthenticatedAdminFilmsFilmIdCreditsRoute
 }
 export interface FileRoutesByTo {
@@ -354,6 +362,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/admin/films/$filmId/analytics': typeof AuthenticatedAdminFilmsFilmIdAnalyticsRoute
   '/admin/films/$filmId/credits': typeof AuthenticatedAdminFilmsFilmIdCreditsRoute
 }
 export interface FileRoutesById {
@@ -398,6 +407,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/_authenticated/admin/films/$filmId/analytics': typeof AuthenticatedAdminFilmsFilmIdAnalyticsRoute
   '/_authenticated/admin/films/$filmId/credits': typeof AuthenticatedAdminFilmsFilmIdCreditsRoute
 }
 export interface FileRouteTypes {
@@ -442,6 +452,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/admin/films/$filmId/analytics'
     | '/admin/films/$filmId/credits'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/admin/films/$filmId/analytics'
     | '/admin/films/$filmId/credits'
   id:
     | '__root__'
@@ -526,6 +538,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/_authenticated/admin/films/$filmId/analytics'
     | '/_authenticated/admin/films/$filmId/credits'
   fileRoutesById: FileRoutesById
 }
@@ -839,15 +852,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFilmsFilmIdCreditsRouteImport
       parentRoute: typeof AuthenticatedAdminFilmsRoute
     }
+    '/_authenticated/admin/films/$filmId/analytics': {
+      id: '/_authenticated/admin/films/$filmId/analytics'
+      path: '/$filmId/analytics'
+      fullPath: '/admin/films/$filmId/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminFilmsFilmIdAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminFilmsRoute
+    }
   }
 }
 
 interface AuthenticatedAdminFilmsRouteChildren {
+  AuthenticatedAdminFilmsFilmIdAnalyticsRoute: typeof AuthenticatedAdminFilmsFilmIdAnalyticsRoute
   AuthenticatedAdminFilmsFilmIdCreditsRoute: typeof AuthenticatedAdminFilmsFilmIdCreditsRoute
 }
 
 const AuthenticatedAdminFilmsRouteChildren: AuthenticatedAdminFilmsRouteChildren =
   {
+    AuthenticatedAdminFilmsFilmIdAnalyticsRoute:
+      AuthenticatedAdminFilmsFilmIdAnalyticsRoute,
     AuthenticatedAdminFilmsFilmIdCreditsRoute:
       AuthenticatedAdminFilmsFilmIdCreditsRoute,
   }
