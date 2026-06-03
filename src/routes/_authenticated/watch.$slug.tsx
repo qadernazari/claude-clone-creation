@@ -138,7 +138,7 @@ function WatchPage() {
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!ticket || !film.video_url) return;
+    if (!ticket || !videoUrl) return;
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
       if (!v) return;
@@ -175,7 +175,7 @@ function WatchPage() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [ticket, film.video_url]);
+  }, [ticket, videoUrl]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
@@ -202,7 +202,7 @@ function WatchPage() {
     aboutFilm: fa ? "درباره فیلم" : "About the film",
   };
 
-  const showPlayer = !isLoading && !!ticket && !!film.video_url;
+  const showPlayer = !isLoading && !!ticket && !!videoUrl;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
@@ -273,14 +273,14 @@ function WatchPage() {
                 {t.buyOne}
               </Link>
             </div>
-          ) : !film.video_url ? (
+          ) : !videoUrl ? (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-cream/70">
               {t.missing}
             </div>
           ) : (
             <video
               ref={videoRef}
-              src={film.video_url}
+              src={videoUrl}
               poster={film.cover_url || undefined}
               controls
               autoPlay
