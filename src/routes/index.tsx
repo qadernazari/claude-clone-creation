@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useLocale } from "../lib/i18n";
 import { supabase } from "../integrations/supabase/client";
+import { Logo } from "../components/logo";
+import { WelcomeSplash } from "../components/welcome-splash";
+import { FilmsRow } from "../components/films-row";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -85,11 +88,13 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
+      <WelcomeSplash />
+
       {/* Header */}
       <header className="hairline sticky top-0 z-30 border-b bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <a href="/" className="font-display text-xl tracking-[0.3em] text-cream-bright">
-            IRAN
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <a href="/" className="inline-flex items-center" aria-label="IRAN — home">
+            <Logo size={44} />
           </a>
           <nav className="hidden gap-8 text-sm text-cream/70 md:flex">
             <a href="/" className="hover:text-cream">
