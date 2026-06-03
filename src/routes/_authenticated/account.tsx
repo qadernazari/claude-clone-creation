@@ -106,6 +106,47 @@ function AccountPage() {
   const [name, setName] = useState("");
   useEffect(() => { if (profile?.full_name) setName(profile.full_name); }, [profile?.full_name]);
 
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwInfo, setPwInfo] = useState<string | null>(null);
+
+  const changePassword = useMutation({
+    mutationFn: async (password: string) => {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      setNewPassword("");
+      setConfirmPassword("");
+      setPwError(null);
+      setPwInfo(fa ? "رمز عبور به‌روزرسانی شد" : "Password updated");
+    },
+    onError: (e: Error) => {
+      setPwInfo(null);
+      setPwError(e.message);
+    },
+  });
+
+  const sendReset = useMutation({
+    mutationFn: async () => {
+      const email = profile?.email ?? user?.email;
+      if (!email) throw new Error("No email on file");
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      setPwError(null);
+      setPwInfo(fa ? "ایمیل بازنشانی ارسال شد. صندوق ورودی خود را بررسی کنید." : "Reset email sent. Check your inbox.");
+    },
+    onError: (e: Error) => {
+      setPwInfo(null);
+      setPwError(e.message);
+    },
+  });
+
   const saveProfile = useMutation({
     mutationFn: async (vars: { full_name: string; locale: string }) => {
       if (!user) throw new Error("Not signed in");
