@@ -14,8 +14,10 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FilmsSlugRouteImport } from './routes/films.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedWatchSlugRouteImport } from './routes/_authenticated/watch.$slug'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -44,6 +46,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
+  id: '/my-tickets',
+  path: '/my-tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -53,6 +60,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedWatchSlugRoute = AuthenticatedWatchSlugRouteImport.update({
+  id: '/watch/$slug',
+  path: '/watch/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminFilmsRoute = AuthenticatedAdminFilmsRouteImport.update({
   id: '/films',
@@ -76,20 +88,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRoute
+  '/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRoute
+  '/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -99,10 +115,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/films/$slug': typeof FilmsSlugRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRoute
+  '/_authenticated/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -112,20 +130,24 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/my-tickets'
     | '/checkout/return'
     | '/films/$slug'
     | '/admin/categories'
     | '/admin/films'
+    | '/watch/$slug'
     | '/admin/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/my-tickets'
     | '/checkout/return'
     | '/films/$slug'
     | '/admin/categories'
     | '/admin/films'
+    | '/watch/$slug'
     | '/admin'
     | '/api/public/payments/webhook'
   id:
@@ -134,10 +156,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/_authenticated/my-tickets'
     | '/checkout/return'
     | '/films/$slug'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/films'
+    | '/_authenticated/watch/$slug'
     | '/_authenticated/admin/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -188,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/my-tickets': {
+      id: '/_authenticated/my-tickets'
+      path: '/my-tickets'
+      fullPath: '/my-tickets'
+      preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -201,6 +232,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/watch/$slug': {
+      id: '/_authenticated/watch/$slug'
+      path: '/watch/$slug'
+      fullPath: '/watch/$slug'
+      preLoaderRoute: typeof AuthenticatedWatchSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/films': {
       id: '/_authenticated/admin/films'
@@ -246,10 +284,14 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
+  AuthenticatedWatchSlugRoute: typeof AuthenticatedWatchSlugRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
+  AuthenticatedWatchSlugRoute: AuthenticatedWatchSlugRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

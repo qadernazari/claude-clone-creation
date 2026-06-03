@@ -49,6 +49,13 @@ export function AuthMenu() {
       {open && (
         <div className="absolute end-0 mt-2 w-56 rounded-md border border-cream/15 bg-bg-1 p-1 shadow-lg z-50">
           <div className="px-3 py-2 text-xs text-cream/60 truncate">{user.email}</div>
+          <Link
+            to="/my-tickets"
+            onClick={() => setOpen(false)}
+            className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
+          >
+            {fa ? "بلیط‌های من" : "My tickets"}
+          </Link>
           <button
             type="button"
             onClick={signOut}
@@ -58,6 +65,7 @@ export function AuthMenu() {
           </button>
         </div>
       )}
+
     </div>
   );
 }
