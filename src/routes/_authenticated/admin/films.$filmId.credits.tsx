@@ -123,6 +123,49 @@ function CreditsPage() {
     onError: (e) => toast.error(e.message),
   });
 
+  const reorder = useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      await Promise.all(
+        updates.map((u) =>
+          supabase.from("film_credits").update({ sort_order: u.sort_order }).eq("id", u.id),
+        ),
+      );
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      qc.invalidateQueries({ queryKey: ["admin", "credits", filmId] });
+    },
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function handleDragEnd(type: string, e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const current = credits.filter((c) => c.credit_type === type);
+    const oldIndex = current.findIndex((c) => c.id === active.id);
+    const newIndex = current.findIndex((c) => c.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(current, oldIndex, newIndex);
+    const updates = reordered.map((c, i) => ({ id: c.id, sort_order: i }));
+
+    // Optimistic cache update
+    qc.setQueryData<Credit[]>(["admin", "credits", filmId], (prev) => {
+      if (!prev) return prev;
+      const others = prev.filter((c) => c.credit_type !== type);
+      const next = reordered.map((c, i) => ({ ...c, sort_order: i }));
+      return [...others, ...next].sort(
+        (a, b) =>
+          a.credit_type.localeCompare(b.credit_type) || a.sort_order - b.sort_order,
+      );
+    });
+
+    reorder.mutate(updates);
+  }
+
   const grouped = CREDIT_TYPES.map((t) => ({
     type: t,
     items: credits.filter((c) => c.credit_type === t),
@@ -170,47 +213,37 @@ function CreditsPage() {
         {grouped.map(({ type, items }) =>
           items.length === 0 ? null : (
             <section key={type} className="rounded-lg border border-border overflow-hidden">
-              <header className="px-4 py-2.5 bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
-                {type}
+              <header className="px-4 py-2.5 bg-card/60 text-xs uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                <span>{type}</span>
+                <span className="text-[10px] normal-case tracking-normal text-muted-foreground/70">
+                  Drag the handle to reorder
+                </span>
               </header>
-              <table className="w-full text-sm">
-                <tbody className="divide-y divide-border">
-                  {items.map((c) => (
-                    <tr key={c.id} className="hover:bg-accent/40 cursor-pointer" onClick={() => setEditing(c)}>
-                      <td className="px-4 py-3 w-8 text-muted-foreground">
-                        <GripVertical className="h-4 w-4" />
-                      </td>
-                      <td className="px-4 py-3 w-48">
-                        <div className="text-foreground">{c.label_en ?? "—"}</div>
-                        {c.label_fa && <div className="text-xs text-muted-foreground" dir="rtl">{c.label_fa}</div>}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="text-foreground">{c.value_en ?? "—"}</div>
-                        {c.value_fa && <div className="text-xs text-muted-foreground" dir="rtl">{c.value_fa}</div>}
-                      </td>
-                      <td className="px-4 py-3 w-16 text-right tabular-nums text-xs text-muted-foreground">
-                        {c.sort_order}
-                      </td>
-                      <td className="px-4 py-3 w-10 text-right">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (confirm("Remove this credit?")) remove.mutate(c.id);
-                          }}
-                          className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(type, e)}
+              >
+                <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+                  <ul className="divide-y divide-border">
+                    {items.map((c) => (
+                      <SortableRow
+                        key={c.id}
+                        credit={c}
+                        onEdit={() => setEditing(c)}
+                        onRemove={() => {
+                          if (confirm("Remove this credit?")) remove.mutate(c.id);
+                        }}
+                      />
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
             </section>
           )
         )}
       </div>
+
 
       {editing && (
         <CreditEditor
