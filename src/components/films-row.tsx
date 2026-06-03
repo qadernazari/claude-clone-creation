@@ -78,29 +78,33 @@ export function FilmsRow() {
 
   return (
     <section className="hairline border-t">
-      <div className="mx-auto max-w-6xl px-6 py-24">
-        <div className="mb-8 flex items-end justify-between gap-4">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-28">
+        <div className="mb-10 flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-3xl text-cream-bright md:text-4xl">{title}</h2>
-            <p className="mt-2 text-sm text-cream/60">{subtitle}</p>
+            <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.35em] text-amber">
+              {locale === "fa" ? "آثار" : "Originals"}
+            </span>
+            <h2 className="font-display text-3xl leading-[0.95] text-cream-bright md:text-5xl">{title}</h2>
+            <p className="mt-3 max-w-md text-sm text-cream/55">{subtitle}</p>
           </div>
           <a
             href="/browse"
-            className="shrink-0 text-xs uppercase tracking-widest text-cream/70 underline-offset-4 hover:text-cream hover:underline"
+            className="group hidden shrink-0 items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-cream/60 transition-colors hover:text-amber md:inline-flex"
           >
-            {locale === "fa" ? "همه‌ی آثار ←" : "Browse all →"}
+            {locale === "fa" ? "همه‌ی آثار" : "Browse all"}
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </a>
         </div>
 
         {visibleCategories.length > 0 ? (
-          <div className="mb-10 flex flex-wrap gap-2">
+          <div className="mb-10 flex flex-wrap gap-1.5">
             <button
               type="button"
               onClick={() => setActive(null)}
-              className={`hairline rounded-full border px-4 py-1.5 text-xs uppercase tracking-widest transition-colors ${
+              className={`rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
                 active === null
-                  ? "bg-cream text-ink"
-                  : "text-cream/70 hover:text-cream"
+                  ? "border-cream bg-cream text-ink"
+                  : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
               }`}
             >
               {locale === "fa" ? "همه" : "All"}
@@ -110,10 +114,10 @@ export function FilmsRow() {
                 key={c.id}
                 type="button"
                 onClick={() => setActive(c.id)}
-                className={`hairline rounded-full border px-4 py-1.5 text-xs uppercase tracking-widest transition-colors ${
+                className={`rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
                   active === c.id
-                    ? "bg-cream text-ink"
-                    : "text-cream/70 hover:text-cream"
+                    ? "border-cream bg-cream text-ink"
+                    : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
                 }`}
               >
                 {t({ en: c.name_en, fa: c.name_fa || c.name_en })}
@@ -123,28 +127,24 @@ export function FilmsRow() {
         ) : null}
 
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="aspect-[2/3] animate-pulse rounded-xl bg-bg-1"
-                aria-hidden
-              />
+              <div key={i} className="aspect-[2/3] animate-pulse rounded-lg bg-bg-1" aria-hidden />
             ))}
           </div>
         ) : !filtered || filtered.length === 0 ? (
-          <div className="hairline rounded-2xl border bg-bg-1 px-8 py-16 text-center">
+          <div className="rounded-2xl border border-cream/10 bg-bg-1/40 px-8 py-20 text-center">
             <p className="font-display text-xl text-cream-bright">
               {locale === "fa" ? "به‌زودی، اولین آثار" : "First films, coming soon"}
             </p>
-            <p className="mt-2 text-sm text-cream/60">
+            <p className="mx-auto mt-2 max-w-sm text-sm text-cream/55">
               {locale === "fa"
                 ? "با ایمیل خود مشترک شوید تا لحظه‌ی انتشار باخبر شوید."
                 : "Subscribe with your email to be notified when the first originals premiere."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-5 md:gap-y-10 lg:grid-cols-4">
             {filtered.map((film) => {
               const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
               const director =
@@ -154,25 +154,28 @@ export function FilmsRow() {
                 : film.poster_gradient || fallbackGradient(film.id);
               return (
                 <a key={film.id} href={`/films/${film.slug}`} className="group block">
-                  <div
-                    className="hairline relative aspect-[2/3] overflow-hidden rounded-xl border transition-transform group-hover:-translate-y-1"
-                    style={{ background: bg }}
-                  >
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-bg-1">
+                    <div className="cine-img absolute inset-0" style={{ background: bg }} />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/85 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                     {film.category ? (
-                      <span className="absolute left-3 top-3 rounded-full bg-bg-0/70 px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream/80 backdrop-blur rtl:left-auto rtl:right-3">
+                      <span className="absolute left-3 top-3 rounded-full bg-bg-0/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-cream/85 backdrop-blur-md rtl:left-auto rtl:right-3">
                         {film.category}
                       </span>
                     ) : null}
+                    <span className="pointer-events-none absolute bottom-3 right-3 translate-y-2 rounded-full bg-amber px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-ink opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 rtl:right-auto rtl:left-3">
+                      {locale === "fa" ? "تماشا" : "Watch"}
+                    </span>
                   </div>
-                  <div className="mt-3 px-1">
-                    <h3 className="font-display text-base text-cream-bright">{ftitle}</h3>
-                    <p className="mt-1 text-xs text-cream/55">
+                  <div className="mt-4 px-0.5">
+                    <h3 className="font-display text-[15px] leading-tight text-cream-bright transition-colors group-hover:text-amber-bright">
+                      {ftitle}
+                    </h3>
+                    <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/45">
                       {director}
                       {film.duration_min ? (
                         <>
                           {" · "}
-                          {num(film.duration_min)}{" "}
-                          {locale === "fa" ? "دقیقه" : "min"}
+                          {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
                         </>
                       ) : null}
                       {film.year ? <> {" · "} {num(film.year)} </> : null}

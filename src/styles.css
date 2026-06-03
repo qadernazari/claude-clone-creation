@@ -95,8 +95,8 @@
   --input: var(--line);
   --ring: var(--amber);
 
-  --font-display: "Syne", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Plus Jakarta Sans", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo Black", "Archivo", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Hind", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-fa: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-editorial: "Fraunces", "Vazirmatn", ui-serif, Georgia, serif;
 }
@@ -115,6 +115,7 @@
   html {
     background-color: var(--bg-0);
     color: var(--cream);
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -123,14 +124,30 @@
     font-family: var(--font-body);
     font-feature-settings: "ss01", "ss02", "kern";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    font-weight: 400;
+    letter-spacing: 0.005em;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     color: var(--cream-bright);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    font-weight: 400; /* Archivo Black ships at 900; let the font carry weight */
   }
+
+  /* Smooth, premium scroll */
+  html { scroll-behavior: smooth; }
+
+  /* Custom thin scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg-0); }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.96 0.005 80 / 0.12);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: oklch(0.96 0.005 80 / 0.22); }
 
   a.inline {
     color: var(--amber);
@@ -143,6 +160,22 @@
     background: var(--amber);
     color: var(--ink-on-cream);
   }
+
+  /* Reusable cinematic image hover */
+  .cine-img {
+    transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), filter 600ms ease;
+  }
+  .group:hover .cine-img {
+    transform: scale(1.06);
+    filter: brightness(1.05);
+  }
+
+  /* Soft fade-up entrance */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 }
 
 @utility hairline {

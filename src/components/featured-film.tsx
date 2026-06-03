@@ -56,25 +56,31 @@ export function FeaturedFilm() {
 
   return (
     <section className="hairline border-t">
-      <div className="mx-auto max-w-6xl px-6 py-20">
-        <p className="mb-6 text-xs uppercase tracking-[0.35em] text-amber">
-          {locale === "fa" ? "اثر برگزیده" : "Now featured"}
-        </p>
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-28">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-amber">
+            {locale === "fa" ? "اثر برگزیده" : "Now featured"}
+          </span>
+          <span className="hidden h-px flex-1 bg-cream/10 md:block" />
+        </div>
         <a
           href={`/films/${data.slug}`}
-          className="hairline group relative block overflow-hidden rounded-2xl border"
+          className="group relative block overflow-hidden rounded-xl"
         >
-          <div
-            className="aspect-[21/9] w-full transition-transform duration-700 group-hover:scale-[1.02]"
-            style={{ background: bg }}
-            aria-hidden
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/60 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
-            <h2 className="font-display text-3xl text-cream-bright md:text-5xl">
+          <div className="relative aspect-[21/9] w-full overflow-hidden bg-bg-1">
+            <div
+              className="cine-img absolute inset-0"
+              style={{ background: bg }}
+              aria-hidden
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/40 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg-0/70 via-transparent to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-6 md:p-12">
+            <h2 className="font-display text-4xl leading-[0.95] text-cream-bright md:text-7xl">
               {title}
             </h2>
-            <p className="mt-2 text-sm text-cream/70">
+            <p className="mt-3 text-[11px] uppercase tracking-[0.25em] text-cream/65">
               {director}
               {data.duration_min ? (
                 <>
@@ -85,11 +91,12 @@ export function FeaturedFilm() {
               {data.year ? <> {" · "} {num(data.year)}</> : null}
             </p>
             {synopsis ? (
-              <p className="mt-4 max-w-2xl text-sm text-cream/65 md:text-base line-clamp-2">
+              <p className="mt-5 max-w-2xl text-sm text-cream/70 md:text-base line-clamp-2">
                 {synopsis}
               </p>
             ) : null}
-            <span className="mt-6 inline-flex items-center rounded-full bg-cream px-5 py-2 text-sm font-medium text-ink transition-colors group-hover:bg-cream-bright">
+            <span className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-ink transition-all duration-300 group-hover:bg-amber-bright group-hover:gap-3">
+              <span>▶</span>
               {locale === "fa" ? "تماشای فیلم" : "Watch now"}
             </span>
           </div>
