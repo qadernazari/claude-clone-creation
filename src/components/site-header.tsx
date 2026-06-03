@@ -5,37 +5,32 @@ import { AuthMenu } from "./auth-menu";
 
 function LanguageToggle() {
   const { locale, setLocale } = useLocale();
+  const isEn = locale === "en";
   return (
     <div
-      className="relative inline-flex items-center overflow-hidden rounded-full border border-cream/10 bg-bg-1/40 p-0.5 text-[10px] uppercase tracking-widest backdrop-blur"
       role="group"
       aria-label="Language"
+      className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.18em] text-cream/45"
     >
-      {/* Sliding active indicator — pinned to the logical start, which is
-          always where the active button sits (EN in LTR, FA in RTL). */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0.5 bottom-0.5 start-0.5 w-[calc(50%-4px)] rounded-full bg-amber shadow-sm transition-opacity duration-500"
-      />
-
       <button
         type="button"
         onClick={() => setLocale("en")}
-        className={`relative z-10 rounded-full px-2.5 py-1 font-semibold transition-colors duration-300 ${
-          locale === "en" ? "text-ink" : "text-cream/50 hover:text-cream"
+        aria-pressed={isEn}
+        className={`rounded-sm px-1 py-0.5 transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          isEn ? "text-amber" : "hover:text-cream/85"
         }`}
-        aria-pressed={locale === "en"}
       >
         EN
       </button>
+      <span aria-hidden="true" className="h-3 w-px bg-cream/15" />
       <button
         type="button"
         onClick={() => setLocale("fa")}
-        className={`relative z-10 rounded-full px-2.5 py-1 font-semibold transition-colors duration-300 ${
-          locale === "fa" ? "text-ink" : "text-cream/50 hover:text-cream"
-        }`}
-        aria-pressed={locale === "fa"}
+        aria-pressed={!isEn}
         lang="fa"
+        className={`rounded-sm px-1 py-0.5 font-fa text-[13px] leading-none tracking-normal transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          !isEn ? "text-amber" : "hover:text-cream/85"
+        }`}
       >
         فا
       </button>
