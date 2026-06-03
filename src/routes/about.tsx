@@ -53,9 +53,15 @@ function AboutPage() {
             <Link to="/" className="hover:text-cream">
               {fa ? "خانه" : "Home"}
             </Link>
+            <a href="/browse" className="hover:text-cream">
+              {fa ? "آثار" : "Browse"}
+            </a>
             <Link to="/about" className="text-cream">
               {fa ? "درباره" : "About"}
             </Link>
+            <a href="/contact" className="hover:text-cream">
+              {fa ? "تماس" : "Contact"}
+            </a>
           </nav>
           <AuthMenu />
         </div>
