@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { LocaleProvider } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { captureMemberGeo } from "../lib/member-geo.functions";
 
 function NotFoundComponent() {
   return (
@@ -148,9 +149,14 @@ function AuthInvalidator() {
   const router = useRouter();
   const queryClient = useQueryClient();
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    // Best-effort: record current IP/geo on first mount when signed in.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) captureMemberGeo().catch(() => {});
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       router.invalidate();
       queryClient.invalidateQueries();
+      if (session?.user) captureMemberGeo().catch(() => {});
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);

@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Users, Eye, EyeOff, X } from "lucide-react";
+import { Plus, Pencil, BarChart3, Eye, EyeOff, X } from "lucide-react";
+import { BilingualField } from "@/components/admin/bilingual-field";
+import { TwoClickDelete } from "@/components/admin/two-click-delete";
+import { capitalize } from "@/lib/cms";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
@@ -23,41 +26,49 @@ type Film = {
   duration_min: number | null;
   price_cents: number;
   price_toman: number;
+  ticket_hours: number;
+  access_mode: string;
   visibility: string;
   sort_order: number;
   cover_url: string | null;
+  poster_gradient: string | null;
   video_url: string | null;
   preview_url: string | null;
 };
 
+type CreditDraft = {
+  id?: string;
+  enabled: boolean;
+  credit_type: string;
+  label_en?: string | null;
+  value_en: string;
+  value_fa: string;
+  sort_order: number;
+};
+
 type FilmDraft = Omit<Film, "id"> & { id?: string };
 
-const empty: FilmDraft = {
-  slug: "",
-  title_en: "",
-  title_fa: "",
-  director_en: "",
-  director_fa: "",
-  synopsis_en: "",
-  synopsis_fa: "",
-  category: "",
-  year: null,
-  duration_min: null,
-  price_cents: 499,
-  price_toman: 0,
-  visibility: "draft",
-  sort_order: 0,
-  cover_url: "",
-  video_url: "",
-  preview_url: "",
+const GRADIENTS = [
+  "linear-gradient(155deg,#3d2c19,#0e0a06 72%)",
+  "linear-gradient(155deg,#4a3318,#120c06 72%)",
+  "linear-gradient(155deg,#312316,#0c0906 72%)",
+  "linear-gradient(155deg,#44301c,#100a06 72%)",
+  "linear-gradient(155deg,#2b2117,#0b0806 72%)",
+  "linear-gradient(155deg,#4a3920,#0e0a06 72%)",
+];
+
+const EMPTY: FilmDraft = {
+  slug: "", title_en: "", title_fa: "", director_en: "", director_fa: "",
+  synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
+  price_cents: 499, price_toman: 120000, ticket_hours: 48, access_mode: "inherit",
+  visibility: "draft", sort_order: 0, cover_url: "", poster_gradient: GRADIENTS[0],
+  video_url: "", preview_url: "",
 };
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films")
-    .select("*")
-    .order("sort_order")
-    .order("created_at", { ascending: false });
+    .from("films").select("*")
+    .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
 }
@@ -71,71 +82,25 @@ function FilmsAdminPage() {
   const qc = useQueryClient();
   const { data: films = [], isLoading } = useQuery({ queryKey: ["admin", "films"], queryFn: listFilms });
   const { data: categories = [] } = useQuery({ queryKey: ["admin", "category-ids"], queryFn: listCategoryIds });
-
   const [editing, setEditing] = useState<FilmDraft | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-
-  const save = useMutation({
-    mutationFn: async (draft: FilmDraft) => {
-      const payload = {
-        slug: draft.slug.trim(),
-        title_en: draft.title_en.trim(),
-        title_fa: draft.title_fa?.trim() || null,
-        director_en: draft.director_en?.trim() || null,
-        director_fa: draft.director_fa?.trim() || null,
-        synopsis_en: draft.synopsis_en?.trim() || null,
-        synopsis_fa: draft.synopsis_fa?.trim() || null,
-        category: draft.category || null,
-        year: draft.year ?? null,
-        duration_min: draft.duration_min ?? null,
-        price_cents: Number(draft.price_cents) || 0,
-        price_toman: Number(draft.price_toman) || 0,
-        visibility: draft.visibility,
-        sort_order: Number(draft.sort_order) || 0,
-        cover_url: draft.cover_url?.trim() || null,
-        video_url: draft.video_url?.trim() || null,
-        preview_url: draft.preview_url?.trim() || null,
-      };
-      if (draft.id) {
-        const { error } = await supabase.from("films").update(payload).eq("id", draft.id);
-        if (error) throw new Error(error.message);
-      } else {
-        const { error } = await supabase.from("films").insert(payload);
-        if (error) throw new Error(error.message);
-      }
-    },
-    onSuccess: () => {
-      toast.success("Film saved");
-      setEditing(null);
-      qc.invalidateQueries({ queryKey: ["admin", "films"] });
-    },
-    onError: (e) => toast.error(e.message),
-  });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("films").delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => {
-      toast.success("Deleted");
-      qc.invalidateQueries({ queryKey: ["admin", "films"] });
-    },
+    onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["admin", "films"] }); },
     onError: (e) => toast.error(e.message),
   });
 
   const bulkVisibility = useMutation({
     mutationFn: async (args: { ids: string[]; visibility: "published" | "draft" }) => {
-      const { error } = await supabase
-        .from("films")
-        .update({ visibility: args.visibility })
-        .in("id", args.ids);
+      const { error } = await supabase.from("films").update({ visibility: args.visibility }).in("id", args.ids);
       if (error) throw new Error(error.message);
     },
     onSuccess: (_, vars) => {
-      toast.success(
-        `${vars.ids.length} film${vars.ids.length === 1 ? "" : "s"} ${vars.visibility === "published" ? "published" : "unpublished"}`,
-      );
+      toast.success(`${vars.ids.length} film${vars.ids.length === 1 ? "" : "s"} ${vars.visibility === "published" ? "published" : "unpublished"}`);
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ["admin", "films"] });
     },
@@ -147,11 +112,7 @@ function FilmsAdminPage() {
       const { error } = await supabase.from("films").delete().in("id", ids);
       if (error) throw new Error(error.message);
     },
-    onSuccess: (_, ids) => {
-      toast.success(`${ids.length} film${ids.length === 1 ? "" : "s"} deleted`);
-      setSelected(new Set());
-      qc.invalidateQueries({ queryKey: ["admin", "films"] });
-    },
+    onSuccess: (_, ids) => { toast.success(`${ids.length} deleted`); setSelected(new Set()); qc.invalidateQueries({ queryKey: ["admin", "films"] }); },
     onError: (e) => toast.error(e.message),
   });
 
@@ -160,32 +121,15 @@ function FilmsAdminPage() {
   const someSelected = selected.size > 0 && !allSelected;
   const selectedIds = Array.from(selected);
 
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(allIds));
-  }
-  function toggleOne(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-
   return (
     <div className="p-8 max-w-6xl">
       <header className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Films</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Manage the catalogue.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Add, edit, publish or remove short films.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setEditing({ ...empty })}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3.5 py-2 text-sm font-medium hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" /> New film
+        <button type="button" onClick={() => setEditing({ ...EMPTY })} className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3.5 py-2 text-sm font-medium hover:bg-primary/90">
+          <Plus className="h-4 w-4" /> Add Film
         </button>
       </header>
 
@@ -194,260 +138,401 @@ function FilmsAdminPage() {
           <thead className="bg-card/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3 w-10">
-                <input
-                  type="checkbox"
-                  aria-label="Select all"
-                  checked={allSelected}
+                <input type="checkbox" aria-label="Select all" checked={allSelected}
                   ref={(el) => { if (el) el.indeterminate = someSelected; }}
-                  onChange={toggleAll}
-                  className="h-4 w-4 rounded border-border accent-primary"
-                />
+                  onChange={() => setSelected(allSelected ? new Set() : new Set(allIds))}
+                  className="h-4 w-4 rounded border-border accent-primary" />
               </th>
-              <th className="px-4 py-3">Title</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3">Director</th>
-              <th className="px-4 py-3 w-24">Price</th>
-              <th className="px-4 py-3 w-28">Visibility</th>
-              <th className="px-4 py-3 w-28"></th>
+              <th className="px-4 py-3">Film</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3 w-44">Price (USD / تومان)</th>
+              <th className="px-4 py-3 w-28">Status</th>
+              <th className="px-4 py-3 w-32"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {isLoading && (
-              <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>
-            )}
+            {isLoading && <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
             {!isLoading && films.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                No films yet. Click <span className="text-foreground">New film</span> to add one.
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                No films yet. Click <span className="text-foreground">Add Film</span> to create one.
               </td></tr>
             )}
             {films.map((f) => {
               const isChecked = selected.has(f.id);
               return (
-              <tr key={f.id} className={isChecked ? "bg-primary/5" : undefined}>
-                <td className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    aria-label={`Select ${f.title_en}`}
-                    checked={isChecked}
-                    onChange={() => toggleOne(f.id)}
-                    className="h-4 w-4 rounded border-border accent-primary"
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="font-medium">{f.title_en}</div>
-                  {f.title_fa && <div className="text-xs text-muted-foreground" dir="rtl">{f.title_fa}</div>}
-                </td>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{f.slug}</td>
-                <td className="px-4 py-3 text-muted-foreground">{f.director_en ?? "—"}</td>
-                <td className="px-4 py-3 tabular-nums">${(f.price_cents / 100).toFixed(2)}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${
-                    f.visibility === "published" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
-                  }`}>{f.visibility}</span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="inline-flex gap-1">
-                    <Link
-                      to="/admin/films/$filmId/credits"
-                      params={{ filmId: f.id }}
-                      title="Edit credits"
-                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Users className="h-4 w-4" />
-                    </Link>
-                    <button type="button" onClick={() => setEditing(f)}
-                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button type="button"
-                      onClick={() => { if (confirm(`Delete "${f.title_en}"?`)) remove.mutate(f.id); }}
-                      className="p-1.5 text-muted-foreground hover:text-destructive transition-colors">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );})}
+                <tr key={f.id} className={isChecked ? "bg-primary/5" : undefined}>
+                  <td className="px-4 py-3">
+                    <input type="checkbox" aria-label={`Select ${f.title_en}`} checked={isChecked}
+                      onChange={() => {
+                        const next = new Set(selected);
+                        next.has(f.id) ? next.delete(f.id) : next.add(f.id);
+                        setSelected(next);
+                      }}
+                      className="h-4 w-4 rounded border-border accent-primary" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-7 rounded shrink-0" style={{ background: f.poster_gradient ?? GRADIENTS[0] }} />
+                      <div>
+                        <div className="font-medium">{f.title_en}</div>
+                        {f.title_fa && <div className="text-xs text-muted-foreground" dir="rtl">{f.title_fa}</div>}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{f.category ?? "—"}</td>
+                  <td className="px-4 py-3 tabular-nums text-xs">
+                    ${(f.price_cents / 100).toFixed(2)} <span className="text-muted-foreground">·</span>{" "}
+                    <span dir="rtl">{f.price_toman.toLocaleString()} تومان</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${
+                      f.visibility === "published" ? "bg-emerald-500/15 text-emerald-400" :
+                      f.visibility === "unlisted" ? "bg-amber-500/15 text-amber-400" :
+                      "bg-muted text-muted-foreground"
+                    }`}>{capitalize(f.visibility)}</span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="inline-flex gap-1">
+                      <Link to="/admin/films/$filmId/analytics" params={{ filmId: f.id }} title="Analytics"
+                        className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                        <BarChart3 className="h-4 w-4" />
+                      </Link>
+                      <button type="button" onClick={() => setEditing(f)}
+                        className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <TwoClickDelete iconOnly onConfirm={() => remove.mutate(f.id)} />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
       {selected.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-2xl">
-          <span className="px-2 text-sm text-muted-foreground">
-            {selected.size} selected
-          </span>
+          <span className="px-2 text-sm text-muted-foreground">{selected.size} selected</span>
           <div className="h-5 w-px bg-border" />
-          <button
-            type="button"
-            onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "published" })}
-            disabled={bulkVisibility.isPending}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
-          >
+          <button type="button" onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "published" })}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent">
             <Eye className="h-4 w-4" /> Publish
           </button>
-          <button
-            type="button"
-            onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "draft" })}
-            disabled={bulkVisibility.isPending}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
-          >
+          <button type="button" onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "draft" })}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent">
             <EyeOff className="h-4 w-4" /> Unpublish
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (confirm(`Delete ${selected.size} film(s)? This cannot be undone.`)) {
-                bulkDelete.mutate(selectedIds);
-              }
-            }}
-            disabled={bulkDelete.isPending}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
-          >
-            <Trash2 className="h-4 w-4" /> Delete
-          </button>
-          <div className="h-5 w-px bg-border" />
-          <button
-            type="button"
-            onClick={() => setSelected(new Set())}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent"
-            aria-label="Clear selection"
-          >
+          <TwoClickDelete onConfirm={() => bulkDelete.mutate(selectedIds)} label={`Delete ${selected.size}`} />
+          <button type="button" onClick={() => setSelected(new Set())} className="inline-flex items-center gap-1.5 rounded-full p-1.5 text-sm text-muted-foreground hover:bg-accent" aria-label="Clear">
             <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
-
       {editing && (
-        <FilmEditor
+        <FilmEditorModal
           draft={editing}
           categories={categories}
           onCancel={() => setEditing(null)}
-          onSave={(d) => save.mutate(d)}
-          saving={save.isPending}
+          onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); }}
         />
       )}
     </div>
   );
 }
 
-function FilmEditor({
-  draft, categories, onCancel, onSave, saving,
+const inp = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
+
+const CREDIT_TYPES: { value: string; label: string }[] = [
+  { value: "cast", label: "Cast" },
+  { value: "producer", label: "Producer" },
+  { value: "writer", label: "Writer" },
+  { value: "cinematographer", label: "Cinematographer" },
+  { value: "composer", label: "Music Composer" },
+  { value: "editor", label: "Editor" },
+  { value: "sound", label: "Sound Designer" },
+  { value: "custom", label: "Other credit…" },
+];
+
+function FilmEditorModal({
+  draft, categories, onCancel, onSaved,
 }: {
   draft: FilmDraft;
   categories: string[];
   onCancel: () => void;
-  onSave: (d: FilmDraft) => void;
-  saving: boolean;
+  onSaved: () => void;
 }) {
   const [d, setD] = useState<FilmDraft>(draft);
+  const [credits, setCredits] = useState<CreditDraft[]>([]);
+  const [saving, setSaving] = useState(false);
   const set = <K extends keyof FilmDraft>(k: K, v: FilmDraft[K]) => setD((p) => ({ ...p, [k]: v }));
+
+  useEffect(() => {
+    if (!d.id) { setCredits([]); return; }
+    supabase.from("film_credits").select("id, credit_type, label_en, value_en, value_fa, sort_order")
+      .eq("film_id", d.id).order("sort_order")
+      .then(({ data }) => {
+        setCredits((data ?? []).map((c) => ({
+          id: c.id, enabled: true, credit_type: c.credit_type,
+          label_en: c.label_en, value_en: c.value_en ?? "", value_fa: c.value_fa ?? "",
+          sort_order: c.sort_order,
+        })));
+      });
+  }, [d.id]);
+
+  const pricingVisible = d.access_mode !== "free";
+
+  async function save() {
+    setSaving(true);
+    try {
+      const payload = {
+        slug: d.slug.trim(),
+        title_en: d.title_en.trim(),
+        title_fa: d.title_fa?.trim() || null,
+        director_en: d.director_en?.trim() || null,
+        director_fa: d.director_fa?.trim() || null,
+        synopsis_en: d.synopsis_en?.trim() || null,
+        synopsis_fa: d.synopsis_fa?.trim() || null,
+        category: d.category || null,
+        year: d.year ?? null,
+        duration_min: d.duration_min ?? null,
+        price_cents: Number(d.price_cents) || 0,
+        price_toman: Number(d.price_toman) || 0,
+        ticket_hours: Number(d.ticket_hours) || 48,
+        access_mode: d.access_mode,
+        visibility: d.visibility,
+        sort_order: Number(d.sort_order) || 0,
+        cover_url: d.cover_url?.trim() || null,
+        poster_gradient: d.poster_gradient || null,
+        video_url: d.video_url?.trim() || null,
+        preview_url: d.preview_url?.trim() || null,
+      };
+
+      let filmId = d.id;
+      if (filmId) {
+        const { error } = await supabase.from("films").update(payload).eq("id", filmId);
+        if (error) throw new Error(error.message);
+      } else {
+        const { data, error } = await supabase.from("films").insert(payload).select("id").single();
+        if (error) throw new Error(error.message);
+        filmId = data.id;
+      }
+
+      // Replace credits set
+      await supabase.from("film_credits").delete().eq("film_id", filmId);
+      const enabled = credits.filter((c) => c.enabled && (c.value_en.trim() || c.value_fa.trim()));
+      if (enabled.length) {
+        const { error } = await supabase.from("film_credits").insert(
+          enabled.map((c, i) => ({
+            film_id: filmId!,
+            credit_type: c.credit_type,
+            label_en: c.label_en ?? null,
+            value_en: c.value_en.trim() || null,
+            value_fa: c.value_fa.trim() || null,
+            sort_order: i,
+          }))
+        );
+        if (error) throw new Error(error.message);
+      }
+
+      toast.success("Film saved");
+      onSaved();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto">
       <div className="w-full max-w-3xl my-8 rounded-lg border border-border bg-background shadow-2xl">
-        <header className="px-6 py-4 border-b border-border flex items-center justify-between">
+        <header className="px-6 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-background z-10">
           <h2 className="font-semibold">{d.id ? "Edit film" : "New film"}</h2>
           <button type="button" onClick={onCancel} className="text-sm text-muted-foreground hover:text-foreground">Cancel</button>
         </header>
-        <form
-          onSubmit={(e) => { e.preventDefault(); onSave(d); }}
-          className="p-6 space-y-5"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Field label="Slug *">
-              <input required value={d.slug} onChange={(e) => set("slug", e.target.value)}
-                placeholder="e.g. mehrjouis-cow" className={inputCls} />
-            </Field>
-            <Field label="Visibility">
-              <select value={d.visibility} onChange={(e) => set("visibility", e.target.value)} className={inputCls}>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-            </Field>
-            <Field label="Title (EN) *">
-              <input required value={d.title_en} onChange={(e) => set("title_en", e.target.value)} className={inputCls} />
-            </Field>
-            <Field label="عنوان (FA)">
-              <input dir="rtl" value={d.title_fa ?? ""} onChange={(e) => set("title_fa", e.target.value)} className={inputCls} />
-            </Field>
-            <Field label="Director (EN)">
-              <input value={d.director_en ?? ""} onChange={(e) => set("director_en", e.target.value)} className={inputCls} />
-            </Field>
-            <Field label="کارگردان (FA)">
-              <input dir="rtl" value={d.director_fa ?? ""} onChange={(e) => set("director_fa", e.target.value)} className={inputCls} />
-            </Field>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Field label="Synopsis (EN)">
-              <textarea rows={4} value={d.synopsis_en ?? ""} onChange={(e) => set("synopsis_en", e.target.value)} className={inputCls} />
-            </Field>
-            <Field label="خلاصه (FA)">
-              <textarea rows={4} dir="rtl" value={d.synopsis_fa ?? ""} onChange={(e) => set("synopsis_fa", e.target.value)} className={inputCls} />
-            </Field>
-          </div>
+        <div className="p-6 space-y-6">
+          {/* Cover & poster */}
+          <Section title="Cover & poster">
+            <div className="grid grid-cols-[120px_1fr] gap-4">
+              <div className="h-44 w-30 rounded-md shrink-0" style={{ background: d.cover_url ? `url(${d.cover_url}) center/cover` : (d.poster_gradient ?? GRADIENTS[0]) }} />
+              <div>
+                <label className="block mb-3">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Cover image URL (portrait ~2:3)</span>
+                  <input value={d.cover_url ?? ""} onChange={(e) => set("cover_url", e.target.value)} placeholder="https://…" className={inp} />
+                </label>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Or a colour cover</div>
+                <div className="flex gap-2">
+                  {GRADIENTS.map((g) => (
+                    <button key={g} type="button" onClick={() => { set("poster_gradient", g); set("cover_url", ""); }}
+                      className={`h-9 w-9 rounded-md border-2 ${d.poster_gradient === g && !d.cover_url ? "border-primary" : "border-border"}`}
+                      style={{ background: g }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <label className="block mt-4">
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Slug (URL) *</span>
+              <input required value={d.slug} onChange={(e) => set("slug", e.target.value)} placeholder="the-pomegranate-house" className={inp} />
+            </label>
+          </Section>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Field label="Category">
-              <select value={d.category ?? ""} onChange={(e) => set("category", e.target.value || null)} className={inputCls}>
-                <option value="">—</option>
-                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </Field>
-            <Field label="Year">
-              <input type="number" value={d.year ?? ""} onChange={(e) => set("year", e.target.value ? Number(e.target.value) : null)} className={inputCls} />
-            </Field>
-            <Field label="Duration (min)">
-              <input type="number" value={d.duration_min ?? ""} onChange={(e) => set("duration_min", e.target.value ? Number(e.target.value) : null)} className={inputCls} />
-            </Field>
-            <Field label="Sort order">
-              <input type="number" value={d.sort_order} onChange={(e) => set("sort_order", Number(e.target.value))} className={inputCls} />
-            </Field>
-          </div>
+          <Section title="Title">
+            <BilingualField label="Title" value={{ en: d.title_en, fa: d.title_fa ?? "" }} onChange={(v) => { set("title_en", v.en); set("title_fa", v.fa); }} placeholderEn="The Pomegranate House" placeholderFa="خانه‌ی انار" />
+          </Section>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Price (USD cents)">
-              <input type="number" value={d.price_cents} onChange={(e) => set("price_cents", Number(e.target.value))} className={inputCls} />
-            </Field>
-            <Field label="Price (Toman)">
-              <input type="number" value={d.price_toman} onChange={(e) => set("price_toman", Number(e.target.value))} className={inputCls} />
-            </Field>
-          </div>
+          <Section title="Description / Synopsis">
+            <BilingualField label="Synopsis" value={{ en: d.synopsis_en ?? "", fa: d.synopsis_fa ?? "" }} onChange={(v) => { set("synopsis_en", v.en); set("synopsis_fa", v.fa); }} textarea rows={3} />
+          </Section>
 
-          <div className="space-y-3">
-            <Field label="Cover image URL">
-              <input value={d.cover_url ?? ""} onChange={(e) => set("cover_url", e.target.value)} placeholder="https://…" className={inputCls} />
-            </Field>
-            <Field label="Video URL (Cloudflare Stream / HLS)">
-              <input value={d.video_url ?? ""} onChange={(e) => set("video_url", e.target.value)} placeholder="https://…" className={inputCls} />
-            </Field>
-            <Field label="Preview clip URL (optional)">
-              <input value={d.preview_url ?? ""} onChange={(e) => set("preview_url", e.target.value)} placeholder="https://…" className={inputCls} />
-            </Field>
-          </div>
+          <Section title="Details">
+            <BilingualField label="Director" value={{ en: d.director_en ?? "", fa: d.director_fa ?? "" }} onChange={(v) => { set("director_en", v.en); set("director_fa", v.fa); }} />
+            <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <label className="block">
+                <span className="block text-xs font-medium text-muted-foreground mb-1.5">Category</span>
+                <select value={d.category ?? ""} onChange={(e) => set("category", e.target.value || null)} className={inp}>
+                  <option value="">—</option>
+                  {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </label>
+              <label className="block">
+                <span className="block text-xs font-medium text-muted-foreground mb-1.5">Year</span>
+                <input type="number" value={d.year ?? ""} onChange={(e) => set("year", e.target.value ? Number(e.target.value) : null)} className={inp} placeholder="2025" />
+              </label>
+              <label className="block">
+                <span className="block text-xs font-medium text-muted-foreground mb-1.5">Duration (min)</span>
+                <input type="number" value={d.duration_min ?? ""} onChange={(e) => set("duration_min", e.target.value ? Number(e.target.value) : null)} className={inp} placeholder="14" />
+              </label>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Year and duration appear automatically in Persian digits on the Persian site.
+            </p>
+          </Section>
 
-          <footer className="pt-4 border-t border-border flex justify-end gap-2">
-            <button type="button" onClick={onCancel} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-accent">Cancel</button>
-            <button type="submit" disabled={saving}
-              className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-50">
-              {saving ? "Saving…" : "Save film"}
-            </button>
-          </footer>
-        </form>
+          <Section title="Credits (optional)" description="Tick a credit to add it. Enabled credits appear on the film page in both languages; unticked ones stay hidden.">
+            <div className="space-y-2">
+              {credits.map((c, i) => (
+                <div key={i} className="rounded-md border border-border p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" checked={c.enabled} onChange={(e) => setCredits(credits.map((x, j) => j === i ? { ...x, enabled: e.target.checked } : x))} className="h-4 w-4 accent-primary" />
+                      <span className="capitalize font-medium">{c.credit_type === "custom" ? (c.label_en || "Custom credit") : c.credit_type}</span>
+                    </label>
+                    <button type="button" onClick={() => setCredits(credits.filter((_, j) => j !== i))} className="text-xs text-muted-foreground hover:text-destructive">Remove</button>
+                  </div>
+                  {c.credit_type === "custom" && (
+                    <input value={c.label_en ?? ""} onChange={(e) => setCredits(credits.map((x, j) => j === i ? { ...x, label_en: e.target.value } : x))} placeholder="Custom label (EN)" className={`${inp} mb-2`} />
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input value={c.value_en} onChange={(e) => setCredits(credits.map((x, j) => j === i ? { ...x, value_en: e.target.value } : x))} placeholder="Name (EN)" className={inp} />
+                    <input value={c.value_fa} dir="rtl" onChange={(e) => setCredits(credits.map((x, j) => j === i ? { ...x, value_fa: e.target.value } : x))} placeholder="نام (FA)" className={inp} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <AddCredit onAdd={(t) => setCredits([...credits, { enabled: true, credit_type: t, value_en: "", value_fa: "", sort_order: credits.length, label_en: t === "custom" ? "" : null }])} />
+          </Section>
+
+          <Section title="Film video">
+            <label className="block">
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Video URL (Mux, Cloudflare Stream, Bunny, Vimeo)</span>
+              <input value={d.video_url ?? ""} onChange={(e) => set("video_url", e.target.value)} placeholder="https://…" className={inp} />
+            </label>
+            <label className="block mt-3">
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Preview clip URL (optional)</span>
+              <input value={d.preview_url ?? ""} onChange={(e) => set("preview_url", e.target.value)} placeholder="https://…" className={inp} />
+            </label>
+          </Section>
+
+          <Section title="Access" description="How this film opens.">
+            <div className="space-y-2">
+              {([
+                { v: "inherit", t: "Use site default", s: "Follows the site-wide Free / Paid setting on the Homepage." },
+                { v: "free", t: "Free — Watch Free + Support the filmmaker", s: "Anyone can watch this film; viewers can optionally support." },
+                { v: "paid", t: "Paid — Pay & Watch", s: "Viewers buy a ticket for this film before watching." },
+              ] as const).map((o) => (
+                <label key={o.v} className={`block cursor-pointer rounded-md border p-3 transition-colors ${d.access_mode === o.v ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                  <input type="radio" name="fAccess" checked={d.access_mode === o.v} onChange={() => set("access_mode", o.v)} className="sr-only" />
+                  <div className="text-sm font-medium">{o.t}</div>
+                  <div className="text-xs text-muted-foreground">{o.s}</div>
+                </label>
+              ))}
+            </div>
+          </Section>
+
+          {pricingVisible && (
+            <Section title="Pricing">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Ticket — International (USD)</span>
+                  <input type="number" step="0.01" value={(d.price_cents / 100).toFixed(2)} onChange={(e) => set("price_cents", Math.round(Number(e.target.value) * 100))} className={inp} placeholder="4.99" />
+                </label>
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">قیمت بلیت — تومان</span>
+                  <input type="number" step="1000" dir="rtl" value={d.price_toman} onChange={(e) => set("price_toman", Number(e.target.value))} className={inp} placeholder="120000" />
+                </label>
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Viewing window (hours)</span>
+                  <input type="number" value={d.ticket_hours} onChange={(e) => set("ticket_hours", Number(e.target.value))} className={inp} placeholder="48" />
+                </label>
+              </div>
+            </Section>
+          )}
+
+          <Section title="Visibility">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {([
+                { v: "published", t: "Published", s: "Visible to everyone on the site" },
+                { v: "unlisted", t: "Unlisted", s: "Only people with the link can see it" },
+                { v: "draft", t: "Draft", s: "Hidden — not on the site yet" },
+              ] as const).map((o) => (
+                <label key={o.v} className={`cursor-pointer rounded-md border p-3 transition-colors ${d.visibility === o.v ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                  <input type="radio" name="fVis" checked={d.visibility === o.v} onChange={() => set("visibility", o.v)} className="sr-only" />
+                  <div className="text-sm font-medium">{o.t}</div>
+                  <div className="text-xs text-muted-foreground">{o.s}</div>
+                </label>
+              ))}
+            </div>
+          </Section>
+        </div>
+
+        <footer className="px-6 py-4 border-t border-border flex items-center gap-3 sticky bottom-0 bg-background">
+          <button type="button" onClick={onCancel} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-accent">Cancel</button>
+          <div className="flex-1" />
+          {d.id && (
+            <Link to="/admin/films/$filmId/analytics" params={{ filmId: d.id }} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-accent">View analytics</Link>
+          )}
+          <button type="button" onClick={save} disabled={saving} className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50">
+            {saving ? "Saving…" : "Save Film"}
+          </button>
+        </footer>
       </div>
     </div>
   );
 }
 
-const inputCls = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <label className="block">
-      <span className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">{label}</span>
+    <section>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{title}</div>
+      {description && <p className="text-xs text-muted-foreground mb-3">{description}</p>}
       {children}
-    </label>
+    </section>
+  );
+}
+
+function AddCredit({ onAdd }: { onAdd: (t: string) => void }) {
+  const [t, setT] = useState("cast");
+  return (
+    <div className="flex gap-2 mt-3">
+      <select value={t} onChange={(e) => setT(e.target.value)} className={`${inp} w-auto`}>
+        {CREDIT_TYPES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+      </select>
+      <button type="button" onClick={() => onAdd(t)} className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-sm hover:bg-accent">
+        + Add credit
+      </button>
+    </div>
   );
 }

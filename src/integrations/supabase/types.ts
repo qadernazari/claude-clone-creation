@@ -385,6 +385,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pages: {
+        Row: {
+          blocks: Json
+          created_at: string
+          id: string
+          menu_label_en: string | null
+          menu_label_fa: string | null
+          slug: string
+          sort_order: number
+          title_en: string
+          title_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          blocks?: Json
+          created_at?: string
+          id?: string
+          menu_label_en?: string | null
+          menu_label_fa?: string | null
+          slug: string
+          sort_order?: number
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          blocks?: Json
+          created_at?: string
+          id?: string
+          menu_label_en?: string | null
+          menu_label_fa?: string | null
+          slug?: string
+          sort_order?: number
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_events: {
         Row: {
           id: string
