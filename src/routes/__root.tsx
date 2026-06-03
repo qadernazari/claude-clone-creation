@@ -15,6 +15,7 @@ import { LocaleProvider } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { captureMemberGeo } from "../lib/member-geo.functions";
+import { PageOverlayProvider } from "@/components/page-overlay";
 
 function NotFoundComponent() {
   return (
@@ -140,10 +141,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LocaleProvider>
-        <AuthInvalidator />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster richColors position="top-center" />
+        <PageOverlayProvider>
+          <AuthInvalidator />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster richColors position="top-center" />
+        </PageOverlayProvider>
       </LocaleProvider>
     </QueryClientProvider>
   );
