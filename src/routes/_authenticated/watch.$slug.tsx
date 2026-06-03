@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
+import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/watch/$slug")({
@@ -11,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/watch/$slug")({
     const { data: film, error } = await supabase
       .from("films")
       .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, video_url, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year"
+        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year"
       )
       .eq("slug", params.slug)
       .maybeSingle();
@@ -92,6 +94,16 @@ function WatchPage() {
     refetchInterval: 60_000,
   });
 
+  const fetchStreamUrl = useServerFn(getFilmStreamUrl);
+  const { data: streamRes } = useQuery({
+    queryKey: ["stream-url", film.slug, ticket?.id],
+    queryFn: () => fetchStreamUrl({ data: { slug: film.slug } }),
+    enabled: !!ticket,
+    staleTime: 5 * 60_000,
+  });
+  const videoUrl =
+    streamRes && "videoUrl" in streamRes ? streamRes.videoUrl : null;
+
   const countdown = useCountdown(ticket?.expires_at);
 
   // Log a play event once when ticket becomes available
@@ -126,7 +138,7 @@ function WatchPage() {
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!ticket || !film.video_url) return;
+    if (!ticket || !videoUrl) return;
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
       if (!v) return;
@@ -163,7 +175,7 @@ function WatchPage() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [ticket, film.video_url]);
+  }, [ticket, videoUrl]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
@@ -190,7 +202,7 @@ function WatchPage() {
     aboutFilm: fa ? "درباره فیلم" : "About the film",
   };
 
-  const showPlayer = !isLoading && !!ticket && !!film.video_url;
+  const showPlayer = !isLoading && !!ticket && !!videoUrl;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
@@ -261,14 +273,14 @@ function WatchPage() {
                 {t.buyOne}
               </Link>
             </div>
-          ) : !film.video_url ? (
+          ) : !videoUrl ? (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-cream/70">
               {t.missing}
             </div>
           ) : (
             <video
               ref={videoRef}
-              src={film.video_url}
+              src={videoUrl}
               poster={film.cover_url || undefined}
               controls
               autoPlay
