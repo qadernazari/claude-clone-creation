@@ -308,6 +308,65 @@ function AccountPage() {
           </div>
         </section>
 
+        {/* Password */}
+        <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
+          <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+            {tr.password}
+          </h2>
+          <p className="mt-1 text-xs text-cream/55">{tr.passwordHint}</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setPwError(null);
+              setPwInfo(null);
+              if (newPassword.length < 8) { setPwError(tr.tooShort); return; }
+              if (newPassword !== confirmPassword) { setPwError(tr.mismatch); return; }
+              changePassword.mutate(newPassword);
+            }}
+            className="mt-6 grid gap-5 md:grid-cols-2"
+          >
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.newPw}</span>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.confirmPw}</span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+              />
+            </label>
+            <div className="md:col-span-2 flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={changePassword.isPending || !newPassword}
+                className="rounded-full bg-cream px-5 py-2 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
+              >
+                {changePassword.isPending ? "…" : tr.update}
+              </button>
+              <button
+                type="button"
+                onClick={() => sendReset.mutate()}
+                disabled={sendReset.isPending}
+                className="text-xs text-cream/70 underline-offset-4 hover:text-cream hover:underline disabled:opacity-60"
+              >
+                {tr.forgot}
+              </button>
+              {pwInfo && <span className="text-xs text-amber">{pwInfo}</span>}
+              {pwError && <span className="text-xs text-destructive">{pwError}</span>}
+            </div>
+          </form>
+        </section>
+
         {/* Tickets */}
         <section>
           <div className="mb-4 flex items-end justify-between">
