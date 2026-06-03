@@ -106,6 +106,47 @@ function AccountPage() {
   const [name, setName] = useState("");
   useEffect(() => { if (profile?.full_name) setName(profile.full_name); }, [profile?.full_name]);
 
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwInfo, setPwInfo] = useState<string | null>(null);
+
+  const changePassword = useMutation({
+    mutationFn: async (password: string) => {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      setNewPassword("");
+      setConfirmPassword("");
+      setPwError(null);
+      setPwInfo(fa ? "رمز عبور به‌روزرسانی شد" : "Password updated");
+    },
+    onError: (e: Error) => {
+      setPwInfo(null);
+      setPwError(e.message);
+    },
+  });
+
+  const sendReset = useMutation({
+    mutationFn: async () => {
+      const email = profile?.email ?? user?.email;
+      if (!email) throw new Error("No email on file");
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      setPwError(null);
+      setPwInfo(fa ? "ایمیل بازنشانی ارسال شد. صندوق ورودی خود را بررسی کنید." : "Reset email sent. Check your inbox.");
+    },
+    onError: (e: Error) => {
+      setPwInfo(null);
+      setPwError(e.message);
+    },
+  });
+
   const saveProfile = useMutation({
     mutationFn: async (vars: { full_name: string; locale: string }) => {
       if (!user) throw new Error("Not signed in");
@@ -151,7 +192,16 @@ function AccountPage() {
     member: fa ? "عضو از" : "Member since",
     signOut: fa ? "خروج از حساب" : "Sign out",
     danger: fa ? "حساب کاربری" : "Account",
+    password: fa ? "رمز عبور" : "Password",
+    passwordHint: fa ? "رمز عبور جدید را وارد کنید (حداقل ۸ کاراکتر)." : "Set a new password (minimum 8 characters).",
+    newPw: fa ? "رمز عبور جدید" : "New password",
+    confirmPw: fa ? "تکرار رمز عبور" : "Confirm password",
+    update: fa ? "به‌روزرسانی رمز" : "Update password",
+    forgot: fa ? "رمز خود را فراموش کرده‌اید؟ ارسال ایمیل بازنشانی" : "Forgot your password? Send reset email",
+    mismatch: fa ? "رمزها مطابقت ندارند" : "Passwords do not match",
+    tooShort: fa ? "حداقل ۸ کاراکتر" : "Minimum 8 characters",
   };
+
 
   function ftitle(f: { title_en: string; title_fa: string | null } | null) {
     if (!f) return "—";
@@ -256,6 +306,65 @@ function AccountPage() {
               <span className="text-xs text-amber">{tr.saved}</span>
             )}
           </div>
+        </section>
+
+        {/* Password */}
+        <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
+          <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+            {tr.password}
+          </h2>
+          <p className="mt-1 text-xs text-cream/55">{tr.passwordHint}</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setPwError(null);
+              setPwInfo(null);
+              if (newPassword.length < 8) { setPwError(tr.tooShort); return; }
+              if (newPassword !== confirmPassword) { setPwError(tr.mismatch); return; }
+              changePassword.mutate(newPassword);
+            }}
+            className="mt-6 grid gap-5 md:grid-cols-2"
+          >
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.newPw}</span>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.confirmPw}</span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+              />
+            </label>
+            <div className="md:col-span-2 flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={changePassword.isPending || !newPassword}
+                className="rounded-full bg-cream px-5 py-2 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
+              >
+                {changePassword.isPending ? "…" : tr.update}
+              </button>
+              <button
+                type="button"
+                onClick={() => sendReset.mutate()}
+                disabled={sendReset.isPending}
+                className="text-xs text-cream/70 underline-offset-4 hover:text-cream hover:underline disabled:opacity-60"
+              >
+                {tr.forgot}
+              </button>
+              {pwInfo && <span className="text-xs text-amber">{pwInfo}</span>}
+              {pwError && <span className="text-xs text-destructive">{pwError}</span>}
+            </div>
+          </form>
         </section>
 
         {/* Tickets */}
