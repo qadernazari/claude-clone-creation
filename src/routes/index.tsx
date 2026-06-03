@@ -168,6 +168,144 @@ function Home() {
         </div>
       </section>
 
+      {/* How it works — 3 step ritual */}
+      <section className="border-t border-line px-6 py-28 md:px-12 md:py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 max-w-2xl">
+            <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
+              {locale === "fa" ? "چطور کار می‌کند" : "How it works"}
+            </span>
+            <h2 className="font-display text-4xl font-bold leading-[1.05] text-cream-bright md:text-5xl">
+              {locale === "fa" ? "بدون اشتراک. بدون تعهد." : "No subscription. No commitment."}
+            </h2>
+          </div>
+          <ol className="grid grid-cols-1 gap-12 md:grid-cols-3">
+            {[
+              {
+                en: ["Choose a film", "Browse a tight, curated selection of original Iranian shorts."],
+                fa: ["یک فیلم انتخاب کنید", "فهرستی کوتاه و دست‌چین از آثار کوتاه ایرانی."],
+              },
+              {
+                en: ["Buy a single ticket", "Pay once for the film you want — supporting its maker directly."],
+                fa: ["یک بلیت بخرید", "فقط برای همان اثر — مستقیم در حمایت سازنده‌اش."],
+              },
+              {
+                en: ["Watch within 48 hours", "Stream on any device. Pause, resume, finish on your time."],
+                fa: ["تا ۴۸ ساعت تماشا کنید", "روی هر دستگاهی — توقف، ادامه، در زمان خودتان."],
+              },
+            ].map((step, i) => {
+              const [title, desc] = locale === "fa" ? step.fa : step.en;
+              return (
+                <li key={i} className="relative">
+                  <div className="mb-6 flex items-baseline gap-4">
+                    <span className="font-display text-5xl font-extrabold text-amber/30 tabular-nums">
+                      0{i + 1}
+                    </span>
+                    <span className="h-px flex-1 bg-line" />
+                  </div>
+                  <h3 className="mb-3 font-display text-xl font-bold text-cream-bright">{title}</h3>
+                  <p className="text-sm leading-relaxed text-cream/55">{desc}</p>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-line px-6 py-28 md:px-12 md:py-32">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-[1fr_2fr]">
+          <div>
+            <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
+              {locale === "fa" ? "پرسش‌های متداول" : "Questions"}
+            </span>
+            <h2 className="font-display text-3xl font-bold leading-tight text-cream-bright md:text-4xl">
+              {locale === "fa" ? "هرچه باید بدانید." : "Everything you might ask."}
+            </h2>
+          </div>
+          <dl className="divide-y divide-line border-y border-line">
+            {[
+              {
+                en: ["Is there a subscription?", "No. You buy a ticket per film and get 48 hours of access. No recurring charges, ever."],
+                fa: ["آیا اشتراک ماهانه دارد؟", "نه. برای هر فیلم یک بلیت می‌خرید و ۴۸ ساعت دسترسی دارید. هرگز کسر دوره‌ای نمی‌شود."],
+              },
+              {
+                en: ["Where does the money go?", "The majority goes directly to the filmmakers. We keep a small share to run the platform."],
+                fa: ["پول کجا می‌رود؟", "بخش عمده به‌طور مستقیم به فیلم‌ساز می‌رسد. سهم کوچکی برای نگه‌داری پلتفرم می‌ماند."],
+              },
+              {
+                en: ["Can I watch from inside Iran?", "Yes. We support Toman payment via ZarinPal, with the rest of the world paying in USD."],
+                fa: ["از داخل ایران هم می‌توان دید؟", "بله. پرداخت تومانی از طریق زرین‌پال، و سایر کشورها با دلار."],
+              },
+              {
+                en: ["What devices are supported?", "Any modern browser — laptop, phone, tablet, or smart TV. No app required."],
+                fa: ["چه دستگاه‌هایی پشتیبانی می‌شود؟", "هر مرورگر مدرنی — لپ‌تاپ، موبایل، تبلت یا تلویزیون هوشمند. بدون نیاز به برنامه."],
+              },
+            ].map((qa, i) => {
+              const [q, a] = locale === "fa" ? qa.fa : qa.en;
+              return (
+                <details key={i} className="group py-6">
+                  <summary className="flex cursor-pointer items-center justify-between gap-6 list-none">
+                    <span className="font-display text-lg font-semibold text-cream-bright">{q}</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cream/15 text-cream/60 transition-all group-open:rotate-45 group-open:border-amber/50 group-open:text-amber">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                        <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                  </summary>
+                  <dd className="mt-4 max-w-2xl text-[15px] leading-relaxed text-cream/60">{a}</dd>
+                </details>
+              );
+            })}
+          </dl>
+        </div>
+      </section>
+
+      {/* Closing CTA */}
+      <section className="relative overflow-hidden border-t border-line px-6 py-32 md:px-12 md:py-40">
+        <div
+          className="pointer-events-none absolute inset-0 z-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 60%, oklch(0.77 0.115 80 / 0.10), transparent 65%)",
+          }}
+        />
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
+          <h2 className="font-display text-4xl font-bold leading-[1.05] text-cream-bright md:text-6xl">
+            {locale === "fa" ? (
+              <>
+                سینمای ایران،{" "}
+                <span className="font-editorial italic font-normal text-amber-bright">دست‌نخورده</span>.
+              </>
+            ) : (
+              <>
+                Iranian cinema,{" "}
+                <span className="font-editorial italic font-normal text-amber-bright">unfiltered</span>.
+              </>
+            )}
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-cream/55 md:text-lg">
+            {locale === "fa"
+              ? "بلیتی بخرید، فیلم‌سازی را حمایت کنید، و آثاری ببینید که جای دیگری پیدا نمی‌کنید."
+              : "Buy a ticket, support a filmmaker, and watch work you won't find anywhere else."}
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <a
+              href="/browse"
+              className="bg-amber px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-amber-bright"
+            >
+              {locale === "fa" ? "تماشای آثار" : "Browse Originals"}
+            </a>
+            <a
+              href="/about"
+              className="border border-cream/20 px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] text-cream transition-colors hover:bg-cream hover:text-ink"
+            >
+              {locale === "fa" ? "درباره‌ی ایران" : "Our story"}
+            </a>
+          </div>
+        </div>
+      </section>
+
       <SiteFooter />
 
     </div>
