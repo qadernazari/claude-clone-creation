@@ -251,6 +251,14 @@ function FilmPage() {
           </aside>
         )}
       </section>
+
+      {checkoutOpen && (
+        <FilmCheckout
+          filmSlug={film.slug}
+          returnUrl={returnUrl}
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
     </div>
   );
 }
