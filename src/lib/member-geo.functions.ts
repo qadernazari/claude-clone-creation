@@ -43,9 +43,13 @@ export const captureMemberGeo = createServerFn({ method: "POST" })
       }
     }
 
-    const patch: Record<string, unknown> = {
-      last_active_at: new Date().toISOString(),
-    };
+    const patch: {
+      last_active_at: string;
+      last_ip?: string;
+      signup_ip?: string;
+      signup_country?: string;
+      signup_city?: string;
+    } = { last_active_at: new Date().toISOString() };
     if (ip) patch.last_ip = ip;
     if (ip && !existing?.signup_ip) patch.signup_ip = ip;
     if (country && !existing?.signup_country) patch.signup_country = country;
