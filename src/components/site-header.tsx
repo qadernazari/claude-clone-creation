@@ -7,18 +7,17 @@ function LanguageToggle() {
   const { locale, setLocale } = useLocale();
   return (
     <div
-      className="relative inline-flex items-center rounded-full border border-cream/10 bg-bg-1/40 p-0.5 text-[10px] uppercase tracking-widest backdrop-blur"
+      className="relative inline-flex items-center overflow-hidden rounded-full border border-cream/10 bg-bg-1/40 p-0.5 text-[10px] uppercase tracking-widest backdrop-blur"
       role="group"
       aria-label="Language"
     >
-      {/* Sliding active indicator */}
+      {/* Sliding active indicator — pinned to the logical start, which is
+          always where the active button sits (EN in LTR, FA in RTL). */}
       <span
         aria-hidden="true"
-        className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-amber shadow-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-        style={{
-          transform: locale === "en" ? "translateX(0)" : "translateX(100%)",
-        }}
+        className="pointer-events-none absolute top-0.5 bottom-0.5 start-0.5 w-[calc(50%-4px)] rounded-full bg-amber shadow-sm transition-opacity duration-500"
       />
+
       <button
         type="button"
         onClick={() => setLocale("en")}
