@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
-import { Logo } from "../components/logo";
-import { AuthMenu } from "../components/auth-menu";
+import { SiteHeader } from "../components/site-header";
+import { SiteFooter } from "../components/site-footer";
+
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -44,28 +45,8 @@ function AboutPage() {
 
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
-      <header className="hairline sticky top-0 z-30 border-b bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={44} />
-          </Link>
-          <nav className="hidden gap-8 text-sm text-cream/70 md:flex">
-            <Link to="/" className="hover:text-cream">
-              {fa ? "خانه" : "Home"}
-            </Link>
-            <a href="/browse" className="hover:text-cream">
-              {fa ? "آثار" : "Browse"}
-            </a>
-            <Link to="/about" className="text-cream">
-              {fa ? "درباره" : "About"}
-            </Link>
-            <a href="/contact" className="hover:text-cream">
-              {fa ? "تماس" : "Contact"}
-            </a>
-          </nav>
-          <AuthMenu />
-        </div>
-      </header>
+      <SiteHeader current="about" />
+
 
       <section className="relative isolate overflow-hidden">
         <div
@@ -173,17 +154,8 @@ function AboutPage() {
         </div>
       </section>
 
-      <footer className="hairline border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-12 text-xs text-cream/50 md:flex-row md:items-center">
-          <Logo size={32} />
-          <p>
-            © {new Date().getFullYear()} IRAN ·{" "}
-            {fa
-              ? "خانه‌ای برای سینمای کوتاه ایران"
-              : "A home for contemporary Iranian cinema"}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
+
     </div>
   );
 }

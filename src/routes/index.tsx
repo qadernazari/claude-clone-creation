@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useLocale } from "../lib/i18n";
 import { supabase } from "../integrations/supabase/client";
-import { Logo } from "../components/logo";
-import { AuthMenu } from "../components/auth-menu";
 import { WelcomeSplash } from "../components/welcome-splash";
 import { FilmsRow } from "../components/films-row";
 import { FeaturedFilm } from "../components/featured-film";
+import { SiteHeader } from "../components/site-header";
+import { SiteFooter } from "../components/site-footer";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,33 +52,6 @@ function useSiteContent<T>(key: string) {
   });
 }
 
-function LanguageToggle() {
-  const { locale, setLocale } = useLocale();
-  return (
-    <div className="hairline inline-flex items-center gap-0.5 rounded-full border bg-bg-1/60 p-1 text-[10px] uppercase tracking-widest">
-      <button
-        type="button"
-        onClick={() => setLocale("en")}
-        className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-          locale === "en" ? "bg-amber text-ink" : "text-cream/40 hover:text-cream"
-        }`}
-        aria-pressed={locale === "en"}
-      >
-        EN
-      </button>
-      <button
-        type="button"
-        onClick={() => setLocale("fa")}
-        className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-          locale === "fa" ? "bg-amber text-ink" : "text-cream/40 hover:text-cream"
-        }`}
-        aria-pressed={locale === "fa"}
-      >
-        فا
-      </button>
-    </div>
-  );
-}
 
 function Home() {
   const { locale, t } = useLocale();
@@ -97,31 +71,8 @@ function Home() {
     <div className="min-h-screen bg-bg-0 text-cream">
       <WelcomeSplash />
 
-      {/* Header */}
-      <header className="fixed top-0 z-30 w-full border-b border-line bg-bg-0/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-12">
-          <div className="flex items-center gap-10">
-            <a href="/" className="inline-flex items-center" aria-label="IRAN — home">
-              <Logo size={36} />
-            </a>
-            <nav className="hidden gap-8 text-[11px] font-medium uppercase tracking-[0.2em] text-cream/60 md:flex">
-              <a href="/" className="text-cream transition-colors">
-                {locale === "fa" ? "خانه" : "Home"}
-              </a>
-              <a href="/browse" className="hover:text-cream transition-colors">
-                {locale === "fa" ? "آثار اختصاصی" : "Originals"}
-              </a>
-              <a href="/about" className="hover:text-cream transition-colors">
-                {locale === "fa" ? "درباره" : "About"}
-              </a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <LanguageToggle />
-            <AuthMenu />
-          </div>
-        </div>
-      </header>
+      <SiteHeader current="home" />
+
 
       {/* Hero — cinematic bottom-aligned editorial spread */}
       <section className="relative flex min-h-screen items-end overflow-hidden px-6 pb-20 pt-32 md:px-12 md:pb-32">
@@ -217,50 +168,8 @@ function Home() {
         </div>
       </section>
 
-      {/* Footer — editorial */}
-      <footer className="border-t border-line px-6 py-20 md:px-12 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col justify-between gap-12 md:flex-row md:items-start">
-            <div className="max-w-xs">
-              <div className="mb-6">
-                <Logo size={32} />
-              </div>
-              <p className="text-sm leading-relaxed text-cream/40">
-                {locale === "fa"
-                  ? "خانه‌ای برای سینمای معاصر ایران. حمایت از فیلم‌سازان مستقل، با روایت مستقیم."
-                  : "A home for contemporary Iranian cinema. Supporting independent artists through direct storytelling."}
-              </p>
-            </div>
+      <SiteFooter />
 
-            <div className="flex gap-16 md:gap-24">
-              <div className="flex flex-col gap-4">
-                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/30">
-                  {locale === "fa" ? "گردش" : "Explore"}
-                </span>
-                <a href="/" className="text-sm transition-colors hover:text-amber">{locale === "fa" ? "خانه" : "Home"}</a>
-                <a href="/browse" className="text-sm transition-colors hover:text-amber">{locale === "fa" ? "آثار" : "Browse"}</a>
-                <a href="/about" className="text-sm transition-colors hover:text-amber">{locale === "fa" ? "درباره" : "About"}</a>
-                <a href="/contact" className="text-sm transition-colors hover:text-amber">{locale === "fa" ? "تماس" : "Contact"}</a>
-              </div>
-              <div className="flex flex-col gap-4">
-                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/30">
-                  {locale === "fa" ? "قانونی" : "Legal"}
-                </span>
-                <span className="cursor-default text-sm text-cream/60">{locale === "fa" ? "شرایط" : "Terms"}</span>
-                <span className="cursor-default text-sm text-cream/60">{locale === "fa" ? "حریم خصوصی" : "Privacy"}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-20 flex flex-col items-center justify-between gap-4 border-t border-line pt-8 text-[10px] font-bold uppercase tracking-[0.25em] text-cream/30 md:flex-row">
-            <span>
-              © {new Date().getFullYear()} IRAN ·{" "}
-              {locale === "fa" ? "تمامی حقوق محفوظ است" : "All rights reserved"}
-            </span>
-            <span>{locale === "fa" ? "برای روح مستقل" : "Designed for the independent spirit"}</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

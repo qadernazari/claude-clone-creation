@@ -3,6 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
 import { useLocale } from "../lib/i18n";
+import { SiteHeader } from "../components/site-header";
+import { SiteFooter } from "../components/site-footer";
+
 
 export const Route = createFileRoute("/browse")({
   head: () => ({
@@ -151,8 +154,10 @@ function BrowsePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-bg-0">
-      <div className="mx-auto max-w-6xl px-6 pb-24 pt-32">
+    <div className="min-h-screen bg-bg-0 text-cream">
+      <SiteHeader current="browse" />
+      <main className="mx-auto max-w-6xl px-6 pb-24 pt-32">
+
         <header className="mb-12">
           <p className="text-xs uppercase tracking-[0.3em] text-cream/50">
             {locale === "fa" ? "کاتالوگ" : "Catalog"}
@@ -304,7 +309,8 @@ function BrowsePage() {
             })}
           </div>
         )}
-      </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

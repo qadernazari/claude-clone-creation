@@ -1,11 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { Logo } from "@/components/logo";
-import { AuthMenu } from "@/components/auth-menu";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { Mail, MapPin, Send } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -92,20 +93,8 @@ function ContactPage() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
-          </Link>
-          <nav className="hidden gap-8 text-sm text-cream/70 md:flex">
-            <a href="/" className="hover:text-cream">{fa ? "خانه" : "Home"}</a>
-            <a href="/browse" className="hover:text-cream">{fa ? "آثار اختصاصی" : "Originals"}</a>
-            <a href="/about" className="hover:text-cream">{fa ? "درباره" : "About"}</a>
-            <a href="/contact" className="text-cream">{fa ? "تماس" : "Contact"}</a>
-          </nav>
-          <AuthMenu />
-        </div>
-      </header>
+      <SiteHeader />
+
 
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
@@ -231,18 +220,8 @@ function ContactPage() {
         </aside>
       </section>
 
-      {/* Footer */}
-      <footer className="hairline border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-12 text-xs text-cream/50 md:flex-row md:items-center">
-          <Logo size={32} />
-          <p>
-            © {new Date().getFullYear()} IRAN ·{" "}
-            {fa
-              ? "خانه‌ای برای سینمای کوتاه ایران"
-              : "A home for contemporary Iranian cinema"}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
+
     </div>
   );
 }
