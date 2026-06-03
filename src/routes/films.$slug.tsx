@@ -7,7 +7,7 @@ import { AuthMenu } from "@/components/auth-menu";
 import { FilmCheckout } from "@/components/film-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { User } from "@supabase/supabase-js";
 
@@ -66,6 +66,21 @@ type Credit = {
   sort_order: number;
 };
 
+type RelatedFilm = {
+  id: string;
+  slug: string;
+  title_en: string;
+  title_fa: string | null;
+  director_en: string | null;
+  director_fa: string | null;
+  duration_min: number | null;
+  year: number | null;
+  cover_url: string | null;
+  poster_gradient: string | null;
+};
+
+const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.18 0.03 240))";
+
 function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, dir } = useLocale();
@@ -73,7 +88,8 @@ function FilmPage() {
   const [user, setUser] = useState<User | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
-
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -118,6 +134,24 @@ function FilmPage() {
     refetchInterval: 30_000,
   });
 
+  const { data: related = [] } = useQuery({
+    queryKey: ["film", film.id, "related", film.category],
+    queryFn: async () => {
+      const q = supabase
+        .from("films")
+        .select(
+          "id, slug, title_en, title_fa, director_en, director_fa, duration_min, year, cover_url, poster_gradient"
+        )
+        .eq("visibility", "published")
+        .neq("id", film.id)
+        .order("sort_order", { ascending: true })
+        .limit(6);
+      if (film.category) q.eq("category", film.category);
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      return (data as RelatedFilm[]) ?? [];
+    },
+  });
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
@@ -128,6 +162,17 @@ function FilmPage() {
       ? `${num(film.price_toman)} ${fa ? "تومان" : "Toman"}`
       : `$${(film.price_cents / 100).toFixed(2)}`;
 
+  // Group credits by type for nicer rendering
+  const groupedCredits = useMemo(() => {
+    const groups = new Map<string, Credit[]>();
+    for (const c of credits) {
+      const key = c.credit_type || "other";
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(c);
+    }
+    return Array.from(groups.entries());
+  }, [credits]);
+
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
@@ -137,18 +182,47 @@ function FilmPage() {
       ? `دسترسی ${num(film.ticket_hours)} ساعت پس از خرید`
       : `${film.ticket_hours}-hour access after purchase`,
     ticketActive: fa ? "بلیط فعال دارید" : "You have an active ticket",
-    about: fa ? "درباره فیلم" : "About the film",
+    about: fa ? "درباره فیلم" : "Synopsis",
     crew: fa ? "عوامل" : "Credits",
     back: fa ? "بازگشت" : "Back",
     contribSoon: fa ? "حمایت به‌زودی فعال می‌شود." : "Contributions coming soon.",
     tomanSoon: fa ? "پرداخت با تومان (زرین‌پال) به‌زودی." : "Toman checkout (ZarinPal) coming soon.",
+    playPreview: fa ? "پخش تیزر" : "Watch trailer",
+    share: fa ? "هم‌رسانی" : "Share",
+    copied: fa ? "لینک کپی شد" : "Link copied",
+    moreFromCat: fa ? "بیشتر از این دسته" : "More to explore",
+    creditGroups: {
+      cast: fa ? "بازیگران" : "Cast",
+      crew: fa ? "عوامل تولید" : "Crew",
+      music: fa ? "موسیقی" : "Music",
+      production: fa ? "تولید" : "Production",
+      other: fa ? "سایر" : "Other",
+    } as Record<string, string>,
   };
-
 
   const tomanOnly = region === "iran" && film.price_toman > 0;
   const returnUrl = typeof window !== "undefined"
     ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&film=${film.slug}`
     : "";
+
+  const posterStyle = film.cover_url
+    ? { background: `center / cover no-repeat url(${film.cover_url})` }
+    : { background: (film.poster_gradient as string) || fallbackGradient };
+
+  const handleShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${title} — IRAN`, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+      }
+    } catch {
+      /* user cancelled */
+    }
+  };
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
@@ -162,49 +236,82 @@ function FilmPage() {
         </div>
       </header>
 
-      {/* Hero */}
+      {/* Cinematic hero */}
       <section className="relative isolate overflow-hidden">
-        {film.cover_url && (
-          <div
-            className="absolute inset-0 -z-10 opacity-30"
-            style={{ background: `center / cover no-repeat url(${film.cover_url})` }}
-            aria-hidden
-          />
-        )}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-bg-0/70 to-bg-0" aria-hidden />
+        {/* Backdrop layers */}
+        <div className="absolute inset-0 -z-20" style={posterStyle} aria-hidden />
+        <div
+          className="absolute inset-0 -z-10 backdrop-blur-2xl"
+          style={{ background: "linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.85) 60%, var(--background) 100%)" }}
+          aria-hidden
+        />
 
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
-          <Link to="/" className="text-xs text-cream/60 hover:text-cream-bright">← {t.back}</Link>
+        <div className="mx-auto max-w-6xl px-6 pt-10 md:pt-12 pb-14 md:pb-20">
+          <Link to="/" className="text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright transition-colors">
+            ← {t.back}
+          </Link>
 
-          <div className="mt-6 grid gap-10 md:grid-cols-[300px_1fr] md:gap-12">
-            <div
-              className="hairline aspect-[2/3] w-full overflow-hidden rounded-xl border bg-bg-1"
-              style={film.cover_url ? { background: `center / cover no-repeat url(${film.cover_url})` } : undefined}
-              aria-hidden
-            />
-
-            <div>
-              {film.category && (
-                <span className="inline-flex rounded-full bg-cream/10 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
-                  {film.category}
-                </span>
+          <div className="mt-8 grid gap-10 md:grid-cols-[320px_1fr] md:gap-14">
+            {/* Poster */}
+            <div className="relative group">
+              <div
+                className="hairline aspect-[2/3] w-full overflow-hidden rounded-xl border shadow-2xl shadow-black/50"
+                style={posterStyle}
+                aria-hidden
+              />
+              {film.preview_url && (
+                <button
+                  type="button"
+                  onClick={() => setPreviewOpen(true)}
+                  className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/0 hover:bg-black/40 transition-colors"
+                  aria-label={t.playPreview}
+                >
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-amber/95 text-bg-0 shadow-xl transition-transform group-hover:scale-105">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                  <span className="absolute bottom-3 inset-x-0 text-center text-[11px] uppercase tracking-widest text-cream/90 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {t.playPreview}
+                  </span>
+                </button>
               )}
-              <h1 className={`mt-3 text-4xl md:text-5xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+            </div>
+
+            {/* Meta + purchase */}
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                {film.category && (
+                  <span className="inline-flex rounded-full bg-cream/10 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
+                    {film.category}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-cream/15 bg-cream/[0.04] px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70 hover:text-cream-bright hover:border-cream/30 transition-colors"
+                >
+                  {copied ? t.copied : t.share}
+                </button>
+              </div>
+
+              <h1 className={`mt-4 text-4xl md:text-6xl leading-[1.05] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
                 {title}
               </h1>
               {director && (
-                <p className="mt-2 text-cream/70">
-                  {fa ? "کارگردان: " : "Directed by "}{director}
+                <p className="mt-3 text-cream/75">
+                  {fa ? "کارگردان: " : "Directed by "}
+                  <span className="text-cream-bright">{director}</span>
                 </p>
               )}
-              <p className="mt-1 text-sm text-cream/55">
+              <p className="mt-1 text-sm text-cream/50">
                 {film.year ? num(film.year) : null}
                 {film.year && film.duration_min ? " · " : null}
                 {film.duration_min ? `${num(film.duration_min)} ${fa ? "دقیقه" : "min"}` : null}
               </p>
 
               {/* Purchase card */}
-              <div className="mt-8 hairline rounded-xl border bg-bg-1/60 p-5 max-w-md">
+              <div className="mt-8 hairline rounded-xl border bg-bg-1/70 backdrop-blur p-5 max-w-md">
                 <div className="flex items-baseline justify-between gap-4">
                   <div>
                     <div className="text-2xl font-medium text-cream-bright tabular-nums">{priceLabel}</div>
@@ -252,7 +359,6 @@ function FilmPage() {
                   >
                     {t.contribute}
                   </button>
-
                 </div>
                 {activeTicket?.expires_at && (
                   <p className="mt-3 text-[11px] text-cream/55">
@@ -260,7 +366,6 @@ function FilmPage() {
                   </p>
                 )}
                 {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
-
               </div>
             </div>
           </div>
@@ -268,36 +373,87 @@ function FilmPage() {
       </section>
 
       {/* Synopsis + Credits */}
-      <section className="mx-auto max-w-6xl px-6 pb-24 grid gap-12 md:grid-cols-[2fr_1fr]">
+      <section className="mx-auto max-w-6xl px-6 pb-20 grid gap-12 md:grid-cols-[2fr_1fr]">
         {synopsis && (
           <div>
-            <h2 className={`text-xs uppercase tracking-[0.2em] text-cream/50 ${fa ? "font-vazir" : ""}`}>
+            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
               {t.about}
             </h2>
-            <p className="mt-4 whitespace-pre-line text-cream/85 leading-relaxed">{synopsis}</p>
+            <p className={`mt-4 whitespace-pre-line text-cream/85 leading-relaxed text-[15px] md:text-base ${fa ? "font-vazir" : ""}`}>
+              {synopsis}
+            </p>
           </div>
         )}
 
-        {credits.length > 0 && (
-          <aside>
-            <h2 className={`text-xs uppercase tracking-[0.2em] text-cream/50 ${fa ? "font-vazir" : ""}`}>
+        {groupedCredits.length > 0 && (
+          <aside className="md:border-s md:border-cream/10 md:ps-10">
+            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
               {t.crew}
             </h2>
-            <dl className="mt-4 space-y-3">
-              {credits.map((c, i) => (
-                <div key={i} className="grid grid-cols-[110px_1fr] gap-3 text-sm">
-                  <dt className="text-cream/50">
-                    {fa ? c.label_fa || c.label_en : c.label_en}
-                  </dt>
-                  <dd className="text-cream/90">
-                    {fa ? c.value_fa || c.value_en : c.value_en}
-                  </dd>
+            <div className="mt-4 space-y-6">
+              {groupedCredits.map(([type, items]) => (
+                <div key={type}>
+                  <div className="text-[11px] uppercase tracking-widest text-cream/55">
+                    {t.creditGroups[type] || type}
+                  </div>
+                  <dl className="mt-2 space-y-1.5">
+                    {items.map((c, i) => (
+                      <div key={i} className="grid grid-cols-[110px_1fr] gap-3 text-sm">
+                        <dt className="text-cream/50">
+                          {fa ? c.label_fa || c.label_en : c.label_en}
+                        </dt>
+                        <dd className="text-cream/90">
+                          {fa ? c.value_fa || c.value_en : c.value_en}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               ))}
-            </dl>
+            </div>
           </aside>
         )}
       </section>
+
+      {/* More films */}
+      {related.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 pb-24">
+          <div className="flex items-baseline justify-between">
+            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
+              {t.moreFromCat}
+            </h2>
+            <Link to="/browse" className="text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright">
+              {fa ? "همه" : "Browse all"} →
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {related.map((r) => {
+              const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
+              const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
+              const bg = r.cover_url
+                ? { background: `center / cover no-repeat url(${r.cover_url})` }
+                : { background: (r.poster_gradient as string) || fallbackGradient };
+              return (
+                <Link
+                  key={r.id}
+                  to="/films/$slug"
+                  params={{ slug: r.slug }}
+                  className="group block"
+                >
+                  <div
+                    className="aspect-[2/3] w-full overflow-hidden rounded-lg border border-cream/10 transition-transform group-hover:-translate-y-0.5 group-hover:border-cream/25"
+                    style={bg}
+                  />
+                  <div className={`mt-2 text-sm text-cream/90 truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
+                  {rDirector && (
+                    <div className="text-[11px] text-cream/50 truncate">{rDirector}</div>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {checkoutOpen && (
         <FilmCheckout
@@ -315,7 +471,37 @@ function FilmPage() {
           onClose={() => setContribOpen(false)}
         />
       )}
+
+      {/* Preview / trailer lightbox */}
+      {previewOpen && film.preview_url && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={() => setPreviewOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            onClick={() => setPreviewOpen(false)}
+            className="absolute top-5 right-5 text-cream/70 hover:text-cream-bright text-2xl leading-none"
+            aria-label="Close preview"
+          >
+            ×
+          </button>
+          <div
+            className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden border border-cream/15 bg-black"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <video
+              src={film.preview_url}
+              controls
+              autoPlay
+              playsInline
+              className="h-full w-full"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-
 }
