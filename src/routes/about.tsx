@@ -19,7 +19,9 @@ export const Route = createFileRoute("/about")({
         content:
           "Our mission, the team, and how to reach us — a premium home for original Iranian short films.",
       },
+      { property: "og:url", content: "https://ir.show/about" },
     ],
+    links: [{ rel: "canonical", href: "https://ir.show/about" }],
   }),
   component: AboutPage,
 });
