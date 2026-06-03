@@ -177,10 +177,12 @@ function Home() {
         </div>
       </section>
 
+      <FilmsRow />
+
       {/* Footer */}
       <footer className="hairline border-t">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-12 text-xs text-cream/50 md:flex-row md:items-center">
-          <p className="font-display tracking-[0.3em] text-cream-bright">IRAN</p>
+          <Logo size={32} />
           <p>
             © {new Date().getFullYear()} IRAN ·{" "}
             {locale === "fa"
