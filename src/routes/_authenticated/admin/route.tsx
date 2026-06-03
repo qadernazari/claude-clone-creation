@@ -22,6 +22,7 @@ const NAV: ReadonlyArray<{ to: string; label: string; icon: typeof LayoutDashboa
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/films", label: "Films", icon: Film },
   { to: "/admin/categories", label: "Categories", icon: Tag },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 function AdminShell() {
