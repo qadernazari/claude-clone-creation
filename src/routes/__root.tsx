@@ -96,6 +96,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "IRAN — Original Iranian short films" },
+      { name: "description", content: "Claude Copilot assists users in replicating code structures and functionalities from Claude.ai." },
+      { property: "og:description", content: "Claude Copilot assists users in replicating code structures and functionalities from Claude.ai." },
+      { name: "twitter:description", content: "Claude Copilot assists users in replicating code structures and functionalities from Claude.ai." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/24da142d-d10d-4b0e-88c2-642c4bb2635e/id-preview-10f44296--0b5dd7d0-84af-4920-8636-85ef6bd7b594.lovable.app-1780517123923.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/24da142d-d10d-4b0e-88c2-642c4bb2635e/id-preview-10f44296--0b5dd7d0-84af-4920-8636-85ef6bd7b594.lovable.app-1780517123923.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
