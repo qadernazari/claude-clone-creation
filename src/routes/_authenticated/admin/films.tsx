@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, Eye, EyeOff, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
@@ -73,6 +73,7 @@ function FilmsAdminPage() {
   const { data: categories = [] } = useQuery({ queryKey: ["admin", "category-ids"], queryFn: listCategoryIds });
 
   const [editing, setEditing] = useState<FilmDraft | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const save = useMutation({
     mutationFn: async (draft: FilmDraft) => {
@@ -123,6 +124,55 @@ function FilmsAdminPage() {
     onError: (e) => toast.error(e.message),
   });
 
+  const bulkVisibility = useMutation({
+    mutationFn: async (args: { ids: string[]; visibility: "published" | "draft" }) => {
+      const { error } = await supabase
+        .from("films")
+        .update({ visibility: args.visibility })
+        .in("id", args.ids);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_, vars) => {
+      toast.success(
+        `${vars.ids.length} film${vars.ids.length === 1 ? "" : "s"} ${vars.visibility === "published" ? "published" : "unpublished"}`,
+      );
+      setSelected(new Set());
+      qc.invalidateQueries({ queryKey: ["admin", "films"] });
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const bulkDelete = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("films").delete().in("id", ids);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_, ids) => {
+      toast.success(`${ids.length} film${ids.length === 1 ? "" : "s"} deleted`);
+      setSelected(new Set());
+      qc.invalidateQueries({ queryKey: ["admin", "films"] });
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const allIds = films.map((f) => f.id);
+  const allSelected = allIds.length > 0 && allIds.every((id) => selected.has(id));
+  const someSelected = selected.size > 0 && !allSelected;
+  const selectedIds = Array.from(selected);
+
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(allIds));
+  }
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+
   return (
     <div className="p-8 max-w-6xl">
       <header className="mb-6 flex items-center justify-between">
@@ -143,25 +193,46 @@ function FilmsAdminPage() {
         <table className="w-full text-sm">
           <thead className="bg-card/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
+              <th className="px-4 py-3 w-10">
+                <input
+                  type="checkbox"
+                  aria-label="Select all"
+                  checked={allSelected}
+                  ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                  onChange={toggleAll}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+              </th>
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Slug</th>
               <th className="px-4 py-3">Director</th>
               <th className="px-4 py-3 w-24">Price</th>
               <th className="px-4 py-3 w-28">Visibility</th>
-              <th className="px-4 py-3 w-24"></th>
+              <th className="px-4 py-3 w-28"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {isLoading && (
-              <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>
+              <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>
             )}
             {!isLoading && films.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                 No films yet. Click <span className="text-foreground">New film</span> to add one.
               </td></tr>
             )}
-            {films.map((f) => (
-              <tr key={f.id}>
+            {films.map((f) => {
+              const isChecked = selected.has(f.id);
+              return (
+              <tr key={f.id} className={isChecked ? "bg-primary/5" : undefined}>
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    aria-label={`Select ${f.title_en}`}
+                    checked={isChecked}
+                    onChange={() => toggleOne(f.id)}
+                    className="h-4 w-4 rounded border-border accent-primary"
+                  />
+                </td>
                 <td className="px-4 py-3">
                   <div className="font-medium">{f.title_en}</div>
                   {f.title_fa && <div className="text-xs text-muted-foreground" dir="rtl">{f.title_fa}</div>}
@@ -196,10 +267,57 @@ function FilmsAdminPage() {
                   </div>
                 </td>
               </tr>
-            ))}
+            );})}
           </tbody>
         </table>
       </div>
+
+      {selected.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-2xl">
+          <span className="px-2 text-sm text-muted-foreground">
+            {selected.size} selected
+          </span>
+          <div className="h-5 w-px bg-border" />
+          <button
+            type="button"
+            onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "published" })}
+            disabled={bulkVisibility.isPending}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          >
+            <Eye className="h-4 w-4" /> Publish
+          </button>
+          <button
+            type="button"
+            onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "draft" })}
+            disabled={bulkVisibility.isPending}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          >
+            <EyeOff className="h-4 w-4" /> Unpublish
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm(`Delete ${selected.size} film(s)? This cannot be undone.`)) {
+                bulkDelete.mutate(selectedIds);
+              }
+            }}
+            disabled={bulkDelete.isPending}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </button>
+          <div className="h-5 w-px bg-border" />
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent"
+            aria-label="Clear selection"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
 
       {editing && (
         <FilmEditor
