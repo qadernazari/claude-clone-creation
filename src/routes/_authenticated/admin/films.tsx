@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
@@ -176,6 +176,14 @@ function FilmsAdminPage() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-1">
+                    <Link
+                      to="/admin/films/$filmId/credits"
+                      params={{ filmId: f.id }}
+                      title="Edit credits"
+                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Users className="h-4 w-4" />
+                    </Link>
                     <button type="button" onClick={() => setEditing(f)}
                       className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
                       <Pencil className="h-4 w-4" />
