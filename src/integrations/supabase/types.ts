@@ -50,6 +50,7 @@ export type Database = {
           provider_ref: string | null
           status: string
           supporter: string | null
+          user_id: string | null
         }
         Insert: {
           amount: number
@@ -62,6 +63,7 @@ export type Database = {
           provider_ref?: string | null
           status?: string
           supporter?: string | null
+          user_id?: string | null
         }
         Update: {
           amount?: number
@@ -74,6 +76,7 @@ export type Database = {
           provider_ref?: string | null
           status?: string
           supporter?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
