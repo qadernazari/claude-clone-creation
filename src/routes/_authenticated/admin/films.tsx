@@ -73,6 +73,7 @@ function FilmsAdminPage() {
   const { data: categories = [] } = useQuery({ queryKey: ["admin", "category-ids"], queryFn: listCategoryIds });
 
   const [editing, setEditing] = useState<FilmDraft | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const save = useMutation({
     mutationFn: async (draft: FilmDraft) => {
@@ -122,6 +123,55 @@ function FilmsAdminPage() {
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const bulkVisibility = useMutation({
+    mutationFn: async (args: { ids: string[]; visibility: "published" | "draft" }) => {
+      const { error } = await supabase
+        .from("films")
+        .update({ visibility: args.visibility })
+        .in("id", args.ids);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_, vars) => {
+      toast.success(
+        `${vars.ids.length} film${vars.ids.length === 1 ? "" : "s"} ${vars.visibility === "published" ? "published" : "unpublished"}`,
+      );
+      setSelected(new Set());
+      qc.invalidateQueries({ queryKey: ["admin", "films"] });
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const bulkDelete = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("films").delete().in("id", ids);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_, ids) => {
+      toast.success(`${ids.length} film${ids.length === 1 ? "" : "s"} deleted`);
+      setSelected(new Set());
+      qc.invalidateQueries({ queryKey: ["admin", "films"] });
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const allIds = films.map((f) => f.id);
+  const allSelected = allIds.length > 0 && allIds.every((id) => selected.has(id));
+  const someSelected = selected.size > 0 && !allSelected;
+  const selectedIds = Array.from(selected);
+
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(allIds));
+  }
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
 
   return (
     <div className="p-8 max-w-6xl">
