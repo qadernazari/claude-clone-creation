@@ -2,8 +2,8 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { Logo } from "@/components/logo";
-import { AuthMenu } from "@/components/auth-menu";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/_authenticated/my-tickets")({
   component: MyTicketsPage,
@@ -92,14 +92,7 @@ function MyTicketsPage() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
-          </Link>
-          <AuthMenu />
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto max-w-5xl px-6 py-12">
         <h1 className={`text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
@@ -201,6 +194,7 @@ function MyTicketsPage() {
           </ul>
         )}
       </main>
+      <SiteFooter />
     </div>
   );
 }

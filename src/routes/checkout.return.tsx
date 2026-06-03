@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
-import { Logo } from "@/components/logo";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/checkout/return")({
   validateSearch: (search: Record<string, unknown>): { session_id?: string; film?: string; kind?: string } => ({
@@ -31,11 +32,7 @@ function CheckoutReturn() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-cream/10">
-        <div className="mx-auto flex max-w-6xl items-center px-6 py-4">
-          <Link to="/" aria-label="IRAN — home"><Logo size={36} /></Link>
-        </div>
-      </header>
+      <SiteHeader />
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
         {session_id ? (
           <>
@@ -74,6 +71,7 @@ function CheckoutReturn() {
           <p className="text-cream/70">{fa ? "اطلاعاتی پیدا نشد." : "No session information found."}</p>
         )}
       </main>
+      <SiteFooter />
     </div>
   );
 }
