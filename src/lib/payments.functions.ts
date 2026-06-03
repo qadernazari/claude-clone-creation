@@ -60,7 +60,7 @@ async function ensureFilmPrice(
       return { priceId: price.id, productName };
     }
     // Price changed: deactivate old, create a new one with the same lookup_key.
-    await stripe.prices.update(price.id, { active: false, lookup_key: null });
+    await stripe.prices.update(price.id, { active: false });
     const productId = typeof price.product === "string" ? price.product : price.product.id;
     const newPrice = await stripe.prices.create({
       product: productId,
