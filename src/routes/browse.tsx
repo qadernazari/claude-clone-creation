@@ -194,6 +194,7 @@ function BrowsePage() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
+              aria-label={locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
               className="hairline rounded-full border bg-bg-1 px-3 py-1.5 text-cream focus:outline-none"
             >
               {sortOptions.map((o) => (
