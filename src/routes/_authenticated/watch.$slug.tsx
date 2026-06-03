@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
+import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/watch/$slug")({
@@ -11,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/watch/$slug")({
     const { data: film, error } = await supabase
       .from("films")
       .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, video_url, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year"
+        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year"
       )
       .eq("slug", params.slug)
       .maybeSingle();
