@@ -94,6 +94,16 @@ function WatchPage() {
     refetchInterval: 60_000,
   });
 
+  const fetchStreamUrl = useServerFn(getFilmStreamUrl);
+  const { data: streamRes } = useQuery({
+    queryKey: ["stream-url", film.slug, ticket?.id],
+    queryFn: () => fetchStreamUrl({ data: { slug: film.slug } }),
+    enabled: !!ticket,
+    staleTime: 5 * 60_000,
+  });
+  const videoUrl =
+    streamRes && "videoUrl" in streamRes ? streamRes.videoUrl : null;
+
   const countdown = useCountdown(ticket?.expires_at);
 
   // Log a play event once when ticket becomes available
