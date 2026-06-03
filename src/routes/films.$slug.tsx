@@ -209,7 +209,15 @@ function FilmPage() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {user ? (
+                  {user && activeTicket ? (
+                    <Link
+                      to="/watch/$slug"
+                      params={{ slug: film.slug }}
+                      className="inline-flex flex-1 items-center justify-center rounded-md bg-amber px-4 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+                    >
+                      {t.watch}
+                    </Link>
+                  ) : user ? (
                     <button
                       type="button"
                       onClick={() => setCheckoutOpen(true)}
@@ -236,7 +244,13 @@ function FilmPage() {
                     {t.contribute}
                   </button>
                 </div>
+                {activeTicket?.expires_at && (
+                  <p className="mt-3 text-[11px] text-cream/55">
+                    {t.ticketActive} · {new Date(activeTicket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", { dateStyle: "medium", timeStyle: "short" })}
+                  </p>
+                )}
                 {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
+
               </div>
             </div>
           </div>
