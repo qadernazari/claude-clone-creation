@@ -72,6 +72,8 @@ function FilmPage() {
   const fa = locale === "fa";
   const [user, setUser] = useState<User | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [contribOpen, setContribOpen] = useState(false);
+
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -239,12 +241,18 @@ function FilmPage() {
                   )}
                   <button
                     type="button"
-                    disabled
-                    title={t.contribSoon}
-                    className="inline-flex items-center justify-center rounded-md border border-cream/20 px-4 py-2.5 text-sm font-medium text-cream/90 hover:bg-cream/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      if (!user) {
+                        window.location.href = "/auth";
+                        return;
+                      }
+                      setContribOpen(true);
+                    }}
+                    className="inline-flex items-center justify-center rounded-md border border-cream/20 px-4 py-2.5 text-sm font-medium text-cream/90 hover:bg-cream/10 transition-colors"
                   >
                     {t.contribute}
                   </button>
+
                 </div>
                 {activeTicket?.expires_at && (
                   <p className="mt-3 text-[11px] text-cream/55">
@@ -298,6 +306,16 @@ function FilmPage() {
           onClose={() => setCheckoutOpen(false)}
         />
       )}
+
+      {contribOpen && (
+        <ContributeModal
+          filmSlug={film.slug}
+          filmTitle={title}
+          returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&kind=contribution&film=${film.slug}` : ""}
+          onClose={() => setContribOpen(false)}
+        />
+      )}
     </div>
   );
+
 }
