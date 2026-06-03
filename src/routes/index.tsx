@@ -23,6 +23,71 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Premium home for original Persian short films. Ticket-based, bilingual.",
       },
+      { property: "og:url", content: "https://ir.show/" },
+    ],
+    links: [{ rel: "canonical", href: "https://ir.show/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "IRAN",
+          url: "https://ir.show",
+          description:
+            "A premium streaming home for original Iranian short films. Ticket-based, bilingual, no subscription.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "IRAN",
+          url: "https://ir.show",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "Is there a subscription?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No. You buy a ticket per film and get 48 hours of access. No recurring charges, ever.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Where does the money go?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "The majority goes directly to the filmmakers. We keep a small share to run the platform.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can I watch from inside Iran?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. We support Toman payment via ZarinPal, with the rest of the world paying in USD.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What devices are supported?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Any modern browser — laptop, phone, tablet, or smart TV. No app required.",
+              },
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: Home,
