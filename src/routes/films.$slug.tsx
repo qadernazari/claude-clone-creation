@@ -24,18 +24,38 @@ export const Route = createFileRoute("/films/$slug")({
     if (!data) throw notFound();
     return { film: data };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const f = loaderData?.film;
     if (!f) return {};
     const title = `${f.title_en} — IRAN`;
     const desc = f.synopsis_en?.slice(0, 160) ?? "Original Iranian short film on IRAN.";
+    const url = `https://ir.show/films/${params.slug}`;
     return {
       meta: [
         { title },
         { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
+        { property: "og:type", content: "video.movie" },
+        { property: "og:url", content: url },
         ...(f.cover_url ? [{ property: "og:image" as const, content: f.cover_url }] : []),
+        ...(f.cover_url ? [{ name: "twitter:image" as const, content: f.cover_url }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Movie",
+            name: f.title_en,
+            ...(f.director_en ? { director: { "@type": "Person", name: f.director_en } } : {}),
+            ...(f.year ? { datePublished: String(f.year) } : {}),
+            ...(f.cover_url ? { image: f.cover_url } : {}),
+            ...(f.synopsis_en ? { description: f.synopsis_en } : {}),
+            url,
+          }),
+        },
       ],
     };
   },

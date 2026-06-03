@@ -22,7 +22,9 @@ export const Route = createFileRoute("/contact")({
         property: "og:description",
         content: "Get in touch with IRAN.",
       },
+      { property: "og:url", content: "https://ir.show/contact" },
     ],
+    links: [{ rel: "canonical", href: "https://ir.show/contact" }],
   }),
   component: ContactPage,
 });

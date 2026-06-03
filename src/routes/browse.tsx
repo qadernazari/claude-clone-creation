@@ -21,7 +21,9 @@ export const Route = createFileRoute("/browse")({
         property: "og:description",
         content: "Every film in the catalog, filterable by category and sort.",
       },
+      { property: "og:url", content: "https://ir.show/browse" },
     ],
+    links: [{ rel: "canonical", href: "https://ir.show/browse" }],
   }),
   component: BrowsePage,
   errorComponent: ({ error }) => {
@@ -192,6 +194,7 @@ function BrowsePage() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
+              aria-label={locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
               className="hairline rounded-full border bg-bg-1 px-3 py-1.5 text-cream focus:outline-none"
             >
               {sortOptions.map((o) => (
