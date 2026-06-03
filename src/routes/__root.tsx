@@ -99,6 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "IRAN — Original Iranian short films" },
       { name: "twitter:description", content: "Premium home for original Persian short films. Ticket-based, bilingual." },
+      { name: "google-site-verification", content: "zoKuyFN67EFMHi4pIwq3FrqFrbDasxMAE2kVfYSTGks" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
