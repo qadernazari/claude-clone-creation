@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { requireAdmin } from "@/lib/admin.functions";
 import {
   LayoutDashboard, Film, Tag, LogOut, Home, Users, Ticket,
   HeartHandshake, Settings, Mail, MessageSquare,
@@ -11,13 +12,14 @@ export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
     const user = (context as { user?: { id: string } }).user;
     if (!user) throw redirect({ to: "/auth" });
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (error || !data) throw redirect({ to: "/" });
+    try {
+      const res = await requireAdmin();
+      if (!res.isAdmin) throw redirect({ to: "/" });
+    } catch (e) {
+      // Re-throw router redirects; otherwise treat as access denied.
+      if (e && typeof e === "object" && "to" in (e as Record<string, unknown>)) throw e;
+      throw redirect({ to: "/" });
+    }
   },
   component: AdminShell,
 });

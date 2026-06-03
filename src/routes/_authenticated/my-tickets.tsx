@@ -9,10 +9,11 @@ export const Route = createFileRoute("/_authenticated/my-tickets")({
   component: MyTicketsPage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
+    console.error("my-tickets error:", error);
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-8">
         <div className="text-center space-y-4">
-          <p className="text-sm text-destructive">{error.message}</p>
+          <p className="text-sm text-destructive">Something went wrong. Please try again.</p>
           <button
             onClick={() => { reset(); router.invalidate(); }}
             className="text-sm underline"
