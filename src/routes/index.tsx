@@ -102,7 +102,7 @@ function Home() {
             <a href="/" className="hover:text-cream">
               {locale === "fa" ? "خانه" : "Home"}
             </a>
-            <a href="/" className="hover:text-cream">
+            <a href="/browse" className="hover:text-cream">
               {locale === "fa" ? "آثار اختصاصی" : "Originals"}
             </a>
             <a href="/about" className="hover:text-cream">
