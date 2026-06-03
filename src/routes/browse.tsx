@@ -309,7 +309,11 @@ function BrowsePage() {
             })}
           </div>
         )}
-      </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
+
   );
 }
