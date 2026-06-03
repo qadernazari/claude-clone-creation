@@ -193,7 +193,8 @@ function Home() {
       </section>
 
       {/* Why IRAN — value props with expanding gold bar */}
-      <section className="border-y border-line px-6 py-28 md:px-12 md:py-32">
+      <section aria-labelledby="why-iran" className="border-y border-line px-6 py-28 md:px-12 md:py-32">
+        <h2 id="why-iran" className="sr-only">{locale === "fa" ? "چرا ایران" : "Why IRAN"}</h2>
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 md:grid-cols-4">
           {[
             {
