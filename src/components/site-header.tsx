@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
@@ -5,12 +6,12 @@ import { AuthMenu } from "./auth-menu";
 function LanguageToggle() {
   const { locale, setLocale } = useLocale();
   return (
-    <div className="hairline inline-flex items-center gap-0.5 rounded-full border bg-bg-1/60 p-1 text-[10px] uppercase tracking-widest">
+    <div className="inline-flex items-center gap-0.5 rounded-full border border-cream/10 bg-bg-1/40 p-0.5 text-[10px] uppercase tracking-widest backdrop-blur">
       <button
         type="button"
         onClick={() => setLocale("en")}
-        className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-          locale === "en" ? "bg-amber text-ink" : "text-cream/40 hover:text-cream"
+        className={`rounded-full px-2.5 py-1 font-semibold transition-all duration-300 ${
+          locale === "en" ? "bg-amber text-ink shadow-sm" : "text-cream/40 hover:text-cream"
         }`}
         aria-pressed={locale === "en"}
       >
@@ -19,8 +20,8 @@ function LanguageToggle() {
       <button
         type="button"
         onClick={() => setLocale("fa")}
-        className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-          locale === "fa" ? "bg-amber text-ink" : "text-cream/40 hover:text-cream"
+        className={`rounded-full px-2.5 py-1 font-semibold transition-all duration-300 ${
+          locale === "fa" ? "bg-amber text-ink shadow-sm" : "text-cream/40 hover:text-cream"
         }`}
         aria-pressed={locale === "fa"}
       >
@@ -32,17 +33,40 @@ function LanguageToggle() {
 
 export function SiteHeader({ current }: { current?: "home" | "browse" | "about" }) {
   const { locale } = useLocale();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const linkCls = (key: "home" | "browse" | "about") =>
-    `transition-colors ${current === key ? "text-cream" : "text-cream/60 hover:text-cream"}`;
+    `relative py-1 transition-colors duration-300 ${
+      current === key ? "text-cream" : "text-cream/55 hover:text-cream"
+    } after:absolute after:left-0 after:-bottom-1 after:h-px after:bg-amber after:transition-all after:duration-500 ${
+      current === key ? "after:w-full" : "after:w-0 hover:after:w-full"
+    }`;
 
   return (
-    <header className="fixed top-0 z-30 w-full border-b border-line bg-bg-0/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-12">
+    <header
+      className={`fixed top-0 z-30 w-full transition-all duration-500 ${
+        scrolled
+          ? "border-b border-cream/[0.06] bg-bg-0/85 backdrop-blur-xl"
+          : "border-b border-transparent bg-gradient-to-b from-bg-0/60 to-transparent"
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 md:px-10 ${
+          scrolled ? "py-3" : "py-5"
+        }`}
+      >
         <div className="flex items-center gap-10">
-          <a href="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
+          <a href="/" className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
+            <Logo size={32} />
           </a>
-          <nav className="hidden gap-8 text-[11px] font-medium uppercase tracking-[0.2em] md:flex">
+          <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
             <a href="/" className={linkCls("home")}>
               {locale === "fa" ? "خانه" : "Home"}
             </a>
@@ -54,7 +78,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             </a>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <LanguageToggle />
           <AuthMenu />
         </div>
