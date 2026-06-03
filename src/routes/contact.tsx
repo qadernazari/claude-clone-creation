@@ -1,11 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { Logo } from "@/components/logo";
-import { AuthMenu } from "@/components/auth-menu";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { Mail, MapPin, Send } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
