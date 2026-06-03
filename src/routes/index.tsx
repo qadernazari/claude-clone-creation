@@ -359,13 +359,14 @@ function Home() {
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <a
               href="/browse"
-              className="bg-amber px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-amber-bright"
+              className="group inline-flex items-center gap-2 rounded-full bg-amber px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.22em] text-ink transition-all duration-300 hover:bg-amber-bright hover:gap-3 hover:shadow-[0_8px_30px_-8px_oklch(0.77_0.115_80/0.5)]"
             >
               {locale === "fa" ? "تماشای آثار" : "Browse Originals"}
+              <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
             </a>
             <a
               href="/about"
-              className="border border-cream/20 px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] text-cream transition-colors hover:bg-cream hover:text-ink"
+              className="inline-flex items-center rounded-full border border-cream/20 px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.22em] text-cream transition-all duration-300 hover:border-cream/60 hover:bg-cream/5"
             >
               {locale === "fa" ? "درباره‌ی ایران" : "Our story"}
             </a>
