@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminNotifyListRouteImport } from './routes/_authenticated/admin/notify-list'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
 import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin/contributions'
+import { Route as AuthenticatedAdminContactSubmissionsRouteImport } from './routes/_authenticated/admin/contact-submissions'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -154,6 +155,12 @@ const AuthenticatedAdminContributionsRoute =
     path: '/contributions',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminContactSubmissionsRoute =
+  AuthenticatedAdminContactSubmissionsRouteImport.update({
+    id: '/contact-submissions',
+    path: '/contact-submissions',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/categories',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
@@ -253,6 +261,7 @@ export interface FileRoutesByTo {
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
@@ -287,6 +296,7 @@ export interface FileRoutesById {
   '/films/$slug': typeof FilmsSlugRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/_authenticated/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/admin/analytics'
     | '/admin/categories'
+    | '/admin/contact-submissions'
     | '/admin/contributions'
     | '/admin/films'
     | '/admin/notify-list'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/admin/analytics'
     | '/admin/categories'
+    | '/admin/contact-submissions'
     | '/admin/contributions'
     | '/admin/films'
     | '/admin/notify-list'
@@ -385,6 +397,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/contact-submissions'
     | '/_authenticated/admin/contributions'
     | '/_authenticated/admin/films'
     | '/_authenticated/admin/notify-list'
@@ -579,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminContributionsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/contact-submissions': {
+      id: '/_authenticated/admin/contact-submissions'
+      path: '/contact-submissions'
+      fullPath: '/admin/contact-submissions'
+      preLoaderRoute: typeof AuthenticatedAdminContactSubmissionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/categories': {
       id: '/_authenticated/admin/categories'
       path: '/categories'
@@ -663,6 +683,7 @@ const AuthenticatedAdminFilmsRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminContactSubmissionsRoute: typeof AuthenticatedAdminContactSubmissionsRoute
   AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
   AuthenticatedAdminFilmsRoute: typeof AuthenticatedAdminFilmsRouteWithChildren
   AuthenticatedAdminNotifyListRoute: typeof AuthenticatedAdminNotifyListRoute
@@ -676,6 +697,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+    AuthenticatedAdminContactSubmissionsRoute:
+      AuthenticatedAdminContactSubmissionsRoute,
     AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
     AuthenticatedAdminFilmsRoute: AuthenticatedAdminFilmsRouteWithChildren,
     AuthenticatedAdminNotifyListRoute: AuthenticatedAdminNotifyListRoute,
