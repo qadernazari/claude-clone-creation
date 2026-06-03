@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ExternalLink, Plus, X } from "lucide-react";
@@ -12,7 +12,6 @@ import {
   type SupportPayments, type WelcomeScreen, type WhyIranCard,
 } from "@/lib/cms";
 import { BilingualField, PageHeader, Panel } from "@/components/admin/bilingual-field";
-import { TwoClickDelete } from "@/components/admin/two-click-delete";
 
 export const Route = createFileRoute("/_authenticated/admin/homepage")({
   component: HomepagePage,
