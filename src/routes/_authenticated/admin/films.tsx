@@ -176,6 +176,14 @@ function FilmsAdminPage() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-1">
+                    <Link
+                      to="/admin/films/$filmId/credits"
+                      params={{ filmId: f.id }}
+                      title="Edit credits"
+                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Users className="h-4 w-4" />
+                    </Link>
                     <button type="button" onClick={() => setEditing(f)}
                       className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
                       <Pencil className="h-4 w-4" />
