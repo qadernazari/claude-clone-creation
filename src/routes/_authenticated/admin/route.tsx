@@ -27,6 +27,7 @@ const NAV: ReadonlyArray<{ to: string; label: string; icon: typeof LayoutDashboa
   { to: "/admin/tickets", label: "Tickets", icon: Ticket },
   { to: "/admin/contributions", label: "Contributions", icon: HeartHandshake },
   { to: "/admin/notify-list", label: "Notify list", icon: Mail },
+  { to: "/admin/contact-submissions", label: "Contact inbox", icon: MessageSquare },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
