@@ -188,14 +188,28 @@ function Home() {
 
       {/* Footer */}
       <footer className="hairline border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-12 text-xs text-cream/50 md:flex-row md:items-center">
-          <Logo size={32} />
-          <p>
-            © {new Date().getFullYear()} IRAN ·{" "}
-            {locale === "fa"
-              ? "خانه‌ای برای سینمای کوتاه ایران"
-              : "A home for contemporary Iranian cinema"}
-          </p>
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <Logo size={32} />
+            <nav className="flex flex-wrap gap-6 text-sm text-cream/60">
+              <a href="/" className="hover:text-cream transition-colors">{locale === "fa" ? "خانه" : "Home"}</a>
+              <a href="/browse" className="hover:text-cream transition-colors">{locale === "fa" ? "آثار" : "Browse"}</a>
+              <a href="/about" className="hover:text-cream transition-colors">{locale === "fa" ? "درباره" : "About"}</a>
+              <a href="/contact" className="hover:text-cream transition-colors">{locale === "fa" ? "تماس" : "Contact"}</a>
+            </nav>
+          </div>
+          <div className="mt-8 flex flex-col gap-2 text-xs text-cream/40 md:flex-row md:items-center md:justify-between">
+            <p>
+              © {new Date().getFullYear()} IRAN ·{" "}
+              {locale === "fa"
+                ? "خانه‌ای برای سینمای کوتاه ایران"
+                : "A home for contemporary Iranian cinema"}
+            </p>
+            <div className="flex gap-4">
+              <span className="hover:text-cream/60 transition-colors cursor-default">{locale === "fa" ? "شرایط استفاده" : "Terms"}</span>
+              <span className="hover:text-cream/60 transition-colors cursor-default">{locale === "fa" ? "حریم خصوصی" : "Privacy"}</span>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
