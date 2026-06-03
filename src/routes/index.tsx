@@ -71,31 +71,8 @@ function Home() {
     <div className="min-h-screen bg-bg-0 text-cream">
       <WelcomeSplash />
 
-      {/* Header */}
-      <header className="fixed top-0 z-30 w-full border-b border-line bg-bg-0/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-12">
-          <div className="flex items-center gap-10">
-            <a href="/" className="inline-flex items-center" aria-label="IRAN — home">
-              <Logo size={36} />
-            </a>
-            <nav className="hidden gap-8 text-[11px] font-medium uppercase tracking-[0.2em] text-cream/60 md:flex">
-              <a href="/" className="text-cream transition-colors">
-                {locale === "fa" ? "خانه" : "Home"}
-              </a>
-              <a href="/browse" className="hover:text-cream transition-colors">
-                {locale === "fa" ? "آثار اختصاصی" : "Originals"}
-              </a>
-              <a href="/about" className="hover:text-cream transition-colors">
-                {locale === "fa" ? "درباره" : "About"}
-              </a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <LanguageToggle />
-            <AuthMenu />
-          </div>
-        </div>
-      </header>
+      <SiteHeader current="home" />
+
 
       {/* Hero — cinematic bottom-aligned editorial spread */}
       <section className="relative flex min-h-screen items-end overflow-hidden px-6 pb-20 pt-32 md:px-12 md:pb-32">
