@@ -220,18 +220,8 @@ function ContactPage() {
         </aside>
       </section>
 
-      {/* Footer */}
-      <footer className="hairline border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-12 text-xs text-cream/50 md:flex-row md:items-center">
-          <Logo size={32} />
-          <p>
-            © {new Date().getFullYear()} IRAN ·{" "}
-            {fa
-              ? "خانه‌ای برای سینمای کوتاه ایران"
-              : "A home for contemporary Iranian cinema"}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
+
     </div>
   );
 }
