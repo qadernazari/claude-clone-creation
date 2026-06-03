@@ -128,6 +128,29 @@
     text-rendering: optimizeLegibility;
     font-weight: 400;
     letter-spacing: 0.005em;
+    /* Match optical line-height between Latin and Persian scripts */
+    line-height: 1.6;
+  }
+
+  /* Persian typography: slightly larger, more open leading for Vazirmatn */
+  [lang="fa"] body,
+  [dir="rtl"] body {
+    font-feature-settings: "kern", "calt", "liga";
+    letter-spacing: 0;
+    line-height: 1.75;
+  }
+  [lang="fa"] h1, [lang="fa"] h2, [lang="fa"] h3, [lang="fa"] h4,
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+    letter-spacing: 0; /* tracking-tight kerning is a Latin idea */
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  /* Mirror tracking utilities that look wrong in Persian */
+  [dir="rtl"] .tracking-widest,
+  [dir="rtl"] .tracking-wider,
+  [dir="rtl"] .tracking-wide,
+  [dir="rtl"] [class*="tracking-["] {
+    letter-spacing: 0 !important;
   }
 
   h1, h2, h3, h4 {
