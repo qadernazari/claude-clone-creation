@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
-import { Logo } from "../components/logo";
-import { AuthMenu } from "../components/auth-menu";
+import { SiteHeader } from "../components/site-header";
+import { SiteFooter } from "../components/site-footer";
+
 
 export const Route = createFileRoute("/about")({
   head: () => ({
