@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/watch/$slug")({
   loader: async ({ params }) => {
     const { data: film, error } = await supabase
       .from("films")
-      .select("id, slug, title_en, title_fa, director_en, director_fa, video_url, visibility, ticket_hours")
+      .select(
+        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, video_url, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year"
+      )
       .eq("slug", params.slug)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -48,10 +50,29 @@ export const Route = createFileRoute("/_authenticated/watch/$slug")({
   },
 });
 
+const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.18 0.03 240))";
+
+function useCountdown(target: string | null | undefined) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!target) return;
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, [target]);
+  if (!target) return null;
+  const ms = new Date(target).getTime() - now;
+  if (ms <= 0) return null;
+  const h = Math.floor(ms / 3_600_000);
+  const m = Math.floor((ms % 3_600_000) / 60_000);
+  return { h, m };
+}
+
 function WatchPage() {
   const { film } = Route.useLoaderData();
   const { locale, num, dir } = useLocale();
   const fa = locale === "fa";
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [theater, setTheater] = useState(true);
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: ["ticket", film.id],
@@ -71,96 +92,248 @@ function WatchPage() {
     refetchInterval: 60_000,
   });
 
+  const countdown = useCountdown(ticket?.expires_at);
+
+  // Log a play event once when ticket becomes available
   useEffect(() => {
     if (ticket) {
       supabase.from("events").insert({ type: "play", film_id: film.id }).then(() => {});
     }
   }, [ticket, film.id]);
 
+  // Resume position: persist currentTime per film in localStorage
+  const storageKey = `watch:pos:${film.id}`;
+  const onLoadedMetadata = useCallback(() => {
+    try {
+      const saved = Number(localStorage.getItem(storageKey) || "0");
+      if (saved > 5 && videoRef.current && saved < (videoRef.current.duration || 0) - 10) {
+        videoRef.current.currentTime = saved;
+      }
+    } catch { /* ignore */ }
+  }, [storageKey]);
+
+  const onTimeUpdate = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (Math.floor(v.currentTime) % 5 === 0) {
+      try { localStorage.setItem(storageKey, String(v.currentTime)); } catch { /* ignore */ }
+    }
+  }, [storageKey]);
+
+  const onEnded = useCallback(() => {
+    try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
+  }, [storageKey]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (!ticket || !film.video_url) return;
+    const handler = (e: KeyboardEvent) => {
+      const v = videoRef.current;
+      if (!v) return;
+      const tag = (e.target as HTMLElement | null)?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea") return;
+      switch (e.key) {
+        case " ":
+        case "k":
+          e.preventDefault();
+          if (v.paused) v.play(); else v.pause();
+          break;
+        case "f":
+          e.preventDefault();
+          if (document.fullscreenElement) document.exitFullscreen();
+          else v.requestFullscreen?.();
+          break;
+        case "m":
+          e.preventDefault();
+          v.muted = !v.muted;
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          v.currentTime = Math.min((v.duration || 0), v.currentTime + 5);
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          v.currentTime = Math.max(0, v.currentTime - 5);
+          break;
+        case "t":
+          e.preventDefault();
+          setTheater((x) => !x);
+          break;
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [ticket, film.video_url]);
+
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
+  const synopsis = fa ? film.synopsis_fa || film.synopsis_en : film.synopsis_en;
+
+  const posterStyle = useMemo(
+    () => ({ background: (film.poster_gradient as string) || fallbackGradient }),
+    [film.poster_gradient]
+  );
 
   const t = {
     back: fa ? "بازگشت به فیلم" : "Back to film",
-    noTicket: fa ? "بلیط فعالی برای این فیلم ندارید." : "You don't have an active ticket for this film.",
+    noTicket: fa ? "بلیط فعالی برای این فیلم ندارید." : "You don't have an active ticket.",
+    noTicketSub: fa
+      ? "برای تماشای این اثر بلیط تهیه کنید."
+      : "Purchase a ticket to start streaming this film.",
     buyOne: fa ? "خرید بلیط" : "Buy a ticket",
     missing: fa ? "ویدئو هنوز در دسترس نیست." : "Video is not available yet.",
-    expiresAt: fa ? "دسترسی تا" : "Access until",
-    loading: fa ? "در حال بررسی بلیط…" : "Checking your ticket…",
+    checking: fa ? "در حال بررسی بلیط…" : "Checking your ticket…",
+    accessRemaining: fa ? "زمان باقی‌مانده" : "Access remaining",
+    theaterOn: fa ? "حالت سینما" : "Theater mode",
+    theaterOff: fa ? "حالت عادی" : "Standard view",
+    shortcuts: fa ? "میانبرها" : "Shortcuts",
+    aboutFilm: fa ? "درباره فیلم" : "About the film",
   };
+
+  const showPlayer = !isLoading && !!ticket && !!film.video_url;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
+            <Logo size={32} />
           </Link>
-          <AuthMenu />
+          <div className="flex items-center gap-4">
+            {countdown && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-cream/15 bg-cream/5 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse" />
+                {t.accessRemaining}: {num(countdown.h)}h {num(countdown.m)}m
+              </span>
+            )}
+            <AuthMenu />
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <Link
-          to="/films/$slug"
-          params={{ slug: film.slug }}
-          className="text-xs text-cream/60 hover:text-cream-bright"
+      <main className={theater ? "mx-auto max-w-[1400px] px-4 py-6" : "mx-auto max-w-5xl px-6 py-8"}>
+        <div className="flex items-center justify-between">
+          <Link
+            to="/films/$slug"
+            params={{ slug: film.slug }}
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright transition-colors"
+          >
+            ← {t.back}
+          </Link>
+          <button
+            type="button"
+            onClick={() => setTheater((x) => !x)}
+            className="text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright transition-colors"
+            aria-pressed={theater}
+          >
+            {theater ? t.theaterOff : t.theaterOn}{" "}
+            <kbd className="ms-1 rounded border border-cream/20 px-1 text-[10px] text-cream/50">T</kbd>
+          </button>
+        </div>
+
+        <div
+          className="mt-4 relative overflow-hidden rounded-xl border border-cream/10 shadow-2xl shadow-black/60 aspect-video"
+          style={!showPlayer ? posterStyle : { background: "#000" }}
         >
-          ← {t.back}
-        </Link>
+          {/* subtle vignette for poster states */}
+          {!showPlayer && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+          )}
 
-        <h1 className={`mt-4 text-2xl md:text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-          {title}
-        </h1>
-        {director && (
-          <p className="mt-1 text-sm text-cream/60">
-            {fa ? "کارگردان: " : "Directed by "}{director}
-          </p>
-        )}
-
-        <div className="mt-6 hairline overflow-hidden rounded-xl border bg-black aspect-video">
           {isLoading ? (
-            <div className="flex h-full items-center justify-center text-sm text-cream/60">
-              {t.loading}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex items-center gap-3 text-sm text-cream/70">
+                <span className="h-2 w-2 rounded-full bg-cream/60 animate-pulse" />
+                {t.checking}
+              </div>
             </div>
           ) : !ticket ? (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-center px-6">
-              <p className="text-sm text-cream/80">{t.noTicket}</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center px-6">
+              <div className="max-w-sm">
+                <p className="font-display text-xl text-cream-bright">{t.noTicket}</p>
+                <p className="mt-2 text-sm text-cream/70">{t.noTicketSub}</p>
+              </div>
               <Link
                 to="/films/$slug"
                 params={{ slug: film.slug }}
-                className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+                className="rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
               >
                 {t.buyOne}
               </Link>
             </div>
           ) : !film.video_url ? (
-            <div className="flex h-full items-center justify-center text-sm text-cream/60">
+            <div className="absolute inset-0 flex items-center justify-center text-sm text-cream/70">
               {t.missing}
             </div>
           ) : (
             <video
+              ref={videoRef}
               src={film.video_url}
+              poster={film.cover_url || undefined}
               controls
+              autoPlay
               playsInline
               controlsList="nodownload"
-              className="h-full w-full"
+              onLoadedMetadata={onLoadedMetadata}
+              onTimeUpdate={onTimeUpdate}
+              onEnded={onEnded}
+              className="absolute inset-0 h-full w-full bg-black"
             />
           )}
         </div>
 
-        {ticket?.expires_at && (
-          <p className="mt-3 text-xs text-cream/55">
-            {t.expiresAt}{" "}
-            <time dateTime={ticket.expires_at}>
-              {new Date(ticket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", {
-                dateStyle: "medium",
-                timeStyle: "short",
-              })}
-            </time>
-            {" · "}{num(film.ticket_hours)}h
-          </p>
-        )}
+        {/* Title block */}
+        <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
+          <div>
+            <h1 className={`text-2xl md:text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+              {title}
+            </h1>
+            <p className="mt-1 text-sm text-cream/60">
+              {director && <>{fa ? "کارگردان: " : "Directed by "}{director}</>}
+              {film.year ? <> · {num(film.year)}</> : null}
+              {film.duration_min ? <> · {num(film.duration_min)} {fa ? "دقیقه" : "min"}</> : null}
+            </p>
+          </div>
+
+          {countdown && (
+            <div className="rounded-lg border border-cream/10 bg-cream/[0.03] px-4 py-3 text-xs text-cream/70 sm:hidden">
+              <div className="uppercase tracking-widest text-[10px] text-cream/45">{t.accessRemaining}</div>
+              <div className="mt-0.5 text-cream-bright">{num(countdown.h)}h {num(countdown.m)}m</div>
+            </div>
+          )}
+        </div>
+
+        {/* About + shortcuts */}
+        <div className="mt-8 grid gap-8 md:grid-cols-3">
+          {synopsis && (
+            <section className="md:col-span-2">
+              <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.aboutFilm}</h2>
+              <p className={`mt-3 text-sm leading-relaxed text-cream/80 ${fa ? "font-vazir" : ""}`}>
+                {synopsis}
+              </p>
+            </section>
+          )}
+
+          <section className={synopsis ? "" : "md:col-span-3"}>
+            <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.shortcuts}</h2>
+            <dl className="mt-3 grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-cream/70">
+              {[
+                { k: "Space / K", v: fa ? "پخش/مکث" : "Play / Pause" },
+                { k: "←  →", v: fa ? "۵ ثانیه" : "Seek 5s" },
+                { k: "F", v: fa ? "تمام‌صفحه" : "Fullscreen" },
+                { k: "M", v: fa ? "بی‌صدا" : "Mute" },
+                { k: "T", v: fa ? "حالت سینما" : "Theater" },
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between gap-2">
+                  <kbd className="rounded border border-cream/15 bg-cream/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-cream/80">
+                    {k}
+                  </kbd>
+                  <span className="text-end">{v}</span>
+                </div>
+              ))}
+            </dl>
+          </section>
+        </div>
       </main>
     </div>
   );
