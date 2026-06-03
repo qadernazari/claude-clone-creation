@@ -14,8 +14,9 @@ export const Route = createFileRoute("/_authenticated/admin/faq")({
 
 function FaqPage() {
   const qc = useQueryClient();
-  const [value, setValue] = useState<FaqContent>(DEFAULT_FAQ);
-  useEffect(() => { loadCmsKey<FaqContent>(CMS_KEYS.FAQ).then(setValue); }, []);
+  const [value, setValueRaw] = useState<FaqContent>(DEFAULT_FAQ);
+  const setValue = (v: FaqContent) => setValueRaw({ heading: v.heading ?? DEFAULT_FAQ.heading, items: v.items ?? [] });
+  useEffect(() => { loadCmsKey<FaqContent>(CMS_KEYS.FAQ).then((v) => setValue(v ?? DEFAULT_FAQ)); }, []);
   const save = useMutation({
     mutationFn: () => saveCmsKey(CMS_KEYS.FAQ, value),
     onSuccess: () => { toast.success("FAQ saved"); qc.invalidateQueries({ queryKey: ["site_content", CMS_KEYS.FAQ] }); },
