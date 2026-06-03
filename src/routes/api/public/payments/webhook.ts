@@ -6,7 +6,54 @@ async function getAdmin() {
   return supabaseAdmin;
 }
 
-async function handleContribution(session: any) {
+function formatUsd(amountCents: number, currency: string) {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).format(amountCents / 100);
+  } catch {
+    return `${(amountCents / 100).toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
+
+function formatExpiry(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+async function sendReceipt(
+  origin: string,
+  templateName: string,
+  recipientEmail: string,
+  idempotencyKey: string,
+  templateData: Record<string, unknown>,
+) {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    console.error("Missing SUPABASE_SERVICE_ROLE_KEY for receipt send");
+    return;
+  }
+  try {
+    const res = await fetch(`${origin}/lovable/email/transactional/send`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ templateName, recipientEmail, idempotencyKey, templateData }),
+    });
+    if (!res.ok) {
+      console.error("Receipt send failed", templateName, res.status, await res.text());
+    }
+  } catch (e) {
+    console.error("Receipt send error", e);
+  }
+}
+
+async function handleContribution(session: any, origin: string) {
   const meta = session.metadata ?? {};
   const userId: string | undefined = meta.userId;
   const filmId: string | undefined = meta.film_id;
@@ -43,14 +90,34 @@ async function handleContribution(session: any) {
     console.error("Failed to upsert contribution:", error.message);
     throw new Error(error.message);
   }
+
+  // Receipt email
+  if (supporter) {
+    let filmTitleEn: string | null = null;
+    let filmTitleFa: string | null = null;
+    if (filmId) {
+      const { data: film } = await admin
+        .from("films")
+        .select("title_en, title_fa")
+        .eq("id", filmId)
+        .maybeSingle();
+      filmTitleEn = film?.title_en ?? null;
+      filmTitleFa = film?.title_fa ?? null;
+    }
+    await sendReceipt(origin, "contribution-receipt", supporter, `contribution-${providerRef}`, {
+      amountFormatted: formatUsd(amount, currency),
+      filmTitleEn,
+      filmTitleFa,
+    });
+  }
 }
 
-async function handleCheckoutCompleted(session: any, env: StripeEnv) {
+async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: string) {
   const meta = session.metadata ?? {};
 
   // Branch by intent: contributions vs ticket purchases.
   if (meta.type === "contribution") {
-    await handleContribution(session);
+    await handleContribution(session, origin);
     const admin = await getAdmin();
     await admin.from("payment_events").upsert(
       { id: session.id, provider: "stripe", type: "checkout.session.completed:contribution" },
@@ -62,6 +129,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
 
   const userId: string | undefined = meta.userId;
   const filmId: string | undefined = meta.film_id;
+  const filmSlug: string | undefined = meta.film_slug;
   const ticketHours = Number(meta.ticket_hours ?? 48) || 48;
 
   if (!userId || !filmId) {
@@ -108,6 +176,25 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     { onConflict: "id" },
   );
 
+  // Receipt email
+  const recipient = session.customer_details?.email as string | undefined;
+  if (recipient) {
+    const { data: film } = await admin
+      .from("films")
+      .select("title_en, title_fa, slug")
+      .eq("id", filmId)
+      .maybeSingle();
+    const slug = film?.slug ?? filmSlug ?? "";
+    await sendReceipt(origin, "ticket-receipt", recipient, `ticket-${providerRef}`, {
+      filmTitleEn: film?.title_en ?? "your film",
+      filmTitleFa: film?.title_fa ?? null,
+      amountFormatted: amount ? formatUsd(amount, currency) : "",
+      ticketHours,
+      expiresAtFormatted: formatExpiry(expiresAt),
+      watchUrl: slug ? `${origin}/watch/${slug}` : origin,
+    });
+  }
+
   void env;
 }
 
@@ -122,11 +209,12 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           return Response.json({ received: true, ignored: "invalid env" });
         }
         const env: StripeEnv = rawEnv;
+        const origin = new URL(request.url).origin;
         try {
           const event = await verifyWebhook(request, env);
           switch (event.type) {
             case "checkout.session.completed":
-              await handleCheckoutCompleted(event.data.object, env);
+              await handleCheckoutCompleted(event.data.object, env, origin);
               break;
             default:
               console.log("Unhandled event:", event.type);
