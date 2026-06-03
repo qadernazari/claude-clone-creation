@@ -28,6 +28,7 @@ import { Route as AuthenticatedWatchSlugRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminTicketsRouteImport } from './routes/_authenticated/admin/tickets'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
+import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin/contributions'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -133,6 +134,12 @@ const AuthenticatedAdminFilmsRoute = AuthenticatedAdminFilmsRouteImport.update({
   path: '/films',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminContributionsRoute =
+  AuthenticatedAdminContributionsRouteImport.update({
+    id: '/contributions',
+    path: '/contributions',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/categories',
@@ -201,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/tickets': typeof AuthenticatedAdminTicketsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -229,6 +237,7 @@ export interface FileRoutesByTo {
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/tickets': typeof AuthenticatedAdminTicketsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -260,6 +269,7 @@ export interface FileRoutesById {
   '/films/$slug': typeof FilmsSlugRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/_authenticated/admin/tickets': typeof AuthenticatedAdminTicketsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/admin/analytics'
     | '/admin/categories'
+    | '/admin/contributions'
     | '/admin/films'
     | '/admin/tickets'
     | '/admin/users'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/admin/analytics'
     | '/admin/categories'
+    | '/admin/contributions'
     | '/admin/films'
     | '/admin/tickets'
     | '/admin/users'
@@ -349,6 +361,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/contributions'
     | '/_authenticated/admin/films'
     | '/_authenticated/admin/tickets'
     | '/_authenticated/admin/users'
@@ -519,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFilmsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/contributions': {
+      id: '/_authenticated/admin/contributions'
+      path: '/contributions'
+      fullPath: '/admin/contributions'
+      preLoaderRoute: typeof AuthenticatedAdminContributionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/categories': {
       id: '/_authenticated/admin/categories'
       path: '/categories'
@@ -603,6 +623,7 @@ const AuthenticatedAdminFilmsRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
   AuthenticatedAdminFilmsRoute: typeof AuthenticatedAdminFilmsRouteWithChildren
   AuthenticatedAdminTicketsRoute: typeof AuthenticatedAdminTicketsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -613,6 +634,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+    AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
     AuthenticatedAdminFilmsRoute: AuthenticatedAdminFilmsRouteWithChildren,
     AuthenticatedAdminTicketsRoute: AuthenticatedAdminTicketsRoute,
     AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
@@ -663,13 +685,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
