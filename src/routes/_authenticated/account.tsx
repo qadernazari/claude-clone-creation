@@ -165,14 +165,7 @@ function AccountPage() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
-          </Link>
-          <AuthMenu />
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto max-w-5xl px-6 py-12 space-y-12">
         <div>
