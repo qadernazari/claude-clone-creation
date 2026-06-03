@@ -161,7 +161,18 @@ async function handleContribution(session: any, origin: string) {
       filmTitleEn,
       filmTitleFa,
     });
+
+    await addToNotifyList(admin, supporter);
+    await notifyAdmins(admin, origin, providerRef, {
+      kind: "contribution",
+      buyerEmail: supporter,
+      amountFormatted: formatUsd(amount, currency),
+      filmTitleEn,
+      occurredAtFormatted: formatExpiry(new Date()),
+    });
   }
+
+  await grantSupporterRole(admin, userId);
 }
 
 async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: string) {
