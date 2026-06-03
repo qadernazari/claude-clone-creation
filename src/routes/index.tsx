@@ -52,33 +52,6 @@ function useSiteContent<T>(key: string) {
   });
 }
 
-function LanguageToggle() {
-  const { locale, setLocale } = useLocale();
-  return (
-    <div className="hairline inline-flex items-center gap-0.5 rounded-full border bg-bg-1/60 p-1 text-[10px] uppercase tracking-widest">
-      <button
-        type="button"
-        onClick={() => setLocale("en")}
-        className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-          locale === "en" ? "bg-amber text-ink" : "text-cream/40 hover:text-cream"
-        }`}
-        aria-pressed={locale === "en"}
-      >
-        EN
-      </button>
-      <button
-        type="button"
-        onClick={() => setLocale("fa")}
-        className={`rounded-full px-2.5 py-1 font-bold transition-colors ${
-          locale === "fa" ? "bg-amber text-ink" : "text-cream/40 hover:text-cream"
-        }`}
-        aria-pressed={locale === "fa"}
-      >
-        فا
-      </button>
-    </div>
-  );
-}
 
 function Home() {
   const { locale, t } = useLocale();
