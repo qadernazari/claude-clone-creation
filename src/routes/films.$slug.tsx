@@ -5,8 +5,10 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
 import { FilmCheckout } from "@/components/film-checkout";
+import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { useEffect, useState } from "react";
+
 import type { User } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/films/$slug")({
