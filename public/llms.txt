@@ -1,0 +1,10 @@
+# IRAN
+
+> A premium streaming home for original Iranian short films. Ticket-based, bilingual (English & Persian), no subscription — pay once per film and watch within 48 hours.
+
+## Pages
+
+- [Home](/): Overview of IRAN, featured films, and how it works.
+- [Browse](/browse): Full catalog of original Iranian short films, filterable by category.
+- [About](/about): Mission, team, and the story behind IRAN.
+- [Contact](/contact): Get in touch for questions, partnerships, or feedback.
