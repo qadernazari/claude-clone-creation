@@ -61,10 +61,41 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const setLocale = useCallback((l: Locale) => {
-    setLocaleState(l);
-    try {
-      window.localStorage.setItem(STORAGE_LANG, l);
-    } catch {}
+    const persist = (next: Locale) => {
+      try {
+        window.localStorage.setItem(STORAGE_LANG, next);
+      } catch {}
+    };
+
+    setLocaleState((prev) => {
+      if (prev === l) return prev;
+      persist(l);
+
+      if (typeof document !== "undefined") {
+        const html = document.documentElement;
+        const doc = document as Document & {
+          startViewTransition?: (cb: () => void) => unknown;
+        };
+
+        // Prefer the View Transitions API: a true cross-fade between LTR/RTL snapshots.
+        if (typeof doc.startViewTransition === "function") {
+          doc.startViewTransition(() => {
+            html.lang = l;
+            html.dir = l === "fa" ? "rtl" : "ltr";
+            queueMicrotask(() => setLocaleState(l));
+          });
+          return prev; // state will flip inside the transition
+        }
+
+        // Fallback: brief opacity fade to mask the direction flip.
+        html.setAttribute("data-locale-switching", "");
+        window.setTimeout(() => {
+          html.removeAttribute("data-locale-switching");
+        }, 420);
+      }
+
+      return l;
+    });
   }, []);
 
   const setRegion = useCallback((r: Region) => {
