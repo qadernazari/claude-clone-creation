@@ -90,8 +90,62 @@ function AboutPage() {
                 : "Every film is selected with care. Every ticket is a direct act of support. Every viewer is part of a small but real community."}
             </p>
           </div>
+
+          <blockquote className="relative mt-14 max-w-3xl border-s-2 border-amber/60 ps-6">
+            <p className="font-editorial text-2xl italic leading-snug text-cream-bright md:text-3xl">
+              {fa
+                ? "«سینما، آن‌گاه که اجازه می‌یابی صدای خودش باشد، چیزی برای پنهان کردن ندارد.»"
+                : "“Cinema, when it is allowed to be its own voice, has nothing to hide.”"}
+            </p>
+            <footer className="mt-3 text-xs uppercase tracking-[0.25em] text-cream/45">
+              {fa ? "— از مانیفست ما" : "— From our manifesto"}
+            </footer>
+          </blockquote>
         </div>
       </section>
+
+      {/* Principles — three commitments */}
+      <section className="hairline border-t">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-amber">
+            {fa ? "اصول ما" : "Principles"}
+          </p>
+          <h2 className="mb-12 max-w-2xl font-display text-3xl text-cream-bright md:text-4xl">
+            {fa ? "سه تعهدی که نمی‌شکنیم." : "Three commitments we don't break."}
+          </h2>
+          <div className="grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
+            {[
+              {
+                en: ["Fair to filmmakers", "The majority of every ticket goes directly to the artist. Transparent payouts, no hidden cuts."],
+                fa: ["عدالت با فیلم‌ساز", "بخش عمده‌ی هر بلیت به‌طور مستقیم به هنرمند می‌رسد. پرداخت شفاف، بدون کسر پنهان."],
+              },
+              {
+                en: ["Curated, never crowded", "We add films when they earn their place — not to fill a feed. Quality over quantity, always."],
+                fa: ["انتخاب‌شده، نه شلوغ", "فیلم را وقتی اضافه می‌کنیم که جایگاهش را به دست آورده باشد — نه برای پر کردن صفحه."],
+              },
+              {
+                en: ["Bilingual by design", "Persian and English at parity — both languages are first-class on every screen, every film."],
+                fa: ["دوزبانه از پایه", "فارسی و انگلیسی هم‌شأن — هر دو زبان روی هر صفحه و هر فیلم در رتبه‌ی اول."],
+              },
+            ].map((p, i) => {
+              const [title, desc] = fa ? p.fa : p.en;
+              return (
+                <div key={i} className="bg-bg-0 p-8">
+                  <div className="mb-5 flex items-baseline gap-3">
+                    <span className="font-display text-3xl font-extrabold text-amber/40 tabular-nums">
+                      0{i + 1}
+                    </span>
+                    <span className="h-px flex-1 bg-line" />
+                  </div>
+                  <h3 className="mb-3 font-display text-xl text-cream-bright">{title}</h3>
+                  <p className="text-sm leading-relaxed text-cream/60">{desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
 
       <section className="hairline border-t">
         <div className="mx-auto max-w-6xl px-6 py-20">
