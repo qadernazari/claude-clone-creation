@@ -47,6 +47,7 @@
   --color-cream-bright: var(--cream-bright);
   --color-tan: var(--tan);
   --color-amber: var(--amber);
+  --color-amber-bright: var(--amber-bright);
   --color-ink: var(--ink-on-cream);
   --color-faint: var(--faint);
   --color-line: var(--line);
@@ -54,6 +55,7 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-fa: var(--font-fa);
+  --font-editorial: var(--font-editorial);
 }
 
 :root {
