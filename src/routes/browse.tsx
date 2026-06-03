@@ -21,7 +21,9 @@ export const Route = createFileRoute("/browse")({
         property: "og:description",
         content: "Every film in the catalog, filterable by category and sort.",
       },
+      { property: "og:url", content: "https://ir.show/browse" },
     ],
+    links: [{ rel: "canonical", href: "https://ir.show/browse" }],
   }),
   component: BrowsePage,
   errorComponent: ({ error }) => {
