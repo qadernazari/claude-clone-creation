@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
+import { FilmCheckout } from "@/components/film-checkout";
+import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
@@ -67,6 +69,7 @@ function FilmPage() {
   const { locale, region, num, dir } = useLocale();
   const fa = locale === "fa";
   const [user, setUser] = useState<User | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -111,11 +114,18 @@ function FilmPage() {
     about: fa ? "درباره فیلم" : "About the film",
     crew: fa ? "عوامل" : "Credits",
     back: fa ? "بازگشت" : "Back",
-    paymentsSoon: fa ? "پرداخت به‌زودی فعال می‌شود." : "Payments coming soon.",
+    contribSoon: fa ? "حمایت به‌زودی فعال می‌شود." : "Contributions coming soon.",
+    tomanSoon: fa ? "پرداخت با تومان (زرین‌پال) به‌زودی." : "Toman checkout (ZarinPal) coming soon.",
   };
+
+  const tomanOnly = region === "iran" && film.price_toman > 0;
+  const returnUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&film=${film.slug}`
+    : "";
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
+      <PaymentTestModeBanner />
       <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
@@ -179,8 +189,9 @@ function FilmPage() {
                   {user ? (
                     <button
                       type="button"
-                      disabled
-                      title={t.paymentsSoon}
+                      onClick={() => setCheckoutOpen(true)}
+                      disabled={tomanOnly}
+                      title={tomanOnly ? t.tomanSoon : undefined}
                       className="inline-flex flex-1 items-center justify-center rounded-md bg-amber px-4 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {t.buy}
@@ -196,13 +207,13 @@ function FilmPage() {
                   <button
                     type="button"
                     disabled
-                    title={t.paymentsSoon}
+                    title={t.contribSoon}
                     className="inline-flex items-center justify-center rounded-md border border-cream/20 px-4 py-2.5 text-sm font-medium text-cream/90 hover:bg-cream/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {t.contribute}
                   </button>
                 </div>
-                <p className="mt-3 text-[11px] text-cream/40">{t.paymentsSoon}</p>
+                {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
               </div>
             </div>
           </div>
@@ -240,6 +251,14 @@ function FilmPage() {
           </aside>
         )}
       </section>
+
+      {checkoutOpen && (
+        <FilmCheckout
+          filmSlug={film.slug}
+          returnUrl={returnUrl}
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
     </div>
   );
 }
