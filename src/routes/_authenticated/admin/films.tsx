@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, Eye, EyeOff, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
