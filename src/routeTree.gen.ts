@@ -16,6 +16,7 @@ import { Route as FilmsSlugRouteImport } from './routes/films.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedWatchSlugRouteImport } from './routes/_authenticated/watch.$slug'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -54,6 +55,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedWatchSlugRoute = AuthenticatedWatchSlugRouteImport.update({
+  id: '/watch/$slug',
+  path: '/watch/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminFilmsRoute = AuthenticatedAdminFilmsRouteImport.update({
   id: '/films',
   path: '/films',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRoute
+  '/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRoute
+  '/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/films/$slug': typeof FilmsSlugRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRoute
+  '/_authenticated/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/admin/categories'
     | '/admin/films'
+    | '/watch/$slug'
     | '/admin/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/admin/categories'
     | '/admin/films'
+    | '/watch/$slug'
     | '/admin'
     | '/api/public/payments/webhook'
   id:
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/films'
+    | '/_authenticated/watch/$slug'
     | '/_authenticated/admin/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -202,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/watch/$slug': {
+      id: '/_authenticated/watch/$slug'
+      path: '/watch/$slug'
+      fullPath: '/watch/$slug'
+      preLoaderRoute: typeof AuthenticatedWatchSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/films': {
       id: '/_authenticated/admin/films'
       path: '/films'
@@ -246,10 +265,12 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedWatchSlugRoute: typeof AuthenticatedWatchSlugRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedWatchSlugRoute: AuthenticatedWatchSlugRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -266,3 +287,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
