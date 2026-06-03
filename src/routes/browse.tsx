@@ -314,6 +314,3 @@ function BrowsePage() {
     </div>
   );
 }
-
-  );
-}
