@@ -6,12 +6,24 @@ import { AuthMenu } from "./auth-menu";
 function LanguageToggle() {
   const { locale, setLocale } = useLocale();
   return (
-    <div className="inline-flex items-center gap-0.5 rounded-full border border-cream/10 bg-bg-1/40 p-0.5 text-[10px] uppercase tracking-widest backdrop-blur">
+    <div
+      className="relative inline-flex items-center rounded-full border border-cream/10 bg-bg-1/40 p-0.5 text-[10px] uppercase tracking-widest backdrop-blur"
+      role="group"
+      aria-label="Language"
+    >
+      {/* Sliding active indicator */}
+      <span
+        aria-hidden="true"
+        className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-amber shadow-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{
+          transform: locale === "en" ? "translateX(0)" : "translateX(100%)",
+        }}
+      />
       <button
         type="button"
         onClick={() => setLocale("en")}
-        className={`rounded-full px-2.5 py-1 font-semibold transition-all duration-300 ${
-          locale === "en" ? "bg-amber text-ink shadow-sm" : "text-cream/40 hover:text-cream"
+        className={`relative z-10 rounded-full px-2.5 py-1 font-semibold transition-colors duration-300 ${
+          locale === "en" ? "text-ink" : "text-cream/50 hover:text-cream"
         }`}
         aria-pressed={locale === "en"}
       >
@@ -20,10 +32,11 @@ function LanguageToggle() {
       <button
         type="button"
         onClick={() => setLocale("fa")}
-        className={`rounded-full px-2.5 py-1 font-semibold transition-all duration-300 ${
-          locale === "fa" ? "bg-amber text-ink shadow-sm" : "text-cream/40 hover:text-cream"
+        className={`relative z-10 rounded-full px-2.5 py-1 font-semibold transition-colors duration-300 ${
+          locale === "fa" ? "text-ink" : "text-cream/50 hover:text-cream"
         }`}
         aria-pressed={locale === "fa"}
+        lang="fa"
       >
         فا
       </button>

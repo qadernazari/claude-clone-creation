@@ -128,6 +128,29 @@
     text-rendering: optimizeLegibility;
     font-weight: 400;
     letter-spacing: 0.005em;
+    /* Match optical line-height between Latin and Persian scripts */
+    line-height: 1.6;
+  }
+
+  /* Persian typography: slightly larger, more open leading for Vazirmatn */
+  [lang="fa"] body,
+  [dir="rtl"] body {
+    font-feature-settings: "kern", "calt", "liga";
+    letter-spacing: 0;
+    line-height: 1.75;
+  }
+  [lang="fa"] h1, [lang="fa"] h2, [lang="fa"] h3, [lang="fa"] h4,
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+    letter-spacing: 0; /* tracking-tight kerning is a Latin idea */
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  /* Mirror tracking utilities that look wrong in Persian */
+  [dir="rtl"] .tracking-widest,
+  [dir="rtl"] .tracking-wider,
+  [dir="rtl"] .tracking-wide,
+  [dir="rtl"] [class*="tracking-["] {
+    letter-spacing: 0 !important;
   }
 
   h1, h2, h3, h4 {
@@ -181,3 +204,46 @@
 @utility hairline {
   border-color: var(--line);
 }
+
+/* ---------------------------------------------------------------
+ * Language switching: cinematic cross-fade between EN ⇄ FA (LTR ⇄ RTL).
+ * Uses the View Transitions API where available, with a CSS-only
+ * fallback driven by [data-locale-switching] on <html>.
+ * --------------------------------------------------------------- */
+
+/* Smooth fallback fade — masks the direction flip */
+html {
+  transition: background-color 300ms ease;
+}
+html[data-locale-switching] body {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+body {
+  transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              filter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* View Transitions API — true snapshot cross-fade */
+@keyframes locale-vt-out {
+  to { opacity: 0; filter: blur(8px); }
+}
+@keyframes locale-vt-in {
+  from { opacity: 0; filter: blur(8px); }
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 480ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { animation-name: locale-vt-out; }
+::view-transition-new(root) { animation-name: locale-vt-in; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-locale-switching] body { transition: none; filter: none; opacity: 1; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
