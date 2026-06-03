@@ -93,20 +93,8 @@ function ContactPage() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
-            <Logo size={36} />
-          </Link>
-          <nav className="hidden gap-8 text-sm text-cream/70 md:flex">
-            <a href="/" className="hover:text-cream">{fa ? "خانه" : "Home"}</a>
-            <a href="/browse" className="hover:text-cream">{fa ? "آثار اختصاصی" : "Originals"}</a>
-            <a href="/about" className="hover:text-cream">{fa ? "درباره" : "About"}</a>
-            <a href="/contact" className="text-cream">{fa ? "تماس" : "Contact"}</a>
-          </nav>
-          <AuthMenu />
-        </div>
-      </header>
+      <SiteHeader />
+
 
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
