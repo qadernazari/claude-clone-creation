@@ -65,7 +65,7 @@ function AdminDashboard() {
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
           <li>• Add your first films in <span className="text-foreground">Films</span>.</li>
           <li>• Manage categories used to group films.</li>
-          <li>• Payments (ticket purchase + contributions) will be wired in the next chunk.</li>
+          <li>• View tickets and contributions in <span className="text-foreground">Tickets</span>.</li>
         </ul>
       </section>
     </div>
