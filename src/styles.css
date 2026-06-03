@@ -47,6 +47,7 @@
   --color-cream-bright: var(--cream-bright);
   --color-tan: var(--tan);
   --color-amber: var(--amber);
+  --color-amber-bright: var(--amber-bright);
   --color-ink: var(--ink-on-cream);
   --color-faint: var(--faint);
   --color-line: var(--line);
@@ -54,22 +55,24 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-fa: var(--font-fa);
+  --font-editorial: var(--font-editorial);
 }
 
 :root {
   --radius: 0.75rem;
 
-  /* IRAN palette — exact values from the spec, expressed in oklch */
-  --bg-0: oklch(0.16 0.012 50);        /* #0a0807 warm near-black */
-  --bg-1: oklch(0.22 0.018 60);        /* #15110c card */
-  --cream: oklch(0.88 0.045 80);       /* #eed4b3 */
-  --cream-bright: oklch(0.93 0.035 85);/* #f7e8d2 display */
-  --tan: oklch(0.46 0.04 60);          /* #6b5542 */
-  --amber: oklch(0.77 0.115 75);       /* #d2a864 */
-  --ink-on-cream: oklch(0.20 0.025 60);/* #1c140c */
-  --muted-tone: oklch(0.88 0.045 80 / 0.6);
-  --faint: oklch(0.88 0.045 80 / 0.35);
-  --line: oklch(0.88 0.045 80 / 0.12);
+  /* IRAN — Noir & Gold (refined). Hex anchors: #0d0d0d, #1a1a1a, #c9a84c, #f0d78c */
+  --bg-0: oklch(0.16 0 0);             /* #0d0d0d true noir */
+  --bg-1: oklch(0.22 0 0);             /* #1a1a1a surface */
+  --cream: oklch(0.96 0.005 80);       /* near-white text */
+  --cream-bright: oklch(0.99 0.005 85);/* display text */
+  --tan: oklch(0.55 0.04 70);
+  --amber: oklch(0.77 0.115 80);       /* #c9a84c gold */
+  --amber-bright: oklch(0.86 0.10 88); /* #f0d78c gold-light */
+  --ink-on-cream: oklch(0.16 0 0);
+  --muted-tone: oklch(0.96 0.005 80 / 0.6);
+  --faint: oklch(0.96 0.005 80 / 0.35);
+  --line: oklch(0.96 0.005 80 / 0.10);
 
   /* Map shadcn semantic tokens onto IRAN palette so all UI inherits brand */
   --background: var(--bg-0);
@@ -92,14 +95,15 @@
   --input: var(--line);
   --ring: var(--amber);
 
-  --font-display: "Fraunces", "Vazirmatn", ui-serif, Georgia, serif;
-  --font-body: "Sora", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-fa: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-editorial: "Fraunces", "Vazirmatn", ui-serif, Georgia, serif;
 }
 
 /* Persian: swap to Vazirmatn for both display and body */
 [lang="fa"], [dir="rtl"] {
-  --font-display: "Vazirmatn", ui-serif, serif;
+  --font-display: "Vazirmatn", ui-sans-serif, sans-serif;
   --font-body: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
 }
 
