@@ -55,9 +55,34 @@ export type BannerContent = {
 };
 
 export type FaqContent = {
-  heading: BilingualText;
-  items: { id: string; question: BilingualText; answer: BilingualText }[];
+  headingEn: string;
+  headingFa: string;
+  en: [string, string][];
+  fa: [string, string][];
 };
+
+export type PageCard = {
+  icon: string;
+  heading: string;
+  desc?: string;
+  address?: string;
+};
+
+export type PageLang = {
+  kicker: string;
+  title: string;
+  body: string;
+  cards?: PageCard[];
+};
+
+export type PageEntry = {
+  nameEn: string;
+  nameFa: string;
+  en: PageLang;
+  fa: PageLang;
+};
+
+export type PagesContent = Record<string, PageEntry>;
 
 export type Appearance = {
   primary: string;
@@ -87,6 +112,7 @@ export const CMS_KEYS = {
   FOOTER: "footer",
   BANNER: "banner",
   FAQ: "faq",
+  PAGES: "pages",
   APPEARANCE: "appearance",
   PAYMENT_PROVIDER_IDS: "payment_provider_ids",
 } as const;
@@ -187,9 +213,13 @@ export const DEFAULT_BANNER: BannerContent = {
 };
 
 export const DEFAULT_FAQ: FaqContent = {
-  heading: { en: "Frequently asked questions", fa: "پرسش‌های متداول" },
-  items: [],
+  headingEn: "Frequently asked questions",
+  headingFa: "پرسش‌های متداول",
+  en: [],
+  fa: [],
 };
+
+export const DEFAULT_PAGES: PagesContent = {};
 
 export const DEFAULT_APPEARANCE: Appearance = {
   primary: "#c9a84c",
@@ -216,6 +246,7 @@ export const DEFAULTS_BY_KEY: Record<string, unknown> = {
   [CMS_KEYS.FOOTER]: DEFAULT_FOOTER,
   [CMS_KEYS.BANNER]: DEFAULT_BANNER,
   [CMS_KEYS.FAQ]: DEFAULT_FAQ,
+  [CMS_KEYS.PAGES]: DEFAULT_PAGES,
   [CMS_KEYS.APPEARANCE]: DEFAULT_APPEARANCE,
   [CMS_KEYS.PAYMENT_PROVIDER_IDS]: DEFAULT_PAYMENT_PROVIDER_IDS,
 };

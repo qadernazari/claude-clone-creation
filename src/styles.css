@@ -247,3 +247,42 @@ body {
   ::view-transition-new(root) { animation: none; }
 }
 
+/* ---------------------------------------------------------------
+ * CMS prose — typography for page bodies stored as HTML in site_content.
+ * Supports <h3>, <p>, <ul>, <li>, <b>, and <a class="inline">.
+ * --------------------------------------------------------------- */
+.cms-prose {
+  color: oklch(0.96 0.005 80 / 0.78);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.cms-prose > * + * { margin-top: 1.1em; }
+.cms-prose h3 {
+  color: var(--cream-bright);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 2em;
+  margin-bottom: 0.4em;
+}
+.cms-prose.font-fa h3 { font-family: var(--font-fa); font-weight: 700; }
+.cms-prose p { color: oklch(0.96 0.005 80 / 0.78); }
+.cms-prose ul {
+  list-style: disc;
+  padding-inline-start: 1.4em;
+  margin-block: 0.6em;
+}
+.cms-prose li + li { margin-top: 0.4em; }
+.cms-prose b, .cms-prose strong { color: var(--cream-bright); font-weight: 600; }
+.cms-prose a.inline,
+.cms-prose a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-decoration-color: oklch(0.77 0.115 80 / 0.4);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 200ms ease;
+}
+.cms-prose a:hover { text-decoration-color: var(--amber); }
+[dir="rtl"] .cms-prose { line-height: 1.95; }
+
