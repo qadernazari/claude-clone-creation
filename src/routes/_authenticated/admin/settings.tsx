@@ -66,7 +66,7 @@ function SettingsPage() {
     setError(null);
     const { error } = await supabase
       .from("site_content")
-      .upsert({ key: "settings", data: form as unknown as Record<string, unknown>, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      .upsert({ key: "settings", data: form as never, updated_at: new Date().toISOString() }, { onConflict: "key" });
     setSaving(false);
     if (error) {
       setError(error.message);
