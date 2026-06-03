@@ -137,9 +137,9 @@ function Home() {
             <button className="rounded-full bg-cream px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-cream-bright">
               {locale === "fa" ? "تماشای آثار" : "Browse Originals"}
             </button>
-            <button className="hairline rounded-full border px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-bg-1">
+            <a href="/about" className="hairline rounded-full border px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-bg-1">
               {locale === "fa" ? "درباره‌ی ایران" : "About IRAN"}
-            </button>
+            </a>
           </div>
         </div>
       </section>
