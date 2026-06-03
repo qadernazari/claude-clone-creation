@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FilmsSlugRouteImport } from './routes/films.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
@@ -29,6 +30,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilmsSlugRoute = FilmsSlugRouteImport.update({
+  id: '/films/$slug',
+  path: '/films/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/films/$slug': typeof FilmsSlugRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/films/$slug': typeof FilmsSlugRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -84,17 +93,25 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/films/$slug'
     | '/admin/categories'
     | '/admin/films'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin/categories' | '/admin/films' | '/admin'
+  to:
+    | '/'
+    | '/auth'
+    | '/films/$slug'
+    | '/admin/categories'
+    | '/admin/films'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/films/$slug'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/films'
     | '/_authenticated/admin/'
@@ -104,6 +121,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  FilmsSlugRoute: typeof FilmsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,6 +145,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/films/$slug': {
+      id: '/films/$slug'
+      path: '/films/$slug'
+      fullPath: '/films/$slug'
+      preLoaderRoute: typeof FilmsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -193,7 +218,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  FilmsSlugRoute: FilmsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
