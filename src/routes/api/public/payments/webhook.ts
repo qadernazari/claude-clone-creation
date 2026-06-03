@@ -241,6 +241,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
 
   // Receipt email
   const recipient = session.customer_details?.email as string | undefined;
+  let filmTitleEn: string | null = null;
   if (recipient) {
     const { data: film } = await admin
       .from("films")
@@ -248,15 +249,27 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
       .eq("id", filmId)
       .maybeSingle();
     const slug = film?.slug ?? filmSlug ?? "";
+    filmTitleEn = film?.title_en ?? null;
     await sendReceipt(origin, "ticket-receipt", recipient, `ticket-${providerRef}`, {
-      filmTitleEn: film?.title_en ?? "your film",
+      filmTitleEn: filmTitleEn ?? "your film",
       filmTitleFa: film?.title_fa ?? null,
       amountFormatted: amount ? formatUsd(amount, currency) : "",
       ticketHours,
       expiresAtFormatted: formatExpiry(expiresAt),
       watchUrl: slug ? `${origin}/watch/${slug}` : origin,
     });
+
+    await addToNotifyList(admin, recipient);
+    await notifyAdmins(admin, origin, providerRef, {
+      kind: "ticket",
+      buyerEmail: recipient,
+      amountFormatted: amount ? formatUsd(amount, currency) : "",
+      filmTitleEn,
+      occurredAtFormatted: formatExpiry(now),
+    });
   }
+
+  await grantSupporterRole(admin, userId);
 
   void env;
 }
