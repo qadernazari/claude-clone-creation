@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocale } from "../lib/i18n";
 import { supabase } from "../integrations/supabase/client";
 import { Logo } from "../components/logo";
+import { AuthMenu } from "../components/auth-menu";
 import { WelcomeSplash } from "../components/welcome-splash";
 import { FilmsRow } from "../components/films-row";
 
@@ -107,7 +108,10 @@ function Home() {
               {locale === "fa" ? "درباره" : "About"}
             </a>
           </nav>
-          <LanguageToggle />
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <AuthMenu />
+          </div>
         </div>
       </header>
 
