@@ -24,11 +24,14 @@ export const Route = createFileRoute("/browse")({
     ],
   }),
   component: BrowsePage,
-  errorComponent: ({ error }) => (
-    <div className="mx-auto max-w-2xl px-6 py-24 text-center text-cream/70">
-      Couldn't load the catalog: {error.message}
-    </div>
-  ),
+  errorComponent: ({ error }) => {
+    console.error("browse error:", error);
+    return (
+      <div className="mx-auto max-w-2xl px-6 py-24 text-center text-cream/70">
+        Couldn't load the catalog. Please try again.
+      </div>
+    );
+  },
   notFoundComponent: () => (
     <div className="mx-auto max-w-2xl px-6 py-24 text-center text-cream/70">
       Not found.

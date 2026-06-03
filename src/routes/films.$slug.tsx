@@ -40,14 +40,17 @@ export const Route = createFileRoute("/films/$slug")({
     };
   },
   component: FilmPage,
-  errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-8">
-      <div className="text-center">
-        <p className="text-sm text-destructive">{error.message}</p>
-        <Link to="/" className="mt-4 inline-block text-sm underline">Back to home</Link>
+  errorComponent: ({ error }) => {
+    console.error("films.$slug error:", error);
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-8">
+        <div className="text-center">
+          <p className="text-sm text-destructive">Something went wrong. Please try again.</p>
+          <Link to="/" className="mt-4 inline-block text-sm underline">Back to home</Link>
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-8">
       <div className="text-center">
