@@ -200,6 +200,8 @@ function AccountPage() {
     forgot: fa ? "رمز خود را فراموش کرده‌اید؟ ارسال ایمیل بازنشانی" : "Forgot your password? Send reset email",
     mismatch: fa ? "رمزها مطابقت ندارند" : "Passwords do not match",
     tooShort: fa ? "حداقل ۸ کاراکتر" : "Minimum 8 characters",
+  };
+
 
   function ftitle(f: { title_en: string; title_fa: string | null } | null) {
     if (!f) return "—";
