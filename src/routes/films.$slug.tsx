@@ -497,6 +497,8 @@ function FilmPage() {
           </div>
         </div>
       )}
+      <SiteFooter />
     </div>
+
   );
 }
