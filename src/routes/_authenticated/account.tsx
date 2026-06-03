@@ -192,7 +192,14 @@ function AccountPage() {
     member: fa ? "عضو از" : "Member since",
     signOut: fa ? "خروج از حساب" : "Sign out",
     danger: fa ? "حساب کاربری" : "Account",
-  };
+    password: fa ? "رمز عبور" : "Password",
+    passwordHint: fa ? "رمز عبور جدید را وارد کنید (حداقل ۸ کاراکتر)." : "Set a new password (minimum 8 characters).",
+    newPw: fa ? "رمز عبور جدید" : "New password",
+    confirmPw: fa ? "تکرار رمز عبور" : "Confirm password",
+    update: fa ? "به‌روزرسانی رمز" : "Update password",
+    forgot: fa ? "رمز خود را فراموش کرده‌اید؟ ارسال ایمیل بازنشانی" : "Forgot your password? Send reset email",
+    mismatch: fa ? "رمزها مطابقت ندارند" : "Passwords do not match",
+    tooShort: fa ? "حداقل ۸ کاراکتر" : "Minimum 8 characters",
 
   function ftitle(f: { title_en: string; title_fa: string | null } | null) {
     if (!f) return "—";
