@@ -84,6 +84,12 @@ export function FilmsRow() {
             <h2 className="font-display text-3xl text-cream-bright md:text-4xl">{title}</h2>
             <p className="mt-2 text-sm text-cream/60">{subtitle}</p>
           </div>
+          <a
+            href="/browse"
+            className="shrink-0 text-xs uppercase tracking-widest text-cream/70 underline-offset-4 hover:text-cream hover:underline"
+          >
+            {locale === "fa" ? "همه‌ی آثار ←" : "Browse all →"}
+          </a>
         </div>
 
         {visibleCategories.length > 0 ? (
