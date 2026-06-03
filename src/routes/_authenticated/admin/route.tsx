@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Film, Tag, LogOut, Home, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Film, Tag, LogOut, Home, BarChart3, Users } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -23,6 +23,7 @@ const NAV: ReadonlyArray<{ to: string; label: string; icon: typeof LayoutDashboa
   { to: "/admin/films", label: "Films", icon: Film },
   { to: "/admin/categories", label: "Categories", icon: Tag },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/admin/users", label: "Users", icon: Users },
 ];
 
 function AdminShell() {
