@@ -20,10 +20,12 @@ export function SiteFooter() {
   });
 
   const labelFor = (slug: string, fallback: string) => {
+    if (slug === "faq") return fa ? "پرسش‌های متداول" : "FAQ";
     const p = pages?.[slug];
     if (!p) return fallback;
     return fa ? p.nameFa || p.nameEn : p.nameEn || p.nameFa;
   };
+
 
   const linkBtn = (slug: string, fallback: string) => (
     <button
