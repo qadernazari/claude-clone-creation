@@ -8,6 +8,7 @@ export function AuthMenu() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -17,6 +18,20 @@ export function AuthMenu() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setIsAdmin(false);
+      return;
+    }
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -63,6 +78,15 @@ export function AuthMenu() {
           >
             {fa ? "بلیط‌های من" : "My tickets"}
           </Link>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
+            >
+              {fa ? "پنل مدیریت" : "Admin dashboard"}
+            </Link>
+          )}
           <button
             type="button"
             onClick={signOut}
