@@ -53,6 +53,58 @@ async function sendReceipt(
   }
 }
 
+async function addToNotifyList(admin: any, email: string | null | undefined) {
+  if (!email) return;
+  const lower = email.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(lower)) return;
+  const { error } = await admin
+    .from("notify_list")
+    .upsert({ email_lower: lower }, { onConflict: "email_lower", ignoreDuplicates: true });
+  if (error) console.error("notify_list upsert failed:", error.message);
+}
+
+async function grantSupporterRole(admin: any, userId: string | null | undefined) {
+  if (!userId) return;
+  const { error } = await admin
+    .from("user_roles")
+    .upsert({ user_id: userId, role: "supporter" }, { onConflict: "user_id,role", ignoreDuplicates: true });
+  if (error) console.error("grant supporter role failed:", error.message);
+}
+
+async function notifyAdmins(
+  admin: any,
+  origin: string,
+  providerRef: string,
+  data: {
+    kind: "ticket" | "contribution";
+    buyerEmail: string;
+    amountFormatted: string;
+    filmTitleEn: string | null;
+    occurredAtFormatted: string;
+  },
+) {
+  const { data: admins, error } = await admin
+    .from("user_roles")
+    .select("profiles:profiles!inner(email)")
+    .eq("role", "admin");
+  if (error) {
+    console.error("Failed to load admin emails:", error.message);
+    return;
+  }
+  const emails = (admins ?? [])
+    .map((r: any) => r?.profiles?.email)
+    .filter((e: any): e is string => typeof e === "string" && e.length > 0);
+  for (const adminEmail of emails) {
+    await sendReceipt(
+      origin,
+      "purchase-admin-notification",
+      adminEmail,
+      `admin-${data.kind}-${providerRef}-${adminEmail}`,
+      data,
+    );
+  }
+}
+
 async function handleContribution(session: any, origin: string) {
   const meta = session.metadata ?? {};
   const userId: string | undefined = meta.userId;
@@ -109,7 +161,18 @@ async function handleContribution(session: any, origin: string) {
       filmTitleEn,
       filmTitleFa,
     });
+
+    await addToNotifyList(admin, supporter);
+    await notifyAdmins(admin, origin, providerRef, {
+      kind: "contribution",
+      buyerEmail: supporter,
+      amountFormatted: formatUsd(amount, currency),
+      filmTitleEn,
+      occurredAtFormatted: formatExpiry(new Date()),
+    });
   }
+
+  await grantSupporterRole(admin, userId);
 }
 
 async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: string) {
@@ -178,6 +241,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
 
   // Receipt email
   const recipient = session.customer_details?.email as string | undefined;
+  let filmTitleEn: string | null = null;
   if (recipient) {
     const { data: film } = await admin
       .from("films")
@@ -185,15 +249,27 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
       .eq("id", filmId)
       .maybeSingle();
     const slug = film?.slug ?? filmSlug ?? "";
+    filmTitleEn = film?.title_en ?? null;
     await sendReceipt(origin, "ticket-receipt", recipient, `ticket-${providerRef}`, {
-      filmTitleEn: film?.title_en ?? "your film",
+      filmTitleEn: filmTitleEn ?? "your film",
       filmTitleFa: film?.title_fa ?? null,
       amountFormatted: amount ? formatUsd(amount, currency) : "",
       ticketHours,
       expiresAtFormatted: formatExpiry(expiresAt),
       watchUrl: slug ? `${origin}/watch/${slug}` : origin,
     });
+
+    await addToNotifyList(admin, recipient);
+    await notifyAdmins(admin, origin, providerRef, {
+      kind: "ticket",
+      buyerEmail: recipient,
+      amountFormatted: amount ? formatUsd(amount, currency) : "",
+      filmTitleEn,
+      occurredAtFormatted: formatExpiry(now),
+    });
   }
+
+  await grantSupporterRole(admin, userId);
 
   void env;
 }
