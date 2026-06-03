@@ -193,25 +193,46 @@ function FilmsAdminPage() {
         <table className="w-full text-sm">
           <thead className="bg-card/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
+              <th className="px-4 py-3 w-10">
+                <input
+                  type="checkbox"
+                  aria-label="Select all"
+                  checked={allSelected}
+                  ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                  onChange={toggleAll}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+              </th>
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Slug</th>
               <th className="px-4 py-3">Director</th>
               <th className="px-4 py-3 w-24">Price</th>
               <th className="px-4 py-3 w-28">Visibility</th>
-              <th className="px-4 py-3 w-24"></th>
+              <th className="px-4 py-3 w-28"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {isLoading && (
-              <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>
+              <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>
             )}
             {!isLoading && films.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                 No films yet. Click <span className="text-foreground">New film</span> to add one.
               </td></tr>
             )}
-            {films.map((f) => (
-              <tr key={f.id}>
+            {films.map((f) => {
+              const isChecked = selected.has(f.id);
+              return (
+              <tr key={f.id} className={isChecked ? "bg-primary/5" : undefined}>
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    aria-label={`Select ${f.title_en}`}
+                    checked={isChecked}
+                    onChange={() => toggleOne(f.id)}
+                    className="h-4 w-4 rounded border-border accent-primary"
+                  />
+                </td>
                 <td className="px-4 py-3">
                   <div className="font-medium">{f.title_en}</div>
                   {f.title_fa && <div className="text-xs text-muted-foreground" dir="rtl">{f.title_fa}</div>}
@@ -246,10 +267,57 @@ function FilmsAdminPage() {
                   </div>
                 </td>
               </tr>
-            ))}
+            );})}
           </tbody>
         </table>
       </div>
+
+      {selected.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-2xl">
+          <span className="px-2 text-sm text-muted-foreground">
+            {selected.size} selected
+          </span>
+          <div className="h-5 w-px bg-border" />
+          <button
+            type="button"
+            onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "published" })}
+            disabled={bulkVisibility.isPending}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          >
+            <Eye className="h-4 w-4" /> Publish
+          </button>
+          <button
+            type="button"
+            onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "draft" })}
+            disabled={bulkVisibility.isPending}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          >
+            <EyeOff className="h-4 w-4" /> Unpublish
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm(`Delete ${selected.size} film(s)? This cannot be undone.`)) {
+                bulkDelete.mutate(selectedIds);
+              }
+            }}
+            disabled={bulkDelete.isPending}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+          >
+            <Trash2 className="h-4 w-4" /> Delete
+          </button>
+          <div className="h-5 w-px bg-border" />
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent"
+            aria-label="Clear selection"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
 
       {editing && (
         <FilmEditor
