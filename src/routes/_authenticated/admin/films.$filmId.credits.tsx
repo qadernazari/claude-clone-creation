@@ -257,6 +257,68 @@ function CreditsPage() {
   );
 }
 
+function SortableRow({
+  credit,
+  onEdit,
+  onRemove,
+}: {
+  credit: Credit;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: credit.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center text-sm bg-background hover:bg-accent/40"
+    >
+      <button
+        type="button"
+        className="px-3 py-3 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none"
+        aria-label="Drag to reorder"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onEdit}
+        className="flex-1 flex items-center gap-4 py-3 pr-3 text-left"
+      >
+        <div className="w-48 shrink-0">
+          <div className="text-foreground">{credit.label_en ?? "—"}</div>
+          {credit.label_fa && (
+            <div className="text-xs text-muted-foreground" dir="rtl">{credit.label_fa}</div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-foreground truncate">{credit.value_en ?? "—"}</div>
+          {credit.value_fa && (
+            <div className="text-xs text-muted-foreground truncate" dir="rtl">{credit.value_fa}</div>
+          )}
+        </div>
+      </button>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="p-3 text-muted-foreground hover:text-destructive transition-colors"
+        aria-label="Remove credit"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+    </li>
+  );
+}
+
 function CreditEditor({
   draft,
   onCancel,
