@@ -71,19 +71,19 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
         }`}
       >
         <div className="flex items-center gap-10">
-          <a href="/" className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
+          <Link to="/" className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
             <Logo size={32} />
-          </a>
+          </Link>
           <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
-            <a href="/" className={linkCls("home")}>
+            <Link to="/" className={linkCls("home")}>
               {locale === "fa" ? "خانه" : "Home"}
-            </a>
-            <a href="/browse" className={linkCls("browse")}>
+            </Link>
+            <Link to="/browse" className={linkCls("browse")}>
               {locale === "fa" ? "آثار اختصاصی" : "Originals"}
-            </a>
-            <a href="/about" className={linkCls("about")}>
+            </Link>
+            <Link to="/about" className={linkCls("about")}>
               {locale === "fa" ? "درباره" : "About"}
-            </a>
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-3">
