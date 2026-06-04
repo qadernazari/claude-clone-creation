@@ -6,6 +6,7 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
 import { useSubscription, memberCanAccess } from "@/hooks/use-subscription";
+import { TrialExpiredModal } from "@/components/trial-expired-modal";
 import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { upsertWatchProgress, getResumePosition } from "@/lib/library.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -79,7 +80,8 @@ function WatchPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [theater, setTheater] = useState(true);
 
-  const { isMember } = useSubscription();
+  const { isMember, isTrialExpired } = useSubscription();
+  const [trialModalOpen, setTrialModalOpen] = useState(false);
   const accessType = (film as { access_type?: string }).access_type ?? "membership";
   const memberAllowed = isMember && memberCanAccess(accessType as never);
 
