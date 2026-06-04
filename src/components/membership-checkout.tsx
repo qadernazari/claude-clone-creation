@@ -18,6 +18,8 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
   const fa = locale === "fa";
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
+  const { hasUsedTrial, isMember } = useSubscription();
+  const showTrialCta = !hasUsedTrial && !isMember;
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const result = await createMembershipCheckout({
