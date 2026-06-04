@@ -182,7 +182,7 @@ function WatchPage() {
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!ticket || !videoUrl) return;
+    if (!hasAccess || !videoUrl) return;
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
       if (!v) return;
