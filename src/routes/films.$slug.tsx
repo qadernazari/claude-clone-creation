@@ -11,6 +11,8 @@ import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
+import { useServerFn } from "@tanstack/react-start";
+import { getResumePosition } from "@/lib/library.functions";
 import { useEffect, useMemo, useState } from "react";
 
 import type { User } from "@supabase/supabase-js";
@@ -162,6 +164,22 @@ function FilmPage() {
     },
     refetchInterval: 30_000,
   });
+
+  const fetchResume = useServerFn(getResumePosition);
+  const { data: resume } = useQuery({
+    queryKey: ["resume", film.id, user?.id ?? "anon"],
+    enabled: !!user,
+    queryFn: () => fetchResume({ data: { filmId: film.id } }),
+    staleTime: 30_000,
+  });
+  const resumeSec = resume && !resume.completed && resume.positionSeconds > 10 ? resume.positionSeconds : 0;
+  const fmtResume = (s: number) => {
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${String(Math.floor(r)).padStart(2, "0")}`;
+  };
+
+
 
   const { data: related = [] } = useQuery({
     queryKey: ["film", film.id, "related", film.category],
@@ -388,7 +406,9 @@ function FilmPage() {
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          {t.watch}
+                          {resumeSec > 0
+                            ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}`
+                            : t.watch}
                         </Link>
                       ) : isMember ? (
                         // Member viewing a ppv_only premium film

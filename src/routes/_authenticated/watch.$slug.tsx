@@ -139,6 +139,7 @@ function WatchPage() {
       .catch(() => {});
   }, [hasAccess, film.id, fetchResume]);
 
+  const [resumedAt, setResumedAt] = useState<number | null>(null);
   const onLoadedMetadata = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -146,8 +147,20 @@ function WatchPage() {
     if (saved > 5 && saved < (v.duration || 0) - 10 && !resumedRef.current) {
       v.currentTime = saved;
       resumedRef.current = true;
+      setResumedAt(saved);
+      setTimeout(() => setResumedAt(null), 4000);
     }
   }, []);
+
+  const fmtTime = (s: number) => {
+    const sec = Math.max(0, Math.floor(s));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const r = sec % 60;
+    return h > 0
+      ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`
+      : `${m}:${String(r).padStart(2, "0")}`;
+  };
 
   const onTimeUpdate = useCallback(() => {
     const v = videoRef.current;
@@ -322,19 +335,26 @@ function WatchPage() {
               {t.missing}
             </div>
           ) : (
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              poster={film.cover_url || undefined}
-              controls
-              autoPlay
-              playsInline
-              controlsList="nodownload"
-              onLoadedMetadata={onLoadedMetadata}
-              onTimeUpdate={onTimeUpdate}
-              onEnded={onEnded}
-              className="absolute inset-0 h-full w-full bg-black"
-            />
+            <>
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                poster={film.cover_url || undefined}
+                controls
+                autoPlay
+                playsInline
+                controlsList="nodownload"
+                onLoadedMetadata={onLoadedMetadata}
+                onTimeUpdate={onTimeUpdate}
+                onEnded={onEnded}
+                className="absolute inset-0 h-full w-full bg-black"
+              />
+              {resumedAt !== null && (
+                <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
+                  {fa ? "ادامه از " : "Resumed from "}{fmtTime(resumedAt)}
+                </div>
+              )}
+            </>
           )}
         </div>
 
