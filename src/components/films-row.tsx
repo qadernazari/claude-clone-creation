@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
 import { useLocale } from "../lib/i18n";
+import type { Database } from "../integrations/supabase/types";
+
+type AccessType = Database["public"]["Enums"]["film_access_type"];
 
 type Film = {
   id: string;
@@ -15,6 +18,8 @@ type Film = {
   duration_min: number | null;
   poster_gradient: string | null;
   cover_url: string | null;
+  access_type: AccessType;
+  is_premium: boolean | null;
 };
 
 type Category = { id: string; name_en: string; name_fa: string | null };
@@ -37,7 +42,7 @@ export function FilmsRow() {
       const { data, error } = await supabase
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url",
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, access_type, is_premium",
         )
         .eq("visibility", "published")
         .order("sort_order", { ascending: true })
@@ -65,9 +70,7 @@ export function FilmsRow() {
     () => new Set((data ?? []).map((f) => f.category).filter(Boolean) as string[]),
     [data],
   );
-  const visibleCategories = (categories ?? []).filter((c) =>
-    usedCategoryIds.has(c.id),
-  );
+  const visibleCategories = (categories ?? []).filter((c) => usedCategoryIds.has(c.id));
   const filtered = active ? (data ?? []).filter((f) => f.category === active) : data;
 
   const title = locale === "fa" ? "آثار اختصاصی ایران" : "Iran Originals";
@@ -77,23 +80,13 @@ export function FilmsRow() {
       : "Selected works, in the filmmakers' own voice.";
 
   return (
-    <section className="hairline border-t">
-      <div className="mx-auto max-w-7xl px-6 py-24 md:py-28">
-        <div className="mb-10 flex items-end justify-between gap-4">
-          <div>
-            <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.35em] text-amber">
-              {locale === "fa" ? "آثار" : "Originals"}
-            </span>
-            <h2 className="font-display text-3xl leading-[0.95] text-cream-bright md:text-5xl">{title}</h2>
-            <p className="mt-3 max-w-md text-sm text-cream/55">{subtitle}</p>
-          </div>
-          <a
-            href="/browse"
-            className="group hidden shrink-0 items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-cream/60 transition-colors hover:text-amber md:inline-flex"
-          >
-            {locale === "fa" ? "همه‌ی آثار" : "Browse all"}
-            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-          </a>
+    <section>
+      <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+        <div className="mb-12 max-w-2xl">
+          <h2 className="font-display text-3xl font-medium tracking-[-0.03em] text-cream-bright md:text-4xl">
+            {title}
+          </h2>
+          <p className="mt-3 text-base text-cream/55">{subtitle}</p>
         </div>
 
         {visibleCategories.length > 0 ? (
@@ -101,10 +94,10 @@ export function FilmsRow() {
             <button
               type="button"
               onClick={() => setActive(null)}
-              className={`rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-300 ${
                 active === null
-                  ? "border-cream bg-cream text-ink"
-                  : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
+                  ? "bg-cream text-ink"
+                  : "bg-cream/[0.06] text-cream/65 hover:bg-cream/10 hover:text-cream"
               }`}
             >
               {locale === "fa" ? "همه" : "All"}
@@ -114,10 +107,10 @@ export function FilmsRow() {
                 key={c.id}
                 type="button"
                 onClick={() => setActive(c.id)}
-                className={`rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
+                className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-300 ${
                   active === c.id
-                    ? "border-cream bg-cream text-ink"
-                    : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
+                    ? "bg-cream text-ink"
+                    : "bg-cream/[0.06] text-cream/65 hover:bg-cream/10 hover:text-cream"
                 }`}
               >
                 {t({ en: c.name_en, fa: c.name_fa || c.name_en })}
@@ -127,9 +120,9 @@ export function FilmsRow() {
         ) : null}
 
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] animate-pulse rounded-lg bg-bg-1" aria-hidden />
+              <div key={i} className="aspect-[2/3] animate-pulse rounded-xl bg-bg-1" aria-hidden />
             ))}
           </div>
         ) : !filtered || filtered.length === 0 ? (
@@ -137,14 +130,9 @@ export function FilmsRow() {
             <p className="font-display text-xl text-cream-bright">
               {locale === "fa" ? "به‌زودی، اولین آثار" : "First films, coming soon"}
             </p>
-            <p className="mx-auto mt-2 max-w-sm text-sm text-cream/55">
-              {locale === "fa"
-                ? "با ایمیل خود مشترک شوید تا لحظه‌ی انتشار باخبر شوید."
-                : "Subscribe with your email to be notified when the first originals premiere."}
-            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-5 md:gap-y-10 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4">
             {filtered.map((film) => {
               const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
               const director =
@@ -152,25 +140,27 @@ export function FilmsRow() {
               const bg = film.cover_url
                 ? `center / cover no-repeat url(${film.cover_url})`
                 : film.poster_gradient || fallbackGradient(film.id);
+              const isPremium = !!film.is_premium || film.access_type === "ppv_only";
               return (
                 <a key={film.id} href={`/films/${film.slug}`} className="group block">
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-bg-1">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] transition-all duration-500 group-hover:ring-cream/15 group-hover:shadow-2xl">
                     <div className="cine-img absolute inset-0" style={{ background: bg }} />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/85 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    {film.category ? (
-                      <span className="absolute left-3 top-3 rounded-full bg-bg-0/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-cream/85 backdrop-blur-md rtl:left-auto rtl:right-3">
-                        {film.category}
+                    {isPremium ? (
+                      <span className="absolute right-3 top-3 rounded-full bg-bg-0/75 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-bright backdrop-blur-md rtl:right-auto rtl:left-3">
+                        {locale === "fa" ? "ویژه" : "Premium"}
                       </span>
-                    ) : null}
-                    <span className="pointer-events-none absolute bottom-3 right-3 translate-y-2 rounded-full bg-amber px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-ink opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 rtl:right-auto rtl:left-3">
-                      {locale === "fa" ? "تماشا" : "Watch"}
-                    </span>
+                    ) : (
+                      <span className="absolute right-3 top-3 rounded-full bg-bg-0/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-cream/85 backdrop-blur-md opacity-0 transition-opacity duration-500 group-hover:opacity-100 rtl:right-auto rtl:left-3">
+                        {locale === "fa" ? "اشتراکی" : "Included"}
+                      </span>
+                    )}
                   </div>
                   <div className="mt-4 px-0.5">
-                    <h3 className="font-display text-[15px] leading-tight text-cream-bright transition-colors group-hover:text-amber-bright">
+                    <h3 className="font-display text-[15px] font-medium leading-tight tracking-[-0.02em] text-cream-bright transition-colors group-hover:text-amber-bright">
                       {ftitle}
                     </h3>
-                    <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/45">
+                    <p className="mt-1.5 text-[12px] text-cream/50">
                       {director}
                       {film.duration_min ? (
                         <>
