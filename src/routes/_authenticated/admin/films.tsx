@@ -262,6 +262,58 @@ function FilmsAdminPage() {
   );
 }
 
+function AssetBadge({ label, present, url, kind, icon }: {
+  label: string; present: boolean; url: string | null; kind: "image" | "video"; icon: React.ReactNode;
+}) {
+  const base = "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium ring-1";
+  if (!present) {
+    return (
+      <span className={`${base} bg-muted/40 text-muted-foreground/60 ring-border/60`} title={`${label}: not set`}>
+        {icon}{label}
+      </span>
+    );
+  }
+  if (kind === "image" && url) {
+    return (
+      <a href={url} target="_blank" rel="noreferrer" title={`${label}: view`}
+        className={`${base} bg-emerald-500/10 text-emerald-400 ring-emerald-500/30 hover:bg-emerald-500/20`}>
+        <img src={url} alt="" className="h-3 w-3 rounded-sm object-cover" />
+        {label}
+      </a>
+    );
+  }
+  return (
+    <a href={url ?? "#"} target="_blank" rel="noreferrer" title={`${label}: view`}
+      className={`${base} bg-emerald-500/10 text-emerald-400 ring-emerald-500/30 hover:bg-emerald-500/20`}>
+      <Check className="h-3 w-3" />{label}
+    </a>
+  );
+}
+
+function PricingCell({ film }: { film: Film }) {
+  const muted = "text-muted-foreground";
+  if (film.access_type === "free") {
+    return <span className="inline-flex rounded-full px-2 py-0.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30">Free</span>;
+  }
+  if (film.access_type === "membership") {
+    return <span className="inline-flex rounded-full px-2 py-0.5 bg-primary/10 text-primary ring-1 ring-primary/30">Included in Membership</span>;
+  }
+  const hasPrice = (film.price_cents ?? 0) > 0 || (film.price_toman ?? 0) > 0;
+  if (!hasPrice) {
+    return <span className={`inline-flex rounded-full px-2 py-0.5 bg-muted/40 ${muted} ring-1 ring-border`}>No Price Set</span>;
+  }
+  const label = film.access_type === "membership_or_ppv" ? "Members or " : "";
+  return (
+    <div className="space-y-0.5">
+      {label && <div className={`text-[10px] ${muted}`}>{label.trim()}</div>}
+      <div className="tabular-nums">
+        ${(film.price_cents / 100).toFixed(2)} <span className={muted}>·</span>{" "}
+        <span dir="rtl">{film.price_toman.toLocaleString()} تومان</span>
+      </div>
+    </div>
+  );
+}
+
 const inp = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 
 const CREDIT_TYPES: { value: string; label: string }[] = [
