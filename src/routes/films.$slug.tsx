@@ -6,8 +6,10 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 import { FilmCheckout } from "@/components/film-checkout";
+import { MembershipCheckout } from "@/components/membership-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
+import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useEffect, useMemo, useState } from "react";
 
 import type { User } from "@supabase/supabase-js";
@@ -109,8 +111,10 @@ function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, dir } = useLocale();
   const fa = locale === "fa";
+  const { isMember } = useSubscription();
   const [user, setUser] = useState<User | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [membershipOpen, setMembershipOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -200,11 +204,20 @@ function FilmPage() {
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
+    startTrial: fa ? "آغاز رایگان ۷ روزه" : "Start 7-day free trial",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
+    signinToWatch: fa ? "برای تماشا وارد شوید" : "Sign in to watch",
     accessNote: fa
       ? `دسترسی ${num(film.ticket_hours)} ساعت پس از خرید`
       : `${film.ticket_hours}-hour access after purchase`,
+    membershipNote: fa
+      ? "با عضویت ایران، نامحدود تماشا کنید"
+      : "Unlimited streaming with IRAN membership",
+    memberIncluded: fa ? "شامل عضویت شماست" : "Included in your membership",
+    premiumNote: fa
+      ? "این اثر ویژه و خارج از عضویت است"
+      : "Premium release — sold separately from membership",
     ticketActive: fa ? "بلیط فعال دارید" : "You have an active ticket",
     about: fa ? "درباره فیلم" : "Synopsis",
     crew: fa ? "عوامل" : "Credits",
@@ -215,6 +228,7 @@ function FilmPage() {
     share: fa ? "هم‌رسانی" : "Share",
     copied: fa ? "لینک کپی شد" : "Link copied",
     moreFromCat: fa ? "بیشتر از این دسته" : "More to explore",
+    orBuy: fa ? "یا فقط این فیلم را بخرید" : "Or buy this film",
     creditGroups: {
       cast: fa ? "بازیگران" : "Cast",
       crew: fa ? "عوامل تولید" : "Crew",
