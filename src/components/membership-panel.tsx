@@ -24,7 +24,7 @@ function daysUntil(iso: string | null): number | null {
 export function MembershipPanel() {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { subscription: sub, isMember, isLoading } = useSubscription();
+  const { subscription: sub, isMember, isLoading, hasUsedTrial, isTrialExpired } = useSubscription();
   const openPortal = useServerFn(createMembershipPortalSession);
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +75,6 @@ export function MembershipPanel() {
 
   // Not a member yet → CTA
   if (!isLoading && !isMember) {
-    const { hasUsedTrial, isTrialExpired } = useSubscription();
     return (
       <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
         <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
