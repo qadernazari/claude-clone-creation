@@ -542,65 +542,74 @@ function FilmPage() {
         </div>
       </section>
 
-      {/* Synopsis + Credits */}
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-20 md:grid-cols-[2fr_1fr]">
-        {synopsis && (
-          <div>
-            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
-              {t.about}
+      {/* Cast & Crew — Apple TV+ style horizontal row */}
+      {(castCredits.length > 0 || crewCredits.length > 0) && (
+        <section className="mx-auto max-w-7xl px-6 pb-16 pt-20 md:px-10">
+          <div className="mb-8 flex items-end justify-between gap-6">
+            <h2 className={`font-display text-2xl font-medium tracking-[-0.02em] text-cream-bright md:text-3xl ${fa ? "font-vazir" : ""}`}>
+              {fa ? "بازیگران و عوامل" : "Cast & Crew"}
             </h2>
-            <p className={`mt-4 whitespace-pre-line text-cream/85 leading-relaxed text-[15px] md:text-base ${fa ? "font-vazir" : ""}`}>
-              {synopsis}
-            </p>
           </div>
-        )}
 
-        {groupedCredits.length > 0 && (
-          <aside className="md:border-s md:border-cream/10 md:ps-10">
-            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
-              {t.crew}
-            </h2>
-            <div className="mt-4 space-y-6">
-              {groupedCredits.map(([type, items]) => (
-                <div key={type}>
-                  <div className="text-[11px] uppercase tracking-widest text-cream/55">
-                    {t.creditGroups[type] || type}
-                  </div>
-                  <dl className="mt-2 space-y-1.5">
-                    {items.map((c, i) => (
-                      <div key={i} className="grid grid-cols-[110px_1fr] gap-3 text-sm">
-                        <dt className="text-cream/50">
-                          {fa ? c.label_fa || c.label_en : c.label_en}
-                        </dt>
-                        <dd className="text-cream/90">
-                          {fa ? c.value_fa || c.value_en : c.value_en}
-                        </dd>
+          {castCredits.length > 0 && (
+            <div className="-mx-6 overflow-x-auto px-6 pb-4 md:-mx-10 md:px-10">
+              <ul className="flex gap-6 min-w-max">
+                {castCredits.map((c, i) => {
+                  const name = fa ? c.value_fa || c.value_en : c.value_en;
+                  const role = fa ? c.label_fa || c.label_en : c.label_en;
+                  const initial = (name || "?").trim().charAt(0).toUpperCase();
+                  return (
+                    <li key={`cast-${i}`} className="flex w-28 flex-col items-center text-center">
+                      <div
+                        className="flex h-24 w-24 items-center justify-center rounded-full bg-cream/[0.06] ring-1 ring-cream/10 text-2xl font-display text-cream/80"
+                        aria-hidden
+                      >
+                        {initial}
                       </div>
-                    ))}
-                  </dl>
+                      <div className={`mt-3 text-[13px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
+                        {name}
+                      </div>
+                      {role && (
+                        <div className="mt-1 text-[11px] text-cream/50 leading-tight line-clamp-1">
+                          {role}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {crewCredits.length > 0 && (
+            <dl className="mt-10 grid grid-cols-1 gap-x-10 gap-y-3 border-t border-cream/10 pt-8 sm:grid-cols-2 md:grid-cols-3">
+              {crewCredits.map((c, i) => (
+                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/[0.06] pb-3">
+                  <dt className="text-[11px] uppercase tracking-[0.18em] text-cream/45">
+                    {fa ? c.label_fa || c.label_en : c.label_en}
+                  </dt>
+                  <dd className={`text-[14px] text-cream-bright text-right ${fa ? "font-vazir" : ""}`}>
+                    {fa ? c.value_fa || c.value_en : c.value_en}
+                  </dd>
                 </div>
               ))}
-            </div>
-          </aside>
-        )}
-      </section>
+            </dl>
+          )}
+        </section>
+      )}
 
       {/* More films */}
       {related.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 pb-20">
+        <section className="mx-auto max-w-7xl px-6 pb-20 md:px-10">
           <div className="mb-8 flex items-end justify-between gap-6">
-            <div>
-              <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
-                {fa ? "بیشتر" : "Continue exploring"}
-              </span>
-              <h2 className="font-editorial text-3xl italic font-normal text-cream-bright md:text-4xl">
-                {t.moreFromCat}
-              </h2>
-            </div>
+            <h2 className={`font-display text-2xl font-medium tracking-[-0.02em] text-cream-bright md:text-3xl ${fa ? "font-vazir" : ""}`}>
+              {t.moreFromCat}
+            </h2>
             <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
               {fa ? "همه آثار" : "Browse all"} →
             </Link>
           </div>
+
           <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {related.map((r) => {
               const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
