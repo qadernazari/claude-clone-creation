@@ -149,16 +149,17 @@ function FilmsAdminPage() {
                   className="h-4 w-4 rounded border-border accent-primary" />
               </th>
               <th className="px-4 py-3">Film</th>
+              <th className="px-4 py-3 w-40">Assets</th>
               <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3 w-44">Price (USD / تومان)</th>
+              <th className="px-4 py-3 w-48">Pricing</th>
               <th className="px-4 py-3 w-28">Status</th>
               <th className="px-4 py-3 w-32"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {isLoading && <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
+            {isLoading && <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
             {!isLoading && films.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                 No films yet. Click <span className="text-foreground">Add Film</span> to create one.
               </td></tr>
             )}
@@ -177,17 +178,31 @@ function FilmsAdminPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-7 rounded shrink-0" style={{ background: f.poster_gradient ?? GRADIENTS[0] }} />
+                      {f.cover_url ? (
+                        <img src={f.cover_url} alt="" loading="lazy"
+                          className="h-14 w-10 rounded object-cover shrink-0 ring-1 ring-border" />
+                      ) : (
+                        <div className="h-14 w-10 rounded shrink-0 flex items-center justify-center ring-1 ring-border"
+                          style={{ background: f.poster_gradient ?? GRADIENTS[0] }}>
+                          <ImageIcon className="h-4 w-4 text-muted-foreground/60" />
+                        </div>
+                      )}
                       <div>
                         <div className="font-medium">{f.title_en}</div>
                         {f.title_fa && <div className="text-xs text-muted-foreground" dir="rtl">{f.title_fa}</div>}
                       </div>
                     </div>
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <AssetBadge label="Thumb" present={!!f.thumbnail_url} url={f.thumbnail_url} kind="image" icon={<ImageIcon className="h-3 w-3" />} />
+                      <AssetBadge label="Trailer" present={!!f.preview_url} url={f.preview_url} kind="video" icon={<Clapperboard className="h-3 w-3" />} />
+                      <AssetBadge label="Video" present={!!f.video_url} url={f.video_url} kind="video" icon={<FilmIcon className="h-3 w-3" />} />
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{f.category ?? "—"}</td>
-                  <td className="px-4 py-3 tabular-nums text-xs">
-                    ${(f.price_cents / 100).toFixed(2)} <span className="text-muted-foreground">·</span>{" "}
-                    <span dir="rtl">{f.price_toman.toLocaleString()} تومان</span>
+                  <td className="px-4 py-3 text-xs">
+                    <PricingCell film={f} />
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${
