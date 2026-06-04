@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
 import { useLocale } from "../lib/i18n";
@@ -20,6 +20,7 @@ type Film = {
   cover_url: string | null;
   access_type: AccessType;
   is_premium: boolean | null;
+  sort_order: number | null;
 };
 
 type Category = { id: string; name_en: string; name_fa: string | null };
@@ -32,21 +33,132 @@ function fallbackGradient(seed: string) {
   return `linear-gradient(135deg, oklch(0.32 0.05 ${a}) 0%, oklch(0.45 0.10 ${b}) 100%)`;
 }
 
+/* ---------- Card ---------- */
+function PosterCard({ film, locale, num }: { film: Film; locale: string; num: (n: number) => string }) {
+  const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
+  const director = locale === "fa" ? film.director_fa || film.director_en : film.director_en;
+  const bg = film.cover_url
+    ? `center / cover no-repeat url(${film.cover_url})`
+    : film.poster_gradient || fallbackGradient(film.id);
+  const isPremium = !!film.is_premium || film.access_type === "ppv_only";
+
+  return (
+    <a
+      href={`/films/${film.slug}`}
+      className="group block w-[44vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
+    >
+      <div className="relative aspect-[2/3] overflow-hidden rounded-[14px] bg-bg-1 ring-1 ring-cream/[0.05] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20 group-hover:shadow-[0_25px_50px_-15px_rgba(0,0,0,0.8)]">
+        <div className="cine-img absolute inset-0" style={{ background: bg }} />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        {isPremium && (
+          <span className="absolute right-3 top-3 rounded-full bg-bg-0/75 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-bright backdrop-blur-md rtl:right-auto rtl:left-3">
+            {locale === "fa" ? "ویژه" : "Premium"}
+          </span>
+        )}
+      </div>
+      <div className="mt-4 px-0.5">
+        <h3 className="font-display text-[14px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors group-hover:text-amber-bright line-clamp-1">
+          {ftitle}
+        </h3>
+        <p className="mt-1 text-[11.5px] text-cream/45 line-clamp-1">
+          {director}
+          {film.year ? <> {" · "} {num(film.year)}</> : null}
+        </p>
+      </div>
+    </a>
+  );
+}
+
+/* ---------- Rail ---------- */
+function Rail({
+  eyebrow,
+  title,
+  subtitle,
+  films,
+  locale,
+  num,
+}: {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  films: Film[];
+  locale: string;
+  num: (n: number) => string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const scroll = (dir: 1 | -1) => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
+  };
+  if (films.length === 0) return null;
+
+  return (
+    <section className="relative">
+      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+        <div className="mb-7 flex items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            {eyebrow && (
+              <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/85">
+                {eyebrow}
+              </span>
+            )}
+            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[28px]">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-2 text-[13px] text-cream/45 md:text-[14px]">{subtitle}</p>
+            )}
+          </div>
+          <div className="hidden gap-1.5 md:flex">
+            <button
+              type="button"
+              onClick={() => scroll(-1)}
+              aria-label="Previous"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/15 text-cream/60 transition-all hover:border-cream/40 hover:text-cream-bright hover:bg-cream/5"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll(1)}
+              aria-label="Next"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/15 text-cream/60 transition-all hover:border-cream/40 hover:text-cream-bright hover:bg-cream/5"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        ref={ref}
+        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:gap-6 md:px-12"
+        style={{ scrollPaddingLeft: "1.5rem" }}
+      >
+        {films.map((f) => (
+          <PosterCard key={f.id} film={f} locale={locale} num={num} />
+        ))}
+        <div className="w-4 shrink-0 md:w-8" aria-hidden />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Multi-rail container ---------- */
 export function FilmsRow() {
   const { locale, num, t } = useLocale();
-  const [active, setActive] = useState<string | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["films", "published"],
+  const { data: films, isLoading } = useQuery({
+    queryKey: ["films", "published-multi"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, access_type, is_premium",
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, access_type, is_premium, sort_order",
         )
         .eq("visibility", "published")
         .order("sort_order", { ascending: true })
-        .limit(40);
+        .limit(60);
       if (error) throw error;
       return data as Film[];
     },
@@ -66,117 +178,115 @@ export function FilmsRow() {
     staleTime: 5 * 60_000,
   });
 
-  const usedCategoryIds = useMemo(
-    () => new Set((data ?? []).map((f) => f.category).filter(Boolean) as string[]),
-    [data],
-  );
-  const visibleCategories = (categories ?? []).filter((c) => usedCategoryIds.has(c.id));
-  const filtered = active ? (data ?? []).filter((f) => f.category === active) : data;
+  const rails = useMemo(() => {
+    const all = films ?? [];
+    if (all.length === 0) return [] as Array<{ key: string; eyebrow?: string; title: string; subtitle?: string; films: Film[] }>;
 
-  const title = locale === "fa" ? "آثار اختصاصی ایران" : "Iran Originals";
-  const subtitle =
-    locale === "fa"
-      ? "آثار منتخب، با امضای فیلم‌سازان."
-      : "Selected works, in the filmmakers' own voice.";
+    const newReleases = all.slice(0, 12);
+    const premium = all.filter((f) => f.is_premium || f.access_type === "ppv_only").slice(0, 12);
+    const editors = [...all]
+      .sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999))
+      .slice(0, 12);
+
+    // Category rails (only categories with ≥3 published films)
+    const byCat = new Map<string, Film[]>();
+    for (const f of all) {
+      if (!f.category) continue;
+      const arr = byCat.get(f.category) ?? [];
+      arr.push(f);
+      byCat.set(f.category, arr);
+    }
+    const catRails = (categories ?? [])
+      .filter((c) => (byCat.get(c.id)?.length ?? 0) >= 3)
+      .slice(0, 4)
+      .map((c) => ({
+        key: `cat-${c.id}`,
+        eyebrow: locale === "fa" ? "مجموعه" : "Collection",
+        title: t({ en: c.name_en, fa: c.name_fa || c.name_en }),
+        films: byCat.get(c.id) ?? [],
+      }));
+
+    const out: Array<{ key: string; eyebrow?: string; title: string; subtitle?: string; films: Film[] }> = [];
+
+    out.push({
+      key: "new",
+      eyebrow: locale === "fa" ? "تازه‌ها" : "Just Added",
+      title: locale === "fa" ? "آثار تازه" : "New Releases",
+      subtitle:
+        locale === "fa"
+          ? "تازه‌ترین افزوده‌های مجموعه‌ی ایران."
+          : "The latest additions to the IRAN library.",
+      films: newReleases,
+    });
+
+    out.push({
+      key: "originals",
+      eyebrow: locale === "fa" ? "اختصاصی" : "IRAN Originals",
+      title: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
+      subtitle:
+        locale === "fa"
+          ? "آثار منتخب، با امضای فیلم‌سازان."
+          : "Selected works, in the filmmakers' own voice.",
+      films: editors,
+    });
+
+    if (premium.length > 0) {
+      out.push({
+        key: "premium",
+        eyebrow: locale === "fa" ? "اکران ویژه" : "Premium",
+        title: locale === "fa" ? "اکران‌های ویژه" : "Premium Releases",
+        subtitle:
+          locale === "fa"
+            ? "آثار ویژه، خارج از اشتراک."
+            : "Special releases, sold separately.",
+        films: premium,
+      });
+    }
+
+    out.push(...catRails);
+    return out;
+  }, [films, categories, locale, t]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-24">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="mx-auto max-w-[1400px] px-6 md:px-12">
+            <div className="mb-7 h-6 w-48 animate-pulse rounded-md bg-bg-1" />
+            <div className="flex gap-6 overflow-hidden">
+              {Array.from({ length: 5 }).map((_, j) => (
+                <div key={j} className="aspect-[2/3] w-[240px] shrink-0 animate-pulse rounded-[14px] bg-bg-1" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (rails.length === 0) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-20 text-center md:px-12">
+        <p className="font-display text-xl text-cream-bright">
+          {locale === "fa" ? "به‌زودی، اولین آثار" : "First films, coming soon"}
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <section>
-      <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-        <div className="mb-12 max-w-2xl">
-          <h2 className="font-display text-3xl font-medium tracking-[-0.03em] text-cream-bright md:text-4xl">
-            {title}
-          </h2>
-          <p className="mt-3 text-base text-cream/55">{subtitle}</p>
-        </div>
-
-        {visibleCategories.length > 0 ? (
-          <div className="mb-10 flex flex-wrap gap-1.5">
-            <button
-              type="button"
-              onClick={() => setActive(null)}
-              className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-300 ${
-                active === null
-                  ? "bg-cream text-ink"
-                  : "bg-cream/[0.06] text-cream/65 hover:bg-cream/10 hover:text-cream"
-              }`}
-            >
-              {locale === "fa" ? "همه" : "All"}
-            </button>
-            {visibleCategories.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setActive(c.id)}
-                className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-300 ${
-                  active === c.id
-                    ? "bg-cream text-ink"
-                    : "bg-cream/[0.06] text-cream/65 hover:bg-cream/10 hover:text-cream"
-                }`}
-              >
-                {t({ en: c.name_en, fa: c.name_fa || c.name_en })}
-              </button>
-            ))}
-          </div>
-        ) : null}
-
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] animate-pulse rounded-xl bg-bg-1" aria-hidden />
-            ))}
-          </div>
-        ) : !filtered || filtered.length === 0 ? (
-          <div className="rounded-2xl border border-cream/10 bg-bg-1/40 px-8 py-20 text-center">
-            <p className="font-display text-xl text-cream-bright">
-              {locale === "fa" ? "به‌زودی، اولین آثار" : "First films, coming soon"}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4">
-            {filtered.map((film) => {
-              const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
-              const director =
-                locale === "fa" ? film.director_fa || film.director_en : film.director_en;
-              const bg = film.cover_url
-                ? `center / cover no-repeat url(${film.cover_url})`
-                : film.poster_gradient || fallbackGradient(film.id);
-              const isPremium = !!film.is_premium || film.access_type === "ppv_only";
-              return (
-                <a key={film.id} href={`/films/${film.slug}`} className="group block">
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] transition-all duration-500 group-hover:ring-cream/15 group-hover:shadow-2xl">
-                    <div className="cine-img absolute inset-0" style={{ background: bg }} />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/85 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    {isPremium ? (
-                      <span className="absolute right-3 top-3 rounded-full bg-bg-0/75 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-bright backdrop-blur-md rtl:right-auto rtl:left-3">
-                        {locale === "fa" ? "ویژه" : "Premium"}
-                      </span>
-                    ) : (
-                      <span className="absolute right-3 top-3 rounded-full bg-bg-0/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-cream/85 backdrop-blur-md opacity-0 transition-opacity duration-500 group-hover:opacity-100 rtl:right-auto rtl:left-3">
-                        {locale === "fa" ? "اشتراکی" : "Included"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-4 px-0.5">
-                    <h3 className="font-display text-[15px] font-medium leading-tight tracking-[-0.02em] text-cream-bright transition-colors group-hover:text-amber-bright">
-                      {ftitle}
-                    </h3>
-                    <p className="mt-1.5 text-[12px] text-cream/50">
-                      {director}
-                      {film.duration_min ? (
-                        <>
-                          {" · "}
-                          {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
-                        </>
-                      ) : null}
-                      {film.year ? <> {" · "} {num(film.year)} </> : null}
-                    </p>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </section>
+    <div className="space-y-24 md:space-y-32">
+      {rails.map((r) => (
+        <Rail
+          key={r.key}
+          eyebrow={r.eyebrow}
+          title={r.title}
+          subtitle={r.subtitle}
+          films={r.films}
+          locale={locale}
+          num={num}
+        />
+      ))}
+    </div>
   );
 }
