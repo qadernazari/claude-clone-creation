@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
+import { useSubscription, memberCanAccess } from "@/hooks/use-subscription";
 import { getFilmStreamUrl } from "@/lib/watch.functions";
+import { upsertWatchProgress, getResumePosition } from "@/lib/library.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/watch/$slug")({
@@ -13,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/watch/$slug")({
     const { data: film, error } = await supabase
       .from("films")
       .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year"
+        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year, access_type, is_premium"
       )
       .eq("slug", params.slug)
       .maybeSingle();
@@ -77,7 +79,11 @@ function WatchPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [theater, setTheater] = useState(true);
 
-  const { data: ticket, isLoading } = useQuery({
+  const { isMember } = useSubscription();
+  const accessType = (film as { access_type?: string }).access_type ?? "membership";
+  const memberAllowed = isMember && memberCanAccess(accessType as never);
+
+  const { data: ticket, isLoading: ticketLoading } = useQuery({
     queryKey: ["ticket", film.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -95,11 +101,14 @@ function WatchPage() {
     refetchInterval: 60_000,
   });
 
+  const hasAccess = !!ticket || memberAllowed || accessType === "free";
+  const isLoading = ticketLoading && !memberAllowed && accessType !== "free";
+
   const fetchStreamUrl = useServerFn(getFilmStreamUrl);
   const { data: streamRes } = useQuery({
-    queryKey: ["stream-url", film.slug, ticket?.id],
+    queryKey: ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")],
     queryFn: () => fetchStreamUrl({ data: { slug: film.slug } }),
-    enabled: !!ticket,
+    enabled: hasAccess,
     staleTime: 5 * 60_000,
   });
   const videoUrl =
@@ -107,39 +116,73 @@ function WatchPage() {
 
   const countdown = useCountdown(ticket?.expires_at);
 
-  // Log a play event once when ticket becomes available
+  // Log a play event once when access is established
   useEffect(() => {
-    if (ticket) {
+    if (hasAccess) {
       supabase.from("events").insert({ type: "play", film_id: film.id }).then(() => {});
     }
-  }, [ticket, film.id]);
+  }, [hasAccess, film.id]);
 
-  // Resume position: persist currentTime per film in localStorage
-  const storageKey = `watch:pos:${film.id}`;
+  // Resume position: fetch from DB on mount, sync up every ~10s
+  const saveProgress = useServerFn(upsertWatchProgress);
+  const fetchResume = useServerFn(getResumePosition);
+  const lastSyncRef = useRef<number>(0);
+  const resumePosRef = useRef<number>(0);
+  const resumedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!hasAccess) return;
+    fetchResume({ data: { filmId: film.id } })
+      .then((r) => {
+        if (!r.completed && r.positionSeconds > 10) resumePosRef.current = r.positionSeconds;
+      })
+      .catch(() => {});
+  }, [hasAccess, film.id, fetchResume]);
+
   const onLoadedMetadata = useCallback(() => {
-    try {
-      const saved = Number(localStorage.getItem(storageKey) || "0");
-      if (saved > 5 && videoRef.current && saved < (videoRef.current.duration || 0) - 10) {
-        videoRef.current.currentTime = saved;
-      }
-    } catch { /* ignore */ }
-  }, [storageKey]);
+    const v = videoRef.current;
+    if (!v) return;
+    const saved = resumePosRef.current;
+    if (saved > 5 && saved < (v.duration || 0) - 10 && !resumedRef.current) {
+      v.currentTime = saved;
+      resumedRef.current = true;
+    }
+  }, []);
 
   const onTimeUpdate = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (Math.floor(v.currentTime) % 5 === 0) {
-      try { localStorage.setItem(storageKey, String(v.currentTime)); } catch { /* ignore */ }
-    }
-  }, [storageKey]);
+    const now = Date.now();
+    if (now - lastSyncRef.current < 10_000) return;
+    lastSyncRef.current = now;
+    const pos = Math.floor(v.currentTime);
+    const dur = v.duration && isFinite(v.duration) ? Math.floor(v.duration) : null;
+    saveProgress({
+      data: {
+        filmId: film.id,
+        positionSeconds: pos,
+        durationSeconds: dur,
+        completed: false,
+      },
+    }).catch(() => {});
+  }, [film.id, saveProgress]);
 
   const onEnded = useCallback(() => {
-    try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
-  }, [storageKey]);
+    const v = videoRef.current;
+    const dur = v?.duration && isFinite(v.duration) ? Math.floor(v.duration) : null;
+    saveProgress({
+      data: {
+        filmId: film.id,
+        positionSeconds: dur ?? 0,
+        durationSeconds: dur,
+        completed: true,
+      },
+    }).catch(() => {});
+  }, [film.id, saveProgress]);
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!ticket || !videoUrl) return;
+    if (!hasAccess || !videoUrl) return;
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
       if (!v) return;
@@ -176,7 +219,7 @@ function WatchPage() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [ticket, videoUrl]);
+  }, [hasAccess, videoUrl]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
@@ -203,7 +246,7 @@ function WatchPage() {
     aboutFilm: fa ? "درباره فیلم" : "About the film",
   };
 
-  const showPlayer = !isLoading && !!ticket && !!videoUrl;
+  const showPlayer = !isLoading && hasAccess && !!videoUrl;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
@@ -260,7 +303,7 @@ function WatchPage() {
                 {t.checking}
               </div>
             </div>
-          ) : !ticket ? (
+          ) : !hasAccess ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center px-6">
               <div className="max-w-sm">
                 <p className="font-display text-xl text-cream-bright">{t.noTicket}</p>

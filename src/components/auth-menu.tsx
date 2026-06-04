@@ -89,6 +89,13 @@ export function AuthMenu() {
             {fa ? "حساب کاربری" : "Account"}
           </Link>
           <Link
+            to="/library"
+            onClick={() => setOpen(false)}
+            className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
+          >
+            {fa ? "کتابخانه من" : "My Library"}
+          </Link>
+          <Link
             to="/my-tickets"
             onClick={() => setOpen(false)}
             className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"

@@ -9,6 +9,7 @@ import { FilmCheckout } from "@/components/film-checkout";
 import { MembershipCheckout } from "@/components/membership-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
+import { WatchlistButton } from "@/components/watchlist-button";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useEffect, useMemo, useState } from "react";
 
@@ -330,6 +331,7 @@ function FilmPage() {
                 >
                   {copied ? t.copied : t.share}
                 </button>
+                <WatchlistButton filmId={film.id} variant="icon" />
               </div>
 
               <h1 className={`mt-5 text-4xl md:text-6xl font-medium leading-[1.02] tracking-[-0.04em] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
