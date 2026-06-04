@@ -329,9 +329,22 @@ function FilmPage() {
       ? t.premiumNote
       : t.membershipNote;
 
-  const shortSynopsis = synopsis
-    ? synopsis.replace(/\s+/g, " ").trim().slice(0, 220) + (synopsis.length > 220 ? "…" : "")
-    : null;
+  // Hero description — let CSS line-clamp handle truncation so the
+  // full synopsis is no longer duplicated below the hero.
+  const heroSynopsis = synopsis ? synopsis.replace(/\s+/g, " ").trim() : null;
+
+  // Pull a "cast" + "crew" view out of grouped credits for the
+  // dedicated Cast & Crew row beneath the hero.
+  const castCredits = useMemo(
+    () => credits.filter((c) => (c.credit_type || "other") === "cast"),
+    [credits],
+  );
+  const crewCredits = useMemo(
+    () => credits.filter((c) => (c.credit_type || "other") !== "cast"),
+    [credits],
+  );
+
+
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
