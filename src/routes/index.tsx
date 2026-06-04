@@ -141,7 +141,7 @@ function Home() {
 
 
       {/* Hero — cinematic bottom-aligned editorial spread */}
-      <section className="relative flex min-h-screen items-end overflow-hidden px-6 pb-20 pt-32 md:px-12 md:pb-32">
+      <section className="relative flex min-h-[100dvh] items-end overflow-hidden px-5 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32 md:px-12 md:pb-32">
         <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-t from-bg-0 via-bg-0/40 to-transparent" />
         <div
           className="pointer-events-none absolute right-0 top-0 z-0 h-full w-2/3"
@@ -162,7 +162,7 @@ function Home() {
           <span className="mb-6 block text-[11px] font-semibold uppercase tracking-[0.4em] text-amber">
             {hero?.kicker}
           </span>
-          <h1 className="font-display text-6xl leading-[0.9] tracking-[-0.02em] text-cream-bright md:text-8xl lg:text-9xl">
+          <h1 className="font-display text-5xl leading-[0.95] tracking-[-0.02em] text-cream-bright sm:text-6xl sm:leading-[0.9] md:text-8xl lg:text-9xl">
             {titleParts ? (
               <>
                 {titleParts[0]}
@@ -173,7 +173,7 @@ function Home() {
               hero?.title
             )}
           </h1>
-          <p className="mt-10 max-w-xl text-lg leading-relaxed text-cream/60 md:text-xl">
+          <p className="mt-8 max-w-xl text-base leading-relaxed text-cream/60 sm:mt-10 sm:text-lg md:text-xl">
             {hero?.subtitle}
           </p>
           <div className="mt-12 flex flex-wrap gap-3">
@@ -386,8 +386,8 @@ function FaqSection() {
   }, []);
 
   return (
-    <section className="border-t border-line px-6 py-28 md:px-12 md:py-32" dir={fa ? "rtl" : "ltr"}>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-[1fr_2fr]">
+    <section className="border-t border-line px-5 py-20 sm:px-6 sm:py-28 md:px-12 md:py-32" dir={fa ? "rtl" : "ltr"}>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 sm:gap-16 md:grid-cols-[1fr_2fr]">
         <div>
           <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
             {fa ? "پرسش‌های متداول" : "Questions"}
