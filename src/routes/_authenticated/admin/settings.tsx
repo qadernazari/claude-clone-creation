@@ -41,7 +41,7 @@ function SettingsPage() {
 function GeneralPanel() {
   const qc = useQueryClient();
   const [v, setV] = useState<GeneralSettings>(DEFAULT_GENERAL);
-  useEffect(() => { loadCmsKey<GeneralSettings>(GENERAL_KEY).then(setV); }, []);
+  useEffect(() => { loadCmsKey<GeneralSettings>(GENERAL_KEY).then((d) => setV({ ...DEFAULT_GENERAL, ...(d ?? {}) })); }, []);
   const save = useMutation({
     mutationFn: () => saveCmsKey(GENERAL_KEY, v),
     onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["site_content", GENERAL_KEY] }); },
@@ -95,7 +95,7 @@ function GeneralPanel() {
 function PaymentProvidersPanel() {
   const qc = useQueryClient();
   const [v, setV] = useState<PaymentProviderIds>(DEFAULT_PAYMENT_PROVIDER_IDS);
-  useEffect(() => { loadCmsKey<PaymentProviderIds>(CMS_KEYS.PAYMENT_PROVIDER_IDS).then(setV); }, []);
+  useEffect(() => { loadCmsKey<PaymentProviderIds>(CMS_KEYS.PAYMENT_PROVIDER_IDS).then((d) => setV({ ...DEFAULT_PAYMENT_PROVIDER_IDS, ...(d ?? {}) })); }, []);
   const save = useMutation({
     mutationFn: () => saveCmsKey(CMS_KEYS.PAYMENT_PROVIDER_IDS, v),
     onSuccess: () => { toast.success("Payment identifiers saved"); qc.invalidateQueries({ queryKey: ["site_content", CMS_KEYS.PAYMENT_PROVIDER_IDS] }); },
