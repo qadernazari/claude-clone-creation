@@ -360,16 +360,8 @@ const FAQ_ITEMS: { en: [string, string]; fa: [string, string] }[] = [
     fa: ["پس از خرید تا چه مدت می‌توانم فیلم را تماشا کنم؟", "پس از فعال‌شدن دسترسی، تا ۴۸ ساعت فرصت دارید فیلم را با آرامش تماشا کنید."],
   },
   {
-    en: ["Are subtitles available?", "Yes. All films are presented in Persian with English subtitles."],
-    fa: ["آیا زیرنویس انگلیسی وجود دارد؟", "بله. تمامی آثار با زیرنویس انگلیسی در دسترس هستند."],
-  },
-  {
     en: ["Can I watch on any device?", "Yes. Watch seamlessly on desktop, tablet, mobile, or smart TV through any modern web browser."],
     fa: ["روی چه دستگاه‌هایی می‌توانم تماشا کنم؟", "موبایل، تبلت، لپ‌تاپ و تلویزیون هوشمند؛ هرجا که مرورگر مدرن داشته باشید."],
-  },
-  {
-    en: ["How do filmmakers benefit?", "Every purchase directly supports filmmakers and helps sustain independent Iranian storytelling."],
-    fa: ["خرید من چگونه از فیلم‌سازان حمایت می‌کند؟", "بخش عمده درآمد هر تماشا مستقیماً به حمایت از فیلم‌سازان و تولید آثار مستقل اختصاص می‌یابد."],
   },
   {
     en: ["Do you add new films regularly?", "Yes. New films, documentaries, and original productions are added throughout the year, with a focus on quality and curation."],
