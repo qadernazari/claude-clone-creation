@@ -415,12 +415,29 @@ function EmptyMini({ text }: { text: string }) {
   return <p className="text-sm text-muted-foreground py-6 text-center">{text}</p>;
 }
 
-function NotTracked({ title, hint }: { title: string; hint: string }) {
+function BreakdownCard({ icon, title, rows, emptyText }: { icon: React.ReactNode; title: string; rows: [string, number][]; emptyText: string }) {
+  const max = rows[0]?.[1] ?? 1;
   return (
-    <div className="rounded-lg border border-dashed border-border bg-card/20 p-4">
-      <div className="text-xs font-medium text-muted-foreground">{title}</div>
-      <div className="text-sm mt-1">Not tracked yet</div>
-      <div className="text-[11px] text-muted-foreground/70 mt-1">{hint}</div>
+    <div className="rounded-lg border border-border bg-card/40 p-5">
+      <h3 className="font-medium mb-4 flex items-center gap-2">{icon} {title}</h3>
+      {rows.length === 0 ? (
+        <EmptyMini text={emptyText} />
+      ) : (
+        <ul className="space-y-2">
+          {rows.map(([label, count]) => {
+            const pct = Math.round((count / max) * 100);
+            return (
+              <li key={label} className="flex items-center gap-3 text-sm">
+                <span className="w-28 truncate" title={label}>{label}</span>
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="tabular-nums text-muted-foreground text-xs w-12 text-right">{count}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
