@@ -80,7 +80,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
         }`}
       >
         <div className="flex items-center gap-10">
-          <Link to="/" className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
+          <Link to="/" onClick={handleHomeClick} className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
             <Logo size={32} />
           </Link>
           <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
