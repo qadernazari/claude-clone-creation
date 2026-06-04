@@ -34,6 +34,7 @@ type Film = {
   visibility: string;
   sort_order: number;
   cover_url: string | null;
+  thumbnail_url: string | null;
   poster_gradient: string | null;
   video_url: string | null;
   preview_url: string | null;
