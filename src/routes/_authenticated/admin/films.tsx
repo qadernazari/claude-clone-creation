@@ -370,6 +370,10 @@ function FilmEditorModal({
           sort_order: c.sort_order,
         })));
       });
+    // Load video_url via admin server fn (column is hidden from clients).
+    getFilmVideoUrl({ data: { id: d.id } })
+      .then((res) => setD((p) => ({ ...p, video_url: res.videoUrl ?? "" })))
+      .catch(() => {});
   }, [d.id]);
 
   const pricingVisible = d.access_mode !== "free";
