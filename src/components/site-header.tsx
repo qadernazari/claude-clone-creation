@@ -167,12 +167,9 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 />
               </span>
             </button>
-          </div>
         </div>
-      </header>
-      <div className="fixed top-[64px] z-20 w-full">
         <TrialBanner />
-      </div>
+      </header>
 
       {/* Mobile menu overlay */}
       <div
