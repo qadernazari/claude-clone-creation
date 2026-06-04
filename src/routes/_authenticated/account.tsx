@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { MembershipPanel } from "@/components/membership-panel";
 
 export const Route = createFileRoute("/_authenticated/account")({
   component: AccountPage,
@@ -308,6 +309,9 @@ function AccountPage() {
             )}
           </div>
         </section>
+
+        {/* Membership */}
+        <MembershipPanel />
 
         {/* Password */}
         <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
