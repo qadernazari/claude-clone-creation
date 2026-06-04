@@ -8,7 +8,9 @@ import { CollectionsGrid } from "../components/collections-grid";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { MembershipCheckout } from "../components/membership-checkout";
+import { FaqSection } from "../components/faq-section";
 import { useSubscription } from "@/hooks/use-subscription";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
