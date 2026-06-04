@@ -660,6 +660,79 @@ export type Database = {
         }
         Relationships: []
       }
+      watch_progress: {
+        Row: {
+          completed: boolean
+          created_at: string
+          duration_seconds: number | null
+          film_id: string
+          id: string
+          last_watched_at: string
+          position_seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          duration_seconds?: number | null
+          film_id: string
+          id?: string
+          last_watched_at?: string
+          position_seconds?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          duration_seconds?: number | null
+          film_id?: string
+          id?: string
+          last_watched_at?: string
+          position_seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_progress_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      watchlist: {
+        Row: {
+          created_at: string
+          film_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          film_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          film_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchlist_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
