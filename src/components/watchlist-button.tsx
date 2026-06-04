@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { toggleWatchlist, getWatchlistStatus } from "@/lib/library.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
@@ -16,6 +18,7 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
   const fa = locale === "fa";
   const user = useCurrentUser();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const fetchStatus = useServerFn(getWatchlistStatus);
   const toggle = useServerFn(toggleWatchlist);
   const [inList, setInList] = useState<boolean | null>(null);
@@ -37,12 +40,27 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
       return;
     }
     setPending(true);
-    const next = !(inList ?? false);
+    const previous = inList ?? false;
+    const next = !previous;
+    // Optimistic update
+    setInList(next);
     try {
       const r = await toggle({ data: { filmId, add: next } });
       setInList(r.inWatchlist);
-    } catch {
-      // revert
+      queryClient.invalidateQueries({ queryKey: ["library"] });
+      toast.success(
+        r.inWatchlist
+          ? fa ? "به فهرست تماشا اضافه شد" : "Added to your watchlist"
+          : fa ? "از فهرست حذف شد" : "Removed from your watchlist",
+      );
+    } catch (err) {
+      // Revert on failure
+      setInList(previous);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : fa ? "خطا در به‌روزرسانی فهرست" : "Couldn't update your watchlist",
+      );
     } finally {
       setPending(false);
     }
