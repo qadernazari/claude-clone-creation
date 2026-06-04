@@ -167,7 +167,7 @@ function BrowsePage() {
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
             {locale === "fa" ? "کاتالوگ" : "The Catalog"}
           </span>
-          <h1 className="mt-5 font-editorial italic font-normal text-cream-bright text-5xl leading-[1.02] tracking-[-0.02em] md:text-6xl">
+          <h1 className="mt-5 font-display font-medium text-cream-bright text-5xl leading-[1.02] tracking-[-0.03em] md:text-6xl">
             {locale === "fa" ? "همه‌ی فیلم‌ها" : "Every film, in one place"}
           </h1>
           <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-cream/55">
