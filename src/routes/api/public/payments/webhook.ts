@@ -275,7 +275,16 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
 }
 
 
-async function upsertSubscription(subscription: any, env: StripeEnv) {
+async function lookupUserEmail(admin: any, userId: string): Promise<string | null> {
+  const { data } = await admin
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .maybeSingle();
+  return (data?.email as string | undefined) ?? null;
+}
+
+async function upsertSubscription(subscription: any, env: StripeEnv, origin: string) {
   const userId = subscription.metadata?.userId;
   if (!userId) {
     console.error("Subscription event missing userId metadata", subscription.id);
@@ -292,6 +301,15 @@ async function upsertSubscription(subscription: any, env: StripeEnv) {
   const trialEnd = subscription.trial_end;
 
   const admin = await getAdmin();
+
+  // Detect first insert vs update so we only fire "trial-started" once.
+  const { data: existing } = await admin
+    .from("subscriptions")
+    .select("id, status")
+    .eq("stripe_subscription_id", subscription.id)
+    .maybeSingle();
+  const isNew = !existing;
+
   const { error } = await admin.from("subscriptions").upsert(
     {
       user_id: userId,
@@ -313,15 +331,110 @@ async function upsertSubscription(subscription: any, env: StripeEnv) {
     console.error("subscription upsert failed:", error.message);
     throw new Error(error.message);
   }
+
+  // Trial-started email (only on first insert in a trial state)
+  if (isNew && subscription.status === "trialing" && trialEnd) {
+    const recipient = await lookupUserEmail(admin, userId);
+    if (recipient) {
+      const trialEndDate = new Date(trialEnd * 1000);
+      const trialDays = Math.max(
+        1,
+        Math.round((trialEnd * 1000 - Date.now()) / (1000 * 60 * 60 * 24)),
+      );
+      await sendReceipt(
+        origin,
+        "trial-started",
+        recipient,
+        `trial-started-${subscription.id}`,
+        {
+          trialDays,
+          trialEndFormatted: formatExpiry(trialEndDate),
+          manageUrl: `${origin}/membership`,
+          browseUrl: `${origin}/browse`,
+        },
+      );
+    }
+  }
 }
 
-async function markSubscriptionCanceled(subscription: any, env: StripeEnv) {
+async function handleTrialWillEnd(subscription: any, env: StripeEnv, origin: string) {
+  const userId = subscription.metadata?.userId;
+  if (!userId || !subscription.trial_end) return;
+  const admin = await getAdmin();
+  const recipient = await lookupUserEmail(admin, userId);
+  if (!recipient) return;
+  const item = subscription.items?.data?.[0];
+  const unit = item?.price?.unit_amount;
+  const currency = item?.price?.currency ?? "usd";
+  const priceFormatted = unit ? `${formatUsd(unit, currency)} / ${item?.price?.recurring?.interval ?? "month"}` : "";
+  await sendReceipt(
+    origin,
+    "trial-ending-soon",
+    recipient,
+    `trial-ending-${subscription.id}-${subscription.trial_end}`,
+    {
+      trialEndFormatted: formatExpiry(new Date(subscription.trial_end * 1000)),
+      priceFormatted,
+      manageUrl: `${origin}/membership`,
+    },
+  );
+  void env;
+}
+
+async function handleInvoicePaymentFailed(invoice: any, env: StripeEnv, origin: string) {
+  const subId = invoice.subscription as string | undefined;
+  if (!subId) return;
+  const admin = await getAdmin();
+  const { data: sub } = await admin
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_subscription_id", subId)
+    .eq("environment", env)
+    .maybeSingle();
+  if (!sub?.user_id) return;
+  const recipient = await lookupUserEmail(admin, sub.user_id);
+  if (!recipient) return;
+  const amount = invoice.amount_due ?? invoice.amount_remaining ?? 0;
+  const currency = (invoice.currency ?? "usd").toLowerCase();
+  const nextAttempt = invoice.next_payment_attempt
+    ? formatExpiry(new Date(invoice.next_payment_attempt * 1000))
+    : "";
+  await sendReceipt(
+    origin,
+    "payment-failed",
+    recipient,
+    `payment-failed-${invoice.id}`,
+    {
+      amountFormatted: amount ? formatUsd(amount, currency) : "",
+      nextAttemptFormatted: nextAttempt,
+      updatePaymentUrl: `${origin}/membership`,
+    },
+  );
+}
+
+async function markSubscriptionCanceled(subscription: any, env: StripeEnv, origin: string) {
   const admin = await getAdmin();
   await admin
     .from("subscriptions")
     .update({ status: "canceled", updated_at: new Date().toISOString() })
     .eq("stripe_subscription_id", subscription.id)
     .eq("environment", env);
+
+  const userId = subscription.metadata?.userId;
+  if (!userId) return;
+  const recipient = await lookupUserEmail(admin, userId);
+  if (!recipient) return;
+  const periodEnd = subscription.items?.data?.[0]?.current_period_end ?? subscription.current_period_end;
+  await sendReceipt(
+    origin,
+    "subscription-canceled",
+    recipient,
+    `subscription-canceled-${subscription.id}`,
+    {
+      accessUntilFormatted: periodEnd ? formatExpiry(new Date(periodEnd * 1000)) : "",
+      resubscribeUrl: `${origin}/membership`,
+    },
+  );
 }
 
 export const Route = createFileRoute("/api/public/payments/webhook")({
@@ -352,10 +465,16 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
             }
             case "customer.subscription.created":
             case "customer.subscription.updated":
-              await upsertSubscription(event.data.object, env);
+              await upsertSubscription(event.data.object, env, origin);
+              break;
+            case "customer.subscription.trial_will_end":
+              await handleTrialWillEnd(event.data.object, env, origin);
               break;
             case "customer.subscription.deleted":
-              await markSubscriptionCanceled(event.data.object, env);
+              await markSubscriptionCanceled(event.data.object, env, origin);
+              break;
+            case "invoice.payment_failed":
+              await handleInvoicePaymentFailed(event.data.object, env, origin);
               break;
             default:
               console.log("Unhandled event:", event.type);
