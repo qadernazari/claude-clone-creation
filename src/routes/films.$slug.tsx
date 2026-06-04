@@ -354,20 +354,15 @@ function FilmPage() {
             {/* Meta + purchase */}
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                {film.is_premium && (
-                  <span className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-bright">
-                    {fa ? "اکران ویژه" : "Premium Release"}
-                  </span>
-                )}
                 {film.category && (
-                  <span className="inline-flex rounded-full bg-cream/10 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
+                  <span className="inline-flex rounded-full border border-cream/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cream/55">
                     {film.category}
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-cream/15 bg-cream/[0.04] px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70 hover:text-cream-bright hover:border-cream/30 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-cream/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cream/55 hover:text-cream-bright hover:border-cream/25 transition-colors"
                 >
                   {copied ? t.copied : t.share}
                 </button>
