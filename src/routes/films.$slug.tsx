@@ -165,6 +165,22 @@ function FilmPage() {
     refetchInterval: 30_000,
   });
 
+  const fetchResume = useServerFn(getResumePosition);
+  const { data: resume } = useQuery({
+    queryKey: ["resume", film.id, user?.id ?? "anon"],
+    enabled: !!user,
+    queryFn: () => fetchResume({ data: { filmId: film.id } }),
+    staleTime: 30_000,
+  });
+  const resumeSec = resume && !resume.completed && resume.positionSeconds > 10 ? resume.positionSeconds : 0;
+  const fmtResume = (s: number) => {
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${String(Math.floor(r)).padStart(2, "0")}`;
+  };
+
+
+
   const { data: related = [] } = useQuery({
     queryKey: ["film", film.id, "related", film.category],
     queryFn: async () => {
