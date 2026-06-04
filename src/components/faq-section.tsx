@@ -96,7 +96,7 @@ export function FaqSection() {
   return (
     <section
       dir={dir}
-      className="mx-auto max-w-4xl px-6 pt-24 pb-28 md:px-10 md:pt-32 md:pb-36"
+      className="mx-auto max-w-4xl px-6 pt-16 pb-20 md:px-10 md:pt-20 md:pb-24"
       aria-labelledby="faq-heading"
     >
       <div className="text-center">
@@ -121,7 +121,7 @@ export function FaqSection() {
         </h2>
       </div>
 
-      <ul className="mt-14 border-t border-cream/[0.08]">
+      <ul className="mt-10 border-t border-cream/[0.08]">
         {items.map((item, i) => (
           <li key={i} className="border-b border-cream/[0.08]">
             <details className="group">
