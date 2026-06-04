@@ -668,61 +668,31 @@ function FilmPage() {
         </section>
       )}
 
-      {/* How to Watch */}
-      <section className="mx-auto max-w-7xl px-6 pt-10 pb-10 md:px-10">
-        <div className="mb-6">
-          <h2 className={`font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : ""}`}>
-            {fa ? "چگونه تماشا کنم" : "How to Watch"}
-          </h2>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="hairline rounded-2xl border bg-bg-1/40 p-6">
-            <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
-              {fa ? "عضویت ایران" : "IRAN Membership"}
-            </span>
-            <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-              {canMemberWatch
-                ? (fa ? "تماشای نامحدود با عضویت" : "Unlimited streaming with membership")
-                : (fa ? "این اثر ویژه است" : "Premium release")}
-            </h3>
-            <p className="mt-2 text-[13px] leading-relaxed text-cream/60">
-              {canMemberWatch
-                ? (fa ? "۷ روز رایگان، سپس اشتراک ماهانه. هر زمان لغو کنید." : "7 days free, then a monthly subscription. Cancel anytime.")
-                : (fa ? "این اثر جدا از عضویت فروخته می‌شود." : "This title is sold separately from membership.")}
-            </p>
-            {!isMember && canMemberWatch && (
-              <button
-                type="button"
-                onClick={() => setMembershipOpen(true)}
-                className="mt-4 inline-flex items-center justify-center rounded-full bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink transition-transform hover:scale-[1.02]"
-              >
-                {t.startTrial}
-              </button>
-            )}
-          </div>
-          {hasPpv && (
-            <div className="hairline rounded-2xl border bg-bg-1/40 p-6">
+      {/* How to Watch — only shown for PPV titles where it isn't already covered by the hero membership CTA */}
+      {hasPpv && !isMember && (
+        <section className="mx-auto max-w-3xl px-6 pt-10 pb-6 md:px-10">
+          <div className="hairline flex flex-col gap-2 rounded-2xl border bg-bg-1/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
               <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
-                {fa ? "خرید بلیط" : "Buy a ticket"}
+                {fa ? "خرید این فیلم" : "Buy this film"}
               </span>
-              <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-                {priceLabel}
-              </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-cream/60">
-                {t.accessNote}
+              <p className="mt-1 text-[13px] text-cream/65">
+                {priceLabel} · {t.accessNote}
               </p>
-              <button
-                type="button"
-                onClick={() => setCheckoutOpen(true)}
-                disabled={tomanOnly}
-                className="mt-4 inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-2.5 text-[13px] font-medium text-cream-bright transition-colors hover:bg-cream/5 disabled:opacity-60"
-              >
-                {t.buy}
-              </button>
             </div>
-          )}
-        </div>
-      </section>
+            <button
+              type="button"
+              onClick={() => setCheckoutOpen(true)}
+              disabled={tomanOnly}
+              className="inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-2.5 text-[13px] font-medium text-cream-bright transition-colors hover:bg-cream/5 disabled:opacity-60"
+            >
+              {t.buy}
+            </button>
+          </div>
+        </section>
+      )}
+
+
 
       {/* Support the filmmaker */}
       <section className="mx-auto max-w-3xl px-6 pt-6 pb-20">
