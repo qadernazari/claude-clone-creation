@@ -52,20 +52,42 @@ export function FeaturedFilm() {
     en: data.synopsis_en || "",
     fa: data.synopsis_fa || data.synopsis_en || "",
   });
-  const bg = data.cover_url
-    ? `center / cover no-repeat url(${data.cover_url})`
-    : data.poster_gradient ||
-      "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
+  const fallbackBg =
+    data.poster_gradient ||
+    "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
 
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden">
-        <div
-          className="absolute inset-0 cine-img"
-          style={{ background: bg, transform: "scale(1.03)" }}
-          aria-hidden
-        />
+      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
+        {data.cover_url ? (
+          <>
+            {/* Soft blurred backdrop fills the frame without cropping the artwork */}
+            <div
+              className="absolute inset-0 scale-110"
+              style={{
+                background: `center / cover no-repeat url(${data.cover_url})`,
+                filter: "blur(60px) saturate(1.1) brightness(0.55)",
+                opacity: 0.55,
+              }}
+              aria-hidden
+            />
+            {/* Artwork itself — contained so nothing important is cropped */}
+            <img
+              src={data.cover_url}
+              alt={title}
+              className="absolute inset-0 h-full w-full object-contain object-center"
+              loading="eager"
+              decoding="async"
+            />
+          </>
+        ) : (
+          <div
+            className="absolute inset-0 cine-img"
+            style={{ background: fallbackBg }}
+            aria-hidden
+          />
+        )}
         {/* Vertical fade for legibility + handoff to bg-0 */}
         <div
           className="pointer-events-none absolute inset-0"
@@ -79,9 +101,10 @@ export function FeaturedFilm() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, rgba(13,13,13,0.85) 0%, rgba(13,13,13,0.3) 45%, transparent 75%)",
+              "linear-gradient(90deg, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.55) 35%, rgba(13,13,13,0.15) 60%, transparent 80%)",
           }}
         />
+
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end">
