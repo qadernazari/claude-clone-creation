@@ -394,8 +394,8 @@ function FilmPage() {
               {title}
             </h1>
 
-            {/* Meta row */}
-            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-cream/75">
+            {/* Meta row + quality badges */}
+            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-cream/75">
               {film.year && <span>{fa ? num(film.year) : String(film.year)}</span>}
               {film.year && film.duration_min ? <span className="text-cream/30">·</span> : null}
               {film.duration_min && (
@@ -411,6 +411,30 @@ function FilmPage() {
                     <span className="text-cream-bright">{director}</span>
                   </span>
                 </>
+              )}
+              {(film.age_rating || film.has_4k || film.has_captions || film.has_subtitles) && (
+                <span className="ms-1 inline-flex items-center gap-1.5">
+                  {film.age_rating && (
+                    <span className="rounded-[4px] border border-cream/25 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-cream-bright">
+                      {film.age_rating}
+                    </span>
+                  )}
+                  {film.has_4k && (
+                    <span className="rounded-[4px] border border-cream/25 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-cream-bright">
+                      4K
+                    </span>
+                  )}
+                  {film.has_captions && (
+                    <span className="rounded-[4px] border border-cream/25 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-cream-bright">
+                      CC
+                    </span>
+                  )}
+                  {film.has_subtitles && (
+                    <span className="rounded-[4px] border border-cream/25 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-cream-bright">
+                      SUB
+                    </span>
+                  )}
+                </span>
               )}
             </div>
 
