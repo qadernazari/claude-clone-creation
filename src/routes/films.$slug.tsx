@@ -303,203 +303,223 @@ function FilmPage() {
     }
   };
 
+  // Compute access state once for the hero CTAs
+  const accessType = film.access_type ?? "membership";
+  const canMemberWatch = memberCanAccess(accessType);
+  const hasPpv = ppvAvailable(accessType);
+  const showWatchNow = !!activeTicket || (isMember && canMemberWatch) || accessType === "free";
+
+  const accessNote = showWatchNow
+    ? activeTicket
+      ? t.ticketActive
+      : isMember && canMemberWatch
+        ? t.memberIncluded
+        : t.accessNote
+    : isMember && accessType === "ppv_only"
+      ? t.premiumNote
+      : t.membershipNote;
+
+  const shortSynopsis = synopsis
+    ? synopsis.replace(/\s+/g, " ").trim().slice(0, 220) + (synopsis.length > 220 ? "…" : "")
+    : null;
+
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <PaymentTestModeBanner />
       <SiteHeader />
 
-
-      {/* Cinematic hero */}
-      <section className="relative isolate overflow-hidden">
-        {/* Backdrop layers */}
-        <div className="absolute inset-0 -z-20" style={posterStyle} aria-hidden />
+      {/* Cinematic full-bleed hero */}
+      <section className="relative isolate -mt-[72px] min-h-[88vh] w-full overflow-hidden">
+        {/* Backdrop — full bleed cover art */}
+        <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
+        {/* Soft blur edge to hide poster seams on ultra-wide */}
+        <div className="absolute inset-0 -z-20 bg-black/10" aria-hidden />
+        {/* Cinematic gradients — bottom-to-top + side fade for readability */}
         <div
-          className="absolute inset-0 -z-10 backdrop-blur-2xl"
-          style={{ background: "linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.85) 60%, var(--background) 100%)" }}
+          className="absolute inset-0 -z-10"
           aria-hidden
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(8,8,10,0.55) 0%, rgba(8,8,10,0) 28%, rgba(8,8,10,0) 50%, rgba(8,8,10,0.75) 82%, var(--background) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 -z-10"
+          aria-hidden
+          style={{
+            background:
+              dir === "rtl"
+                ? "linear-gradient(270deg, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.35) 45%, rgba(8,8,10,0) 75%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.35) 45%, rgba(8,8,10,0) 75%)",
+          }}
         />
 
-        <div className="mx-auto max-w-6xl px-6 pt-10 md:pt-12 pb-14 md:pb-20">
-          <Link to="/" className="text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright transition-colors">
+        {/* Hero content — anchored bottom-start */}
+        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-32 md:px-10 md:pb-20 md:pt-40">
+          <Link
+            to="/"
+            className="absolute top-24 inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/55 transition-colors hover:text-cream-bright md:top-28"
+            style={dir === "rtl" ? { right: "1.5rem" } : { left: "1.5rem" }}
+          >
             ← {t.back}
           </Link>
 
-          <div className="mt-8 grid gap-10 md:grid-cols-[320px_1fr] md:gap-14">
-            {/* Poster */}
-            <div className="relative group">
-              <div
-                className="hairline aspect-[2/3] w-full overflow-hidden rounded-xl border shadow-2xl shadow-black/50"
-                style={posterStyle}
-                aria-hidden
-              />
+          <div className="max-w-2xl">
+            {film.category && (
+              <span className="inline-flex rounded-full bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-cream/80 backdrop-blur-sm ring-1 ring-cream/10">
+                {film.category}
+              </span>
+            )}
+
+            <h1
+              className={`mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.045em] text-cream-bright drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)] md:text-7xl ${fa ? "font-vazir" : "font-display"}`}
+            >
+              {title}
+            </h1>
+
+            {/* Meta row */}
+            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-cream/75">
+              {film.year && <span>{num(film.year)}</span>}
+              {film.year && film.duration_min ? <span className="text-cream/30">·</span> : null}
+              {film.duration_min && (
+                <span>
+                  {num(film.duration_min)} {fa ? "دقیقه" : "min"}
+                </span>
+              )}
+              {director && (
+                <>
+                  <span className="text-cream/30">·</span>
+                  <span>
+                    {fa ? "کارگردان " : "Dir. "}
+                    <span className="text-cream-bright">{director}</span>
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Short synopsis */}
+            {shortSynopsis && (
+              <p
+                className={`mt-5 max-w-xl text-[15px] leading-relaxed text-cream/85 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] md:text-base ${fa ? "font-vazir" : ""}`}
+              >
+                {shortSynopsis}
+              </p>
+            )}
+
+            {/* CTAs — integrated, not boxed */}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              {!user ? (
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}
+                </Link>
+              ) : showWatchNow ? (
+                <Link
+                  to="/watch/$slug"
+                  params={{ slug: film.slug }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {resumeSec > 0
+                    ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}`
+                    : t.watch}
+                </Link>
+              ) : isMember ? (
+                <button
+                  type="button"
+                  onClick={() => setCheckoutOpen(true)}
+                  disabled={tomanOnly}
+                  className="inline-flex items-center justify-center rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
+                >
+                  {t.buy} — {priceLabel}
+                </button>
+              ) : accessType === "ppv_only" ? (
+                <button
+                  type="button"
+                  onClick={() => setCheckoutOpen(true)}
+                  disabled={tomanOnly}
+                  className="inline-flex items-center justify-center rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
+                >
+                  {t.buy} — {priceLabel}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setMembershipOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {t.watch}
+                </button>
+              )}
+
+              <WatchlistButton filmId={film.id} variant="pill" />
+
               {film.preview_url && (
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
-                  className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/0 hover:bg-black/40 transition-colors"
-                  aria-label={t.playPreview}
+                  className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-black/30 px-5 py-3 text-sm font-medium text-cream backdrop-blur-sm transition-colors hover:bg-cream/10"
                 >
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream-bright/95 text-ink shadow-xl transition-transform group-hover:scale-105">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
-                  <span className="absolute bottom-3 inset-x-0 text-center text-[11px] uppercase tracking-widest text-cream/90 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {t.playPreview}
-                  </span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {t.playPreview}
                 </button>
               )}
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="inline-flex items-center justify-center rounded-full border border-cream/15 bg-black/30 p-3 text-cream/80 backdrop-blur-sm transition-colors hover:bg-cream/10 hover:text-cream-bright"
+                aria-label={t.share}
+                title={copied ? t.copied : t.share}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </button>
             </div>
 
-            {/* Meta + purchase */}
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                {film.category && (
-                  <span className="inline-flex rounded-full border border-cream/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cream/55">
-                    {film.category}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-cream/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cream/55 hover:text-cream-bright hover:border-cream/25 transition-colors"
-                >
-                  {copied ? t.copied : t.share}
-                </button>
-                <WatchlistButton filmId={film.id} variant="icon" />
+            {/* Subtle access note — no boxed pricing */}
+            <p className="mt-5 text-[12px] tracking-wide text-cream/55">
+              {accessNote}
+              {activeTicket?.expires_at && (
+                <span className="ms-2 text-cream/35">
+                  · {new Date(activeTicket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", { dateStyle: "medium", timeStyle: "short" })}
+                </span>
+              )}
+            </p>
+            {tomanOnly && <p className="mt-1.5 text-[11px] text-cream/40">{t.tomanSoon}</p>}
+
+            {!showWatchNow && (hasPpv || accessType !== "ppv_only") && (
+              <div className="mt-4 max-w-md">
+                <PromoBannerList
+                  context={isMember || accessType === "ppv_only" ? "ticket" : "membership"}
+                  filmId={film.id}
+                  fa={fa}
+                />
               </div>
-
-              <h1 className={`mt-5 text-4xl md:text-6xl font-medium leading-[1.02] tracking-[-0.04em] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-                {title}
-              </h1>
-              {director && (
-                <p className="mt-3 text-cream/75">
-                  {fa ? "کارگردان: " : "Directed by "}
-                  <span className="text-cream-bright">{director}</span>
-                </p>
-              )}
-              <p className="mt-1 text-sm text-cream/50">
-                {film.year ? num(film.year) : null}
-                {film.year && film.duration_min ? " · " : null}
-                {film.duration_min ? `${num(film.duration_min)} ${fa ? "دقیقه" : "min"}` : null}
-              </p>
-
-              {/* Access card — member-aware */}
-              {(() => {
-                const accessType = film.access_type ?? "membership";
-                const canMemberWatch = memberCanAccess(accessType);
-                const hasPpv = ppvAvailable(accessType);
-                const showWatchNow = !!activeTicket || (isMember && canMemberWatch) || accessType === "free";
-                const primaryLabel = showWatchNow ? t.watch : isMember ? t.buy : t.startTrial;
-
-                return (
-                  <div className="mt-8 hairline rounded-2xl border bg-bg-1/70 backdrop-blur p-6 max-w-md">
-                    <div className="text-sm text-cream/75">
-                      {showWatchNow
-                        ? activeTicket
-                          ? t.ticketActive
-                          : isMember && canMemberWatch
-                            ? t.memberIncluded
-                            : t.accessNote
-                        : isMember && accessType === "ppv_only"
-                          ? t.premiumNote
-                          : t.membershipNote}
-                    </div>
-
-                    <div className="mt-4 flex flex-col gap-2">
-                      {!user ? (
-                        <Link
-                          to="/auth"
-                          className="inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright"
-                        >
-                          {accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}
-                        </Link>
-                      ) : showWatchNow ? (
-                        <Link
-                          to="/watch/$slug"
-                          params={{ slug: film.slug }}
-                          className="inline-flex items-center justify-center gap-2 rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                          {resumeSec > 0
-                            ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}`
-                            : t.watch}
-                        </Link>
-                      ) : isMember ? (
-                        // Member viewing a ppv_only premium film
-                        <button
-                          type="button"
-                          onClick={() => setCheckoutOpen(true)}
-                          disabled={tomanOnly}
-                          className="inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright disabled:opacity-60"
-                        >
-                          {t.buy} — {priceLabel}
-                        </button>
-                      ) : (
-                        // Non-member, film offers membership
-                        <>
-                          {accessType !== "ppv_only" && (
-                            <button
-                              type="button"
-                              onClick={() => setMembershipOpen(true)}
-                              className="inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright"
-                            >
-                              {primaryLabel}
-                            </button>
-                          )}
-                          {hasPpv && (
-                            <button
-                              type="button"
-                              onClick={() => setCheckoutOpen(true)}
-                              disabled={tomanOnly}
-                              className="inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-3 text-sm font-medium text-cream hover:bg-cream/5 transition-colors disabled:opacity-60"
-                            >
-                              {accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : `${t.orBuy} — ${priceLabel}`}
-                            </button>
-                          )}
-                        </>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!user) {
-                            window.location.href = "/auth";
-                            return;
-                          }
-                          setContribOpen(true);
-                        }}
-                        className="inline-flex items-center justify-center rounded-full border border-cream/15 px-5 py-2.5 text-[12px] font-medium text-cream/75 hover:bg-cream/5 transition-colors"
-                      >
-                        {t.contribute}
-                      </button>
-                    </div>
-                    {activeTicket?.expires_at && (
-                      <p className="mt-4 text-[11px] text-cream/55">
-                        {new Date(activeTicket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", { dateStyle: "medium", timeStyle: "short" })}
-                      </p>
-                    )}
-                    {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
-                    {!showWatchNow && (hasPpv || accessType !== "ppv_only") && (
-                      <div className="mt-4">
-                        <PromoBannerList
-                          context={isMember || accessType === "ppv_only" ? "ticket" : "membership"}
-                          filmId={film.id}
-                          fa={fa}
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* Synopsis + Credits */}
-      <section className="mx-auto max-w-6xl px-6 pb-20 grid gap-12 md:grid-cols-[2fr_1fr]">
+      <section className="mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-20 md:grid-cols-[2fr_1fr]">
         {synopsis && (
           <div>
             <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
@@ -543,7 +563,7 @@ function FilmPage() {
 
       {/* More films */}
       {related.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 pb-24">
+        <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="mb-8 flex items-end justify-between gap-6">
             <div>
               <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
@@ -585,6 +605,36 @@ function FilmPage() {
           </div>
         </section>
       )}
+
+      {/* Support the filmmaker — subtle, near the bottom */}
+      <section className="mx-auto max-w-3xl px-6 pb-24">
+        <div className="hairline rounded-2xl border bg-bg-1/40 px-8 py-8 text-center">
+          <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
+            {fa ? "حمایت" : "Support"}
+          </span>
+          <h3 className={`mt-3 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+            {fa ? "از فیلم‌ساز حمایت کنید" : "Support the filmmaker"}
+          </h3>
+          <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-cream/60">
+            {fa
+              ? "کمک‌های شما مستقیماً به ادامه ساخت سینمای مستقل ایران می‌رسد."
+              : "Your contribution goes directly to keeping independent Iranian cinema alive."}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              if (!user) {
+                window.location.href = "/auth";
+                return;
+              }
+              setContribOpen(true);
+            }}
+            className="mt-5 inline-flex items-center justify-center rounded-full border border-cream/20 px-5 py-2.5 text-[13px] font-medium text-cream/85 transition-colors hover:bg-cream/5 hover:text-cream-bright"
+          >
+            {t.contribute}
+          </button>
+        </div>
+      </section>
 
       {checkoutOpen && (
         <FilmCheckout
@@ -643,6 +693,5 @@ function FilmPage() {
       )}
       <SiteFooter />
     </div>
-
   );
 }
