@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
+import { PromoBannerList } from "@/components/promo-banner";
 import { useLocale } from "@/lib/i18n";
 
 interface MembershipCheckoutProps {
@@ -66,6 +67,11 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
               <p className="mb-2 text-[11px] uppercase tracking-widest text-cream/55">
                 {fa ? "کد تخفیف (اختیاری)" : "Promo code (optional)"}
               </p>
+              {!applied && (
+                <div className="mb-3">
+                  <PromoBannerList context="membership" fa={fa} onApply={setApplied} />
+                </div>
+              )}
               <CouponField
                 context="membership"
                 fa={fa}
