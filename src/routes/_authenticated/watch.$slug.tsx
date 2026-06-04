@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
+import { useSubscription, memberCanAccess } from "@/hooks/use-subscription";
 import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { upsertWatchProgress, getResumePosition } from "@/lib/library.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
