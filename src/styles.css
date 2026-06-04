@@ -95,8 +95,8 @@
   --input: var(--line);
   --ring: var(--amber);
 
-  --font-display: "Sora", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Manrope", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-fa: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-editorial: "Fraunces", "Vazirmatn", ui-serif, Georgia, serif;
 }

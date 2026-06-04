@@ -132,9 +132,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               <Link to="/browse" className={linkCls("browse")}>
                 {fa ? "آثار اختصاصی" : "Originals"}
               </Link>
-              <Link to="/about" className={linkCls("about")}>
-                {fa ? "درباره" : "About"}
-              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-1 sm:gap-3">
@@ -204,13 +201,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               className={mobileLinkCls("browse")}
             >
               {fa ? "آثار اختصاصی" : "Originals"}
-            </Link>
-            <Link
-              to="/about"
-              onClick={() => setMenuOpen(false)}
-              className={mobileLinkCls("about")}
-            >
-              {fa ? "درباره" : "About"}
             </Link>
           </nav>
           <div className="mt-auto flex items-center justify-between border-t border-line pt-6">

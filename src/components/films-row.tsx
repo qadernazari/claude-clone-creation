@@ -40,27 +40,21 @@ function PosterCard({ film, locale, num }: { film: Film; locale: string; num: (n
   const bg = film.cover_url
     ? `center / cover no-repeat url(${film.cover_url})`
     : film.poster_gradient || fallbackGradient(film.id);
-  const isPremium = !!film.is_premium || film.access_type === "ppv_only";
 
   return (
     <a
       href={`/films/${film.slug}`}
       className="group block w-[44vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-[14px] bg-bg-1 ring-1 ring-cream/[0.05] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20 group-hover:shadow-[0_25px_50px_-15px_rgba(0,0,0,0.8)]">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
         <div className="cine-img absolute inset-0" style={{ background: bg }} />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        {isPremium && (
-          <span className="absolute right-3 top-3 rounded-full bg-bg-0/75 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-bright backdrop-blur-md rtl:right-auto rtl:left-3">
-            {locale === "fa" ? "ویژه" : "Premium"}
-          </span>
-        )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
       <div className="mt-4 px-0.5">
-        <h3 className="font-display text-[14px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors group-hover:text-amber-bright line-clamp-1">
+        <h3 className="font-display text-[14px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors line-clamp-1">
           {ftitle}
         </h3>
-        <p className="mt-1 text-[11.5px] text-cream/45 line-clamp-1">
+        <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1">
           {director}
           {film.year ? <> {" · "} {num(film.year)}</> : null}
         </p>
@@ -96,18 +90,18 @@ function Rail({
   return (
     <section className="relative">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-        <div className="mb-7 flex items-end justify-between gap-6">
+        <div className="mb-8 flex items-end justify-between gap-6">
           <div className="max-w-2xl">
             {eyebrow && (
-              <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/85">
+              <span className="mb-2.5 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
                 {eyebrow}
               </span>
             )}
-            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[28px]">
+            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
               {title}
             </h2>
             {subtitle && (
-              <p className="mt-2 text-[13px] text-cream/45 md:text-[14px]">{subtitle}</p>
+              <p className="mt-2 text-[13px] text-cream/45">{subtitle}</p>
             )}
           </div>
           <div className="hidden gap-1.5 md:flex">
@@ -115,7 +109,7 @@ function Rail({
               type="button"
               onClick={() => scroll(-1)}
               aria-label="Previous"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/15 text-cream/60 transition-all hover:border-cream/40 hover:text-cream-bright hover:bg-cream/5"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
             </button>
@@ -123,7 +117,7 @@ function Rail({
               type="button"
               onClick={() => scroll(1)}
               aria-label="Next"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/15 text-cream/60 transition-all hover:border-cream/40 hover:text-cream-bright hover:bg-cream/5"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
             </button>
@@ -209,39 +203,22 @@ export function FilmsRow() {
     const out: Array<{ key: string; eyebrow?: string; title: string; subtitle?: string; films: Film[] }> = [];
 
     out.push({
-      key: "new",
-      eyebrow: locale === "fa" ? "تازه‌ها" : "Just Added",
-      title: locale === "fa" ? "آثار تازه" : "New Releases",
-      subtitle:
-        locale === "fa"
-          ? "تازه‌ترین افزوده‌های مجموعه‌ی ایران."
-          : "The latest additions to the IRAN library.",
-      films: newReleases,
-    });
-
-    out.push({
       key: "originals",
-      eyebrow: locale === "fa" ? "اختصاصی" : "IRAN Originals",
+      eyebrow: locale === "fa" ? "اختصاصی ایران" : "Iranian Originals",
       title: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
       subtitle:
         locale === "fa"
           ? "آثار منتخب، با امضای فیلم‌سازان."
-          : "Selected works, in the filmmakers' own voice.",
+          : "Signature works, in the filmmakers' own voice.",
       films: editors,
     });
 
-    if (premium.length > 0) {
-      out.push({
-        key: "premium",
-        eyebrow: locale === "fa" ? "اکران ویژه" : "Premium",
-        title: locale === "fa" ? "اکران‌های ویژه" : "Premium Releases",
-        subtitle:
-          locale === "fa"
-            ? "آثار ویژه، خارج از اشتراک."
-            : "Special releases, sold separately.",
-        films: premium,
-      });
-    }
+    out.push({
+      key: "new",
+      eyebrow: locale === "fa" ? "تازه‌ها" : "New Releases",
+      title: locale === "fa" ? "آثار تازه" : "New Releases",
+      films: newReleases,
+    });
 
     out.push(...catRails);
     return out;
