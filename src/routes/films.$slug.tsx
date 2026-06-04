@@ -9,6 +9,7 @@ import { FilmCheckout } from "@/components/film-checkout";
 import { MembershipCheckout } from "@/components/membership-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
+import { WatchlistButton } from "@/components/watchlist-button";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useEffect, useMemo, useState } from "react";
 
