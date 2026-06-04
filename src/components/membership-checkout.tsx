@@ -62,10 +62,27 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
               {fa ? "عضویت ماهانه" : "Monthly membership"}
             </h2>
             <p className="mt-2 text-sm text-cream/65">
-              {fa
-                ? "۷ روز رایگان، سپس پرداخت ماهانه. هر زمان لغو کنید."
-                : "7-day free trial, then billed monthly. Cancel anytime."}
+              {showTrialCta
+                ? fa
+                  ? "هفت روز رایگان — بدون نیاز به اطلاعات پرداخت."
+                  : "7 days free — no payment information required."
+                : fa
+                  ? "پرداخت ماهانه. هر زمان لغو کنید."
+                  : "Billed monthly. Cancel anytime."}
             </p>
+
+            {showTrialCta && (
+              <div className="mt-6">
+                <AcceptTrialButton
+                  fullWidth
+                  className="inline-flex items-center justify-center rounded-full bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
+                  label={fa ? "پذیرش دوره آزمایشی رایگان" : "Accept Free Trial"}
+                />
+                <p className="mt-3 text-center text-xs text-cream/50">
+                  {fa ? "یا" : "or"}
+                </p>
+              </div>
+            )}
 
             <div className="mt-6">
               <p className="mb-2 text-[11px] uppercase tracking-widest text-cream/55">
@@ -87,9 +104,15 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
             <button
               type="button"
               onClick={() => setStarted(true)}
-              className="mt-6 w-full rounded-full bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"
+              className={`mt-6 w-full rounded-full ${showTrialCta ? "border border-cream/25 px-5 py-3 text-sm text-cream hover:bg-cream/5" : "bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"}`}
             >
-              {fa ? "ادامه به پرداخت" : "Continue to payment"}
+              {showTrialCta
+                ? fa
+                  ? "خرید مستقیم عضویت"
+                  : "Skip trial, become a member"
+                : fa
+                  ? "ادامه به پرداخت"
+                  : "Continue to payment"}
             </button>
           </div>
         ) : (
