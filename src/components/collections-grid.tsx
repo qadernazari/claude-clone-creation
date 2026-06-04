@@ -49,9 +49,8 @@ export function CollectionsGrid() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("films")
-        .select("id, slug, category, cover_url, poster_gradient")
-        .eq("visibility", "published")
-        .not("cover_url", "is", null);
+        .select("id, slug, category, cover_url, thumbnail_url, poster_gradient")
+        .eq("visibility", "published");
       if (error) throw error;
       return (data as Film[]) ?? [];
     },
