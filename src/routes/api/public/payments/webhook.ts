@@ -275,6 +275,55 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
 }
 
 
+async function upsertSubscription(subscription: any, env: StripeEnv) {
+  const userId = subscription.metadata?.userId;
+  if (!userId) {
+    console.error("Subscription event missing userId metadata", subscription.id);
+    return;
+  }
+  const item = subscription.items?.data?.[0];
+  const priceId =
+    item?.price?.lookup_key ||
+    item?.price?.metadata?.lovable_external_id ||
+    item?.price?.id;
+  const productId = item?.price?.product;
+  const periodStart = item?.current_period_start ?? subscription.current_period_start;
+  const periodEnd = item?.current_period_end ?? subscription.current_period_end;
+  const trialEnd = subscription.trial_end;
+
+  const admin = await getAdmin();
+  const { error } = await admin.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      stripe_subscription_id: subscription.id,
+      stripe_customer_id: subscription.customer,
+      product_id: productId ?? "iran_membership",
+      price_id: priceId ?? "membership_monthly",
+      status: subscription.status,
+      current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      cancel_at_period_end: !!subscription.cancel_at_period_end,
+      trial_end: trialEnd ? new Date(trialEnd * 1000).toISOString() : null,
+      environment: env,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_subscription_id" },
+  );
+  if (error) {
+    console.error("subscription upsert failed:", error.message);
+    throw new Error(error.message);
+  }
+}
+
+async function markSubscriptionCanceled(subscription: any, env: StripeEnv) {
+  const admin = await getAdmin();
+  await admin
+    .from("subscriptions")
+    .update({ status: "canceled", updated_at: new Date().toISOString() })
+    .eq("stripe_subscription_id", subscription.id)
+    .eq("environment", env);
+}
+
 export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
@@ -289,8 +338,24 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
         try {
           const event = await verifyWebhook(request, env);
           switch (event.type) {
-            case "checkout.session.completed":
-              await handleCheckoutCompleted(event.data.object, env, origin);
+            case "checkout.session.completed": {
+              const session: any = event.data.object;
+              // Subscription checkouts: skip the ticket path; the subscription.*
+              // events below handle persistence. PPV (no kind=membership) keeps
+              // running through handleCheckoutCompleted.
+              if (session.mode === "subscription" || session.metadata?.kind === "membership") {
+                console.log("Membership checkout completed", session.id);
+                break;
+              }
+              await handleCheckoutCompleted(session, env, origin);
+              break;
+            }
+            case "customer.subscription.created":
+            case "customer.subscription.updated":
+              await upsertSubscription(event.data.object, env);
+              break;
+            case "customer.subscription.deleted":
+              await markSubscriptionCanceled(event.data.object, env);
               break;
             default:
               console.log("Unhandled event:", event.type);
