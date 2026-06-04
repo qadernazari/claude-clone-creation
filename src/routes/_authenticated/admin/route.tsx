@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/admin.functions";
 import {
   LayoutDashboard, Film, Tag, LogOut, Home, Users, Ticket,
   HeartHandshake, Settings, Mail, MessageSquare, TicketPercent,
-  Globe, ListTree, FileText, HelpCircle, PanelTop, Megaphone, Palette,
+  Globe, ListTree, FileText, HelpCircle, PanelTop, Megaphone, Palette, Gift,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 
@@ -35,6 +35,7 @@ const MAIN: ReadonlyArray<NavItem> = [
   { to: "/admin/support", label: "Support", icon: HeartHandshake },
   { to: "/admin/notify-list", label: "Subscribers", icon: Mail },
   { to: "/admin/users", label: "Members", icon: Users },
+  { to: "/admin/trials", label: "Trial Analytics", icon: Gift },
   { to: "/admin/contact-submissions", label: "Contact inbox", icon: MessageSquare },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
