@@ -503,6 +503,9 @@ function WatchPage() {
               {[
                 { k: "Space / K", v: fa ? "پخش/مکث" : "Play / Pause" },
                 { k: "←  →", v: fa ? "۵ ثانیه" : "Seek 5s" },
+                { k: "J / L", v: fa ? "۱۰ ثانیه" : "Seek 10s" },
+                { k: "↑  ↓", v: fa ? "صدا" : "Volume" },
+                { k: "0–9", v: fa ? "پرش درصدی" : "Jump to %" },
                 { k: "F", v: fa ? "تمام‌صفحه" : "Fullscreen" },
                 { k: "M", v: fa ? "بی‌صدا" : "Mute" },
                 { k: "T", v: fa ? "حالت سینما" : "Theater" },
