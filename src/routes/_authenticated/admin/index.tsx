@@ -12,6 +12,9 @@ import {
   BarChart3,
   Mail,
   Eye,
+  CreditCard,
+  Clock,
+  TrendingUp,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -29,10 +32,20 @@ type Counts = {
   contributionsTotalCents: number;
   views7d: number;
   notifySubscribers: number;
+  activeSubs: number;
+  trialingSubs: number;
+  pastDueSubs: number;
+  canceledSubs: number;
+  mrrCents: number;
+  ticketRevenue30dCents: number;
 };
+
+// Rough MRR estimate; replace with real Stripe price lookup when needed.
+const ASSUMED_MONTHLY_PRICE_CENTS = 999;
 
 async function getCounts(): Promise<Counts> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const [
     films,
     publishedFilms,
@@ -43,6 +56,11 @@ async function getCounts(): Promise<Counts> {
     contributions,
     views,
     notify,
+    activeSubs,
+    trialingSubs,
+    pastDueSubs,
+    canceledSubs,
+    ticketRev30d,
   ] = await Promise.all([
     supabase.from("films").select("*", { count: "exact", head: true }),
     supabase
@@ -73,11 +91,38 @@ async function getCounts(): Promise<Counts> {
       .eq("type", "view")
       .gte("created_at", sevenDaysAgo),
     supabase.from("notify_list").select("*", { count: "exact", head: true }),
+    supabase
+      .from("subscriptions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active"),
+    supabase
+      .from("subscriptions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "trialing"),
+    supabase
+      .from("subscriptions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "past_due"),
+    supabase
+      .from("subscriptions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "canceled"),
+    supabase
+      .from("tickets")
+      .select("amount, currency")
+      .eq("status", "paid")
+      .eq("currency", "usd")
+      .gte("created_at", thirtyDaysAgo),
   ]);
   const contribTotal = (contributions.data ?? []).reduce(
     (sum, row) => sum + Number((row as { amount: number }).amount ?? 0),
     0,
   );
+  const ticketRev = (ticketRev30d.data ?? []).reduce(
+    (sum, row) => sum + Number((row as { amount: number }).amount ?? 0),
+    0,
+  );
+  const active = activeSubs.count ?? 0;
   return {
     films: films.count ?? 0,
     publishedFilms: publishedFilms.count ?? 0,
@@ -89,6 +134,12 @@ async function getCounts(): Promise<Counts> {
     contributionsTotalCents: contribTotal,
     views7d: views.count ?? 0,
     notifySubscribers: notify.count ?? 0,
+    activeSubs: active,
+    trialingSubs: trialingSubs.count ?? 0,
+    pastDueSubs: pastDueSubs.count ?? 0,
+    canceledSubs: canceledSubs.count ?? 0,
+    mrrCents: active * ASSUMED_MONTHLY_PRICE_CENTS,
+    ticketRevenue30dCents: ticketRev,
   };
 }
 
@@ -182,6 +233,43 @@ function AdminDashboard() {
           </Link>
         </div>
       </header>
+
+      {/* Subscription KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
+        <Stat
+          label="MRR (est.)"
+          value={data ? Math.round(data.mrrCents / 100) : undefined}
+          sub={data ? `$${(data.mrrCents / 100).toFixed(2)}/mo` : undefined}
+          icon={TrendingUp}
+          loading={isLoading}
+        />
+        <Stat
+          label="Active subs"
+          value={data?.activeSubs}
+          icon={CreditCard}
+          loading={isLoading}
+        />
+        <Stat
+          label="On trial"
+          value={data?.trialingSubs}
+          icon={Clock}
+          loading={isLoading}
+        />
+        <Stat
+          label="Past due"
+          value={data?.pastDueSubs}
+          sub={data && data.pastDueSubs > 0 ? "Needs attention" : undefined}
+          icon={CreditCard}
+          loading={isLoading}
+        />
+        <Stat
+          label="Ticket revenue (30d)"
+          value={data ? Math.round(data.ticketRevenue30dCents / 100) : undefined}
+          sub={data ? `$${(data.ticketRevenue30dCents / 100).toFixed(2)}` : undefined}
+          icon={Ticket}
+          loading={isLoading}
+        />
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat
