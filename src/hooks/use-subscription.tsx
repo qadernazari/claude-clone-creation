@@ -17,12 +17,25 @@ export type SubscriptionRow = {
   environment: string;
 };
 
-function isActive(sub: SubscriptionRow | null | undefined): boolean {
+export type TrialRow = {
+  id: string;
+  status: string; // active | expired | converted
+  started_at: string;
+  ends_at: string;
+  converted_at: string | null;
+};
+
+function isActiveSub(sub: SubscriptionRow | null | undefined): boolean {
   if (!sub) return false;
   const futureEnd = !sub.current_period_end || new Date(sub.current_period_end) > new Date();
   if (["active", "trialing", "past_due"].includes(sub.status) && futureEnd) return true;
   if (sub.status === "canceled" && futureEnd) return true;
   return false;
+}
+
+function isActiveTrial(t: TrialRow | null | undefined): boolean {
+  if (!t) return false;
+  return t.status === "active" && new Date(t.ends_at) > new Date();
 }
 
 export function useCurrentUser() {
@@ -51,7 +64,7 @@ export function useSubscription() {
   } catch {
     env = null;
   }
-  const query = useQuery({
+  const subQ = useQuery({
     queryKey: ["subscription", user?.id ?? "anon", env],
     enabled: !!user && !!env,
     queryFn: async (): Promise<SubscriptionRow | null> => {
@@ -70,11 +83,36 @@ export function useSubscription() {
     staleTime: 30_000,
   });
 
+  const trialQ = useQuery({
+    queryKey: ["my-trial", user?.id ?? "anon"],
+    enabled: !!user,
+    queryFn: async (): Promise<TrialRow | null> => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("trials")
+        .select("id, status, started_at, ends_at, converted_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return data as TrialRow | null;
+    },
+    staleTime: 30_000,
+  });
+
+  const sub = subQ.data ?? null;
+  const trial = trialQ.data ?? null;
+  const isMember = isActiveSub(sub) || isActiveTrial(trial);
+  const trialExpired = !!trial && !isActiveTrial(trial) && !isActiveSub(sub);
+
   return {
     user,
-    subscription: query.data ?? null,
-    isMember: isActive(query.data ?? null),
-    isLoading: query.isLoading,
+    subscription: sub,
+    trial,
+    isMember,
+    isTrialActive: isActiveTrial(trial),
+    isTrialExpired: trialExpired,
+    hasUsedTrial: !!trial,
+    isLoading: subQ.isLoading || trialQ.isLoading,
   };
 }
 

@@ -6,6 +6,7 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
 import { useSubscription, memberCanAccess } from "@/hooks/use-subscription";
+import { TrialExpiredModal } from "@/components/trial-expired-modal";
 import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { upsertWatchProgress, getResumePosition } from "@/lib/library.functions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -79,7 +80,8 @@ function WatchPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [theater, setTheater] = useState(true);
 
-  const { isMember } = useSubscription();
+  const { isMember, isTrialExpired } = useSubscription();
+  const [trialModalOpen, setTrialModalOpen] = useState(false);
   const accessType = (film as { access_type?: string }).access_type ?? "membership";
   const memberAllowed = isMember && memberCanAccess(accessType as never);
 
@@ -103,6 +105,14 @@ function WatchPage() {
 
   const hasAccess = !!ticket || memberAllowed || accessType === "free";
   const isLoading = ticketLoading && !memberAllowed && accessType !== "free";
+
+  // If the user just landed here without access AND their trial recently ended,
+  // surface the upgrade modal.
+  useEffect(() => {
+    if (!isLoading && isTrialExpired && !memberAllowed && !ticket) {
+      setTrialModalOpen(true);
+    }
+  }, [isLoading, isTrialExpired, memberAllowed, ticket]);
 
   const fetchStreamUrl = useServerFn(getFilmStreamUrl);
   const { data: streamRes } = useQuery({
@@ -350,6 +360,7 @@ function WatchPage() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
+      {trialModalOpen && <TrialExpiredModal onClose={() => setTrialModalOpen(false)} />}
       <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">

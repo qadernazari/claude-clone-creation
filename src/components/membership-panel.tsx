@@ -5,6 +5,7 @@ import { useLocale } from "@/lib/i18n";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipPortalSession } from "@/lib/membership.functions";
 import { MembershipCheckout } from "@/components/membership-checkout";
+import { AcceptTrialButton } from "@/components/accept-trial-button";
 
 function fmtDate(iso: string | null, fa: boolean) {
   if (!iso) return "—";
@@ -23,7 +24,7 @@ function daysUntil(iso: string | null): number | null {
 export function MembershipPanel() {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { subscription: sub, isMember, isLoading } = useSubscription();
+  const { subscription: sub, isMember, isLoading, hasUsedTrial, isTrialExpired } = useSubscription();
   const openPortal = useServerFn(createMembershipPortalSession);
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,15 +80,35 @@ export function MembershipPanel() {
         <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
           {t.title}
         </h2>
-        <p className="mt-2 text-sm text-cream/70">{t.none}</p>
-        <p className="mt-1 text-xs text-cream/55">{t.noneSub}</p>
-        <button
-          type="button"
-          onClick={() => setCheckoutOpen(true)}
-          className="mt-5 inline-flex items-center rounded-full bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90"
-        >
-          {t.start}
-        </button>
+        <p className="mt-2 text-sm text-cream/70">
+          {isTrialExpired
+            ? fa
+              ? "دوره آزمایشی شما به پایان رسید. برای ادامه، عضو شوید."
+              : "Your free trial has ended. Become a member to keep watching."
+            : t.none}
+        </p>
+        {!isTrialExpired && (
+          <p className="mt-1 text-xs text-cream/55">
+            {fa
+              ? "هفت روز دسترسی کامل — بدون نیاز به اطلاعات پرداخت."
+              : "7 days of full access — no payment information required."}
+          </p>
+        )}
+        <div className="mt-5 flex flex-wrap gap-3">
+          {!hasUsedTrial && (
+            <AcceptTrialButton
+              className="inline-flex items-center rounded-full bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
+              label={t.start}
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => setCheckoutOpen(true)}
+            className="inline-flex items-center rounded-full border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
+          >
+            {fa ? "ارتقا به عضویت" : "Become a member"}
+          </button>
+        </div>
         {checkoutOpen && (
           <MembershipCheckout
             returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}

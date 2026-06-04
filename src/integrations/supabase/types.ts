@@ -791,6 +791,48 @@ export type Database = {
           },
         ]
       }
+      trials: {
+        Row: {
+          converted_at: string | null
+          country: string | null
+          created_at: string
+          email: string
+          ends_at: string
+          id: string
+          reminders_sent: Json
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          converted_at?: string | null
+          country?: string | null
+          created_at?: string
+          email: string
+          ends_at: string
+          id?: string
+          reminders_sent?: Json
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          converted_at?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string
+          ends_at?: string
+          id?: string
+          reminders_sent?: Json
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -899,6 +941,11 @@ export type Database = {
         Returns: number
       }
       has_active_subscription: {
+        Args: { check_env?: string; user_uuid: string }
+        Returns: boolean
+      }
+      has_active_trial: { Args: { user_uuid: string }; Returns: boolean }
+      has_membership_access: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
       }
