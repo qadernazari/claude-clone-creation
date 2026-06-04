@@ -31,7 +31,7 @@ async function loadAll(filmId: string) {
 
 function FilmAnalyticsPage() {
   const { filmId } = Route.useParams();
-  const { data, isLoading } = useQuery({ queryKey: ["admin", "film-analytics", filmId], queryFn: () => loadAll(filmId) });
+  const { data, isLoading, error } = useQuery({ queryKey: ["admin", "film-analytics", filmId], queryFn: () => loadAll(filmId) });
 
   const stats = useMemo(() => {
     const ev = data?.events ?? [];
@@ -96,8 +96,26 @@ function FilmAnalyticsPage() {
     return out.sort((a, b) => b.date.localeCompare(a.date));
   }, [data]);
 
-  if (isLoading) return <div className="p-8 text-muted-foreground">Loading…</div>;
-  if (!data?.film) return <div className="p-8 text-muted-foreground">Film not found.</div>;
+  if (isLoading) return <div className="p-8 text-muted-foreground">Loading analytics…</div>;
+  if (error) return (
+    <div className="p-8 max-w-2xl">
+      <Link to="/admin/films" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4">
+        <ArrowLeft className="h-4 w-4" /> Films
+      </Link>
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+        <h2 className="font-medium text-destructive mb-1">Couldn't load analytics</h2>
+        <p className="text-sm text-muted-foreground">{(error as Error).message}</p>
+      </div>
+    </div>
+  );
+  if (!data?.film) return (
+    <div className="p-8 max-w-2xl">
+      <Link to="/admin/films" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4">
+        <ArrowLeft className="h-4 w-4" /> Films
+      </Link>
+      <div className="rounded-lg border border-border bg-card/40 p-6 text-muted-foreground">Film not found.</div>
+    </div>
+  );
 
   return (
     <div className="p-8 max-w-6xl">

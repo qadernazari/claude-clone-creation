@@ -212,16 +212,26 @@ function FilmsAdminPage() {
                     }`}>{capitalize(f.visibility)}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="inline-flex gap-1">
-                      <Link to="/admin/films/$filmId/analytics" params={{ filmId: f.id }} title="Analytics"
-                        className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                    <div className="inline-flex items-center gap-1">
+                      <Link
+                        to="/admin/films/$filmId/analytics"
+                        params={{ filmId: f.id }}
+                        aria-label={`Analytics for ${f.title_en}`}
+                        title="Analytics"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors"
+                      >
                         <BarChart3 className="h-4 w-4" />
                       </Link>
-                      <button type="button" onClick={() => setEditing(f)}
-                        className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                      <button
+                        type="button"
+                        onClick={() => setEditing(f)}
+                        aria-label={`Edit ${f.title_en}`}
+                        title="Edit"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors"
+                      >
                         <Pencil className="h-4 w-4" />
                       </button>
-                      <TwoClickDelete iconOnly onConfirm={() => remove.mutate(f.id)} />
+                      <TwoClickDelete iconOnly onConfirm={() => remove.mutate(f.id)} className="h-9 w-9 justify-center" />
                     </div>
                   </td>
                 </tr>
