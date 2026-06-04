@@ -66,27 +66,38 @@ export function FeaturedFilm() {
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
       <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
-        {data.cover_url ? (
-          <>
-            {/* Soft blurred backdrop fills the frame without cropping the artwork */}
+        {heroImage ? (
+          isLandscapeHero ? (
+            // 16:9 hero artwork — full-bleed cinematic banner
             <div
-              className="absolute inset-0 scale-110"
+              className="absolute inset-0 cine-img"
               style={{
-                background: `center / cover no-repeat url(${data.cover_url})`,
-                filter: "blur(60px) saturate(1.1) brightness(0.55)",
-                opacity: 0.55,
+                background: `center / cover no-repeat url(${heroImage})`,
+                transform: "scale(1.03)",
               }}
               aria-hidden
             />
-            {/* Artwork itself — contained so nothing important is cropped */}
-            <img
-              src={data.cover_url}
-              alt={title}
-              className="absolute inset-0 h-full w-full object-contain object-center"
-              loading="eager"
-              decoding="async"
-            />
-          </>
+          ) : (
+            // Fallback: vertical poster — contain to preserve composition, blurred backdrop fills the frame
+            <>
+              <div
+                className="absolute inset-0 scale-110"
+                style={{
+                  background: `center / cover no-repeat url(${heroImage})`,
+                  filter: "blur(60px) saturate(1.1) brightness(0.55)",
+                  opacity: 0.55,
+                }}
+                aria-hidden
+              />
+              <img
+                src={heroImage}
+                alt={title}
+                className="absolute inset-0 h-full w-full object-contain object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </>
+          )
         ) : (
           <div
             className="absolute inset-0 cine-img"
