@@ -41,7 +41,7 @@ function SettingsPage() {
 function GeneralPanel() {
   const qc = useQueryClient();
   const [v, setV] = useState<GeneralSettings>(DEFAULT_GENERAL);
-  useEffect(() => { loadCmsKey<GeneralSettings>(GENERAL_KEY).then(setV); }, []);
+  useEffect(() => { loadCmsKey<GeneralSettings>(GENERAL_KEY).then((d) => setV({ ...DEFAULT_GENERAL, ...(d ?? {}) })); }, []);
   const save = useMutation({
     mutationFn: () => saveCmsKey(GENERAL_KEY, v),
     onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["site_content", GENERAL_KEY] }); },
