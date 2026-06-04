@@ -28,6 +28,8 @@ type Film = {
   price_toman: number;
   ticket_hours: number;
   access_mode: string;
+  access_type: "membership" | "ppv_only" | "membership_or_ppv" | "free";
+  is_premium: boolean;
   visibility: string;
   sort_order: number;
   cover_url: string | null;
@@ -61,6 +63,7 @@ const EMPTY: FilmDraft = {
   slug: "", title_en: "", title_fa: "", director_en: "", director_fa: "",
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 499, price_toman: 120000, ticket_hours: 48, access_mode: "inherit",
+  access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
 };
@@ -301,6 +304,8 @@ function FilmEditorModal({
         price_toman: Number(d.price_toman) || 0,
         ticket_hours: Number(d.ticket_hours) || 48,
         access_mode: d.access_mode,
+        access_type: d.access_type,
+        is_premium: !!d.is_premium,
         visibility: d.visibility,
         sort_order: Number(d.sort_order) || 0,
         cover_url: d.cover_url?.trim() || null,
@@ -446,7 +451,31 @@ function FilmEditorModal({
             </label>
           </Section>
 
-          <Section title="Access" description="How this film opens.">
+          <Section title="Membership access" description="How members and visitors can watch this film.">
+            <div className="space-y-2">
+              {([
+                { v: "membership", t: "Included in Membership", s: "Members watch free. Non-members are shown the trial CTA." },
+                { v: "membership_or_ppv", t: "Membership + Individual Purchase", s: "Members watch free. Non-members can join, or buy a single ticket." },
+                { v: "ppv_only", t: "Pay-Per-View Only", s: "Premium release. Members and non-members both pay separately." },
+                { v: "free", t: "Free to Watch", s: "Anyone signed in can watch without membership or ticket." },
+              ] as const).map((o) => (
+                <label key={o.v} className={`block cursor-pointer rounded-md border p-3 transition-colors ${d.access_type === o.v ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                  <input type="radio" name="fAccessType" checked={d.access_type === o.v} onChange={() => set("access_type", o.v)} className="sr-only" />
+                  <div className="text-sm font-medium">{o.t}</div>
+                  <div className="text-xs text-muted-foreground">{o.s}</div>
+                </label>
+              ))}
+            </div>
+            <label className="mt-4 flex items-start gap-3 cursor-pointer rounded-md border border-border p-3 hover:bg-accent">
+              <input type="checkbox" checked={!!d.is_premium} onChange={(e) => set("is_premium", e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-border accent-primary" />
+              <div>
+                <div className="text-sm font-medium">Premium release badge</div>
+                <div className="text-xs text-muted-foreground">Adds a "Premium Release" badge on the film card and detail page.</div>
+              </div>
+            </label>
+          </Section>
+
+          <Section title="Legacy access mode" description="Older free/paid setting — used as a fallback if no membership.">
             <div className="space-y-2">
               {([
                 { v: "inherit", t: "Use site default", s: "Follows the site-wide Free / Paid setting on the Homepage." },

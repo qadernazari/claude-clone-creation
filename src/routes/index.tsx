@@ -57,8 +57,8 @@ export const Route = createFileRoute("/")({
           mainEntity: [
             {
               "@type": "Question",
-              name: "Do I need a subscription?",
-              acceptedAnswer: { "@type": "Answer", text: "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges." },
+              name: "How does membership work?",
+              acceptedAnswer: { "@type": "Answer", text: "A monthly membership unlocks unlimited streaming of the standard catalog. Start with a 7-day free trial. Select premium releases are sold separately." },
             },
             {
               "@type": "Question",
@@ -125,8 +125,8 @@ function Home() {
   const hero = settings.data?.hero
     ? t(settings.data.hero)
     : locale === "fa"
-      ? { kicker: "آثار کوتاه اختصاصی ایرانی", title: "سینما، با صدای واقعی‌اش.", subtitle: "بدون اشتراک — بلیت همان فیلمی که می‌خواهید." }
-      : { kicker: "Original Iranian short films", title: "Cinema, in its true voice.", subtitle: "No subscription — pay only for what you watch." };
+      ? { kicker: "خانه‌ی سینمای ایرانی", title: "سینما، با صدای واقعی‌اش.", subtitle: "نامحدود تماشا کنید با عضویت ایران — هفت روز رایگان." }
+      : { kicker: "Home of Iranian cinema", title: "Cinema, in its true voice.", subtitle: "Unlimited streaming with IRAN membership. 7 days free." };
 
   // Split title for "true voice" italic accent (EN only — leave FA intact)
   const titleParts = locale === "en" && hero?.title?.toLowerCase().includes("true")
@@ -243,23 +243,23 @@ function Home() {
             <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
               {locale === "fa" ? "چطور کار می‌کند" : "How it works"}
             </span>
-            <h2 className="font-display text-4xl font-bold leading-[1.05] text-cream-bright md:text-5xl">
-              {locale === "fa" ? "بدون اشتراک. بدون تعهد." : "No subscription. No commitment."}
+            <h2 className="font-display text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-cream-bright md:text-5xl">
+              {locale === "fa" ? "یک عضویت. تمام سینمای ایران." : "One membership. All of Iranian cinema."}
             </h2>
           </div>
           <ol className="grid grid-cols-1 gap-12 md:grid-cols-3">
             {[
               {
-                en: ["Choose a film", "Browse a tight, curated selection of original Iranian shorts."],
-                fa: ["یک فیلم انتخاب کنید", "فهرستی کوتاه و دست‌چین از آثار کوتاه ایرانی."],
+                en: ["Start your free trial", "Seven days on us. Cancel anytime — no questions."],
+                fa: ["شروع رایگان", "هفت روز رایگان. هر زمان، بی‌چون‌وچرا لغو کنید."],
               },
               {
-                en: ["Buy a single ticket", "Pay once for the film you want — supporting its maker directly."],
-                fa: ["یک بلیت بخرید", "فقط برای همان اثر — مستقیم در حمایت سازنده‌اش."],
+                en: ["Stream the whole catalog", "Unlimited access to standard films. Premium releases sold separately."],
+                fa: ["تماشای کامل مجموعه", "دسترسی نامحدود به آثار استاندارد. آثار ویژه جداگانه."],
               },
               {
-                en: ["Watch within 48 hours", "Stream on any device. Pause, resume, finish on your time."],
-                fa: ["تا ۴۸ ساعت تماشا کنید", "روی هر دستگاهی — توقف، ادامه، در زمان خودتان."],
+                en: ["Watch anywhere", "On any device, any browser. Pause, resume, finish on your time."],
+                fa: ["تماشای جهانی", "روی هر دستگاه و مرورگری. توقف و ادامه در زمان خودتان."],
               },
             ].map((step, i) => {
               const [title, desc] = locale === "fa" ? step.fa : step.en;
@@ -338,8 +338,8 @@ function Home() {
 
 const FAQ_ITEMS: { en: [string, string]; fa: [string, string] }[] = [
   {
-    en: ["Do I need a subscription?", "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges."],
-    fa: ["آیا به اشتراک نیاز دارم؟", "خیر. تنها برای فیلمی که می‌خواهید تماشا کنید هزینه پرداخت می‌کنید؛ بدون اشتراک ماهانه و هزینه‌های دوره‌ای."],
+    en: ["How does membership work?", "A monthly membership unlocks unlimited streaming of the standard catalog with a 7-day free trial. Select premium releases stay outside the membership and are sold separately."],
+    fa: ["عضویت چگونه کار می‌کند؟", "با یک عضویت ماهانه و هفت روز رایگانِ آزمایشی، به‌صورت نامحدود به مجموعه‌ی استاندارد آثار دسترسی دارید. آثار ویژه جداگانه عرضه می‌شوند."],
   },
   {
     en: ["What makes IRAN different?", "IRAN is dedicated to independent Iranian cinema, bringing together original films, emerging filmmakers, and carefully curated stories from across Iran and its global creative community."],

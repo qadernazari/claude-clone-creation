@@ -6,8 +6,10 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 import { FilmCheckout } from "@/components/film-checkout";
+import { MembershipCheckout } from "@/components/membership-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
+import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useEffect, useMemo, useState } from "react";
 
 import type { User } from "@supabase/supabase-js";
@@ -109,8 +111,10 @@ function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, dir } = useLocale();
   const fa = locale === "fa";
+  const { isMember } = useSubscription();
   const [user, setUser] = useState<User | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [membershipOpen, setMembershipOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -200,11 +204,20 @@ function FilmPage() {
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
+    startTrial: fa ? "آغاز رایگان ۷ روزه" : "Start 7-day free trial",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
+    signinToWatch: fa ? "برای تماشا وارد شوید" : "Sign in to watch",
     accessNote: fa
       ? `دسترسی ${num(film.ticket_hours)} ساعت پس از خرید`
       : `${film.ticket_hours}-hour access after purchase`,
+    membershipNote: fa
+      ? "با عضویت ایران، نامحدود تماشا کنید"
+      : "Unlimited streaming with IRAN membership",
+    memberIncluded: fa ? "شامل عضویت شماست" : "Included in your membership",
+    premiumNote: fa
+      ? "این اثر ویژه و خارج از عضویت است"
+      : "Premium release — sold separately from membership",
     ticketActive: fa ? "بلیط فعال دارید" : "You have an active ticket",
     about: fa ? "درباره فیلم" : "Synopsis",
     crew: fa ? "عوامل" : "Credits",
@@ -215,6 +228,7 @@ function FilmPage() {
     share: fa ? "هم‌رسانی" : "Share",
     copied: fa ? "لینک کپی شد" : "Link copied",
     moreFromCat: fa ? "بیشتر از این دسته" : "More to explore",
+    orBuy: fa ? "یا فقط این فیلم را بخرید" : "Or buy this film",
     creditGroups: {
       cast: fa ? "بازیگران" : "Cast",
       crew: fa ? "عوامل تولید" : "Crew",
@@ -299,6 +313,11 @@ function FilmPage() {
             {/* Meta + purchase */}
             <div>
               <div className="flex flex-wrap items-center gap-2">
+                {film.is_premium && (
+                  <span className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-bright">
+                    {fa ? "اکران ویژه" : "Premium Release"}
+                  </span>
+                )}
                 {film.category && (
                   <span className="inline-flex rounded-full bg-cream/10 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
                     {film.category}
@@ -313,7 +332,7 @@ function FilmPage() {
                 </button>
               </div>
 
-              <h1 className={`mt-4 text-4xl md:text-6xl leading-[1.05] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+              <h1 className={`mt-5 text-4xl md:text-6xl font-medium leading-[1.02] tracking-[-0.04em] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
                 {title}
               </h1>
               {director && (
@@ -328,63 +347,104 @@ function FilmPage() {
                 {film.duration_min ? `${num(film.duration_min)} ${fa ? "دقیقه" : "min"}` : null}
               </p>
 
-              {/* Purchase card */}
-              <div className="mt-8 hairline rounded-xl border bg-bg-1/70 backdrop-blur p-5 max-w-md">
-                <div className="flex items-baseline justify-between gap-4">
-                  <div>
-                    <div className="text-2xl font-medium text-cream-bright tabular-nums">{priceLabel}</div>
-                    <div className="mt-1 text-xs text-cream/60">{t.accessNote}</div>
-                  </div>
-                </div>
+              {/* Access card — member-aware */}
+              {(() => {
+                const accessType = film.access_type ?? "membership";
+                const canMemberWatch = memberCanAccess(accessType);
+                const hasPpv = ppvAvailable(accessType);
+                const showWatchNow = !!activeTicket || (isMember && canMemberWatch) || accessType === "free";
+                const primaryLabel = showWatchNow ? t.watch : isMember ? t.buy : t.startTrial;
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {user && activeTicket ? (
-                    <Link
-                      to="/watch/$slug"
-                      params={{ slug: film.slug }}
-                      className="inline-flex flex-1 items-center justify-center rounded-md bg-amber px-4 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
-                    >
-                      {t.watch}
-                    </Link>
-                  ) : user ? (
-                    <button
-                      type="button"
-                      onClick={() => setCheckoutOpen(true)}
-                      disabled={tomanOnly}
-                      title={tomanOnly ? t.tomanSoon : undefined}
-                      className="inline-flex flex-1 items-center justify-center rounded-md bg-amber px-4 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {t.buy}
-                    </button>
-                  ) : (
-                    <Link
-                      to="/auth"
-                      className="inline-flex flex-1 items-center justify-center rounded-md bg-amber px-4 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
-                    >
-                      {t.signinToBuy}
-                    </Link>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!user) {
-                        window.location.href = "/auth";
-                        return;
-                      }
-                      setContribOpen(true);
-                    }}
-                    className="inline-flex items-center justify-center rounded-md border border-cream/20 px-4 py-2.5 text-sm font-medium text-cream/90 hover:bg-cream/10 transition-colors"
-                  >
-                    {t.contribute}
-                  </button>
-                </div>
-                {activeTicket?.expires_at && (
-                  <p className="mt-3 text-[11px] text-cream/55">
-                    {t.ticketActive} · {new Date(activeTicket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", { dateStyle: "medium", timeStyle: "short" })}
-                  </p>
-                )}
-                {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
-              </div>
+                return (
+                  <div className="mt-8 hairline rounded-2xl border bg-bg-1/70 backdrop-blur p-6 max-w-md">
+                    <div className="text-sm text-cream/75">
+                      {showWatchNow
+                        ? activeTicket
+                          ? t.ticketActive
+                          : isMember && canMemberWatch
+                            ? t.memberIncluded
+                            : t.accessNote
+                        : isMember && accessType === "ppv_only"
+                          ? t.premiumNote
+                          : t.membershipNote}
+                    </div>
+
+                    <div className="mt-4 flex flex-col gap-2">
+                      {!user ? (
+                        <Link
+                          to="/auth"
+                          className="inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright"
+                        >
+                          {accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}
+                        </Link>
+                      ) : showWatchNow ? (
+                        <Link
+                          to="/watch/$slug"
+                          params={{ slug: film.slug }}
+                          className="inline-flex items-center justify-center gap-2 rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                          {t.watch}
+                        </Link>
+                      ) : isMember ? (
+                        // Member viewing a ppv_only premium film
+                        <button
+                          type="button"
+                          onClick={() => setCheckoutOpen(true)}
+                          disabled={tomanOnly}
+                          className="inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright disabled:opacity-60"
+                        >
+                          {t.buy} — {priceLabel}
+                        </button>
+                      ) : (
+                        // Non-member, film offers membership
+                        <>
+                          {accessType !== "ppv_only" && (
+                            <button
+                              type="button"
+                              onClick={() => setMembershipOpen(true)}
+                              className="inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-cream-bright"
+                            >
+                              {primaryLabel}
+                            </button>
+                          )}
+                          {hasPpv && (
+                            <button
+                              type="button"
+                              onClick={() => setCheckoutOpen(true)}
+                              disabled={tomanOnly}
+                              className="inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-3 text-sm font-medium text-cream hover:bg-cream/5 transition-colors disabled:opacity-60"
+                            >
+                              {accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : `${t.orBuy} — ${priceLabel}`}
+                            </button>
+                          )}
+                        </>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!user) {
+                            window.location.href = "/auth";
+                            return;
+                          }
+                          setContribOpen(true);
+                        }}
+                        className="inline-flex items-center justify-center rounded-full border border-cream/15 px-5 py-2.5 text-[12px] font-medium text-cream/75 hover:bg-cream/5 transition-colors"
+                      >
+                        {t.contribute}
+                      </button>
+                    </div>
+                    {activeTicket?.expires_at && (
+                      <p className="mt-4 text-[11px] text-cream/55">
+                        {new Date(activeTicket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", { dateStyle: "medium", timeStyle: "short" })}
+                      </p>
+                    )}
+                    {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -478,6 +538,13 @@ function FilmPage() {
           filmSlug={film.slug}
           returnUrl={returnUrl}
           onClose={() => setCheckoutOpen(false)}
+        />
+      )}
+
+      {membershipOpen && (
+        <MembershipCheckout
+          returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
+          onClose={() => setMembershipOpen(false)}
         />
       )}
 
