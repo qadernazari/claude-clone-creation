@@ -31,11 +31,7 @@ function fmt(d: Date) {
   return d.toLocaleDateString("en-US", { dateStyle: "long" });
 }
 
-async function process() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const nowMs = Date.now();
-
-  // Pull trials active OR recently expired (last 2 days) for post-expiration email.
+async function processReminders() {
   const { data: trials, error } = await supabaseAdmin
     .from("trials")
     .select("id, email, started_at, ends_at, status, reminders_sent")
