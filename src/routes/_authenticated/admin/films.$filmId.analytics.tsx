@@ -3,10 +3,21 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ArrowLeft, Eye, Users, Clock, Activity, Ticket as TicketIcon,
-  HeartHandshake, DollarSign, Crown, Sparkles, Globe2, BarChart3,
+  ArrowLeft,
+  Eye,
+  Users,
+  Clock,
+  Activity,
+  Ticket as TicketIcon,
+  HeartHandshake,
+  DollarSign,
+  Crown,
+  Sparkles,
+  Globe2,
+  BarChart3,
+  MapPin,
+  MonitorSmartphone,
 } from "lucide-react";
-import { PageHeader } from "@/components/admin/bilingual-field";
 import { capitalize } from "@/lib/cms";
 
 export const Route = createFileRoute("/_authenticated/admin/films/$filmId/analytics")({
@@ -15,14 +26,16 @@ export const Route = createFileRoute("/_authenticated/admin/films/$filmId/analyt
 
 async function loadAll(filmId: string) {
   const [film, events, tickets, contribs, progress, profiles] = await Promise.all([
-    supabase.from("films").select("id, slug, title_en, title_fa, access_type, is_premium, duration_min").eq("id", filmId).maybeSingle(),
+    supabase.from("films").select("id, slug, title_en, title_fa, cover_url, thumbnail_url, poster_gradient, access_type, is_premium, duration_min").eq("id", filmId).maybeSingle(),
     supabase.from("events").select("id, type, value, country, session_id, created_at").eq("film_id", filmId).order("created_at", { ascending: false }).limit(5000),
     supabase.from("tickets").select("id, status, amount, currency, paid_at, created_at, user_id, provider").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("contributions").select("id, status, amount, currency, paid_at, created_at, user_id, provider, supporter").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("watch_progress").select("user_id, position_seconds, duration_seconds, completed, updated_at").eq("film_id", filmId),
     supabase.from("profiles").select("id, email, full_name"),
   ]);
-  if (film.error) throw new Error(film.error.message);
+  for (const result of [film, events, tickets, contribs, progress, profiles]) {
+    if (result.error) throw new Error(result.error.message);
+  }
   const profileMap = new Map((profiles.data ?? []).map((p) => [p.id, p]));
   return {
     film: film.data,
