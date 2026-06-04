@@ -3,11 +3,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Trash2, Plus, Tag } from "lucide-react";
+import { Trash2, Plus, Tag, History, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/coupons")({
   component: CouponsPage,
 });
+
+type Redemption = {
+  id: string;
+  user_id: string | null;
+  stripe_session_id: string | null;
+  context: string;
+  film_id: string | null;
+  amount_off: number | null;
+  created_at: string;
+};
 
 type DiscountType = "percent" | "amount";
 type AppliesTo = "membership" | "ticket" | "all";
