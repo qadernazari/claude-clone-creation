@@ -420,14 +420,15 @@ function FilmPage() {
               )}
             </div>
 
-            {/* Short synopsis */}
-            {shortSynopsis && (
+            {/* Short synopsis — clamped so the hero stays tight */}
+            {heroSynopsis && (
               <p
-                className={`mt-5 max-w-xl text-[15px] leading-relaxed text-cream/85 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] md:text-base ${fa ? "font-vazir" : ""}`}
+                className={`mt-5 max-w-xl text-[15px] leading-relaxed text-cream/85 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] md:text-base line-clamp-3 ${fa ? "font-vazir" : ""}`}
               >
-                {shortSynopsis}
+                {heroSynopsis}
               </p>
             )}
+
 
             {/* CTAs — integrated, not boxed */}
             <div className="mt-8 flex flex-wrap items-center gap-3">
