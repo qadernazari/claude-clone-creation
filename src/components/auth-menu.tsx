@@ -4,13 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import type { User } from "@supabase/supabase-js";
 
+type SubInfo = {
+  status: string;
+  current_period_end: string | null;
+  trial_end: string | null;
+  cancel_at_period_end: boolean | null;
+} | null;
+
 export function AuthMenu() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [sub, setSub] = useState<SubInfo>(null);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     if (!open) return;
