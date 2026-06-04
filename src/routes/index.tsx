@@ -13,25 +13,6 @@ import { useSubscription } from "@/hooks/use-subscription";
 
 
 export const Route = createFileRoute("/")({
-  loader: async ({ context }) => {
-    await context.queryClient.prefetchQuery({
-      queryKey: ["films", "featured"],
-      queryFn: async () => {
-        const { supabase } = await import("../integrations/supabase/client");
-        const { data } = await supabase
-          .from("films")
-          .select(
-            "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, is_premium",
-          )
-          .eq("visibility", "published")
-          .order("sort_order", { ascending: true })
-          .limit(1)
-          .maybeSingle();
-        return data;
-      },
-      staleTime: 60_000,
-    });
-  },
   head: () => ({
     meta: [
       { title: "ir.show — Home of Iranian cinema" },
