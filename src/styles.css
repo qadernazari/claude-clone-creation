@@ -95,8 +95,8 @@
   --input: var(--line);
   --ring: var(--amber);
 
-  --font-display: "Archivo Black", "Archivo", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Hind", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-fa: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
   --font-editorial: "Fraunces", "Vazirmatn", ui-serif, Georgia, serif;
 }
@@ -169,9 +169,10 @@
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     color: var(--cream-bright);
-    letter-spacing: -0.02em;
-    font-weight: 400; /* Archivo Black ships at 900; let the font carry weight */
+    letter-spacing: -0.03em;
+    font-weight: 500; /* Sora: keep display weight quiet, Apple TV+ style */
   }
+  h1 { letter-spacing: -0.04em; font-weight: 600; }
 
   /* Smooth, premium scroll */
   html { scroll-behavior: smooth; }
