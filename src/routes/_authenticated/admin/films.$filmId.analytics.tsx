@@ -31,7 +31,7 @@ async function loadAll(filmId: string) {
 
 function FilmAnalyticsPage() {
   const { filmId } = Route.useParams();
-  const { data, isLoading } = useQuery({ queryKey: ["admin", "film-analytics", filmId], queryFn: () => loadAll(filmId) });
+  const { data, isLoading, error } = useQuery({ queryKey: ["admin", "film-analytics", filmId], queryFn: () => loadAll(filmId) });
 
   const stats = useMemo(() => {
     const ev = data?.events ?? [];
