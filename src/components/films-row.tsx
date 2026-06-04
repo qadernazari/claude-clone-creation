@@ -202,7 +202,7 @@ export function FilmsRow() {
       .map((c) => ({
         key: `cat-${c.id}`,
         eyebrow: locale === "fa" ? "مجموعه" : "Collection",
-        title: t({ en: c.name_en, fa: c.name_fa || c.name_en }),
+        title: t({ en: c.name_en, fa: c.name_fa || c.name_en }) || c.name_en,
         films: byCat.get(c.id) ?? [],
       }));
 
