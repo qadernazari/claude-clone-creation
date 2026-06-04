@@ -116,11 +116,20 @@ function WatchPage() {
 
   const countdown = useCountdown(ticket?.expires_at);
 
-  // Log a play event once when access is established
+  // Log a play event once when access is established (with geo / device captured server-side)
   useEffect(() => {
-    if (hasAccess) {
-      supabase.from("events").insert({ type: "play", film_id: film.id }).then(() => {});
-    }
+    if (!hasAccess) return;
+    let sid = "";
+    try {
+      sid = localStorage.getItem("ir_sid") || "";
+      if (!sid) {
+        sid = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        localStorage.setItem("ir_sid", sid);
+      }
+    } catch { /* ignore */ }
+    import("@/lib/analytics.functions").then(({ logFilmEvent }) => {
+      logFilmEvent({ data: { filmId: film.id, type: "play", sessionId: sid, referrer: document.referrer || null } }).catch(() => {});
+    });
   }, [hasAccess, film.id]);
 
   // Resume position: fetch from DB on mount, sync up every ~10s

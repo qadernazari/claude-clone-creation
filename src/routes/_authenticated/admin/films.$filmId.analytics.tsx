@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/admin/films/$filmId/analyt
 async function loadAll(filmId: string) {
   const [film, events, tickets, contribs, progress, profiles] = await Promise.all([
     supabase.from("films").select("id, slug, title_en, title_fa, cover_url, thumbnail_url, poster_gradient, access_type, is_premium, duration_min").eq("id", filmId).maybeSingle(),
-    supabase.from("events").select("id, type, value, country, session_id, created_at").eq("film_id", filmId).order("created_at", { ascending: false }).limit(5000),
+    supabase.from("events").select("id, type, value, country, city, region, device_type, os, browser, referrer_source, referrer_host, session_id, created_at").eq("film_id", filmId).order("created_at", { ascending: false }).limit(5000),
     supabase.from("tickets").select("id, status, amount, currency, paid_at, created_at, user_id, provider").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("contributions").select("id, status, amount, currency, paid_at, created_at, user_id, provider, supporter").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("watch_progress").select("user_id, position_seconds, duration_seconds, completed, updated_at").eq("film_id", filmId),
@@ -121,15 +121,30 @@ function FilmAnalyticsPage() {
     };
   }, [data, cutoff]);
 
-  const countries = useMemo(() => {
-    const ev = (data?.events ?? []).filter((e) => inRange(e.created_at));
+  function topN<T extends string | null | undefined>(values: T[], n = 10, fallback = "Unavailable") {
     const counts = new Map<string, number>();
-    for (const e of ev) {
-      const k = e.country || "Unknown";
+    for (const v of values) {
+      const k = (v && String(v).trim()) || fallback;
       counts.set(k, (counts.get(k) ?? 0) + 1);
     }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  }, [data, cutoff]);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
+  }
+
+  const filteredEvents = useMemo(
+    () => (data?.events ?? []).filter((e) => inRange(e.created_at)),
+    [data, cutoff],
+  );
+
+  const countries = useMemo(() => topN(filteredEvents.map((e) => (e as any).country as string | null)), [filteredEvents]);
+  const cities = useMemo(() => topN(filteredEvents.map((e) => {
+    const c = (e as any).city as string | null;
+    const co = (e as any).country as string | null;
+    return c ? (co ? `${c}, ${co}` : c) : null;
+  })), [filteredEvents]);
+  const devices = useMemo(() => topN(filteredEvents.map((e) => (e as any).device_type as string | null)), [filteredEvents]);
+  const oses = useMemo(() => topN(filteredEvents.map((e) => (e as any).os as string | null)), [filteredEvents]);
+  const browsers = useMemo(() => topN(filteredEvents.map((e) => (e as any).browser as string | null)), [filteredEvents]);
+  const sources = useMemo(() => topN(filteredEvents.map((e) => (e as any).referrer_source as string | null)), [filteredEvents]);
 
   const trend = useMemo(() => {
     const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
@@ -299,11 +314,15 @@ function FilmAnalyticsPage() {
             </div>
           </div>
 
-          {/* Not-yet-tracked metrics */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
-            <NotTracked title="City breakdown" hint="Add city to event logging to populate this." />
-            <NotTracked title="Device breakdown" hint="Capture user-agent on view events to populate this." />
-            <NotTracked title="Traffic sources" hint="Log referrer on view events to populate this." />
+          {/* Geo / Device / Traffic breakdowns */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <BreakdownCard icon={<MapPin className="h-4 w-4" />} title="Top cities" rows={cities} emptyText="No city data captured yet." />
+            <BreakdownCard icon={<Globe2 className="h-4 w-4" />} title="Traffic sources" rows={sources} emptyText="No referrer data captured yet." />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <BreakdownCard icon={<MonitorSmartphone className="h-4 w-4" />} title="Devices" rows={devices} emptyText="No device data captured yet." />
+            <BreakdownCard icon={<MonitorSmartphone className="h-4 w-4" />} title="Operating systems" rows={oses} emptyText="No OS data captured yet." />
+            <BreakdownCard icon={<MonitorSmartphone className="h-4 w-4" />} title="Browsers" rows={browsers} emptyText="No browser data captured yet." />
           </div>
 
           {/* Transactions */}
@@ -396,12 +415,29 @@ function EmptyMini({ text }: { text: string }) {
   return <p className="text-sm text-muted-foreground py-6 text-center">{text}</p>;
 }
 
-function NotTracked({ title, hint }: { title: string; hint: string }) {
+function BreakdownCard({ icon, title, rows, emptyText }: { icon: React.ReactNode; title: string; rows: [string, number][]; emptyText: string }) {
+  const max = rows[0]?.[1] ?? 1;
   return (
-    <div className="rounded-lg border border-dashed border-border bg-card/20 p-4">
-      <div className="text-xs font-medium text-muted-foreground">{title}</div>
-      <div className="text-sm mt-1">Not tracked yet</div>
-      <div className="text-[11px] text-muted-foreground/70 mt-1">{hint}</div>
+    <div className="rounded-lg border border-border bg-card/40 p-5">
+      <h3 className="font-medium mb-4 flex items-center gap-2">{icon} {title}</h3>
+      {rows.length === 0 ? (
+        <EmptyMini text={emptyText} />
+      ) : (
+        <ul className="space-y-2">
+          {rows.map(([label, count]) => {
+            const pct = Math.round((count / max) * 100);
+            return (
+              <li key={label} className="flex items-center gap-3 text-sm">
+                <span className="w-28 truncate" title={label}>{label}</span>
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="tabular-nums text-muted-foreground text-xs w-12 text-right">{count}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
