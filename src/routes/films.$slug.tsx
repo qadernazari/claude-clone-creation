@@ -150,9 +150,19 @@ function FilmPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Log a "view" event (anon-allowed)
+  // Log a "view" event with geo / device / referrer captured server-side
   useEffect(() => {
-    supabase.from("events").insert({ type: "view", film_id: film.id }).then(() => {});
+    let sid = "";
+    try {
+      sid = localStorage.getItem("ir_sid") || "";
+      if (!sid) {
+        sid = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        localStorage.setItem("ir_sid", sid);
+      }
+    } catch { /* ignore */ }
+    import("@/lib/analytics.functions").then(({ logFilmEvent }) => {
+      logFilmEvent({ data: { filmId: film.id, type: "view", sessionId: sid, referrer: document.referrer || null } }).catch(() => {});
+    });
   }, [film.id]);
 
   const { data: credits = [] } = useQuery({
