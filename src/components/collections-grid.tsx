@@ -15,6 +15,7 @@ type Film = {
   slug: string;
   category: string | null;
   cover_url: string | null;
+  thumbnail_url: string | null;
   poster_gradient: string | null;
 };
 
