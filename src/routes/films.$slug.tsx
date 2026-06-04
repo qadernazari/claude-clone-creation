@@ -65,7 +65,7 @@ export const Route = createFileRoute("/films/$slug")({
             ...(isoDuration ? { duration: isoDuration } : {}),
             inLanguage: "fa",
             countryOfOrigin: { "@type": "Country", name: "Iran" },
-            ...(f.genre_en ? { genre: f.genre_en } : {}),
+            ...(f.category ? { genre: f.category } : {}),
             url,
           }),
         },
