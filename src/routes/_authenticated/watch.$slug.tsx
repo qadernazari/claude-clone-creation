@@ -115,28 +115,62 @@ function WatchPage() {
     }
   }, [ticket, film.id]);
 
-  // Resume position: persist currentTime per film in localStorage
-  const storageKey = `watch:pos:${film.id}`;
+  // Resume position: fetch from DB on mount, sync up every ~10s
+  const saveProgress = useServerFn(upsertWatchProgress);
+  const fetchResume = useServerFn(getResumePosition);
+  const lastSyncRef = useRef<number>(0);
+  const resumePosRef = useRef<number>(0);
+  const resumedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!ticket) return;
+    fetchResume({ data: { filmId: film.id } })
+      .then((r) => {
+        if (!r.completed && r.positionSeconds > 10) resumePosRef.current = r.positionSeconds;
+      })
+      .catch(() => {});
+  }, [ticket, film.id, fetchResume]);
+
   const onLoadedMetadata = useCallback(() => {
-    try {
-      const saved = Number(localStorage.getItem(storageKey) || "0");
-      if (saved > 5 && videoRef.current && saved < (videoRef.current.duration || 0) - 10) {
-        videoRef.current.currentTime = saved;
-      }
-    } catch { /* ignore */ }
-  }, [storageKey]);
+    const v = videoRef.current;
+    if (!v) return;
+    const saved = resumePosRef.current;
+    if (saved > 5 && saved < (v.duration || 0) - 10 && !resumedRef.current) {
+      v.currentTime = saved;
+      resumedRef.current = true;
+    }
+  }, []);
 
   const onTimeUpdate = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (Math.floor(v.currentTime) % 5 === 0) {
-      try { localStorage.setItem(storageKey, String(v.currentTime)); } catch { /* ignore */ }
-    }
-  }, [storageKey]);
+    const now = Date.now();
+    if (now - lastSyncRef.current < 10_000) return;
+    lastSyncRef.current = now;
+    const pos = Math.floor(v.currentTime);
+    const dur = v.duration && isFinite(v.duration) ? Math.floor(v.duration) : null;
+    saveProgress({
+      data: {
+        filmId: film.id,
+        positionSeconds: pos,
+        durationSeconds: dur,
+        completed: false,
+      },
+    }).catch(() => {});
+  }, [film.id, saveProgress]);
 
   const onEnded = useCallback(() => {
-    try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
-  }, [storageKey]);
+    const v = videoRef.current;
+    const dur = v?.duration && isFinite(v.duration) ? Math.floor(v.duration) : null;
+    saveProgress({
+      data: {
+        filmId: film.id,
+        positionSeconds: dur ?? 0,
+        durationSeconds: dur,
+        completed: true,
+      },
+    }).catch(() => {});
+  }, [film.id, saveProgress]);
 
   // Keyboard shortcuts
   useEffect(() => {
