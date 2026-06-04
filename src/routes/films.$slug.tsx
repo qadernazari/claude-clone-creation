@@ -241,16 +241,8 @@ function FilmPage() {
       ? `${num(film.price_toman)} ${fa ? "تومان" : "Toman"}`
       : `$${(film.price_cents / 100).toFixed(2)}`;
 
-  // Group credits by type for nicer rendering
-  const groupedCredits = useMemo(() => {
-    const groups = new Map<string, Credit[]>();
-    for (const c of credits) {
-      const key = c.credit_type || "other";
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(c);
-    }
-    return Array.from(groups.entries());
-  }, [credits]);
+
+
 
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
