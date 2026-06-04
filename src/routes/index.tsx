@@ -57,37 +57,46 @@ export const Route = createFileRoute("/")({
           mainEntity: [
             {
               "@type": "Question",
-              name: "Is there a subscription?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "No. You buy a ticket per film and get 48 hours of access. No recurring charges, ever.",
-              },
+              name: "Do I need a subscription?",
+              acceptedAnswer: { "@type": "Answer", text: "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges." },
             },
             {
               "@type": "Question",
-              name: "Where does the money go?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "The majority goes directly to the filmmakers. We keep a small share to run the platform.",
-              },
+              name: "What makes IRAN different?",
+              acceptedAnswer: { "@type": "Answer", text: "IRAN is dedicated to independent Iranian cinema, bringing together original films, emerging filmmakers, and carefully curated stories from across Iran and its global creative community." },
             },
             {
               "@type": "Question",
-              name: "Can I watch from inside Iran?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Yes. We support Toman payment via ZarinPal, with the rest of the world paying in USD.",
-              },
+              name: "How long do I have to watch a film?",
+              acceptedAnswer: { "@type": "Answer", text: "Once your viewing window begins, you'll have 48 hours to watch the film at your own pace." },
             },
             {
               "@type": "Question",
-              name: "What devices are supported?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Any modern browser — laptop, phone, tablet, or smart TV. No app required.",
-              },
+              name: "Are subtitles available?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. All films are presented in Persian with English subtitles." },
+            },
+            {
+              "@type": "Question",
+              name: "Can I watch on any device?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. Watch seamlessly on desktop, tablet, mobile, or smart TV through any modern web browser." },
+            },
+            {
+              "@type": "Question",
+              name: "How do filmmakers benefit?",
+              acceptedAnswer: { "@type": "Answer", text: "Every purchase directly supports filmmakers and helps sustain independent Iranian storytelling." },
+            },
+            {
+              "@type": "Question",
+              name: "Do you add new films regularly?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. New films, documentaries, and original productions are added throughout the year, with a focus on quality and curation." },
+            },
+            {
+              "@type": "Question",
+              name: "Can I watch from anywhere in the world?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. IRAN is designed for audiences worldwide who want to discover and experience Iranian cinema." },
             },
           ],
+
         }),
       },
     ],
