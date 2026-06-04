@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/admin/films/$filmId/analyt
 async function loadAll(filmId: string) {
   const [film, events, tickets, contribs, progress, profiles] = await Promise.all([
     supabase.from("films").select("id, slug, title_en, title_fa, cover_url, thumbnail_url, poster_gradient, access_type, is_premium, duration_min").eq("id", filmId).maybeSingle(),
-    supabase.from("events").select("id, type, value, country, session_id, created_at").eq("film_id", filmId).order("created_at", { ascending: false }).limit(5000),
+    supabase.from("events").select("id, type, value, country, city, region, device_type, os, browser, referrer_source, referrer_host, session_id, created_at").eq("film_id", filmId).order("created_at", { ascending: false }).limit(5000),
     supabase.from("tickets").select("id, status, amount, currency, paid_at, created_at, user_id, provider").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("contributions").select("id, status, amount, currency, paid_at, created_at, user_id, provider, supporter").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("watch_progress").select("user_id, position_seconds, duration_seconds, completed, updated_at").eq("film_id", filmId),
