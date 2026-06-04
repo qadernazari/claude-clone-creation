@@ -541,6 +541,13 @@ function FilmPage() {
         />
       )}
 
+      {membershipOpen && (
+        <MembershipCheckout
+          returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
+          onClose={() => setMembershipOpen(false)}
+        />
+      )}
+
       {contribOpen && (
         <ContributeModal
           filmSlug={film.slug}
