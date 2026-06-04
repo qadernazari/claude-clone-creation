@@ -248,7 +248,7 @@ function FilmPage() {
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
-    startTrial: fa ? "آغاز رایگان ۷ روزه" : "Start 7-day free trial",
+    startTrial: fa ? "شروع رایگان ۷ روزه" : "Accept Free Trial",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
     signinToWatch: fa ? "برای تماشا وارد شوید" : "Sign in to watch",
