@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, BarChart3, Eye, EyeOff, X } from "lucide-react";
+import { Plus, Pencil, BarChart3, Eye, EyeOff, X, Image as ImageIcon, Film as FilmIcon, Clapperboard, Check } from "lucide-react";
 import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
 import { FileUpload } from "@/components/admin/file-upload";
