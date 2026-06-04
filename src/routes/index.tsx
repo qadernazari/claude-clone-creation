@@ -8,7 +8,9 @@ import { CollectionsGrid } from "../components/collections-grid";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { MembershipCheckout } from "../components/membership-checkout";
+import { FaqSection } from "../components/faq-section";
 import { useSubscription } from "@/hooks/use-subscription";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -70,6 +72,11 @@ function Home() {
       <div className="px-6 pt-32 pb-28 md:px-12 md:pt-40 md:pb-32">
         <MembershipMoment />
       </div>
+
+      {/* 11. FAQ — trust + SEO */}
+      <FaqSection />
+
+
 
       <SiteFooter />
     </div>
