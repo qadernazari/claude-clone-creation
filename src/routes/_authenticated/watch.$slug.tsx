@@ -139,17 +139,39 @@ function WatchPage() {
       .catch(() => {});
   }, [hasAccess, film.id, fetchResume]);
 
-  const [resumedAt, setResumedAt] = useState<number | null>(null);
+  const [resumePrompt, setResumePrompt] = useState<number | null>(null);
   const onLoadedMetadata = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
+    // Restore persisted volume
+    try {
+      const savedVol = parseFloat(localStorage.getItem("player:volume") ?? "");
+      if (!Number.isNaN(savedVol) && savedVol >= 0 && savedVol <= 1) v.volume = savedVol;
+      const savedMuted = localStorage.getItem("player:muted");
+      if (savedMuted === "1") v.muted = true;
+    } catch {}
     const saved = resumePosRef.current;
     if (saved > 5 && saved < (v.duration || 0) - 10 && !resumedRef.current) {
-      v.currentTime = saved;
+      v.pause();
       resumedRef.current = true;
-      setResumedAt(saved);
-      setTimeout(() => setResumedAt(null), 4000);
+      setResumePrompt(saved);
     }
+  }, []);
+
+  const acceptResume = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || resumePrompt === null) return;
+    v.currentTime = resumePrompt;
+    setResumePrompt(null);
+    v.play().catch(() => {});
+  }, [resumePrompt]);
+
+  const declineResume = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = 0;
+    setResumePrompt(null);
+    v.play().catch(() => {});
   }, []);
 
   const fmtTime = (s: number) => {
@@ -193,19 +215,56 @@ function WatchPage() {
     }).catch(() => {});
   }, [film.id, saveProgress]);
 
+  // Transient HUD overlay (volume / seek / playback feedback)
+  const [hud, setHud] = useState<string | null>(null);
+  const hudTimerRef = useRef<number | null>(null);
+  const flashHud = useCallback((text: string) => {
+    setHud(text);
+    if (hudTimerRef.current) window.clearTimeout(hudTimerRef.current);
+    hudTimerRef.current = window.setTimeout(() => setHud(null), 900);
+  }, []);
+
+  // Persist volume changes
+  const onVolumeChange = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    try {
+      localStorage.setItem("player:volume", String(v.volume));
+      localStorage.setItem("player:muted", v.muted ? "1" : "0");
+    } catch {}
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     if (!hasAccess || !videoUrl) return;
+    const seekBy = (v: HTMLVideoElement, delta: number) => {
+      v.currentTime = Math.min(v.duration || 0, Math.max(0, v.currentTime + delta));
+      flashHud(`${delta > 0 ? "+" : ""}${delta}s`);
+    };
+    const bumpVolume = (v: HTMLVideoElement, delta: number) => {
+      v.muted = false;
+      v.volume = Math.min(1, Math.max(0, v.volume + delta));
+      flashHud(`${fa ? "صدا" : "Volume"} ${Math.round(v.volume * 100)}%`);
+    };
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
       if (!v) return;
       const tag = (e.target as HTMLElement | null)?.tagName?.toLowerCase();
       if (tag === "input" || tag === "textarea") return;
+      // Number keys 0-9 → jump to that decile of the video
+      if (/^[0-9]$/.test(e.key) && v.duration && isFinite(v.duration)) {
+        e.preventDefault();
+        const pct = parseInt(e.key, 10) / 10;
+        v.currentTime = v.duration * pct;
+        flashHud(`${pct * 100}%`);
+        return;
+      }
       switch (e.key) {
         case " ":
         case "k":
           e.preventDefault();
-          if (v.paused) v.play(); else v.pause();
+          if (v.paused) { v.play(); flashHud(fa ? "پخش" : "Play"); }
+          else { v.pause(); flashHud(fa ? "مکث" : "Pause"); }
           break;
         case "f":
           e.preventDefault();
@@ -215,14 +274,33 @@ function WatchPage() {
         case "m":
           e.preventDefault();
           v.muted = !v.muted;
+          flashHud(v.muted ? (fa ? "بی‌صدا" : "Muted") : (fa ? "صدادار" : "Unmuted"));
           break;
         case "ArrowRight":
           e.preventDefault();
-          v.currentTime = Math.min((v.duration || 0), v.currentTime + 5);
+          seekBy(v, 5);
           break;
         case "ArrowLeft":
           e.preventDefault();
-          v.currentTime = Math.max(0, v.currentTime - 5);
+          seekBy(v, -5);
+          break;
+        case "l":
+        case "L":
+          e.preventDefault();
+          seekBy(v, 10);
+          break;
+        case "j":
+        case "J":
+          e.preventDefault();
+          seekBy(v, -10);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          bumpVolume(v, 0.1);
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          bumpVolume(v, -0.1);
           break;
         case "t":
           e.preventDefault();
@@ -232,7 +310,7 @@ function WatchPage() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [hasAccess, videoUrl]);
+  }, [hasAccess, videoUrl, fa, flashHud]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
@@ -341,17 +419,46 @@ function WatchPage() {
                 src={videoUrl}
                 poster={film.cover_url || undefined}
                 controls
-                autoPlay
+                autoPlay={resumePrompt === null}
                 playsInline
                 controlsList="nodownload"
                 onLoadedMetadata={onLoadedMetadata}
                 onTimeUpdate={onTimeUpdate}
                 onEnded={onEnded}
+                onVolumeChange={onVolumeChange}
                 className="absolute inset-0 h-full w-full bg-black"
               />
-              {resumedAt !== null && (
+              {resumePrompt !== null && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                  <div className="rounded-xl border border-cream/15 bg-bg-0/90 p-6 max-w-sm text-center shadow-2xl">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                      {fa ? "ادامه تماشا" : "Continue watching"}
+                    </p>
+                    <p className="mt-2 font-display text-xl text-cream-bright">
+                      {fa ? "از " : "Resume from "}{fmtTime(resumePrompt)}?
+                    </p>
+                    <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
+                      <button
+                        type="button"
+                        onClick={acceptResume}
+                        className="rounded-md bg-amber px-5 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+                      >
+                        {fa ? "ادامه بده" : "Resume"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={declineResume}
+                        className="rounded-md border border-cream/20 px-5 py-2 text-sm text-cream/80 hover:bg-cream/5 transition-colors"
+                      >
+                        {fa ? "از ابتدا" : "Start over"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {hud && (
                 <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
-                  {fa ? "ادامه از " : "Resumed from "}{fmtTime(resumedAt)}
+                  {hud}
                 </div>
               )}
             </>
@@ -396,6 +503,9 @@ function WatchPage() {
               {[
                 { k: "Space / K", v: fa ? "پخش/مکث" : "Play / Pause" },
                 { k: "←  →", v: fa ? "۵ ثانیه" : "Seek 5s" },
+                { k: "J / L", v: fa ? "۱۰ ثانیه" : "Seek 10s" },
+                { k: "↑  ↓", v: fa ? "صدا" : "Volume" },
+                { k: "0–9", v: fa ? "پرش درصدی" : "Jump to %" },
                 { k: "F", v: fa ? "تمام‌صفحه" : "Fullscreen" },
                 { k: "M", v: fa ? "بی‌صدا" : "Mute" },
                 { k: "T", v: fa ? "حالت سینما" : "Theater" },
