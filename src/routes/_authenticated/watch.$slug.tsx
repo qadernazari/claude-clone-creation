@@ -303,7 +303,7 @@ function WatchPage() {
                 {t.checking}
               </div>
             </div>
-          ) : !ticket ? (
+          ) : !hasAccess ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center px-6">
               <div className="max-w-sm">
                 <p className="font-display text-xl text-cream-bright">{t.noTicket}</p>
