@@ -310,6 +310,9 @@ function AccountPage() {
           </div>
         </section>
 
+        {/* Membership */}
+        <MembershipPanel />
+
         {/* Password */}
         <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
           <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
