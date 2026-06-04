@@ -22,6 +22,17 @@ import { capitalize } from "@/lib/cms";
 
 export const Route = createFileRoute("/_authenticated/admin/films/$filmId/analytics")({
   component: FilmAnalyticsPage,
+  errorComponent: ({ error }) => (
+    <div className="p-8 max-w-2xl">
+      <Link to="/admin/films" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4">
+        <ArrowLeft className="h-4 w-4" /> Films
+      </Link>
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+        <h1 className="font-medium text-destructive mb-1">Couldn't open film analytics</h1>
+        <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : "The analytics page could not be rendered."}</p>
+      </div>
+    </div>
+  ),
 });
 
 async function loadAll(filmId: string) {
@@ -80,7 +91,8 @@ function FilmAnalyticsPage() {
     const views = ev.filter((e) => e.type === "view").length;
     const completes = ev.filter((e) => e.type === "complete").length;
     const sessions = new Set(ev.map((e) => e.session_id).filter(Boolean) as string[]);
-    const uniqueViewers = sessions.size || wp.length || 0;
+    const progressUsers = new Set(wp.map((p) => p.user_id).filter(Boolean) as string[]);
+    const uniqueViewers = sessions.size || progressUsers.size || views;
 
     const watchSeconds = wp.reduce((s, p) => s + (p.position_seconds || 0), 0);
     const avgWatchSeconds = wp.length ? Math.round(watchSeconds / wp.length) : 0;
@@ -99,6 +111,8 @@ function FilmAnalyticsPage() {
     return {
       views, completes, uniqueViewers, completion,
       watchSeconds, avgWatchSeconds,
+      continueWatching: wp.filter((p) => !p.completed && (p.position_seconds || 0) > 15).length,
+      uniqueViewersEstimated: sessions.size === 0 && progressUsers.size === 0 && views > 0,
       ppvCount: paidTickets.length,
       contribCount: paidContribs.length,
       ticketRevUsd, ticketRevToman, contribRevUsd, contribRevToman,
