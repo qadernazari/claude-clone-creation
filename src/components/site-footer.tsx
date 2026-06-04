@@ -14,6 +14,15 @@ export function SiteFooter() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const { openPage } = usePageOverlay();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (isHome) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const { data: pages } = useQuery({
     queryKey: ["site_content", CMS_KEYS.PAGES],
