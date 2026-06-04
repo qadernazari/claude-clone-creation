@@ -419,12 +419,16 @@ export type Database = {
         Row: {
           access_mode: string
           access_type: Database["public"]["Enums"]["film_access_type"]
+          age_rating: string | null
           category: string | null
           cover_url: string | null
           created_at: string
           director_en: string | null
           director_fa: string | null
           duration_min: number | null
+          has_4k: boolean
+          has_captions: boolean
+          has_subtitles: boolean
           id: string
           is_premium: boolean
           poster_gradient: string | null
@@ -447,12 +451,16 @@ export type Database = {
         Insert: {
           access_mode?: string
           access_type?: Database["public"]["Enums"]["film_access_type"]
+          age_rating?: string | null
           category?: string | null
           cover_url?: string | null
           created_at?: string
           director_en?: string | null
           director_fa?: string | null
           duration_min?: number | null
+          has_4k?: boolean
+          has_captions?: boolean
+          has_subtitles?: boolean
           id?: string
           is_premium?: boolean
           poster_gradient?: string | null
@@ -475,12 +483,16 @@ export type Database = {
         Update: {
           access_mode?: string
           access_type?: Database["public"]["Enums"]["film_access_type"]
+          age_rating?: string | null
           category?: string | null
           cover_url?: string | null
           created_at?: string
           director_en?: string | null
           director_fa?: string | null
           duration_min?: number | null
+          has_4k?: boolean
+          has_captions?: boolean
+          has_subtitles?: boolean
           id?: string
           is_premium?: boolean
           poster_gradient?: string | null
