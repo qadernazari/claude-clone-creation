@@ -335,19 +335,26 @@ function WatchPage() {
               {t.missing}
             </div>
           ) : (
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              poster={film.cover_url || undefined}
-              controls
-              autoPlay
-              playsInline
-              controlsList="nodownload"
-              onLoadedMetadata={onLoadedMetadata}
-              onTimeUpdate={onTimeUpdate}
-              onEnded={onEnded}
-              className="absolute inset-0 h-full w-full bg-black"
-            />
+            <>
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                poster={film.cover_url || undefined}
+                controls
+                autoPlay
+                playsInline
+                controlsList="nodownload"
+                onLoadedMetadata={onLoadedMetadata}
+                onTimeUpdate={onTimeUpdate}
+                onEnded={onEnded}
+                className="absolute inset-0 h-full w-full bg-black"
+              />
+              {resumedAt !== null && (
+                <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
+                  {fa ? "ادامه از " : "Resumed from "}{fmtTime(resumedAt)}
+                </div>
+              )}
+            </>
           )}
         </div>
 
