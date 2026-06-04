@@ -287,8 +287,9 @@ function FilmPage() {
     ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&film=${film.slug}`
     : "";
 
-  const posterStyle = film.cover_url
-    ? { background: `center / cover no-repeat url(${film.cover_url})` }
+  const heroArt = film.thumbnail_url || film.cover_url;
+  const posterStyle = heroArt
+    ? { background: `center / cover no-repeat url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
 
   const handleShare = async () => {
