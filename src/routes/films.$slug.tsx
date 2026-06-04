@@ -339,7 +339,7 @@ function FilmPage() {
                   className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/0 hover:bg-black/40 transition-colors"
                   aria-label={t.playPreview}
                 >
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-amber/95 text-bg-0 shadow-xl transition-transform group-hover:scale-105">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream-bright/95 text-ink shadow-xl transition-transform group-hover:scale-105">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7z" />
                     </svg>
