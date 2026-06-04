@@ -56,12 +56,12 @@ function Home() {
       <FeaturedFilm />
 
       {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-      <div className="pt-16 md:pt-20">
+      <div className="pt-10 md:pt-14">
         <ContinueWatching />
       </div>
 
       {/* 3-8. Editorial rails: Originals (flagship), New Releases, category rails */}
-      <div className="pt-16 pb-28 md:pt-20 md:pb-36 space-y-24 md:space-y-28">
+      <div className="pt-10 pb-16 md:pt-14 md:pb-20 space-y-14 md:space-y-16">
         <FilmsRow />
       </div>
 
@@ -69,7 +69,7 @@ function Home() {
       <CollectionsGrid />
 
       {/* 10. Membership — one quiet moment */}
-      <div className="px-6 pt-32 pb-28 md:px-12 md:pt-40 md:pb-32">
+      <div className="px-6 pt-20 pb-16 md:px-12 md:pt-24 md:pb-20">
         <MembershipMoment />
       </div>
 
