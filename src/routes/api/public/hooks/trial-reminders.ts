@@ -32,6 +32,9 @@ function fmt(d: Date) {
 }
 
 async function processReminders() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const nowMs = Date.now();
+
   const { data: trials, error } = await supabaseAdmin
     .from("trials")
     .select("id, email, started_at, ends_at, status, reminders_sent")
@@ -83,7 +86,7 @@ async function processReminders() {
     }
 
     if (Object.keys(updates).length > 0 || statusUpdate) {
-      const patch: Record<string, unknown> = {};
+      const patch: { reminders_sent?: Record<string, string>; status?: string } = {};
       if (Object.keys(updates).length > 0) {
         patch.reminders_sent = { ...sent, ...updates };
       }
@@ -100,11 +103,11 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
   server: {
     handlers: {
       POST: async () => {
-        const result = await process();
+        const result = await processReminders();
         return Response.json(result);
       },
       GET: async () => {
-        const result = await process();
+        const result = await processReminders();
         return Response.json(result);
       },
     },
