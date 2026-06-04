@@ -40,9 +40,7 @@ const Email = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>
-      Your {trialDays}-day {SITE_NAME} trial has started · دوره آزمایشی شما آغاز شد
-    </Preview>
+    <Preview>{`Your ${trialDays}-day ${SITE_NAME} trial has started · دوره آزمایشی شما آغاز شد`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{SITE_NAME}</Heading>
