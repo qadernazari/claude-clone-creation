@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, BarChart3, Eye, EyeOff, X } from "lucide-react";
+import { Plus, Pencil, BarChart3, Eye, EyeOff, X, Image as ImageIcon, Film as FilmIcon, Clapperboard, Check } from "lucide-react";
 import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
 import { FileUpload } from "@/components/admin/file-upload";
@@ -64,7 +64,7 @@ const GRADIENTS = [
 const EMPTY: FilmDraft = {
   slug: "", title_en: "", title_fa: "", director_en: "", director_fa: "",
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
-  price_cents: 499, price_toman: 120000, ticket_hours: 48, access_mode: "inherit",
+  price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
@@ -149,16 +149,17 @@ function FilmsAdminPage() {
                   className="h-4 w-4 rounded border-border accent-primary" />
               </th>
               <th className="px-4 py-3">Film</th>
+              <th className="px-4 py-3 w-40">Assets</th>
               <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3 w-44">Price (USD / تومان)</th>
+              <th className="px-4 py-3 w-48">Pricing</th>
               <th className="px-4 py-3 w-28">Status</th>
               <th className="px-4 py-3 w-32"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {isLoading && <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
+            {isLoading && <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
             {!isLoading && films.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                 No films yet. Click <span className="text-foreground">Add Film</span> to create one.
               </td></tr>
             )}
@@ -177,17 +178,31 @@ function FilmsAdminPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-7 rounded shrink-0" style={{ background: f.poster_gradient ?? GRADIENTS[0] }} />
+                      {f.cover_url ? (
+                        <img src={f.cover_url} alt="" loading="lazy"
+                          className="h-14 w-10 rounded object-cover shrink-0 ring-1 ring-border" />
+                      ) : (
+                        <div className="h-14 w-10 rounded shrink-0 flex items-center justify-center ring-1 ring-border"
+                          style={{ background: f.poster_gradient ?? GRADIENTS[0] }}>
+                          <ImageIcon className="h-4 w-4 text-muted-foreground/60" />
+                        </div>
+                      )}
                       <div>
                         <div className="font-medium">{f.title_en}</div>
                         {f.title_fa && <div className="text-xs text-muted-foreground" dir="rtl">{f.title_fa}</div>}
                       </div>
                     </div>
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <AssetBadge label="Thumb" present={!!f.thumbnail_url} url={f.thumbnail_url} kind="image" icon={<ImageIcon className="h-3 w-3" />} />
+                      <AssetBadge label="Trailer" present={!!f.preview_url} url={f.preview_url} kind="video" icon={<Clapperboard className="h-3 w-3" />} />
+                      <AssetBadge label="Video" present={!!f.video_url} url={f.video_url} kind="video" icon={<FilmIcon className="h-3 w-3" />} />
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{f.category ?? "—"}</td>
-                  <td className="px-4 py-3 tabular-nums text-xs">
-                    ${(f.price_cents / 100).toFixed(2)} <span className="text-muted-foreground">·</span>{" "}
-                    <span dir="rtl">{f.price_toman.toLocaleString()} تومان</span>
+                  <td className="px-4 py-3 text-xs">
+                    <PricingCell film={f} />
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${
@@ -243,6 +258,58 @@ function FilmsAdminPage() {
           onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); }}
         />
       )}
+    </div>
+  );
+}
+
+function AssetBadge({ label, present, url, kind, icon }: {
+  label: string; present: boolean; url: string | null; kind: "image" | "video"; icon: React.ReactNode;
+}) {
+  const base = "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium ring-1";
+  if (!present) {
+    return (
+      <span className={`${base} bg-muted/40 text-muted-foreground/60 ring-border/60`} title={`${label}: not set`}>
+        {icon}{label}
+      </span>
+    );
+  }
+  if (kind === "image" && url) {
+    return (
+      <a href={url} target="_blank" rel="noreferrer" title={`${label}: view`}
+        className={`${base} bg-emerald-500/10 text-emerald-400 ring-emerald-500/30 hover:bg-emerald-500/20`}>
+        <img src={url} alt="" className="h-3 w-3 rounded-sm object-cover" />
+        {label}
+      </a>
+    );
+  }
+  return (
+    <a href={url ?? "#"} target="_blank" rel="noreferrer" title={`${label}: view`}
+      className={`${base} bg-emerald-500/10 text-emerald-400 ring-emerald-500/30 hover:bg-emerald-500/20`}>
+      <Check className="h-3 w-3" />{label}
+    </a>
+  );
+}
+
+function PricingCell({ film }: { film: Film }) {
+  const muted = "text-muted-foreground";
+  if (film.access_type === "free") {
+    return <span className="inline-flex rounded-full px-2 py-0.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30">Free</span>;
+  }
+  if (film.access_type === "membership") {
+    return <span className="inline-flex rounded-full px-2 py-0.5 bg-primary/10 text-primary ring-1 ring-primary/30">Included in Membership</span>;
+  }
+  const hasPrice = (film.price_cents ?? 0) > 0 || (film.price_toman ?? 0) > 0;
+  if (!hasPrice) {
+    return <span className={`inline-flex rounded-full px-2 py-0.5 bg-muted/40 ${muted} ring-1 ring-border`}>No Price Set</span>;
+  }
+  const label = film.access_type === "membership_or_ppv" ? "Members or " : "";
+  return (
+    <div className="space-y-0.5">
+      {label && <div className={`text-[10px] ${muted}`}>{label.trim()}</div>}
+      <div className="tabular-nums">
+        ${(film.price_cents / 100).toFixed(2)} <span className={muted}>·</span>{" "}
+        <span dir="rtl">{film.price_toman.toLocaleString()} تومان</span>
+      </div>
     </div>
   );
 }
