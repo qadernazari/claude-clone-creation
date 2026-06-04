@@ -71,13 +71,14 @@ export function CollectionsGrid() {
       .slice(0, 6)
       .map((c) => {
         const list = byCat.get(c.id) ?? [];
-        const cover = list[0];
+        const cover = list.find((f) => f.thumbnail_url) ?? list.find((f) => f.cover_url) ?? list[0];
+        const art = cover?.thumbnail_url || cover?.cover_url;
         return {
           id: c.id,
           name: t({ en: c.name_en, fa: c.name_fa || c.name_en }),
           slug: c.id,
-          bg: cover?.cover_url
-            ? `center / cover no-repeat url(${cover.cover_url})`
+          bg: art
+            ? `center / cover no-repeat url(${art})`
             : cover?.poster_gradient || fallbackGradient(c.id),
           count: list.length,
         };
@@ -89,13 +90,13 @@ export function CollectionsGrid() {
   return (
     <section className="relative px-6 md:px-12">
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-10 flex items-end justify-between gap-6">
+        <div className="mb-6 flex items-end justify-between gap-6">
           <div>
             <span className="mb-2.5 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
               {fa ? "مجموعه‌ها" : "Collections"}
             </span>
-            <h2 className="font-editorial text-3xl italic font-normal text-cream-bright md:text-4xl">
-              {fa ? "مقصدهای منتخب" : "Curated destinations"}
+            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
+              {fa ? "مجموعه‌های منتخب" : "Curated collections"}
             </h2>
           </div>
         </div>
