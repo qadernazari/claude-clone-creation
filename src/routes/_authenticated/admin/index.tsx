@@ -234,6 +234,43 @@ function AdminDashboard() {
         </div>
       </header>
 
+      {/* Subscription KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
+        <Stat
+          label="MRR (est.)"
+          value={data ? Math.round(data.mrrCents / 100) : undefined}
+          sub={data ? `$${(data.mrrCents / 100).toFixed(2)}/mo` : undefined}
+          icon={TrendingUp}
+          loading={isLoading}
+        />
+        <Stat
+          label="Active subs"
+          value={data?.activeSubs}
+          icon={CreditCard}
+          loading={isLoading}
+        />
+        <Stat
+          label="On trial"
+          value={data?.trialingSubs}
+          icon={Clock}
+          loading={isLoading}
+        />
+        <Stat
+          label="Past due"
+          value={data?.pastDueSubs}
+          sub={data && data.pastDueSubs > 0 ? "Needs attention" : undefined}
+          icon={CreditCard}
+          loading={isLoading}
+        />
+        <Stat
+          label="Ticket revenue (30d)"
+          value={data ? Math.round(data.ticketRevenue30dCents / 100) : undefined}
+          sub={data ? `$${(data.ticketRevenue30dCents / 100).toFixed(2)}` : undefined}
+          icon={Ticket}
+          loading={isLoading}
+        />
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat
           label="Films"
