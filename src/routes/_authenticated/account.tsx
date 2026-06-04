@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { MembershipPanel } from "@/components/membership-panel";
 
 export const Route = createFileRoute("/_authenticated/account")({
   component: AccountPage,
