@@ -339,7 +339,7 @@ function FilmPage() {
                   className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/0 hover:bg-black/40 transition-colors"
                   aria-label={t.playPreview}
                 >
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-amber/95 text-bg-0 shadow-xl transition-transform group-hover:scale-105">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream-bright/95 text-ink shadow-xl transition-transform group-hover:scale-105">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7z" />
                     </svg>
@@ -354,20 +354,15 @@ function FilmPage() {
             {/* Meta + purchase */}
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                {film.is_premium && (
-                  <span className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-bright">
-                    {fa ? "اکران ویژه" : "Premium Release"}
-                  </span>
-                )}
                 {film.category && (
-                  <span className="inline-flex rounded-full bg-cream/10 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
+                  <span className="inline-flex rounded-full border border-cream/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cream/55">
                     {film.category}
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-cream/15 bg-cream/[0.04] px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70 hover:text-cream-bright hover:border-cream/30 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-cream/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cream/55 hover:text-cream-bright hover:border-cream/25 transition-colors"
                 >
                   {copied ? t.copied : t.share}
                 </button>
@@ -549,15 +544,20 @@ function FilmPage() {
       {/* More films */}
       {related.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-24">
-          <div className="flex items-baseline justify-between">
-            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
-              {t.moreFromCat}
-            </h2>
-            <Link to="/browse" className="text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright">
-              {fa ? "همه" : "Browse all"} →
+          <div className="mb-8 flex items-end justify-between gap-6">
+            <div>
+              <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+                {fa ? "بیشتر" : "Continue exploring"}
+              </span>
+              <h2 className="font-editorial text-3xl italic font-normal text-cream-bright md:text-4xl">
+                {t.moreFromCat}
+              </h2>
+            </div>
+            <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
+              {fa ? "همه آثار" : "Browse all"} →
             </Link>
           </div>
-          <div className="mt-5 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {related.map((r) => {
               const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
               const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
@@ -572,12 +572,12 @@ function FilmPage() {
                   className="group block"
                 >
                   <div
-                    className="aspect-[2/3] w-full overflow-hidden rounded-lg border border-cream/10 transition-transform group-hover:-translate-y-0.5 group-hover:border-cream/25"
+                    className="aspect-[2/3] w-full overflow-hidden rounded-xl ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20"
                     style={bg}
                   />
-                  <div className={`mt-2 text-sm text-cream/90 truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
+                  <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
                   {rDirector && (
-                    <div className="text-[11px] text-cream/50 truncate">{rDirector}</div>
+                    <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
                   )}
                 </Link>
               );
