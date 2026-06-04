@@ -4,7 +4,8 @@ import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
 import { useSubscription } from "@/hooks/use-subscription";
-import { MembershipCheckout } from "./membership-checkout";
+import { AcceptTrialButton } from "./accept-trial-button";
+import { TrialBanner } from "./trial-banner";
 
 function LanguageToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   const { locale, setLocale } = useLocale();
@@ -217,36 +218,18 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
 
 function MembershipCta() {
   const { locale } = useLocale();
-  const { user, isMember, isLoading } = useSubscription();
-  const [open, setOpen] = useState(false);
+  const { isMember, isLoading } = useSubscription();
 
   if (isLoading || isMember) return null;
 
-  const label = locale === "fa" ? "آغاز رایگان" : "Start free trial";
-  const returnUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`
-      : "";
+  const label = locale === "fa" ? "پذیرش رایگان" : "Accept Free Trial";
 
   return (
-    <>
-      {user ? (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="hidden sm:inline-flex items-center rounded-full bg-cream px-4 py-2 text-[12px] font-semibold text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg"
-        >
-          {label}
-        </button>
-      ) : (
-        <Link
-          to="/auth"
-          className="hidden sm:inline-flex items-center rounded-full bg-cream px-4 py-2 text-[12px] font-semibold text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg"
-        >
-          {label}
-        </Link>
-      )}
-      {open && <MembershipCheckout returnUrl={returnUrl} onClose={() => setOpen(false)} />}
-    </>
+    <div className="hidden sm:block">
+      <AcceptTrialButton
+        className="inline-flex items-center rounded-full bg-cream px-4 py-2 text-[12px] font-semibold text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg disabled:opacity-70"
+        label={label}
+      />
+    </div>
   );
 }
