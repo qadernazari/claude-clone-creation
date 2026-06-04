@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { toast } from "sonner";
+import { X } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getLibrary, type LibraryFilm, type LibraryData } from "@/lib/library.functions";
+import { getLibrary, toggleWatchlist, type LibraryFilm, type LibraryData } from "@/lib/library.functions";
 import { useSubscription } from "@/hooks/use-subscription";
 
 export const Route = createFileRoute("/_authenticated/library")({
@@ -142,7 +144,7 @@ function LibraryPage() {
             ) : (
               <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {lib.watchlist.map((r) => (
-                  <FilmCard key={r.film.id} film={r.film} />
+                  <WatchlistCard key={r.film.id} film={r.film} />
                 ))}
               </div>
             )
@@ -263,6 +265,50 @@ function FilmCard({ film }: { film: LibraryFilm }) {
         )}
       </div>
     </Link>
+  );
+}
+
+function WatchlistCard({ film }: { film: LibraryFilm }) {
+  const { locale } = useLocale();
+  const fa = locale === "fa";
+  const queryClient = useQueryClient();
+  const removeFromList = useServerFn(toggleWatchlist);
+  const [pending, setPending] = useState(false);
+
+  async function onRemove(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (pending) return;
+    setPending(true);
+    try {
+      await removeFromList({ data: { filmId: film.id, add: false } });
+      toast.success(fa ? "از فهرست حذف شد" : "Removed from watchlist");
+      queryClient.invalidateQueries({ queryKey: ["library"] });
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : fa ? "خطا در حذف" : "Couldn't remove from watchlist",
+      );
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <div className="group relative">
+      <button
+        type="button"
+        onClick={onRemove}
+        disabled={pending}
+        aria-label={fa ? "حذف از فهرست" : "Remove from watchlist"}
+        title={fa ? "حذف از فهرست" : "Remove from watchlist"}
+        className="absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full bg-bg-0/80 text-cream/70 border border-cream/15 backdrop-blur opacity-0 group-hover:opacity-100 hover:text-cream-bright hover:border-cream/40 transition-all disabled:opacity-50"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+      <FilmCard film={film} />
+    </div>
   );
 }
 
