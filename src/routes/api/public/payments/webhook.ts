@@ -465,10 +465,16 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
             }
             case "customer.subscription.created":
             case "customer.subscription.updated":
-              await upsertSubscription(event.data.object, env);
+              await upsertSubscription(event.data.object, env, origin);
+              break;
+            case "customer.subscription.trial_will_end":
+              await handleTrialWillEnd(event.data.object, env, origin);
               break;
             case "customer.subscription.deleted":
-              await markSubscriptionCanceled(event.data.object, env);
+              await markSubscriptionCanceled(event.data.object, env, origin);
+              break;
+            case "invoice.payment_failed":
+              await handleInvoicePaymentFailed(event.data.object, env, origin);
               break;
             default:
               console.log("Unhandled event:", event.type);
