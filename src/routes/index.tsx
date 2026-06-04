@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
 import { supabase } from "../integrations/supabase/client";
 import { WelcomeSplash } from "../components/welcome-splash";
@@ -7,6 +8,7 @@ import { FilmsRow } from "../components/films-row";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
+
 
 
 export const Route = createFileRoute("/")({
@@ -55,37 +57,46 @@ export const Route = createFileRoute("/")({
           mainEntity: [
             {
               "@type": "Question",
-              name: "Is there a subscription?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "No. You buy a ticket per film and get 48 hours of access. No recurring charges, ever.",
-              },
+              name: "Do I need a subscription?",
+              acceptedAnswer: { "@type": "Answer", text: "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges." },
             },
             {
               "@type": "Question",
-              name: "Where does the money go?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "The majority goes directly to the filmmakers. We keep a small share to run the platform.",
-              },
+              name: "What makes IRAN different?",
+              acceptedAnswer: { "@type": "Answer", text: "IRAN is dedicated to independent Iranian cinema, bringing together original films, emerging filmmakers, and carefully curated stories from across Iran and its global creative community." },
             },
             {
               "@type": "Question",
-              name: "Can I watch from inside Iran?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Yes. We support Toman payment via ZarinPal, with the rest of the world paying in USD.",
-              },
+              name: "How long do I have to watch a film?",
+              acceptedAnswer: { "@type": "Answer", text: "Once your viewing window begins, you'll have 48 hours to watch the film at your own pace." },
             },
             {
               "@type": "Question",
-              name: "What devices are supported?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Any modern browser — laptop, phone, tablet, or smart TV. No app required.",
-              },
+              name: "Are subtitles available?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. All films are presented in Persian with English subtitles." },
+            },
+            {
+              "@type": "Question",
+              name: "Can I watch on any device?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. Watch seamlessly on desktop, tablet, mobile, or smart TV through any modern web browser." },
+            },
+            {
+              "@type": "Question",
+              name: "How do filmmakers benefit?",
+              acceptedAnswer: { "@type": "Answer", text: "Every purchase directly supports filmmakers and helps sustain independent Iranian storytelling." },
+            },
+            {
+              "@type": "Question",
+              name: "Do you add new films regularly?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. New films, documentaries, and original productions are added throughout the year, with a focus on quality and curation." },
+            },
+            {
+              "@type": "Question",
+              name: "Can I watch from anywhere in the world?",
+              acceptedAnswer: { "@type": "Answer", text: "Yes. IRAN is designed for audiences worldwide who want to discover and experience Iranian cinema." },
             },
           ],
+
         }),
       },
     ],
@@ -280,53 +291,7 @@ function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-line px-6 py-28 md:px-12 md:py-32">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-[1fr_2fr]">
-          <div>
-            <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
-              {locale === "fa" ? "پرسش‌های متداول" : "Questions"}
-            </span>
-            <h2 className="font-display text-3xl font-bold leading-tight text-cream-bright md:text-4xl">
-              {locale === "fa" ? "هرچه باید بدانید." : "Everything you might ask."}
-            </h2>
-          </div>
-          <dl className="divide-y divide-line border-y border-line">
-            {[
-              {
-                en: ["Is there a subscription?", "No. You buy a ticket per film and get 48 hours of access. No recurring charges, ever."],
-                fa: ["آیا اشتراک ماهانه دارد؟", "نه. برای هر فیلم یک بلیت می‌خرید و ۴۸ ساعت دسترسی دارید. هرگز کسر دوره‌ای نمی‌شود."],
-              },
-              {
-                en: ["Where does the money go?", "The majority goes directly to the filmmakers. We keep a small share to run the platform."],
-                fa: ["پول کجا می‌رود؟", "بخش عمده به‌طور مستقیم به فیلم‌ساز می‌رسد. سهم کوچکی برای نگه‌داری پلتفرم می‌ماند."],
-              },
-              {
-                en: ["Can I watch from inside Iran?", "Yes. We support Toman payment via ZarinPal, with the rest of the world paying in USD."],
-                fa: ["از داخل ایران هم می‌توان دید؟", "بله. پرداخت تومانی از طریق زرین‌پال، و سایر کشورها با دلار."],
-              },
-              {
-                en: ["What devices are supported?", "Any modern browser — laptop, phone, tablet, or smart TV. No app required."],
-                fa: ["چه دستگاه‌هایی پشتیبانی می‌شود؟", "هر مرورگر مدرنی — لپ‌تاپ، موبایل، تبلت یا تلویزیون هوشمند. بدون نیاز به برنامه."],
-              },
-            ].map((qa, i) => {
-              const [q, a] = locale === "fa" ? qa.fa : qa.en;
-              return (
-                <details key={i} className="group py-6">
-                  <summary className="flex cursor-pointer items-center justify-between gap-6 list-none">
-                    <span className="font-display text-lg font-semibold text-cream-bright">{q}</span>
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cream/15 text-cream/60 transition-all group-open:rotate-45 group-open:border-amber/50 group-open:text-amber">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-                        <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                  </summary>
-                  <dd className="mt-4 max-w-2xl text-[15px] leading-relaxed text-cream/60">{a}</dd>
-                </details>
-              );
-            })}
-          </dl>
-        </div>
-      </section>
+      <FaqSection />
 
       {/* Closing CTA */}
       <section className="relative overflow-hidden border-t border-line px-6 py-32 md:px-12 md:py-40">
@@ -337,6 +302,7 @@ function Home() {
               "radial-gradient(ellipse at 50% 60%, oklch(0.77 0.115 80 / 0.10), transparent 65%)",
           }}
         />
+
         <div className="relative z-10 mx-auto max-w-3xl text-center">
           <h2 className="font-display text-4xl font-bold leading-[1.05] text-cream-bright md:text-6xl">
             {locale === "fa" ? (
@@ -377,5 +343,115 @@ function Home() {
       <SiteFooter />
 
     </div>
+  );
+}
+
+const FAQ_ITEMS: { en: [string, string]; fa: [string, string] }[] = [
+  {
+    en: ["Do I need a subscription?", "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges."],
+    fa: ["آیا به اشتراک نیاز دارم؟", "خیر. تنها برای فیلمی که می‌خواهید تماشا کنید هزینه پرداخت می‌کنید؛ بدون اشتراک ماهانه و هزینه‌های دوره‌ای."],
+  },
+  {
+    en: ["What makes IRAN different?", "IRAN is dedicated to independent Iranian cinema, bringing together original films, emerging filmmakers, and carefully curated stories from across Iran and its global creative community."],
+    fa: ["چه چیزی ایران را متفاوت می‌کند؟", "ایران خانه‌ای برای سینمای مستقل ایران است؛ جایی که فیلم‌سازان فرصت دیده‌شدن پیدا می‌کنند و مخاطبان به مجموعه‌ای گزینش‌شده از آثار ایرانی دسترسی دارند."],
+  },
+  {
+    en: ["How long do I have to watch a film?", "Once your viewing window begins, you'll have 48 hours to watch the film at your own pace."],
+    fa: ["پس از خرید تا چه مدت می‌توانم فیلم را تماشا کنم؟", "پس از فعال‌شدن دسترسی، تا ۴۸ ساعت فرصت دارید فیلم را با آرامش تماشا کنید."],
+  },
+  {
+    en: ["Are subtitles available?", "Yes. All films are presented in Persian with English subtitles."],
+    fa: ["آیا زیرنویس انگلیسی وجود دارد؟", "بله. تمامی آثار با زیرنویس انگلیسی در دسترس هستند."],
+  },
+  {
+    en: ["Can I watch on any device?", "Yes. Watch seamlessly on desktop, tablet, mobile, or smart TV through any modern web browser."],
+    fa: ["روی چه دستگاه‌هایی می‌توانم تماشا کنم؟", "موبایل، تبلت، لپ‌تاپ و تلویزیون هوشمند؛ هرجا که مرورگر مدرن داشته باشید."],
+  },
+  {
+    en: ["How do filmmakers benefit?", "Every purchase directly supports filmmakers and helps sustain independent Iranian storytelling."],
+    fa: ["خرید من چگونه از فیلم‌سازان حمایت می‌کند؟", "بخش عمده درآمد هر تماشا مستقیماً به حمایت از فیلم‌سازان و تولید آثار مستقل اختصاص می‌یابد."],
+  },
+  {
+    en: ["Do you add new films regularly?", "Yes. New films, documentaries, and original productions are added throughout the year, with a focus on quality and curation."],
+    fa: ["آیا آثار جدید اضافه می‌شوند؟", "بله. به‌طور مستمر فیلم‌های تازه، مستندها و آثار اختصاصی به مجموعه افزوده می‌شوند."],
+  },
+  {
+    en: ["Can I watch from anywhere in the world?", "Yes. IRAN is designed for audiences worldwide who want to discover and experience Iranian cinema."],
+    fa: ["آیا از خارج از ایران هم می‌توانم تماشا کنم؟", "بله. این پلتفرم برای مخاطبان فارسی‌زبان و علاقه‌مندان به سینمای ایران در سراسر جهان طراحی شده است."],
+  },
+];
+
+function FaqSection() {
+  const { locale } = useLocale();
+  const fa = locale === "fa";
+  const [open, setOpen] = useState<number | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (!listRef.current) return;
+      if (!listRef.current.contains(e.target as Node)) setOpen(null);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(null);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  return (
+    <section className="border-t border-line px-6 py-28 md:px-12 md:py-32" dir={fa ? "rtl" : "ltr"}>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-[1fr_2fr]">
+        <div>
+          <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
+            {fa ? "پرسش‌های متداول" : "Questions"}
+          </span>
+          <h2 className={`text-3xl font-bold leading-tight text-cream-bright md:text-4xl ${fa ? "font-fa" : "font-display"}`}>
+            {fa ? "هرچه باید بدانید" : "Everything You Need to Know"}
+          </h2>
+        </div>
+        <div ref={listRef} className="divide-y divide-line border-y border-line">
+          {FAQ_ITEMS.map((qa, i) => {
+            const [q, a] = fa ? qa.fa : qa.en;
+            const isOpen = open === i;
+            return (
+              <div key={i} className="py-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  className={`flex w-full items-center justify-between gap-6 py-6 text-start ${fa ? "font-fa" : ""}`}
+                >
+                  <span className={`text-base md:text-lg font-semibold text-cream-bright ${fa ? "font-fa" : "font-display"}`}>{q}</span>
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-base leading-none transition-all duration-300 ${
+                      isOpen ? "border-amber/60 text-amber bg-amber/5" : "border-cream/15 text-cream/60"
+                    }`}
+                    aria-hidden
+                  >
+                    {isOpen ? "−" : "+"}
+                  </span>
+                </button>
+                <div
+                  className={`grid overflow-hidden transition-all duration-500 ease-out ${
+                    isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="min-h-0">
+                    <p className={`max-w-2xl pb-7 pe-10 text-[15px] md:text-base leading-[1.85] text-cream/65 ${fa ? "font-fa" : ""}`}>
+                      {a}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
