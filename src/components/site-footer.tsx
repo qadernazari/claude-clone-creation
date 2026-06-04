@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { loadCmsKey } from "@/lib/cms-client";
@@ -58,12 +59,12 @@ export function SiteFooter() {
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/30">
                 {fa ? "گردش" : "Explore"}
               </span>
-              <a href="/" className="text-sm text-cream/65 transition-colors hover:text-amber">
+              <Link to="/" className="text-sm text-cream/65 transition-colors hover:text-amber">
                 {fa ? "خانه" : "Home"}
-              </a>
-              <a href="/browse" className="text-sm text-cream/65 transition-colors hover:text-amber">
+              </Link>
+              <Link to="/browse" className="text-sm text-cream/65 transition-colors hover:text-amber">
                 {fa ? "آثار" : "Browse"}
-              </a>
+              </Link>
               {COL_EXPLORE.map((s) => linkBtn(s, s))}
             </div>
             <div className="flex flex-col gap-3">
