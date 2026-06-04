@@ -6,7 +6,8 @@ interface PromoBannerListProps {
   context: "membership" | "ticket";
   filmId?: string;
   fa?: boolean;
-  onApply?: (code: string) => void;
+  /** If provided, clicking a banner applies the code directly. Otherwise it is copied to the clipboard. */
+  onApply?: (info: { code: string; label: string }) => void;
 }
 
 export function PromoBannerList({ context, filmId, fa, onApply }: PromoBannerListProps) {
@@ -30,15 +31,15 @@ export function PromoBannerList({ context, filmId, fa, onApply }: PromoBannerLis
 
   if (banners.length === 0) return null;
 
-  async function handleClick(code: string) {
+  async function handleClick(b: PromoBanner) {
     if (onApply) {
-      onApply(code);
+      onApply({ code: b.code, label: b.discountLabel });
       return;
     }
     try {
-      await navigator.clipboard.writeText(code);
-      setCopiedCode(code);
-      setTimeout(() => setCopiedCode((c) => (c === code ? null : c)), 1800);
+      await navigator.clipboard.writeText(b.code);
+      setCopiedCode(b.code);
+      setTimeout(() => setCopiedCode((c) => (c === b.code ? null : c)), 1800);
     } catch {
       // ignore
     }
@@ -50,7 +51,7 @@ export function PromoBannerList({ context, filmId, fa, onApply }: PromoBannerLis
         <button
           key={b.code}
           type="button"
-          onClick={() => handleClick(b.code)}
+          onClick={() => handleClick(b)}
           className="group flex w-full items-center gap-3 rounded-md border border-amber/40 bg-amber/10 px-3 py-2 text-start text-sm text-cream hover:bg-amber/15 transition-colors"
         >
           <span className="grid h-7 min-w-7 place-items-center rounded-full bg-amber/30 px-2 text-[11px] font-medium text-amber">
