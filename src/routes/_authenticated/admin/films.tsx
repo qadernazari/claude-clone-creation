@@ -89,6 +89,11 @@ function FilmsAdminPage() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: films = [], isLoading } = useQuery({ queryKey: ["admin", "films"], queryFn: listFilms });
   const { data: categories = [] } = useQuery({ queryKey: ["admin", "category-ids"], queryFn: listCategoryIds });
+  const { data: videoIds = [] } = useQuery({
+    queryKey: ["admin", "films-with-video"],
+    queryFn: async () => (await listFilmsWithVideo()).ids,
+  });
+  const videoIdSet = new Set(videoIds);
   const [editing, setEditing] = useState<FilmDraft | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
