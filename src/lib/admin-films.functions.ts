@@ -48,3 +48,16 @@ export const setFilmVideoUrl = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const listFilmsWithVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("films")
+      .select("id")
+      .not("video_url", "is", null);
+    if (error) throw new Error(error.message);
+    return { ids: (data ?? []).map((r: { id: string }) => r.id) };
+  });
