@@ -10,6 +10,7 @@ import { MembershipCheckout } from "@/components/membership-checkout";
 import { ContributeModal } from "@/components/contribute-modal";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { WatchlistButton } from "@/components/watchlist-button";
+import { PromoBannerList } from "@/components/promo-banner";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
@@ -485,6 +486,15 @@ function FilmPage() {
                       </p>
                     )}
                     {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
+                    {!showWatchNow && (hasPpv || accessType !== "ppv_only") && (
+                      <div className="mt-4">
+                        <PromoBannerList
+                          context={isMember || accessType === "ppv_only" ? "ticket" : "membership"}
+                          filmId={film.id}
+                          fa={fa}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })()}
