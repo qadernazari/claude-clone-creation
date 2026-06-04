@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
