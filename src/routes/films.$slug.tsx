@@ -544,15 +544,20 @@ function FilmPage() {
       {/* More films */}
       {related.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-24">
-          <div className="flex items-baseline justify-between">
-            <h2 className={`text-[10px] uppercase tracking-[0.25em] text-cream/45 ${fa ? "font-vazir" : ""}`}>
-              {t.moreFromCat}
-            </h2>
-            <Link to="/browse" className="text-xs uppercase tracking-widest text-cream/55 hover:text-cream-bright">
-              {fa ? "همه" : "Browse all"} →
+          <div className="mb-8 flex items-end justify-between gap-6">
+            <div>
+              <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+                {fa ? "بیشتر" : "Continue exploring"}
+              </span>
+              <h2 className="font-editorial text-3xl italic font-normal text-cream-bright md:text-4xl">
+                {t.moreFromCat}
+              </h2>
+            </div>
+            <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
+              {fa ? "همه آثار" : "Browse all"} →
             </Link>
           </div>
-          <div className="mt-5 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {related.map((r) => {
               const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
               const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
@@ -567,12 +572,12 @@ function FilmPage() {
                   className="group block"
                 >
                   <div
-                    className="aspect-[2/3] w-full overflow-hidden rounded-lg border border-cream/10 transition-transform group-hover:-translate-y-0.5 group-hover:border-cream/25"
+                    className="aspect-[2/3] w-full overflow-hidden rounded-xl ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20"
                     style={bg}
                   />
-                  <div className={`mt-2 text-sm text-cream/90 truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
+                  <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
                   {rDirector && (
-                    <div className="text-[11px] text-cream/50 truncate">{rDirector}</div>
+                    <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
                   )}
                 </Link>
               );
