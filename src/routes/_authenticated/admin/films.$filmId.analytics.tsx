@@ -121,15 +121,30 @@ function FilmAnalyticsPage() {
     };
   }, [data, cutoff]);
 
-  const countries = useMemo(() => {
-    const ev = (data?.events ?? []).filter((e) => inRange(e.created_at));
+  function topN<T extends string | null | undefined>(values: T[], n = 10, fallback = "Unavailable") {
     const counts = new Map<string, number>();
-    for (const e of ev) {
-      const k = e.country || "Unknown";
+    for (const v of values) {
+      const k = (v && String(v).trim()) || fallback;
       counts.set(k, (counts.get(k) ?? 0) + 1);
     }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  }, [data, cutoff]);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
+  }
+
+  const filteredEvents = useMemo(
+    () => (data?.events ?? []).filter((e) => inRange(e.created_at)),
+    [data, cutoff],
+  );
+
+  const countries = useMemo(() => topN(filteredEvents.map((e) => (e as any).country as string | null)), [filteredEvents]);
+  const cities = useMemo(() => topN(filteredEvents.map((e) => {
+    const c = (e as any).city as string | null;
+    const co = (e as any).country as string | null;
+    return c ? (co ? `${c}, ${co}` : c) : null;
+  })), [filteredEvents]);
+  const devices = useMemo(() => topN(filteredEvents.map((e) => (e as any).device_type as string | null)), [filteredEvents]);
+  const oses = useMemo(() => topN(filteredEvents.map((e) => (e as any).os as string | null)), [filteredEvents]);
+  const browsers = useMemo(() => topN(filteredEvents.map((e) => (e as any).browser as string | null)), [filteredEvents]);
+  const sources = useMemo(() => topN(filteredEvents.map((e) => (e as any).referrer_source as string | null)), [filteredEvents]);
 
   const trend = useMemo(() => {
     const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
