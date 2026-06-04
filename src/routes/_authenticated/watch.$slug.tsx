@@ -419,17 +419,46 @@ function WatchPage() {
                 src={videoUrl}
                 poster={film.cover_url || undefined}
                 controls
-                autoPlay
+                autoPlay={resumePrompt === null}
                 playsInline
                 controlsList="nodownload"
                 onLoadedMetadata={onLoadedMetadata}
                 onTimeUpdate={onTimeUpdate}
                 onEnded={onEnded}
+                onVolumeChange={onVolumeChange}
                 className="absolute inset-0 h-full w-full bg-black"
               />
-              {resumedAt !== null && (
+              {resumePrompt !== null && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                  <div className="rounded-xl border border-cream/15 bg-bg-0/90 p-6 max-w-sm text-center shadow-2xl">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                      {fa ? "ادامه تماشا" : "Continue watching"}
+                    </p>
+                    <p className="mt-2 font-display text-xl text-cream-bright">
+                      {fa ? "از " : "Resume from "}{fmtTime(resumePrompt)}?
+                    </p>
+                    <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
+                      <button
+                        type="button"
+                        onClick={acceptResume}
+                        className="rounded-md bg-amber px-5 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+                      >
+                        {fa ? "ادامه بده" : "Resume"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={declineResume}
+                        className="rounded-md border border-cream/20 px-5 py-2 text-sm text-cream/80 hover:bg-cream/5 transition-colors"
+                      >
+                        {fa ? "از ابتدا" : "Start over"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {hud && (
                 <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
-                  {fa ? "ادامه از " : "Resumed from "}{fmtTime(resumedAt)}
+                  {hud}
                 </div>
               )}
             </>
