@@ -489,16 +489,17 @@ function FilmEditorModal({
             <AddCredit onAdd={(t) => setCredits([...credits, { enabled: true, credit_type: t, value_en: "", value_fa: "", sort_order: credits.length, label_en: t === "custom" ? "" : null }])} />
           </Section>
 
-          <Section title="Film video">
+          <Section title="External video URLs" description="Optional — use these only when hosting on Mux, Cloudflare Stream, Bunny or Vimeo instead of uploading above. The uploader fills these fields automatically.">
             <label className="block">
-              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Video URL (Mux, Cloudflare Stream, Bunny, Vimeo)</span>
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Full film URL</span>
               <input value={d.video_url ?? ""} onChange={(e) => set("video_url", e.target.value)} placeholder="https://…" className={inp} />
             </label>
             <label className="block mt-3">
-              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Preview clip URL (optional)</span>
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Trailer / preview URL</span>
               <input value={d.preview_url ?? ""} onChange={(e) => set("preview_url", e.target.value)} placeholder="https://…" className={inp} />
             </label>
           </Section>
+
 
           <Section title="Membership access" description="How members and visitors can watch this film.">
             <div className="space-y-2">
