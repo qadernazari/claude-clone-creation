@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
 import { supabase } from "../integrations/supabase/client";
 import { WelcomeSplash } from "../components/welcome-splash";
@@ -7,6 +8,7 @@ import { FilmsRow } from "../components/films-row";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
+
 
 
 export const Route = createFileRoute("/")({
