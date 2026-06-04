@@ -3,6 +3,8 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
+import { useSubscription } from "@/hooks/use-subscription";
+import { MembershipCheckout } from "./membership-checkout";
 
 function LanguageToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   const { locale, setLocale } = useLocale();
@@ -139,6 +141,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <div className="hidden md:block">
               <LanguageToggle />
             </div>
+            <MembershipCta />
             <AuthMenu />
             {/* Hamburger — mobile only */}
             <button
