@@ -547,68 +547,12 @@ function FilmPage() {
         </div>
       </section>
 
-      {/* Cast & Crew — Apple TV+ style horizontal row */}
-      {(castCredits.length > 0 || crewCredits.length > 0) && (
-        <section className="mx-auto max-w-7xl px-6 pb-16 pt-20 md:px-10">
-          <div className="mb-8 flex items-end justify-between gap-6">
-            <h2 className={`font-display text-2xl font-medium tracking-[-0.02em] text-cream-bright md:text-3xl ${fa ? "font-vazir" : ""}`}>
-              {fa ? "بازیگران و عوامل" : "Cast & Crew"}
-            </h2>
-          </div>
-
-          {castCredits.length > 0 && (
-            <div className="-mx-6 overflow-x-auto px-6 pb-4 md:-mx-10 md:px-10">
-              <ul className="flex gap-6 min-w-max">
-                {castCredits.map((c, i) => {
-                  const name = fa ? c.value_fa || c.value_en : c.value_en;
-                  const role = fa ? c.label_fa || c.label_en : c.label_en;
-                  const initial = (name || "?").trim().charAt(0).toUpperCase();
-                  return (
-                    <li key={`cast-${i}`} className="flex w-28 flex-col items-center text-center">
-                      <div
-                        className="flex h-24 w-24 items-center justify-center rounded-full bg-cream/[0.06] ring-1 ring-cream/10 text-2xl font-display text-cream/80"
-                        aria-hidden
-                      >
-                        {initial}
-                      </div>
-                      <div className={`mt-3 text-[13px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
-                        {name}
-                      </div>
-                      {role && (
-                        <div className="mt-1 text-[11px] text-cream/50 leading-tight line-clamp-1">
-                          {role}
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-
-          {crewCredits.length > 0 && (
-            <dl className="mt-10 grid grid-cols-1 gap-x-10 gap-y-3 border-t border-cream/10 pt-8 sm:grid-cols-2 md:grid-cols-3">
-              {crewCredits.map((c, i) => (
-                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/[0.06] pb-3">
-                  <dt className="text-[11px] uppercase tracking-[0.18em] text-cream/45">
-                    {fa ? c.label_fa || c.label_en : c.label_en}
-                  </dt>
-                  <dd className={`text-[14px] text-cream-bright text-right ${fa ? "font-vazir" : ""}`}>
-                    {fa ? c.value_fa || c.value_en : c.value_en}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </section>
-      )}
-
-      {/* More films */}
+      {/* More Like This — horizontal poster row, above the fold of "below hero" */}
       {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pb-20 md:px-10">
-          <div className="mb-8 flex items-end justify-between gap-6">
-            <h2 className={`font-display text-2xl font-medium tracking-[-0.02em] text-cream-bright md:text-3xl ${fa ? "font-vazir" : ""}`}>
-              {t.moreFromCat}
+        <section className="mx-auto max-w-7xl px-6 pt-14 pb-10 md:px-10 md:pt-16">
+          <div className="mb-6 flex items-end justify-between gap-6">
+            <h2 className={`font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : ""}`}>
+              {fa ? "آثار مرتبط" : "Related"}
             </h2>
             <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
               {fa ? "همه آثار" : "Browse all"} →
@@ -644,8 +588,120 @@ function FilmPage() {
         </section>
       )}
 
-      {/* Support the filmmaker — subtle, near the bottom */}
-      <section className="mx-auto max-w-3xl px-6 pb-24">
+      {/* Cast & Crew */}
+      {(castCredits.length > 0 || crewCredits.length > 0) && (
+        <section className="mx-auto max-w-7xl px-6 pt-10 pb-10 md:px-10">
+          <div className="mb-6 flex items-end justify-between gap-6">
+            <h2 className={`font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : ""}`}>
+              {fa ? "بازیگران و عوامل" : "Cast & Crew"}
+            </h2>
+          </div>
+
+          {castCredits.length > 0 && (
+            <div className="-mx-6 overflow-x-auto px-6 pb-2 md:-mx-10 md:px-10">
+              <ul className="flex gap-6 min-w-max">
+                {castCredits.map((c, i) => {
+                  const name = fa ? c.value_fa || c.value_en : c.value_en;
+                  const role = fa ? c.label_fa || c.label_en : c.label_en;
+                  const initial = (name || "?").trim().charAt(0).toUpperCase();
+                  return (
+                    <li key={`cast-${i}`} className="flex w-28 flex-col items-center text-center">
+                      <div
+                        className="flex h-24 w-24 items-center justify-center rounded-full bg-cream/[0.06] ring-1 ring-cream/10 text-2xl font-display text-cream/80"
+                        aria-hidden
+                      >
+                        {initial}
+                      </div>
+                      <div className={`mt-3 text-[13px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
+                        {name}
+                      </div>
+                      {role && (
+                        <div className="mt-1 text-[11px] text-cream/50 leading-tight line-clamp-1">
+                          {role}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {crewCredits.length > 0 && (
+            <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-3 border-t border-cream/10 pt-6 sm:grid-cols-2 md:grid-cols-3">
+              {crewCredits.map((c, i) => (
+                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/[0.06] pb-3">
+                  <dt className="text-[11px] uppercase tracking-[0.18em] text-cream/45">
+                    {fa ? c.label_fa || c.label_en : c.label_en}
+                  </dt>
+                  <dd className={`text-[14px] text-cream-bright text-right ${fa ? "font-vazir" : ""}`}>
+                    {fa ? c.value_fa || c.value_en : c.value_en}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+      )}
+
+      {/* How to Watch */}
+      <section className="mx-auto max-w-7xl px-6 pt-10 pb-10 md:px-10">
+        <div className="mb-6">
+          <h2 className={`font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : ""}`}>
+            {fa ? "چگونه تماشا کنم" : "How to Watch"}
+          </h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="hairline rounded-2xl border bg-bg-1/40 p-6">
+            <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
+              {fa ? "عضویت ایران" : "IRAN Membership"}
+            </span>
+            <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+              {canMemberWatch
+                ? (fa ? "تماشای نامحدود با عضویت" : "Unlimited streaming with membership")
+                : (fa ? "این اثر ویژه است" : "Premium release")}
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-cream/60">
+              {canMemberWatch
+                ? (fa ? "۷ روز رایگان، سپس اشتراک ماهانه. هر زمان لغو کنید." : "7 days free, then a monthly subscription. Cancel anytime.")
+                : (fa ? "این اثر جدا از عضویت فروخته می‌شود." : "This title is sold separately from membership.")}
+            </p>
+            {!isMember && canMemberWatch && (
+              <button
+                type="button"
+                onClick={() => setMembershipOpen(true)}
+                className="mt-4 inline-flex items-center justify-center rounded-full bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink transition-transform hover:scale-[1.02]"
+              >
+                {t.startTrial}
+              </button>
+            )}
+          </div>
+          {hasPpv && (
+            <div className="hairline rounded-2xl border bg-bg-1/40 p-6">
+              <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
+                {fa ? "خرید بلیط" : "Buy a ticket"}
+              </span>
+              <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+                {priceLabel}
+              </h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-cream/60">
+                {t.accessNote}
+              </p>
+              <button
+                type="button"
+                onClick={() => setCheckoutOpen(true)}
+                disabled={tomanOnly}
+                className="mt-4 inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-2.5 text-[13px] font-medium text-cream-bright transition-colors hover:bg-cream/5 disabled:opacity-60"
+              >
+                {t.buy}
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Support the filmmaker */}
+      <section className="mx-auto max-w-3xl px-6 pt-6 pb-20">
         <div className="hairline rounded-2xl border bg-bg-1/40 px-8 py-8 text-center">
           <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
             {fa ? "حمایت" : "Support"}
