@@ -5,6 +5,8 @@ import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
 import { PromoBannerList } from "@/components/promo-banner";
 import { useLocale } from "@/lib/i18n";
+import { AcceptTrialButton } from "@/components/accept-trial-button";
+import { useSubscription } from "@/hooks/use-subscription";
 
 interface MembershipCheckoutProps {
   returnUrl: string;
