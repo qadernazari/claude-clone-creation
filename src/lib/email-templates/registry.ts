@@ -4,6 +4,10 @@ import { template as contributionReceipt } from './contribution-receipt'
 import { template as purchaseAdminNotification } from './purchase-admin-notification'
 import { template as trialStarted } from './trial-started'
 import { template as trialEndingSoon } from './trial-ending-soon'
+import { template as trialDay5 } from './trial-day-5'
+import { template as trialDay6 } from './trial-day-6'
+import { template as trialFinalDay } from './trial-final-day'
+import { template as trialExpired } from './trial-expired'
 import { template as paymentFailed } from './payment-failed'
 import { template as subscriptionCanceled } from './subscription-canceled'
 
@@ -22,6 +26,10 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'purchase-admin-notification': purchaseAdminNotification,
   'trial-started': trialStarted,
   'trial-ending-soon': trialEndingSoon,
+  'trial-day-5': trialDay5,
+  'trial-day-6': trialDay6,
+  'trial-final-day': trialFinalDay,
+  'trial-expired': trialExpired,
   'payment-failed': paymentFailed,
   'subscription-canceled': subscriptionCanceled,
 }
