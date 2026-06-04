@@ -486,6 +486,15 @@ function FilmPage() {
                       </p>
                     )}
                     {tomanOnly && <p className="mt-3 text-[11px] text-cream/40">{t.tomanSoon}</p>}
+                    {!showWatchNow && (hasPpv || accessType !== "ppv_only") && (
+                      <div className="mt-4">
+                        <PromoBannerList
+                          context={isMember || accessType === "ppv_only" ? "ticket" : "membership"}
+                          filmId={film.id}
+                          fa={fa}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })()}
