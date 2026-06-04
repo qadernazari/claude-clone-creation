@@ -84,7 +84,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Logo size={32} />
           </Link>
           <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
-            <Link to="/" className={linkCls("home")}>
+            <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
               {locale === "fa" ? "خانه" : "Home"}
             </Link>
             <Link to="/browse" className={linkCls("browse")}>
