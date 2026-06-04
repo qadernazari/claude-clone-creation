@@ -228,13 +228,15 @@ function Home() {
         </div>
       </section>
 
-      {/* Featured film + Originals grid */}
-      <FeaturedFilm />
-      <section className="px-6 pb-32 md:px-12">
-        <div className="mx-auto max-w-7xl">
-          <FilmsRow />
-        </div>
-      </section>
+      {/* Featured film */}
+      <div className="pt-8 md:pt-12">
+        <FeaturedFilm />
+      </div>
+
+      {/* Editorial rails — each row a distinct destination */}
+      <div className="pt-20 pb-32 md:pt-28 md:pb-40">
+        <FilmsRow />
+      </div>
 
       {/* How it works — 3 step ritual */}
       <section className="border-t border-line px-6 py-28 md:px-12 md:py-32">

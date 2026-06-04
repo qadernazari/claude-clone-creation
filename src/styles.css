@@ -219,6 +219,12 @@
   border-color: var(--line);
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 /* ---------------------------------------------------------------
  * Language switching: cinematic cross-fade between EN ⇄ FA (LTR ⇄ RTL).
  * Uses the View Transitions API where available, with a CSS-only
