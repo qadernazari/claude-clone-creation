@@ -49,7 +49,10 @@ export function SiteFooter() {
   );
 
   return (
-    <footer className="border-t border-line px-6 py-20 md:px-12 md:py-24">
+    <footer
+      className="border-t border-line px-5 py-16 sm:px-6 sm:py-20 md:px-12 md:py-24"
+      style={{ paddingBottom: "max(4rem, env(safe-area-inset-bottom, 0px))" }}
+    >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col justify-between gap-12 md:flex-row md:items-start">
           <div className="max-w-xs">
