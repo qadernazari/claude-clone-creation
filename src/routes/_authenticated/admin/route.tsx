@@ -31,6 +31,7 @@ const MAIN: ReadonlyArray<NavItem> = [
   { to: "/admin/films", label: "Films", icon: Film },
   { to: "/admin/categories", label: "Categories", icon: Tag },
   { to: "/admin/tickets", label: "Tickets & Sales", icon: Ticket },
+  { to: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { to: "/admin/support", label: "Support", icon: HeartHandshake },
   { to: "/admin/notify-list", label: "Subscribers", icon: Mail },
   { to: "/admin/users", label: "Members", icon: Users },
