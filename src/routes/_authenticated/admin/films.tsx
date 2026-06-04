@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Plus, Pencil, BarChart3, Eye, EyeOff, X } from "lucide-react";
 import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
+import { FileUpload } from "@/components/admin/file-upload";
 import { capitalize } from "@/lib/cms";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
@@ -33,6 +34,7 @@ type Film = {
   visibility: string;
   sort_order: number;
   cover_url: string | null;
+  thumbnail_url: string | null;
   poster_gradient: string | null;
   video_url: string | null;
   preview_url: string | null;
@@ -64,7 +66,7 @@ const EMPTY: FilmDraft = {
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 499, price_toman: 120000, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
-  visibility: "draft", sort_order: 0, cover_url: "", poster_gradient: GRADIENTS[0],
+  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
 };
 
@@ -309,6 +311,7 @@ function FilmEditorModal({
         visibility: d.visibility,
         sort_order: Number(d.sort_order) || 0,
         cover_url: d.cover_url?.trim() || null,
+        thumbnail_url: d.thumbnail_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
         video_url: d.video_url?.trim() || null,
         preview_url: d.preview_url?.trim() || null,
@@ -359,30 +362,76 @@ function FilmEditorModal({
         </header>
 
         <div className="p-6 space-y-6">
-          {/* Cover & poster */}
-          <Section title="Cover & poster">
-            <div className="grid grid-cols-[120px_1fr] gap-4">
-              <div className="h-44 w-30 rounded-md shrink-0" style={{ background: d.cover_url ? `url(${d.cover_url}) center/cover` : (d.poster_gradient ?? GRADIENTS[0]) }} />
-              <div>
-                <label className="block mb-3">
-                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Cover image URL (portrait ~2:3)</span>
-                  <input value={d.cover_url ?? ""} onChange={(e) => set("cover_url", e.target.value)} placeholder="https://…" className={inp} />
-                </label>
-                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Or a colour cover</div>
-                <div className="flex gap-2">
-                  {GRADIENTS.map((g) => (
-                    <button key={g} type="button" onClick={() => { set("poster_gradient", g); set("cover_url", ""); }}
-                      className={`h-9 w-9 rounded-md border-2 ${d.poster_gradient === g && !d.cover_url ? "border-primary" : "border-border"}`}
-                      style={{ background: g }} />
-                  ))}
-                </div>
+          {/* Media uploads — Cover, Thumbnail, Trailer, Full Video */}
+          <Section
+            title="Media"
+            description="Upload the four media assets that make up this film. Each is stored separately and can be replaced at any time."
+          >
+            <div className="space-y-3">
+              <FileUpload
+                bucket="film-covers"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.cover_url ?? null}
+                onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Cover (Poster)"
+                description="Main portrait poster (~2:3). Used on homepage, film page, collections, search and featured sections. Hi-res JPG, PNG, WebP or AVIF."
+                maxBytes={25 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-thumbnails"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.thumbnail_url ?? null}
+                onChange={(u) => set("thumbnail_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Thumbnail"
+                description="Landscape thumbnail (~16:9) used for grids, suggestions and previews."
+                maxBytes={15 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-trailers"
+                kind="video"
+                accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+                value={d.preview_url ?? null}
+                onChange={(u) => set("preview_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Trailer"
+                description="Short preview clip shown on the film page and marketing surfaces. MP4 / WebM / MOV."
+                maxBytes={500 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-videos"
+                kind="video"
+                accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+                value={d.video_url ?? null}
+                onChange={(u) => set("video_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Video (Full Film)"
+                description="The full feature. MP4 / WebM / MOV / MKV. Large files are supported — progress is shown as the upload runs."
+                maxBytes={5 * 1024 * 1024 * 1024}
+              />
+            </div>
+
+            <div className="mt-5 rounded-md border border-border p-3">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Fallback colour cover</div>
+              <p className="text-xs text-muted-foreground mb-2">Used only when no cover image is uploaded.</p>
+              <div className="flex gap-2">
+                {GRADIENTS.map((g) => (
+                  <button key={g} type="button" onClick={() => set("poster_gradient", g)}
+                    className={`h-9 w-9 rounded-md border-2 ${d.poster_gradient === g && !d.cover_url ? "border-primary" : "border-border"}`}
+                    style={{ background: g }} />
+                ))}
               </div>
             </div>
+
             <label className="block mt-4">
               <span className="block text-xs font-medium text-muted-foreground mb-1.5">Slug (URL) *</span>
               <input required value={d.slug} onChange={(e) => set("slug", e.target.value)} placeholder="the-pomegranate-house" className={inp} />
             </label>
           </Section>
+
 
           <Section title="Title">
             <BilingualField label="Title" value={{ en: d.title_en, fa: d.title_fa ?? "" }} onChange={(v) => { set("title_en", v.en); set("title_fa", v.fa); }} placeholderEn="The Pomegranate House" placeholderFa="خانه‌ی انار" />
@@ -440,16 +489,17 @@ function FilmEditorModal({
             <AddCredit onAdd={(t) => setCredits([...credits, { enabled: true, credit_type: t, value_en: "", value_fa: "", sort_order: credits.length, label_en: t === "custom" ? "" : null }])} />
           </Section>
 
-          <Section title="Film video">
+          <Section title="External video URLs" description="Optional — use these only when hosting on Mux, Cloudflare Stream, Bunny or Vimeo instead of uploading above. The uploader fills these fields automatically.">
             <label className="block">
-              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Video URL (Mux, Cloudflare Stream, Bunny, Vimeo)</span>
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Full film URL</span>
               <input value={d.video_url ?? ""} onChange={(e) => set("video_url", e.target.value)} placeholder="https://…" className={inp} />
             </label>
             <label className="block mt-3">
-              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Preview clip URL (optional)</span>
+              <span className="block text-xs font-medium text-muted-foreground mb-1.5">Trailer / preview URL</span>
               <input value={d.preview_url ?? ""} onChange={(e) => set("preview_url", e.target.value)} placeholder="https://…" className={inp} />
             </label>
           </Section>
+
 
           <Section title="Membership access" description="How members and visitors can watch this film.">
             <div className="space-y-2">

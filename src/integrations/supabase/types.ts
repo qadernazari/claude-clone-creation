@@ -411,6 +411,7 @@ export type Database = {
           sort_order: number
           synopsis_en: string | null
           synopsis_fa: string | null
+          thumbnail_url: string | null
           ticket_hours: number
           title_en: string
           title_fa: string | null
@@ -438,6 +439,7 @@ export type Database = {
           sort_order?: number
           synopsis_en?: string | null
           synopsis_fa?: string | null
+          thumbnail_url?: string | null
           ticket_hours?: number
           title_en: string
           title_fa?: string | null
@@ -465,6 +467,7 @@ export type Database = {
           sort_order?: number
           synopsis_en?: string | null
           synopsis_fa?: string | null
+          thumbnail_url?: string | null
           ticket_hours?: number
           title_en?: string
           title_fa?: string | null
