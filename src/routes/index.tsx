@@ -73,6 +73,11 @@ function Home() {
         <MembershipMoment />
       </div>
 
+      {/* 11. FAQ — trust + SEO */}
+      <FaqSection />
+
+
+
       <SiteFooter />
     </div>
   );
