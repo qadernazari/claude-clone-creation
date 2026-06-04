@@ -58,59 +58,62 @@ export function FeaturedFilm() {
 
   return (
     <section className="relative isolate overflow-hidden">
-      {/* Edge-to-edge cinematic backdrop */}
-      <div className="relative h-[72vh] min-h-[520px] w-full overflow-hidden">
-        <div className="absolute inset-0" style={{ background: bg }} aria-hidden />
-        {/* Smooth gradient fade to bg-0 */}
+      {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
+      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden">
+        <div
+          className="absolute inset-0 cine-img"
+          style={{ background: bg, transform: "scale(1.03)" }}
+          aria-hidden
+        />
+        {/* Vertical fade for legibility + handoff to bg-0 */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(13,13,13,0.45) 0%, rgba(13,13,13,0.15) 35%, rgba(13,13,13,0.75) 80%, var(--bg-0) 100%)",
+              "linear-gradient(180deg, rgba(13,13,13,0.55) 0%, rgba(13,13,13,0.10) 30%, rgba(13,13,13,0.55) 70%, var(--bg-0) 100%)",
           }}
         />
+        {/* Horizontal fade — lights the left side where copy lives */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, rgba(13,13,13,0.85) 0%, rgba(13,13,13,0.4) 40%, transparent 70%)",
+              "linear-gradient(90deg, rgba(13,13,13,0.85) 0%, rgba(13,13,13,0.3) 45%, transparent 75%)",
           }}
         />
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-12 md:pb-24">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-20 sm:px-6 md:px-12 md:pb-28">
             <div className="max-w-2xl fade-up">
-              {data.is_premium && (
-                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber/40 bg-amber/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-bright backdrop-blur">
-                  {locale === "fa" ? "اکران ویژه" : "Premium Release"}
-                </span>
-              )}
-              <h2 className="font-display text-4xl font-medium leading-[1.02] tracking-[-0.04em] text-cream-bright md:text-6xl lg:text-7xl">
+              <span className="mb-5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
+                {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+              </span>
+              <h1 className="font-display text-5xl font-medium leading-[0.95] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
                 {title}
-              </h2>
-              <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.22em] text-cream/55">
+              </h1>
+              <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.24em] text-cream/55">
                 {director}
+                {data.year ? <> {" · "} {num(data.year)}</> : null}
                 {data.duration_min ? (
                   <>
                     {" · "}
                     {num(data.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
                   </>
                 ) : null}
-                {data.year ? <> {" · "} {num(data.year)}</> : null}
               </p>
               {synopsis ? (
-                <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-cream/75 md:text-base line-clamp-3">
+                <p className="mt-7 max-w-xl text-[15px] leading-relaxed text-cream/75 md:text-base line-clamp-3">
                   {synopsis}
                 </p>
               ) : null}
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-10 flex flex-wrap items-center gap-3">
                 <Link
                   to="/films/$slug"
                   params={{ slug: data.slug }}
-                  className="inline-flex items-center gap-2 rounded-full bg-cream px-7 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg"
+                  className="inline-flex items-center gap-2.5 rounded-full bg-cream-bright px-8 py-3.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)]"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   {locale === "fa" ? "تماشای فیلم" : "Watch Now"}
@@ -118,9 +121,13 @@ export function FeaturedFilm() {
                 <Link
                   to="/films/$slug"
                   params={{ slug: data.slug }}
-                  className="inline-flex items-center rounded-full border border-cream/25 bg-cream/[0.03] px-7 py-3 text-sm font-medium text-cream backdrop-blur-sm transition-all duration-300 hover:border-cream/50 hover:bg-cream/10"
+                  className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/[0.04] px-7 py-3.5 text-sm font-medium text-cream backdrop-blur-md transition-all duration-300 hover:border-cream/45 hover:bg-cream/10"
                 >
-                  {locale === "fa" ? "اطلاعات بیشتر" : "More Info"}
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  {locale === "fa" ? "افزودن به فهرست" : "Add to Watchlist"}
                 </Link>
               </div>
             </div>
