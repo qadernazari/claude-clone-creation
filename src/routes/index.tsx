@@ -406,11 +406,11 @@ function FaqSection() {
                   type="button"
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className={`flex w-full items-center justify-between gap-6 py-6 text-start ${fa ? "font-fa" : ""}`}
+                  className={`flex w-full items-center justify-between gap-4 py-5 text-start md:gap-6 md:py-6 ${fa ? "font-fa" : ""}`}
                 >
-                  <span className={`text-base md:text-lg font-semibold text-cream-bright ${fa ? "font-fa" : "font-display"}`}>{q}</span>
+                  <span className={`text-[15px] md:text-lg font-semibold text-cream-bright ${fa ? "font-fa" : "font-display"}`}>{q}</span>
                   <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-base leading-none transition-all duration-300 ${
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-lg leading-none transition-all duration-300 md:h-9 md:w-9 md:text-base ${
                       isOpen ? "border-amber/60 text-amber bg-amber/5" : "border-cream/15 text-cream/60"
                     }`}
                     aria-hidden
