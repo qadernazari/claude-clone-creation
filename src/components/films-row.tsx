@@ -88,51 +88,49 @@ function Rail({
   if (films.length === 0) return null;
 
   return (
-    <section className="relative">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-        <div className="mb-8 flex items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            {eyebrow && (
-              <span className="mb-2.5 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
-                {eyebrow}
-              </span>
-            )}
-            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
-              {title}
-            </h2>
-            {subtitle && (
-              <p className="mt-2 text-[13px] text-cream/45">{subtitle}</p>
-            )}
-          </div>
-          <div className="hidden gap-1.5 md:flex">
-            <button
-              type="button"
-              onClick={() => scroll(-1)}
-              aria-label="Previous"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => scroll(1)}
-              aria-label="Next"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-            </button>
-          </div>
+    <section className="relative mx-auto max-w-[1400px] px-6 md:px-12">
+      <div className="mb-8 flex items-end justify-between gap-6">
+        <div className="max-w-2xl">
+          {eyebrow && (
+            <span className="mb-2.5 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+              {eyebrow}
+            </span>
+          )}
+          <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="mt-2 text-[13px] text-cream/45">{subtitle}</p>
+          )}
+        </div>
+        <div className="hidden gap-1.5 md:flex">
+          <button
+            type="button"
+            onClick={() => scroll(-1)}
+            aria-label="Previous"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll(1)}
+            aria-label="Next"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+          </button>
         </div>
       </div>
       <div
         ref={ref}
-        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:gap-6 md:px-12"
+        className="no-scrollbar -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:-mx-12 md:gap-6 md:px-12"
         style={{ scrollPaddingLeft: "1.5rem" }}
       >
         {films.map((f) => (
           <PosterCard key={f.id} film={f} locale={locale} num={num} />
         ))}
-        <div className="w-4 shrink-0 md:w-8" aria-hidden />
+        <div className="w-2 shrink-0 md:w-4" aria-hidden />
       </div>
     </section>
   );
