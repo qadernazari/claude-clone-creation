@@ -56,6 +56,18 @@ export const getFilmStreamUrl = createServerFn({ method: "POST" })
         }
       }
 
+      if (!allowed && accessType !== "ppv_only") {
+        // Active free trial grants membership-level access
+        const { data: trialRow } = await supabase
+          .from("trials")
+          .select("status, ends_at")
+          .eq("user_id", userId)
+          .eq("status", "active")
+          .gt("ends_at", new Date().toISOString())
+          .maybeSingle();
+        if (trialRow) allowed = true;
+      }
+
       if (!allowed) {
         // Fall back to ticket check (covers ppv_only and membership_or_ppv non-members).
         const { data: ticket, error: ticketErr } = await supabase
