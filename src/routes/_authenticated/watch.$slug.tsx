@@ -139,6 +139,7 @@ function WatchPage() {
       .catch(() => {});
   }, [hasAccess, film.id, fetchResume]);
 
+  const [resumedAt, setResumedAt] = useState<number | null>(null);
   const onLoadedMetadata = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -146,8 +147,20 @@ function WatchPage() {
     if (saved > 5 && saved < (v.duration || 0) - 10 && !resumedRef.current) {
       v.currentTime = saved;
       resumedRef.current = true;
+      setResumedAt(saved);
+      setTimeout(() => setResumedAt(null), 4000);
     }
   }, []);
+
+  const fmtTime = (s: number) => {
+    const sec = Math.max(0, Math.floor(s));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const r = sec % 60;
+    return h > 0
+      ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`
+      : `${m}:${String(r).padStart(2, "0")}`;
+  };
 
   const onTimeUpdate = useCallback(() => {
     const v = videoRef.current;
