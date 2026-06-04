@@ -274,7 +274,7 @@ function FilmsAdminPage() {
           draft={editing}
           categories={categories}
           onCancel={() => setEditing(null)}
-          onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); }}
+          onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); qc.invalidateQueries({ queryKey: ["admin", "films-with-video"] }); }}
         />
       )}
     </div>
