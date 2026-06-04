@@ -167,6 +167,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 />
               </span>
             </button>
+          </div>
         </div>
         <TrialBanner />
       </header>
