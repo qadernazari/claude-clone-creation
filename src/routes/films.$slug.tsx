@@ -331,6 +331,7 @@ function FilmPage() {
                 >
                   {copied ? t.copied : t.share}
                 </button>
+                <WatchlistButton filmId={film.id} variant="icon" />
               </div>
 
               <h1 className={`mt-5 text-4xl md:text-6xl font-medium leading-[1.02] tracking-[-0.04em] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
