@@ -143,6 +143,7 @@ function FilmPage() {
   const [contribOpen, setContribOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [synopsisOpen, setSynopsisOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
