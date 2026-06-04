@@ -35,7 +35,7 @@ export function MembershipPanel() {
     noneSub: fa
       ? "با عضویت، تمام آثار قابل تماشا را نامحدود ببینید."
       : "Unlock unlimited streaming with an IRAN membership.",
-    start: fa ? "شروع ۷ روز رایگان" : "Start 7-day free trial",
+    start: fa ? "شروع رایگان ۷ روزه" : "Accept Free Trial",
     manage: fa ? "مدیریت اشتراک" : "Manage subscription",
     statusActive: fa ? "فعال" : "Active",
     statusTrial: fa ? "دوره آزمایشی" : "Trial",
