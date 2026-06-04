@@ -79,7 +79,11 @@ function WatchPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [theater, setTheater] = useState(true);
 
-  const { data: ticket, isLoading } = useQuery({
+  const { isMember } = useSubscription();
+  const accessType = (film as { access_type?: string }).access_type ?? "membership";
+  const memberAllowed = isMember && memberCanAccess(accessType as never);
+
+  const { data: ticket, isLoading: ticketLoading } = useQuery({
     queryKey: ["ticket", film.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -97,11 +101,14 @@ function WatchPage() {
     refetchInterval: 60_000,
   });
 
+  const hasAccess = !!ticket || memberAllowed || accessType === "free";
+  const isLoading = ticketLoading && !memberAllowed && accessType !== "free";
+
   const fetchStreamUrl = useServerFn(getFilmStreamUrl);
   const { data: streamRes } = useQuery({
-    queryKey: ["stream-url", film.slug, ticket?.id],
+    queryKey: ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")],
     queryFn: () => fetchStreamUrl({ data: { slug: film.slug } }),
-    enabled: !!ticket,
+    enabled: hasAccess,
     staleTime: 5 * 60_000,
   });
   const videoUrl =
