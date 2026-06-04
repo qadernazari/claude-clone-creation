@@ -37,7 +37,7 @@ type Film = {
   cover_url: string | null;
   thumbnail_url: string | null;
   poster_gradient: string | null;
-  video_url: string | null;
+  video_url?: string | null;
   preview_url: string | null;
 };
 
@@ -73,7 +73,7 @@ const EMPTY: FilmDraft = {
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("*")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
