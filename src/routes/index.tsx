@@ -72,18 +72,8 @@ export const Route = createFileRoute("/")({
             },
             {
               "@type": "Question",
-              name: "Are subtitles available?",
-              acceptedAnswer: { "@type": "Answer", text: "Yes. All films are presented in Persian with English subtitles." },
-            },
-            {
-              "@type": "Question",
               name: "Can I watch on any device?",
               acceptedAnswer: { "@type": "Answer", text: "Yes. Watch seamlessly on desktop, tablet, mobile, or smart TV through any modern web browser." },
-            },
-            {
-              "@type": "Question",
-              name: "How do filmmakers benefit?",
-              acceptedAnswer: { "@type": "Answer", text: "Every purchase directly supports filmmakers and helps sustain independent Iranian storytelling." },
             },
             {
               "@type": "Question",
