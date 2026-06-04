@@ -8,7 +8,7 @@ import { usePageOverlay } from "./page-overlay";
 
 const COL_EXPLORE = ["about", "submit", "press", "careers"] as const;
 const COL_HELP = ["help", "devices", "contact", "faq"] as const;
-const COL_LEGAL = ["terms", "privacy", "cookies"] as const;
+const COL_LEGAL = ["terms", "privacy", "refunds", "cookies"] as const;
 
 export function SiteFooter() {
   const { locale } = useLocale();
