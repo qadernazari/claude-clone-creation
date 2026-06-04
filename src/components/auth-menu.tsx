@@ -101,14 +101,41 @@ export function AuthMenu() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="h-10 w-10 rounded-full bg-cream/10 text-cream text-sm font-medium hover:bg-cream/20 transition-colors"
+        className="relative h-10 w-10 rounded-full bg-cream/10 text-cream text-sm font-medium hover:bg-cream/20 transition-colors"
         aria-label="Account menu"
       >
         {initial}
+        {(trialDaysLeft !== null || pastDue) && (
+          <span
+            className={`absolute -top-0.5 -end-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-bg-0 ${pastDue ? "bg-red-500" : "bg-amber"}`}
+            aria-hidden
+          />
+        )}
       </button>
       {open && (
-        <div className="absolute end-0 mt-2 w-56 max-w-[calc(100vw-2rem)] rounded-md border border-cream/15 bg-bg-1 p-1 shadow-lg z-50">
+        <div className="absolute end-0 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-md border border-cream/15 bg-bg-1 p-1 shadow-lg z-50">
           <div className="px-3 py-2 text-xs text-cream/60 truncate">{user.email}</div>
+          {trialDaysLeft !== null && (
+            <Link
+              to="/account"
+              onClick={() => setOpen(false)}
+              className="mx-1 mb-1 block rounded-sm bg-amber/15 px-3 py-2 text-xs text-amber hover:bg-amber/25 transition-colors"
+            >
+              {fa
+                ? `${trialDaysLeft} روز از دوره آزمایشی باقی است`
+                : `${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left in trial`}
+            </Link>
+          )}
+          {pastDue && (
+            <Link
+              to="/account"
+              onClick={() => setOpen(false)}
+              className="mx-1 mb-1 block rounded-sm bg-red-500/15 px-3 py-2 text-xs text-red-300 hover:bg-red-500/25 transition-colors"
+            >
+              {fa ? "پرداخت ناموفق — به‌روزرسانی" : "Payment failed — update billing"}
+            </Link>
+          )}
+
           <Link
             to="/account"
             onClick={() => setOpen(false)}
