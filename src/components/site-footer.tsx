@@ -30,7 +30,7 @@ export function SiteFooter() {
 
   return (
     <footer
-      className="border-t border-line px-5 pt-20 pb-12 sm:px-6 md:px-12 md:pt-24"
+      className="border-t border-line px-5 pt-14 pb-10 sm:px-6 md:px-12 md:pt-16"
       style={{ paddingBottom: "max(3rem, env(safe-area-inset-bottom, 0px))" }}
     >
       <div className="mx-auto max-w-7xl">

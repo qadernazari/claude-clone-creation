@@ -121,7 +121,7 @@ export function FaqSection() {
         </h2>
       </div>
 
-      <ul className="mt-14 border-t border-cream/[0.08]">
+      <ul className="mt-10 border-t border-cream/[0.08]">
         {items.map((item, i) => (
           <li key={i} className="border-b border-cream/[0.08]">
             <details className="group">

@@ -85,7 +85,7 @@ export function FeaturedFilm() {
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-20 sm:px-6 md:px-12 md:pb-28">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-2xl fade-up">
               <span className="mb-5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
                 {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
@@ -154,7 +154,7 @@ function BrandHero() {
           aria-hidden
         />
         <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-20 sm:px-6 md:px-12 md:pb-28">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-3xl fade-up">
               <span className="mb-6 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
                 {fa ? "خانه‌ی سینمای ایران" : "Home of Iranian cinema"}
