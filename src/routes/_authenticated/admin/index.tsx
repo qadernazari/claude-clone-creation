@@ -12,6 +12,9 @@ import {
   BarChart3,
   Mail,
   Eye,
+  CreditCard,
+  Clock,
+  TrendingUp,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
