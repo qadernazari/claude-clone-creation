@@ -314,30 +314,54 @@ export type Database = {
       }
       events: {
         Row: {
+          browser: string | null
+          city: string | null
           country: string | null
           created_at: string
+          device_type: string | null
           film_id: string | null
           id: number
+          os: string | null
+          referrer_host: string | null
+          referrer_source: string | null
+          region: string | null
           session_id: string | null
           type: string
+          user_agent: string | null
           value: number | null
         }
         Insert: {
+          browser?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string
+          device_type?: string | null
           film_id?: string | null
           id?: number
+          os?: string | null
+          referrer_host?: string | null
+          referrer_source?: string | null
+          region?: string | null
           session_id?: string | null
           type: string
+          user_agent?: string | null
           value?: number | null
         }
         Update: {
+          browser?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string
+          device_type?: string | null
           film_id?: string | null
           id?: number
+          os?: string | null
+          referrer_host?: string | null
+          referrer_source?: string | null
+          region?: string | null
           session_id?: string | null
           type?: string
+          user_agent?: string | null
           value?: number | null
         }
         Relationships: [
