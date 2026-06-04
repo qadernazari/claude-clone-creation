@@ -3,11 +3,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Trash2, Plus, Tag } from "lucide-react";
+import { Trash2, Plus, Tag, History, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/coupons")({
   component: CouponsPage,
 });
+
+type Redemption = {
+  id: string;
+  user_id: string | null;
+  stripe_session_id: string | null;
+  context: string;
+  film_id: string | null;
+  amount_off: number | null;
+  created_at: string;
+};
 
 type DiscountType = "percent" | "amount";
 type AppliesTo = "membership" | "ticket" | "all";
@@ -86,6 +96,7 @@ function CouponsPage() {
   const [filmId, setFilmId] = useState<string>("");
   const [maxRedemptions, setMaxRedemptions] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
+  const [historyFor, setHistoryFor] = useState<{ id: string; code: string } | null>(null);
 
   function resetForm() {
     setCode("");
@@ -381,16 +392,27 @@ function CouponsPage() {
                     </label>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Delete coupon "${c.code}"?`)) remove.mutate(c.id);
-                      }}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
-                      aria-label="Delete coupon"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setHistoryFor({ id: c.id, code: c.code })}
+                        className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                        aria-label="View redemption history"
+                        title="Redemption history"
+                      >
+                        <History className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete coupon "${c.code}"?`)) remove.mutate(c.id);
+                        }}
+                        className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                        aria-label="Delete coupon"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -403,6 +425,135 @@ function CouponsPage() {
         Codes are stored locally. At checkout, a one-shot Stripe coupon is created and attached
         to the session, then logged in the redemption history.
       </p>
+
+      {historyFor && (
+        <RedemptionDrawer
+          couponId={historyFor.id}
+          code={historyFor.code}
+          films={films}
+          onClose={() => setHistoryFor(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function RedemptionDrawer({
+  couponId,
+  code,
+  films,
+  onClose,
+}: {
+  couponId: string;
+  code: string;
+  films: FilmOption[];
+  onClose: () => void;
+}) {
+  const { data: rows = [], isLoading } = useQuery({
+    queryKey: ["admin", "coupons", "redemptions", couponId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("coupon_redemptions")
+        .select("id, user_id, stripe_session_id, context, film_id, amount_off, created_at")
+        .eq("coupon_id", couponId)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw new Error(error.message);
+      return (data ?? []) as Redemption[];
+    },
+  });
+
+  return (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="h-full w-full max-w-xl overflow-y-auto bg-background border-l border-border shadow-xl"
+      >
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background/95 backdrop-blur px-5 py-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Redemption history
+            </p>
+            <h2 className="font-mono text-base">{code}</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </header>
+
+        <div className="p-5">
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : rows.length === 0 ? (
+            <div className="rounded-md border border-dashed border-border py-12 text-center text-sm text-muted-foreground">
+              <Tag className="mx-auto mb-2 h-5 w-5 opacity-40" />
+              No redemptions yet.
+            </div>
+          ) : (
+            <>
+              <p className="mb-3 text-xs text-muted-foreground">
+                {rows.length} {rows.length === 1 ? "redemption" : "redemptions"} · most recent first
+              </p>
+              <ol className="space-y-2">
+                {rows.map((r) => {
+                  const filmName = r.film_id
+                    ? films.find((f) => f.id === r.film_id)?.title_en
+                    : null;
+                  return (
+                    <li
+                      key={r.id}
+                      className="rounded-md border border-border bg-card/40 px-3 py-2.5 text-xs"
+                    >
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="font-medium text-foreground capitalize">{r.context}</span>
+                        <span className="text-muted-foreground tabular-nums">
+                          {new Date(r.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      <dl className="mt-1.5 grid grid-cols-[88px_1fr] gap-y-0.5 text-muted-foreground">
+                        {filmName && (
+                          <>
+                            <dt>Film</dt>
+                            <dd className="text-foreground">{filmName}</dd>
+                          </>
+                        )}
+                        {r.amount_off != null && (
+                          <>
+                            <dt>Amount off</dt>
+                            <dd className="text-foreground tabular-nums">
+                              ${(r.amount_off / 100).toFixed(2)}
+                            </dd>
+                          </>
+                        )}
+                        <dt>User</dt>
+                        <dd className="font-mono text-[10px] truncate">
+                          {r.user_id ?? "—"}
+                        </dd>
+                        {r.stripe_session_id && (
+                          <>
+                            <dt>Session</dt>
+                            <dd className="font-mono text-[10px] truncate">
+                              {r.stripe_session_id}
+                            </dd>
+                          </>
+                        )}
+                      </dl>
+                    </li>
+                  );
+                })}
+              </ol>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
