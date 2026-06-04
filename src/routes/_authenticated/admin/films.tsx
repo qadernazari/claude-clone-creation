@@ -362,30 +362,76 @@ function FilmEditorModal({
         </header>
 
         <div className="p-6 space-y-6">
-          {/* Cover & poster */}
-          <Section title="Cover & poster">
-            <div className="grid grid-cols-[120px_1fr] gap-4">
-              <div className="h-44 w-30 rounded-md shrink-0" style={{ background: d.cover_url ? `url(${d.cover_url}) center/cover` : (d.poster_gradient ?? GRADIENTS[0]) }} />
-              <div>
-                <label className="block mb-3">
-                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Cover image URL (portrait ~2:3)</span>
-                  <input value={d.cover_url ?? ""} onChange={(e) => set("cover_url", e.target.value)} placeholder="https://…" className={inp} />
-                </label>
-                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Or a colour cover</div>
-                <div className="flex gap-2">
-                  {GRADIENTS.map((g) => (
-                    <button key={g} type="button" onClick={() => { set("poster_gradient", g); set("cover_url", ""); }}
-                      className={`h-9 w-9 rounded-md border-2 ${d.poster_gradient === g && !d.cover_url ? "border-primary" : "border-border"}`}
-                      style={{ background: g }} />
-                  ))}
-                </div>
+          {/* Media uploads — Cover, Thumbnail, Trailer, Full Video */}
+          <Section
+            title="Media"
+            description="Upload the four media assets that make up this film. Each is stored separately and can be replaced at any time."
+          >
+            <div className="space-y-3">
+              <FileUpload
+                bucket="film-covers"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.cover_url ?? null}
+                onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Cover (Poster)"
+                description="Main portrait poster (~2:3). Used on homepage, film page, collections, search and featured sections. Hi-res JPG, PNG, WebP or AVIF."
+                maxBytes={25 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-thumbnails"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.thumbnail_url ?? null}
+                onChange={(u) => set("thumbnail_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Thumbnail"
+                description="Landscape thumbnail (~16:9) used for grids, suggestions and previews."
+                maxBytes={15 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-trailers"
+                kind="video"
+                accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+                value={d.preview_url ?? null}
+                onChange={(u) => set("preview_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Trailer"
+                description="Short preview clip shown on the film page and marketing surfaces. MP4 / WebM / MOV."
+                maxBytes={500 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-videos"
+                kind="video"
+                accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+                value={d.video_url ?? null}
+                onChange={(u) => set("video_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Video (Full Film)"
+                description="The full feature. MP4 / WebM / MOV / MKV. Large files are supported — progress is shown as the upload runs."
+                maxBytes={5 * 1024 * 1024 * 1024}
+              />
+            </div>
+
+            <div className="mt-5 rounded-md border border-border p-3">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Fallback colour cover</div>
+              <p className="text-xs text-muted-foreground mb-2">Used only when no cover image is uploaded.</p>
+              <div className="flex gap-2">
+                {GRADIENTS.map((g) => (
+                  <button key={g} type="button" onClick={() => set("poster_gradient", g)}
+                    className={`h-9 w-9 rounded-md border-2 ${d.poster_gradient === g && !d.cover_url ? "border-primary" : "border-border"}`}
+                    style={{ background: g }} />
+                ))}
               </div>
             </div>
+
             <label className="block mt-4">
               <span className="block text-xs font-medium text-muted-foreground mb-1.5">Slug (URL) *</span>
               <input required value={d.slug} onChange={(e) => set("slug", e.target.value)} placeholder="the-pomegranate-house" className={inp} />
             </label>
           </Section>
+
 
           <Section title="Title">
             <BilingualField label="Title" value={{ en: d.title_en, fa: d.title_fa ?? "" }} onChange={(v) => { set("title_en", v.en); set("title_fa", v.fa); }} placeholderEn="The Pomegranate House" placeholderFa="خانه‌ی انار" />
