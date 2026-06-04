@@ -311,6 +311,7 @@ function FilmEditorModal({
         visibility: d.visibility,
         sort_order: Number(d.sort_order) || 0,
         cover_url: d.cover_url?.trim() || null,
+        thumbnail_url: d.thumbnail_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
         video_url: d.video_url?.trim() || null,
         preview_url: d.preview_url?.trim() || null,
