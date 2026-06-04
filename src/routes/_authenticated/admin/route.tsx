@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { requireAdmin } from "@/lib/admin.functions";
 import {
   LayoutDashboard, Film, Tag, LogOut, Home, Users, Ticket,
-  HeartHandshake, Settings, Mail, MessageSquare,
+  HeartHandshake, Settings, Mail, MessageSquare, TicketPercent,
   Globe, ListTree, FileText, HelpCircle, PanelTop, Megaphone, Palette,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
