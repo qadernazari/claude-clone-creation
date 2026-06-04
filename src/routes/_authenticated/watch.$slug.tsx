@@ -106,6 +106,14 @@ function WatchPage() {
   const hasAccess = !!ticket || memberAllowed || accessType === "free";
   const isLoading = ticketLoading && !memberAllowed && accessType !== "free";
 
+  // If the user just landed here without access AND their trial recently ended,
+  // surface the upgrade modal.
+  useEffect(() => {
+    if (!isLoading && isTrialExpired && !memberAllowed && !ticket) {
+      setTrialModalOpen(true);
+    }
+  }, [isLoading, isTrialExpired, memberAllowed, ticket]);
+
   const fetchStreamUrl = useServerFn(getFilmStreamUrl);
   const { data: streamRes } = useQuery({
     queryKey: ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")],
