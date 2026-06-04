@@ -13,12 +13,33 @@ const STORAGE_SEEN = "iran_splash_seen";
 export function WelcomeSplash() {
   const { setLocale, setRegion } = useLocale();
   const [visible, setVisible] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const seen = window.localStorage.getItem(STORAGE_SEEN);
-    if (!seen) setVisible(true);
+    if (!seen) {
+      setVisible(true);
+      // next frame for enter transition
+      requestAnimationFrame(() => setMounted(true));
+    }
   }, []);
+
+  // Lock background scroll/interaction while splash is visible
+  useEffect(() => {
+    if (!visible) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -28,7 +49,8 @@ export function WelcomeSplash() {
     try {
       window.localStorage.setItem(STORAGE_SEEN, "1");
     } catch {}
-    setVisible(false);
+    setClosing(true);
+    window.setTimeout(() => setVisible(false), 500);
   };
 
   return (
@@ -36,46 +58,81 @@ export function WelcomeSplash() {
       role="dialog"
       aria-modal="true"
       aria-label="Select region"
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg-0 px-5 py-8 sm:px-6"
+      onWheel={(e) => e.preventDefault()}
+      onTouchMove={(e) => e.preventDefault()}
+      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-bg-0 px-5 py-8 transition-opacity duration-500 ease-out sm:px-6 ${
+        mounted && !closing ? "opacity-100" : "opacity-0"
+      }`}
       style={{
         paddingTop: "max(2rem, env(safe-area-inset-top, 0px))",
         paddingBottom: "max(2rem, env(safe-area-inset-bottom, 0px))",
       }}
     >
-      <div className="w-full max-w-xl text-center">
+      {/* Subtle cinematic vignette */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 0%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+        }}
+      />
+
+      <div
+        className={`relative w-full max-w-xl text-center transition-all duration-700 ease-out ${
+          mounted && !closing ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+        }`}
+      >
         <div className="flex justify-center">
-          <Logo size={88} />
+          <Logo size={72} />
         </div>
-        <div className="mt-8 space-y-1 sm:mt-10">
-          <h2 className="font-display text-2xl text-cream-bright sm:text-3xl">Select Region</h2>
-          <p className="text-sm text-cream/70 sm:text-base" lang="fa" dir="rtl">
-            انتخاب منطقه
+
+        <div className="mt-10 space-y-3 sm:mt-12">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-amber/80">
+            Welcome
+          </p>
+          <h2 className="font-display text-2xl font-light tracking-tight text-cream-bright sm:text-[28px]">
+            Choose your experience
+          </h2>
+          <p className="text-xs tracking-[0.18em] text-cream/45" lang="fa" dir="rtl">
+            تجربه‌ی خود را انتخاب کنید
           </p>
         </div>
-        <div className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2">
+
+        <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4">
           <button
             type="button"
             onClick={() => choose("en", "global")}
-            className="hairline group flex flex-col items-center gap-2 rounded-2xl border bg-bg-1 px-6 py-6 text-left transition-colors hover:border-amber/40 hover:bg-bg-1/80 sm:py-7"
+            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[0.02] sm:py-10"
           >
-            <span className="text-3xl">🌍</span>
-            <span className="font-display text-xl text-cream-bright">Global</span>
-            <span className="text-xs text-cream/55">English · USD · Card / PayPal</span>
+            <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
+              English
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-cream/40 transition-colors group-hover:text-cream/70">
+              International
+            </span>
+            <span className="mt-3 block h-px w-6 bg-cream/15 transition-all duration-500 group-hover:w-12 group-hover:bg-amber/60" />
           </button>
+
           <button
             type="button"
             onClick={() => choose("fa", "iran")}
-            className="hairline group flex flex-col items-center gap-2 rounded-2xl border bg-bg-1 px-6 py-6 text-left transition-colors hover:border-amber/40 hover:bg-bg-1/80 sm:py-7"
+            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[0.02] sm:py-10"
             dir="rtl"
             lang="fa"
           >
-            <span className="text-3xl">🇮🇷</span>
-            <span className="font-display text-xl text-cream-bright">تماشا در ایران</span>
-            <span className="text-xs text-cream/55">فارسی · تومان · زرین‌پال</span>
+            <span className="font-fa text-2xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
+              فارسی
+            </span>
+            <span className="font-fa text-[12px] tracking-[0.15em] text-cream/40 transition-colors group-hover:text-cream/70">
+              ایران
+            </span>
+            <span className="mt-3 block h-px w-6 bg-cream/15 transition-all duration-500 group-hover:w-12 group-hover:bg-amber/60" />
           </button>
         </div>
-        <p className="mt-6 text-xs text-cream/45 sm:mt-8">
-          You can change language any time from the header.
+
+        <p className="mt-10 text-[10px] font-medium uppercase tracking-[0.3em] text-cream/30 sm:mt-12">
+          You can change language anytime
         </p>
       </div>
     </div>
