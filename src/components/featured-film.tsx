@@ -179,56 +179,20 @@ export function FeaturedFilm() {
   );
 }
 
-function BrandHero() {
-  const { locale } = useLocale();
-  const fa = locale === "fa";
+function HeroSkeleton() {
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden">
+      <div
+        className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0"
+        aria-hidden
+      >
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 animate-pulse"
           style={{
             background:
-              "radial-gradient(ellipse at 25% 60%, oklch(0.30 0.04 60 / 0.55), transparent 60%), radial-gradient(ellipse at 75% 30%, oklch(0.77 0.115 80 / 0.08), transparent 55%), var(--bg-0)",
+              "radial-gradient(ellipse at 30% 60%, oklch(0.22 0.02 60 / 0.6), transparent 60%), var(--bg-0)",
           }}
-          aria-hidden
         />
-        <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
-            <div className="max-w-3xl fade-up">
-              <span className="mb-6 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
-                {fa ? "خانه‌ی سینمای ایران" : "Home of Iranian cinema"}
-              </span>
-              <h1 className="font-display text-5xl font-medium leading-[0.95] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
-                {fa ? (
-                  <>
-                    سینما،{" "}
-                    <span className="font-editorial italic font-normal text-amber">با صدای واقعی‌اش</span>.
-                  </>
-                ) : (
-                  <>
-                    Cinema, in its{" "}
-                    <span className="font-editorial italic font-normal text-amber">true</span> voice.
-                  </>
-                )}
-              </h1>
-              <p className="mt-8 max-w-xl text-base leading-relaxed text-cream/60 md:text-lg">
-                {fa
-                  ? "خانه‌ای برای سینمای مستقل ایران — آثار اصیل، مستندها و مجموعه‌های منتخب."
-                  : "A premium streaming home for Iranian cinema — originals, documentaries, and curated collections."}
-              </p>
-              <div className="mt-10">
-                <a
-                  href="/browse"
-                  className="inline-flex items-center gap-2.5 rounded-full bg-cream-bright px-8 py-3.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)]"
-                >
-                  {fa ? "تماشای آثار" : "Browse Originals"}
-                  <span aria-hidden>→</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
