@@ -8,6 +8,7 @@ import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
 import { FileUpload } from "@/components/admin/file-upload";
 import { capitalize } from "@/lib/cms";
+import { getFilmVideoUrl, setFilmVideoUrl, listFilmsWithVideo } from "@/lib/admin-films.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
@@ -88,6 +89,11 @@ function FilmsAdminPage() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: films = [], isLoading } = useQuery({ queryKey: ["admin", "films"], queryFn: listFilms });
   const { data: categories = [] } = useQuery({ queryKey: ["admin", "category-ids"], queryFn: listCategoryIds });
+  const { data: videoIds = [] } = useQuery({
+    queryKey: ["admin", "films-with-video"],
+    queryFn: async () => (await listFilmsWithVideo()).ids,
+  });
+  const videoIdSet = new Set(videoIds);
   const [editing, setEditing] = useState<FilmDraft | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -200,7 +206,7 @@ function FilmsAdminPage() {
                     <div className="flex items-center gap-2">
                       <AssetBadge label="Thumb" present={!!f.thumbnail_url} url={f.thumbnail_url} kind="image" icon={<ImageIcon className="h-3 w-3" />} />
                       <AssetBadge label="Trailer" present={!!f.preview_url} url={f.preview_url} kind="video" icon={<Clapperboard className="h-3 w-3" />} />
-                      <AssetBadge label="Video" present={!!f.video_url} url={f.video_url} kind="video" icon={<FilmIcon className="h-3 w-3" />} />
+                      <AssetBadge label="Video" present={videoIdSet.has(f.id)} url={null} kind="video" icon={<FilmIcon className="h-3 w-3" />} />
                     </div>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{f.category ?? "—"}</td>
@@ -268,7 +274,7 @@ function FilmsAdminPage() {
           draft={editing}
           categories={categories}
           onCancel={() => setEditing(null)}
-          onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); }}
+          onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); qc.invalidateQueries({ queryKey: ["admin", "films-with-video"] }); }}
         />
       )}
     </div>
@@ -364,6 +370,10 @@ function FilmEditorModal({
           sort_order: c.sort_order,
         })));
       });
+    // Load video_url via admin server fn (column is hidden from clients).
+    getFilmVideoUrl({ data: { id: d.id } })
+      .then((res) => setD((p) => ({ ...p, video_url: res.videoUrl ?? "" })))
+      .catch(() => {});
   }, [d.id]);
 
   const pricingVisible = d.access_mode !== "free";
@@ -393,7 +403,6 @@ function FilmEditorModal({
         cover_url: d.cover_url?.trim() || null,
         thumbnail_url: d.thumbnail_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
-        video_url: d.video_url?.trim() || null,
         preview_url: d.preview_url?.trim() || null,
       };
 
@@ -406,6 +415,9 @@ function FilmEditorModal({
         if (error) throw new Error(error.message);
         filmId = data.id;
       }
+
+      // Persist video_url through the admin server fn (column is hidden from clients).
+      await setFilmVideoUrl({ data: { id: filmId!, videoUrl: d.video_url?.trim() || null } });
 
       // Replace credits set
       await supabase.from("film_credits").delete().eq("film_id", filmId);
