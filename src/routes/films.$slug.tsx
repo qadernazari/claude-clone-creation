@@ -579,6 +579,7 @@ function FilmPage() {
       {checkoutOpen && (
         <FilmCheckout
           filmSlug={film.slug}
+          filmId={film.id}
           returnUrl={returnUrl}
           onClose={() => setCheckoutOpen(false)}
         />
