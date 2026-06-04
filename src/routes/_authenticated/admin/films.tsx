@@ -8,7 +8,7 @@ import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
 import { FileUpload } from "@/components/admin/file-upload";
 import { capitalize } from "@/lib/cms";
-import { getFilmVideoUrl, setFilmVideoUrl } from "@/lib/admin-films.functions";
+import { getFilmVideoUrl, setFilmVideoUrl, listFilmsWithVideo } from "@/lib/admin-films.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
