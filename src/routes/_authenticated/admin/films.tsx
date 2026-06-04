@@ -28,6 +28,8 @@ type Film = {
   price_toman: number;
   ticket_hours: number;
   access_mode: string;
+  access_type: "membership" | "ppv_only" | "membership_or_ppv" | "free";
+  is_premium: boolean;
   visibility: string;
   sort_order: number;
   cover_url: string | null;
@@ -61,6 +63,7 @@ const EMPTY: FilmDraft = {
   slug: "", title_en: "", title_fa: "", director_en: "", director_fa: "",
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 499, price_toman: 120000, ticket_hours: 48, access_mode: "inherit",
+  access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
 };
