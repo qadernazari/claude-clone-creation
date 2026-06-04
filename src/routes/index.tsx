@@ -338,8 +338,8 @@ function Home() {
 
 const FAQ_ITEMS: { en: [string, string]; fa: [string, string] }[] = [
   {
-    en: ["Do I need a subscription?", "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges."],
-    fa: ["آیا به اشتراک نیاز دارم؟", "خیر. تنها برای فیلمی که می‌خواهید تماشا کنید هزینه پرداخت می‌کنید؛ بدون اشتراک ماهانه و هزینه‌های دوره‌ای."],
+    en: ["How does membership work?", "A monthly membership unlocks unlimited streaming of the standard catalog with a 7-day free trial. Select premium releases stay outside the membership and are sold separately."],
+    fa: ["عضویت چگونه کار می‌کند؟", "با یک عضویت ماهانه و هفت روز رایگانِ آزمایشی، به‌صورت نامحدود به مجموعه‌ی استاندارد آثار دسترسی دارید. آثار ویژه جداگانه عرضه می‌شوند."],
   },
   {
     en: ["What makes IRAN different?", "IRAN is dedicated to independent Iranian cinema, bringing together original films, emerging filmmakers, and carefully curated stories from across Iran and its global creative community."],
