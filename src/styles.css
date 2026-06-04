@@ -116,6 +116,8 @@
     background-color: var(--bg-0);
     color: var(--cream);
     -webkit-text-size-adjust: 100%;
+    /* Prevent any rogue child from causing horizontal scroll on mobile */
+    overflow-x: hidden;
   }
 
   body {
@@ -130,6 +132,17 @@
     letter-spacing: 0.005em;
     /* Match optical line-height between Latin and Persian scripts */
     line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent iOS Safari from auto-zooming when focusing inputs (font-size < 16px triggers zoom) */
+  @media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
   }
 
   /* Persian typography: slightly larger, more open leading for Vazirmatn */

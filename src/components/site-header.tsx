@@ -4,22 +4,25 @@ import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
 
-function LanguageToggle() {
+function LanguageToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   const { locale, setLocale } = useLocale();
   const isEn = locale === "en";
+  const lg = size === "lg";
   return (
     <div
       role="group"
       aria-label="Language"
-      className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.18em] text-cream/45"
+      className={`inline-flex items-center gap-2 font-medium tracking-[0.18em] text-cream/45 ${
+        lg ? "text-[13px]" : "text-[11px]"
+      }`}
     >
       <button
         type="button"
         onClick={() => setLocale("en")}
         aria-pressed={isEn}
-        className={`rounded-sm px-1 py-0.5 transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-          isEn ? "text-amber" : "hover:text-cream/85"
-        }`}
+        className={`rounded-sm transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          lg ? "min-h-11 min-w-11 px-3 py-2" : "px-1 py-0.5"
+        } ${isEn ? "text-amber" : "hover:text-cream/85"}`}
       >
         EN
       </button>
@@ -29,9 +32,9 @@ function LanguageToggle() {
         onClick={() => setLocale("fa")}
         aria-pressed={!isEn}
         lang="fa"
-        className={`rounded-sm px-1 py-0.5 font-fa text-[13px] leading-none tracking-normal transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-          !isEn ? "text-amber" : "hover:text-cream/85"
-        }`}
+        className={`rounded-sm font-fa leading-none tracking-normal transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          lg ? "min-h-11 min-w-11 px-3 py-2 text-[15px]" : "px-1 py-0.5 text-[13px]"
+        } ${!isEn ? "text-amber" : "hover:text-cream/85"}`}
       >
         فا
       </button>
@@ -43,13 +46,16 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   const { locale } = useLocale();
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const fa = locale === "fa";
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleHomeClick = (e: React.MouseEvent) => {
     if (isHome) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -59,6 +65,24 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock body scroll while mobile menu open
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   const linkCls = (key: "home" | "browse" | "about") =>
     `relative py-1 transition-colors duration-300 ${
       current === key ? "text-cream" : "text-cream/55 hover:text-cream"
@@ -66,40 +90,134 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       current === key ? "after:w-full" : "after:w-0 hover:after:w-full"
     }`;
 
+  const mobileLinkCls = (key: "home" | "browse" | "about") =>
+    `block py-4 text-2xl font-semibold tracking-tight transition-colors ${
+      current === key ? "text-amber" : "text-cream-bright hover:text-amber"
+    } ${fa ? "font-fa text-right" : "font-display"}`;
+
   return (
-    <header
-      className={`fixed top-0 z-30 w-full transition-all duration-500 ${
-        scrolled
-          ? "border-b border-cream/[0.06] bg-bg-0/85 backdrop-blur-xl"
-          : "border-b border-transparent bg-gradient-to-b from-bg-0/60 to-transparent"
-      }`}
-    >
-      <div
-        className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 md:px-10 ${
-          scrolled ? "py-3" : "py-5"
+    <>
+      <header
+        className={`fixed top-0 z-30 w-full transition-all duration-500 ${
+          scrolled
+            ? "border-b border-cream/[0.06] bg-bg-0/85 backdrop-blur-xl"
+            : "border-b border-transparent bg-gradient-to-b from-bg-0/60 to-transparent"
         }`}
+        style={{
+          paddingTop: "env(safe-area-inset-top, 0px)",
+          paddingLeft: "env(safe-area-inset-left, 0px)",
+          paddingRight: "env(safe-area-inset-right, 0px)",
+        }}
       >
-        <div className="flex items-center gap-10">
-          <Link to="/" onClick={handleHomeClick} className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
-            <Logo size={32} />
-          </Link>
-          <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
-            <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
-              {locale === "fa" ? "خانه" : "Home"}
+        <div
+          className={`mx-auto flex max-w-7xl items-center justify-between px-4 transition-all duration-500 sm:px-6 md:px-10 ${
+            scrolled ? "py-2.5 md:py-3" : "py-3.5 md:py-5"
+          }`}
+        >
+          <div className="flex items-center gap-10">
+            <Link
+              to="/"
+              onClick={handleHomeClick}
+              className="inline-flex items-center transition-opacity hover:opacity-80"
+              aria-label="IRAN — home"
+            >
+              <Logo size={28} />
             </Link>
-            <Link to="/browse" className={linkCls("browse")}>
-              {locale === "fa" ? "آثار اختصاصی" : "Originals"}
+            <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
+              <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
+                {fa ? "خانه" : "Home"}
+              </Link>
+              <Link to="/browse" className={linkCls("browse")}>
+                {fa ? "آثار اختصاصی" : "Originals"}
+              </Link>
+              <Link to="/about" className={linkCls("about")}>
+                {fa ? "درباره" : "About"}
+              </Link>
+            </nav>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <div className="hidden md:block">
+              <LanguageToggle />
+            </div>
+            <AuthMenu />
+            {/* Hamburger — mobile only */}
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-cream/80 hover:text-cream-bright transition-colors md:hidden"
+            >
+              <span className="relative block h-4 w-5">
+                <span
+                  className={`absolute left-0 top-0 h-px w-5 bg-current transition-all duration-300 ${
+                    menuOpen ? "translate-y-2 rotate-45" : ""
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 top-2 h-px w-5 bg-current transition-all duration-200 ${
+                    menuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 top-4 h-px w-5 bg-current transition-all duration-300 ${
+                    menuOpen ? "-translate-y-2 -rotate-45" : ""
+                  }`}
+                />
+              </span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile menu overlay */}
+      <div
+        className={`fixed inset-0 z-20 md:hidden transition-opacity duration-300 ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden={!menuOpen}
+      >
+        <div
+          className="absolute inset-0 bg-bg-0/95 backdrop-blur-2xl"
+          onClick={() => setMenuOpen(false)}
+        />
+        <div
+          className={`relative flex h-full flex-col px-6 pb-10 transition-transform duration-500 ease-out ${
+            menuOpen ? "translate-y-0" : "-translate-y-4"
+          }`}
+          style={{
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 2.5rem)",
+          }}
+          dir={fa ? "rtl" : "ltr"}
+        >
+          <nav className="flex flex-1 flex-col gap-1 border-t border-line pt-6">
+            <Link to="/" onClick={handleHomeClick} className={mobileLinkCls("home")}>
+              {fa ? "خانه" : "Home"}
             </Link>
-            <Link to="/about" className={linkCls("about")}>
-              {locale === "fa" ? "درباره" : "About"}
+            <Link
+              to="/browse"
+              onClick={() => setMenuOpen(false)}
+              className={mobileLinkCls("browse")}
+            >
+              {fa ? "آثار اختصاصی" : "Originals"}
+            </Link>
+            <Link
+              to="/about"
+              onClick={() => setMenuOpen(false)}
+              className={mobileLinkCls("about")}
+            >
+              {fa ? "درباره" : "About"}
             </Link>
           </nav>
-        </div>
-        <div className="flex items-center gap-3">
-          <LanguageToggle />
-          <AuthMenu />
+          <div className="mt-auto flex items-center justify-between border-t border-line pt-6">
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/40">
+              {fa ? "زبان" : "Language"}
+            </span>
+            <LanguageToggle size="lg" />
+          </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }

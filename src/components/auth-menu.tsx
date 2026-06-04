@@ -59,7 +59,7 @@ export function AuthMenu() {
     return (
       <Link
         to="/auth"
-        className="text-sm rounded-full border border-cream/20 px-4 py-1.5 text-cream/90 hover:bg-cream/10 transition-colors"
+        className="inline-flex min-h-10 items-center justify-center rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/90 hover:bg-cream/10 transition-colors"
       >
         {fa ? "ورود" : "Sign in"}
       </Link>
@@ -73,13 +73,13 @@ export function AuthMenu() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="h-9 w-9 rounded-full bg-cream/10 text-cream text-sm font-medium hover:bg-cream/20 transition-colors"
+        className="h-10 w-10 rounded-full bg-cream/10 text-cream text-sm font-medium hover:bg-cream/20 transition-colors"
         aria-label="Account menu"
       >
         {initial}
       </button>
       {open && (
-        <div className="absolute end-0 mt-2 w-56 rounded-md border border-cream/15 bg-bg-1 p-1 shadow-lg z-50">
+        <div className="absolute end-0 mt-2 w-56 max-w-[calc(100vw-2rem)] rounded-md border border-cream/15 bg-bg-1 p-1 shadow-lg z-50">
           <div className="px-3 py-2 text-xs text-cream/60 truncate">{user.email}</div>
           <Link
             to="/account"
