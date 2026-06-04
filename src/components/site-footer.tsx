@@ -68,7 +68,7 @@ export function SiteFooter() {
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/30">
                 {fa ? "گردش" : "Explore"}
               </span>
-              <Link to="/" className="text-sm text-cream/65 transition-colors hover:text-amber">
+              <Link to="/" onClick={handleHomeClick} className="text-sm text-cream/65 transition-colors hover:text-amber">
                 {fa ? "خانه" : "Home"}
               </Link>
               <Link to="/browse" className="text-sm text-cream/65 transition-colors hover:text-amber">
