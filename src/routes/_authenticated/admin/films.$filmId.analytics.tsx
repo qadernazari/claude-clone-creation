@@ -212,12 +212,12 @@ function FilmAnalyticsPage() {
         </div>
       </div>
 
-      <PageHeader title={film.title_en} subtitle="Per-film performance" />
+      <FilmHero film={film} />
 
       {totallyEmpty ? (
         <div className="rounded-lg border border-border bg-card/40 p-12 text-center">
           <BarChart3 className="mx-auto h-10 w-10 text-muted-foreground/40 mb-3" />
-          <h3 className="font-medium mb-1">No analytics data available yet</h3>
+          <h3 className="font-medium mb-1">No analytics data available for this film yet.</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
             Views, watch time, purchases and contributions will appear here once viewers start
             interacting with this film.
@@ -229,12 +229,12 @@ function FilmAnalyticsPage() {
           <SectionHeader title="Engagement" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard icon={<Eye className="h-4 w-4" />} label="Total views" value={stats.views.toLocaleString()} />
-            <StatCard icon={<Users className="h-4 w-4" />} label="Unique viewers" value={stats.uniqueViewers.toLocaleString()} hint={stats.uniqueViewers === 0 ? "Tracked via sessions" : undefined} />
+            <StatCard icon={<Users className="h-4 w-4" />} label="Unique viewers" value={stats.uniqueViewers.toLocaleString()} hint={stats.uniqueViewersEstimated ? "Estimated from view events" : undefined} />
             <StatCard icon={<Clock className="h-4 w-4" />} label="Total watch time" value={formatDuration(stats.watchSeconds)} />
             <StatCard icon={<Activity className="h-4 w-4" />} label="Avg. watch duration" value={formatDuration(stats.avgWatchSeconds)} />
             <StatCard icon={<Activity className="h-4 w-4" />} label="Completion rate" value={`${stats.completion}%`} />
             <StatCard icon={<Eye className="h-4 w-4" />} label="Completes" value={stats.completes.toLocaleString()} />
-            <StatCard icon={<Users className="h-4 w-4" />} label="Watchers in progress" value={data.progress.length.toLocaleString()} />
+            <StatCard icon={<Users className="h-4 w-4" />} label="Continue watching" value={stats.continueWatching.toLocaleString()} />
             <StatCard icon={<Clock className="h-4 w-4" />} label="Film length" value={film.duration_min ? `${film.duration_min} min` : "—"} />
           </div>
 
