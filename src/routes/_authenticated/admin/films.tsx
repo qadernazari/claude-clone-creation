@@ -403,7 +403,6 @@ function FilmEditorModal({
         cover_url: d.cover_url?.trim() || null,
         thumbnail_url: d.thumbnail_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
-        video_url: d.video_url?.trim() || null,
         preview_url: d.preview_url?.trim() || null,
       };
 
@@ -416,6 +415,9 @@ function FilmEditorModal({
         if (error) throw new Error(error.message);
         filmId = data.id;
       }
+
+      // Persist video_url through the admin server fn (column is hidden from clients).
+      await setFilmVideoUrl({ data: { id: filmId!, videoUrl: d.video_url?.trim() || null } });
 
       // Replace credits set
       await supabase.from("film_credits").delete().eq("film_id", filmId);
