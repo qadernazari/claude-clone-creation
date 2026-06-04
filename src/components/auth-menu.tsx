@@ -48,6 +48,7 @@ export function AuthMenu() {
   useEffect(() => {
     if (!user) {
       setIsAdmin(false);
+      setSub(null);
       return;
     }
     supabase
@@ -57,12 +58,30 @@ export function AuthMenu() {
       .eq("role", "admin")
       .maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
+    supabase
+      .from("subscriptions")
+      .select("status, current_period_end, trial_end, cancel_at_period_end")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => setSub((data as SubInfo) ?? null));
   }, [user]);
 
   async function signOut() {
     await supabase.auth.signOut();
     setOpen(false);
   }
+
+  const trialDaysLeft = (() => {
+    if (!sub || sub.status !== "trialing" || !sub.trial_end) return null;
+    const ms = new Date(sub.trial_end).getTime() - Date.now();
+    if (ms <= 0) return null;
+    return Math.max(1, Math.ceil(ms / 86400000));
+  })();
+  const pastDue = sub?.status === "past_due";
+
+
 
   if (!user) {
     return (
