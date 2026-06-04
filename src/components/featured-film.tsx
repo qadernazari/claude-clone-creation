@@ -17,6 +17,7 @@ type Film = {
   synopsis_fa: string | null;
   poster_gradient: string | null;
   cover_url: string | null;
+  thumbnail_url: string | null;
   is_premium: boolean | null;
 };
 
@@ -28,7 +29,7 @@ export function FeaturedFilm() {
       const { data, error } = await supabase
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, is_premium",
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, is_premium",
         )
         .eq("visibility", "published")
         .order("sort_order", { ascending: true })
@@ -43,7 +44,7 @@ export function FeaturedFilm() {
   if (isLoading) return <BrandHero />;
   if (!data) return <BrandHero />;
 
-  const title = t({ en: data.title_en, fa: data.title_fa || data.title_en });
+  const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
   const director = t({
     en: data.director_en || "",
     fa: data.director_fa || data.director_en || "",
@@ -52,35 +53,51 @@ export function FeaturedFilm() {
     en: data.synopsis_en || "",
     fa: data.synopsis_fa || data.synopsis_en || "",
   });
+  // Prefer the dedicated 16:9 hero/thumbnail image for the cinematic banner.
+  // Only fall back to the vertical poster (cover_url) when no landscape art exists.
+  const heroImage = data.thumbnail_url || data.cover_url;
+  const isLandscapeHero = !!data.thumbnail_url;
   const fallbackBg =
     data.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
+
 
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
       <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
-        {data.cover_url ? (
-          <>
-            {/* Soft blurred backdrop fills the frame without cropping the artwork */}
+        {heroImage ? (
+          isLandscapeHero ? (
+            // 16:9 hero artwork — full-bleed cinematic banner
             <div
-              className="absolute inset-0 scale-110"
+              className="absolute inset-0 cine-img"
               style={{
-                background: `center / cover no-repeat url(${data.cover_url})`,
-                filter: "blur(60px) saturate(1.1) brightness(0.55)",
-                opacity: 0.55,
+                background: `center / cover no-repeat url(${heroImage})`,
+                transform: "scale(1.03)",
               }}
               aria-hidden
             />
-            {/* Artwork itself — contained so nothing important is cropped */}
-            <img
-              src={data.cover_url}
-              alt={title}
-              className="absolute inset-0 h-full w-full object-contain object-center"
-              loading="eager"
-              decoding="async"
-            />
-          </>
+          ) : (
+            // Fallback: vertical poster — contain to preserve composition, blurred backdrop fills the frame
+            <>
+              <div
+                className="absolute inset-0 scale-110"
+                style={{
+                  background: `center / cover no-repeat url(${heroImage})`,
+                  filter: "blur(60px) saturate(1.1) brightness(0.55)",
+                  opacity: 0.55,
+                }}
+                aria-hidden
+              />
+              <img
+                src={heroImage}
+                alt={title}
+                className="absolute inset-0 h-full w-full object-contain object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </>
+          )
         ) : (
           <div
             className="absolute inset-0 cine-img"
