@@ -345,3 +345,113 @@ function Home() {
     </div>
   );
 }
+
+const FAQ_ITEMS: { en: [string, string]; fa: [string, string] }[] = [
+  {
+    en: ["Do I need a subscription?", "No. Purchase access only to the films you want to watch. No monthly fees and no recurring charges."],
+    fa: ["آیا به اشتراک نیاز دارم؟", "خیر. تنها برای فیلمی که می‌خواهید تماشا کنید هزینه پرداخت می‌کنید؛ بدون اشتراک ماهانه و هزینه‌های دوره‌ای."],
+  },
+  {
+    en: ["What makes IRAN different?", "IRAN is dedicated to independent Iranian cinema, bringing together original films, emerging filmmakers, and carefully curated stories from across Iran and its global creative community."],
+    fa: ["چه چیزی ایران را متفاوت می‌کند؟", "ایران خانه‌ای برای سینمای مستقل ایران است؛ جایی که فیلم‌سازان فرصت دیده‌شدن پیدا می‌کنند و مخاطبان به مجموعه‌ای گزینش‌شده از آثار ایرانی دسترسی دارند."],
+  },
+  {
+    en: ["How long do I have to watch a film?", "Once your viewing window begins, you'll have 48 hours to watch the film at your own pace."],
+    fa: ["پس از خرید تا چه مدت می‌توانم فیلم را تماشا کنم؟", "پس از فعال‌شدن دسترسی، تا ۴۸ ساعت فرصت دارید فیلم را با آرامش تماشا کنید."],
+  },
+  {
+    en: ["Are subtitles available?", "Yes. All films are presented in Persian with English subtitles."],
+    fa: ["آیا زیرنویس انگلیسی وجود دارد؟", "بله. تمامی آثار با زیرنویس انگلیسی در دسترس هستند."],
+  },
+  {
+    en: ["Can I watch on any device?", "Yes. Watch seamlessly on desktop, tablet, mobile, or smart TV through any modern web browser."],
+    fa: ["روی چه دستگاه‌هایی می‌توانم تماشا کنم؟", "موبایل، تبلت، لپ‌تاپ و تلویزیون هوشمند؛ هرجا که مرورگر مدرن داشته باشید."],
+  },
+  {
+    en: ["How do filmmakers benefit?", "Every purchase directly supports filmmakers and helps sustain independent Iranian storytelling."],
+    fa: ["خرید من چگونه از فیلم‌سازان حمایت می‌کند؟", "بخش عمده درآمد هر تماشا مستقیماً به حمایت از فیلم‌سازان و تولید آثار مستقل اختصاص می‌یابد."],
+  },
+  {
+    en: ["Do you add new films regularly?", "Yes. New films, documentaries, and original productions are added throughout the year, with a focus on quality and curation."],
+    fa: ["آیا آثار جدید اضافه می‌شوند؟", "بله. به‌طور مستمر فیلم‌های تازه، مستندها و آثار اختصاصی به مجموعه افزوده می‌شوند."],
+  },
+  {
+    en: ["Can I watch from anywhere in the world?", "Yes. IRAN is designed for audiences worldwide who want to discover and experience Iranian cinema."],
+    fa: ["آیا از خارج از ایران هم می‌توانم تماشا کنم؟", "بله. این پلتفرم برای مخاطبان فارسی‌زبان و علاقه‌مندان به سینمای ایران در سراسر جهان طراحی شده است."],
+  },
+];
+
+function FaqSection() {
+  const { locale } = useLocale();
+  const fa = locale === "fa";
+  const [open, setOpen] = useState<number | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (!listRef.current) return;
+      if (!listRef.current.contains(e.target as Node)) setOpen(null);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(null);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  return (
+    <section className="border-t border-line px-6 py-28 md:px-12 md:py-32" dir={fa ? "rtl" : "ltr"}>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-[1fr_2fr]">
+        <div>
+          <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.4em] text-amber">
+            {fa ? "پرسش‌های متداول" : "Questions"}
+          </span>
+          <h2 className={`text-3xl font-bold leading-tight text-cream-bright md:text-4xl ${fa ? "font-fa" : "font-display"}`}>
+            {fa ? "هرچه باید بدانید" : "Everything You Need to Know"}
+          </h2>
+        </div>
+        <div ref={listRef} className="divide-y divide-line border-y border-line">
+          {FAQ_ITEMS.map((qa, i) => {
+            const [q, a] = fa ? qa.fa : qa.en;
+            const isOpen = open === i;
+            return (
+              <div key={i} className="py-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  className={`flex w-full items-center justify-between gap-6 py-6 text-start ${fa ? "font-fa" : ""}`}
+                >
+                  <span className={`text-base md:text-lg font-semibold text-cream-bright ${fa ? "font-fa" : "font-display"}`}>{q}</span>
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-base leading-none transition-all duration-300 ${
+                      isOpen ? "border-amber/60 text-amber bg-amber/5" : "border-cream/15 text-cream/60"
+                    }`}
+                    aria-hidden
+                  >
+                    {isOpen ? "−" : "+"}
+                  </span>
+                </button>
+                <div
+                  className={`grid overflow-hidden transition-all duration-500 ease-out ${
+                    isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="min-h-0">
+                    <p className={`max-w-2xl pb-7 pe-10 text-[15px] md:text-base leading-[1.85] text-cream/65 ${fa ? "font-fa" : ""}`}>
+                      {a}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
