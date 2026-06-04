@@ -357,6 +357,31 @@ function SectionHeader({ title }: { title: string }) {
   return <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 mt-2">{title}</h2>;
 }
 
+function FilmHero({ film }: { film: { title_en: string; title_fa: string | null; cover_url: string | null; thumbnail_url: string | null; poster_gradient: string | null; duration_min: number | null; access_type: string; is_premium: boolean } }) {
+  const poster = film.cover_url || film.thumbnail_url;
+  return (
+    <header className="mb-6 rounded-lg border border-border bg-card/40 p-4 sm:p-5">
+      <div className="flex items-center gap-4">
+        {poster ? (
+          <img src={poster} alt={`${film.title_en} poster`} className="h-24 w-16 shrink-0 rounded-md object-cover ring-1 ring-border" />
+        ) : (
+          <div className="h-24 w-16 shrink-0 rounded-md ring-1 ring-border" style={{ background: film.poster_gradient ?? "var(--muted)" }} />
+        )}
+        <div className="min-w-0">
+          <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Film analytics</div>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{film.title_en}</h1>
+          {film.title_fa && <p className="mt-1 text-sm text-muted-foreground" dir="rtl">{film.title_fa}</p>}
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-muted px-2 py-0.5">{capitalize(film.access_type.replaceAll("_", " "))}</span>
+            {film.is_premium && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-primary">Premium</span>}
+            <span className="rounded-full bg-muted px-2 py-0.5">{film.duration_min ? `${film.duration_min} min` : "Duration not set"}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function StatCard({ icon, label, value, hint }: { icon: React.ReactNode; label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card/40 p-4">
