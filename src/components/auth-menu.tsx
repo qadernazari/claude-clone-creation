@@ -59,7 +59,7 @@ export function AuthMenu() {
     return (
       <Link
         to="/auth"
-        className="text-sm rounded-full border border-cream/20 px-4 py-1.5 text-cream/90 hover:bg-cream/10 transition-colors"
+        className="inline-flex min-h-10 items-center justify-center rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/90 hover:bg-cream/10 transition-colors"
       >
         {fa ? "ورود" : "Sign in"}
       </Link>
