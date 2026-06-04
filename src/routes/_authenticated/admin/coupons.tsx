@@ -96,6 +96,7 @@ function CouponsPage() {
   const [filmId, setFilmId] = useState<string>("");
   const [maxRedemptions, setMaxRedemptions] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
+  const [historyFor, setHistoryFor] = useState<{ id: string; code: string } | null>(null);
 
   function resetForm() {
     setCode("");
