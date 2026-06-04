@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,10 +85,13 @@ async function listCategoryIds(): Promise<string[]> {
 
 function FilmsAdminPage() {
   const qc = useQueryClient();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: films = [], isLoading } = useQuery({ queryKey: ["admin", "films"], queryFn: listFilms });
   const { data: categories = [] } = useQuery({ queryKey: ["admin", "category-ids"], queryFn: listCategoryIds });
   const [editing, setEditing] = useState<FilmDraft | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  if (pathname.startsWith("/admin/films/")) return <Outlet />;
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
