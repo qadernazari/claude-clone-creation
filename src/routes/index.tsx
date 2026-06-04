@@ -1,5 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { FilmsRow } from "../components/films-row";
 import { FeaturedFilm } from "../components/featured-film";
@@ -7,9 +6,9 @@ import { ContinueWatching } from "../components/continue-watching";
 import { CollectionsGrid } from "../components/collections-grid";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { MembershipCheckout } from "../components/membership-checkout";
 import { FaqSection } from "../components/faq-section";
 import { useSubscription } from "@/hooks/use-subscription";
+import { AcceptTrialButton } from "@/components/accept-trial-button";
 
 
 export const Route = createFileRoute("/")({
@@ -86,20 +85,14 @@ function Home() {
 function MembershipMoment() {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { user, isMember, isLoading } = useSubscription();
-  const [open, setOpen] = useState(false);
+  const { isMember, isLoading } = useSubscription();
 
   // Hide entirely for active members — no upsell noise
   if (isLoading || isMember) return null;
 
-  const returnUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`
-      : "";
-
   const benefits = fa
-    ? ["هفت روز رایگان", "تماشای نامحدودِ مجموعه", "هر زمان لغو کنید"]
-    : ["7 days free", "Unlimited access to the membership catalog", "Cancel anytime"];
+    ? ["هفت روز رایگان", "بدون نیاز به اطلاعات پرداخت", "تماشای نامحدودِ مجموعه", "هر زمان لغو کنید"]
+    : ["7 days free", "No payment information required", "Unlimited access to the membership catalog", "Cancel anytime"];
 
   return (
     <div className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl border border-cream/[0.06] bg-bg-1/40 px-8 py-20 text-center md:px-16 md:py-24">
@@ -114,7 +107,7 @@ function MembershipMoment() {
       <h2 className="font-display text-3xl font-medium leading-[1.05] tracking-[-0.02em] text-cream-bright md:text-5xl">
         {fa ? (
           <>
-            سینمای ایران،{" "}
+            سینمای ایران,{" "}
             <span className="font-editorial italic font-normal text-amber">دست‌نخورده</span>.
           </>
         ) : (
@@ -148,27 +141,11 @@ function MembershipMoment() {
       </ul>
 
       <div className="mt-12">
-        {user ? (
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-amber px-9 py-3.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-ink transition-all duration-300 hover:bg-amber-bright hover:scale-[1.02] hover:shadow-[0_10px_30px_-10px_oklch(0.77_0.115_80/0.5)]"
-          >
-            {fa ? "آغاز رایگان" : "Start Free Trial"}
-          </button>
-        ) : (
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-2 rounded-full bg-amber px-9 py-3.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-ink transition-all duration-300 hover:bg-amber-bright hover:scale-[1.02] hover:shadow-[0_10px_30px_-10px_oklch(0.77_0.115_80/0.5)]"
-          >
-            {fa ? "آغاز رایگان" : "Start Free Trial"}
-          </Link>
-        )}
+        <AcceptTrialButton
+          className="inline-flex items-center gap-2 rounded-full bg-amber px-9 py-3.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-ink transition-all duration-300 hover:bg-amber-bright hover:scale-[1.02] hover:shadow-[0_10px_30px_-10px_oklch(0.77_0.115_80/0.5)] disabled:opacity-70"
+          label={fa ? "پذیرش دوره آزمایشی رایگان" : "Accept Free Trial"}
+        />
       </div>
-
-      {open && (
-        <MembershipCheckout returnUrl={returnUrl} onClose={() => setOpen(false)} />
-      )}
     </div>
   );
 }
