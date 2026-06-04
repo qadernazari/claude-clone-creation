@@ -250,7 +250,7 @@ export function FilmsRow() {
   }
 
   return (
-    <div className="space-y-24 md:space-y-32">
+    <div className="space-y-14 md:space-y-16">
       {rails.map((r) => (
         <Rail
           key={r.key}
