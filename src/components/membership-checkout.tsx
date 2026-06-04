@@ -1,7 +1,9 @@
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
+import { CouponField } from "@/components/coupon-field";
+import { useLocale } from "@/lib/i18n";
 
 interface MembershipCheckoutProps {
   returnUrl: string;
@@ -9,14 +11,23 @@ interface MembershipCheckoutProps {
 }
 
 export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutProps) {
+  const { locale } = useLocale();
+  const fa = locale === "fa";
+  const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
+  const [started, setStarted] = useState(false);
+
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const result = await createMembershipCheckout({
-      data: { returnUrl, environment: getStripeEnvironment() },
+      data: {
+        returnUrl,
+        environment: getStripeEnvironment(),
+        ...(applied && { couponCode: applied.code }),
+      },
     });
     if ("error" in result) throw new Error(result.error);
     if (!result.clientSecret) throw new Error("No client secret returned");
     return result.clientSecret;
-  }, [returnUrl]);
+  }, [returnUrl, applied]);
 
   const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
@@ -39,11 +50,45 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
         >
           ✕
         </button>
-        <div className="overflow-hidden rounded-lg bg-white">
-          <EmbeddedCheckoutProvider stripe={getStripe()} options={options}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
-        </div>
+
+        {!started ? (
+          <div className="p-6 sm:p-8">
+            <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+              {fa ? "عضویت ماهانه" : "Monthly membership"}
+            </h2>
+            <p className="mt-2 text-sm text-cream/65">
+              {fa
+                ? "۷ روز رایگان، سپس پرداخت ماهانه. هر زمان لغو کنید."
+                : "7-day free trial, then billed monthly. Cancel anytime."}
+            </p>
+
+            <div className="mt-6">
+              <p className="mb-2 text-[11px] uppercase tracking-widest text-cream/55">
+                {fa ? "کد تخفیف (اختیاری)" : "Promo code (optional)"}
+              </p>
+              <CouponField
+                context="membership"
+                fa={fa}
+                applied={applied}
+                onApply={setApplied}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setStarted(true)}
+              className="mt-6 w-full rounded-full bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"
+            >
+              {fa ? "ادامه به پرداخت" : "Continue to payment"}
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-lg bg-white">
+            <EmbeddedCheckoutProvider stripe={getStripe()} options={options}>
+              <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -47,10 +47,11 @@ async function resolveOrCreateCustomer(
 
 export const createMembershipCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl: string; environment: StripeEnv }) =>
+  .inputValidator((data: { returnUrl: string; environment: StripeEnv; couponCode?: string }) =>
     z.object({
       returnUrl: z.string().url(),
       environment: z.enum(["sandbox", "live"]),
+      couponCode: z.string().min(1).max(64).optional(),
     }).parse(data),
   )
   .handler(async ({ data, context }): Promise<CheckoutResult> => {
@@ -71,18 +72,60 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
 
       const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
 
+      // Resolve & validate coupon (if provided) BEFORE creating the session.
+      let resolvedCoupon:
+        | { couponId: string; stripeCouponId: string; amountOff: number | null; currentCount: number }
+        | null = null;
+      if (data.couponCode) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { lookupCoupon, createStripeCoupon } = await import("@/lib/coupons.server");
+        const lookup = await lookupCoupon(supabaseAdmin as never, {
+          code: data.couponCode,
+          context: "membership",
+        });
+        if (!lookup.ok) return { error: lookup.error };
+        const created = await createStripeCoupon(stripe, lookup.coupon);
+        resolvedCoupon = {
+          couponId: lookup.coupon.id,
+          stripeCouponId: created.stripeCouponId,
+          amountOff: created.amountOff,
+          currentCount: lookup.coupon.redemptions_count,
+        };
+      }
+
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: price.id, quantity: 1 }],
         mode: "subscription",
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         customer: customerId,
+        ...(resolvedCoupon && {
+          discounts: [{ coupon: resolvedCoupon.stripeCouponId }],
+        }),
         subscription_data: {
           trial_period_days: TRIAL_DAYS,
           metadata: { userId },
         },
-        metadata: { userId, kind: "membership" },
+        metadata: {
+          userId,
+          kind: "membership",
+          ...(resolvedCoupon && { coupon_id: resolvedCoupon.couponId }),
+        },
       });
+
+      if (resolvedCoupon) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { recordRedemption } = await import("@/lib/coupons.server");
+        await recordRedemption(supabaseAdmin as never, {
+          couponId: resolvedCoupon.couponId,
+          userId,
+          sessionId: session.id,
+          stripeCouponId: resolvedCoupon.stripeCouponId,
+          context: "membership",
+          amountOff: resolvedCoupon.amountOff,
+          currentCount: resolvedCoupon.currentCount,
+        });
+      }
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {

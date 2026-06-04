@@ -92,11 +92,12 @@ async function ensureFilmPrice(
 
 export const createFilmCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { filmSlug: string; returnUrl: string; environment: StripeEnv }) =>
+  .inputValidator((data: { filmSlug: string; returnUrl: string; environment: StripeEnv; couponCode?: string }) =>
     z.object({
       filmSlug: z.string().min(1).max(120).regex(/^[a-z0-9-]+$/),
       returnUrl: z.string().url(),
       environment: z.enum(["sandbox", "live"]),
+      couponCode: z.string().min(1).max(64).optional(),
     }).parse(data),
   )
   .handler(async ({ data, context }): Promise<CheckoutResult> => {
@@ -117,12 +118,37 @@ export const createFilmCheckout = createServerFn({ method: "POST" })
       const { priceId, productName } = await ensureFilmPrice(stripe, film);
       const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
 
+      // Resolve & validate coupon (if provided) BEFORE creating the session.
+      let resolvedCoupon:
+        | { couponId: string; stripeCouponId: string; amountOff: number | null; currentCount: number }
+        | null = null;
+      if (data.couponCode) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { lookupCoupon, createStripeCoupon } = await import("@/lib/coupons.server");
+        const lookup = await lookupCoupon(supabaseAdmin as never, {
+          code: data.couponCode,
+          context: "ticket",
+          filmId: film.id,
+        });
+        if (!lookup.ok) return { error: lookup.error };
+        const created = await createStripeCoupon(stripe, lookup.coupon);
+        resolvedCoupon = {
+          couponId: lookup.coupon.id,
+          stripeCouponId: created.stripeCouponId,
+          amountOff: created.amountOff,
+          currentCount: lookup.coupon.redemptions_count,
+        };
+      }
+
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: priceId, quantity: 1 }],
         mode: "payment",
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         customer: customerId,
+        ...(resolvedCoupon && {
+          discounts: [{ coupon: resolvedCoupon.stripeCouponId }],
+        }),
         payment_intent_data: {
           description: productName,
           metadata: {
@@ -130,6 +156,7 @@ export const createFilmCheckout = createServerFn({ method: "POST" })
             film_id: film.id,
             film_slug: film.slug,
             ticket_hours: String(film.ticket_hours ?? 48),
+            ...(resolvedCoupon && { coupon_id: resolvedCoupon.couponId }),
           },
         },
         metadata: {
@@ -137,8 +164,24 @@ export const createFilmCheckout = createServerFn({ method: "POST" })
           film_id: film.id,
           film_slug: film.slug,
           ticket_hours: String(film.ticket_hours ?? 48),
+          ...(resolvedCoupon && { coupon_id: resolvedCoupon.couponId }),
         },
       });
+
+      if (resolvedCoupon) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { recordRedemption } = await import("@/lib/coupons.server");
+        await recordRedemption(supabaseAdmin as never, {
+          couponId: resolvedCoupon.couponId,
+          userId,
+          sessionId: session.id,
+          stripeCouponId: resolvedCoupon.stripeCouponId,
+          context: "ticket",
+          filmId: film.id,
+          amountOff: resolvedCoupon.amountOff,
+          currentCount: resolvedCoupon.currentCount,
+        });
+      }
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
