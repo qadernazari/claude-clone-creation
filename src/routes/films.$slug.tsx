@@ -35,6 +35,7 @@ export const Route = createFileRoute("/films/$slug")({
     const title = `${f.title_en} — IRAN`;
     const desc = f.synopsis_en?.slice(0, 160) ?? "Original Iranian short film on IRAN.";
     const url = `https://ir.show/films/${params.slug}`;
+    const isoDuration = f.duration_min ? `PT${f.duration_min}M` : undefined;
     return {
       meta: [
         { title },
@@ -43,8 +44,10 @@ export const Route = createFileRoute("/films/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "video.movie" },
         { property: "og:url", content: url },
+        { property: "og:site_name", content: "IRAN" },
         ...(f.cover_url ? [{ property: "og:image" as const, content: f.cover_url }] : []),
         ...(f.cover_url ? [{ name: "twitter:image" as const, content: f.cover_url }] : []),
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -54,16 +57,34 @@ export const Route = createFileRoute("/films/$slug")({
             "@context": "https://schema.org",
             "@type": "Movie",
             name: f.title_en,
+            ...(f.title_fa ? { alternateName: f.title_fa } : {}),
             ...(f.director_en ? { director: { "@type": "Person", name: f.director_en } } : {}),
             ...(f.year ? { datePublished: String(f.year) } : {}),
             ...(f.cover_url ? { image: f.cover_url } : {}),
             ...(f.synopsis_en ? { description: f.synopsis_en } : {}),
+            ...(isoDuration ? { duration: isoDuration } : {}),
+            inLanguage: "fa",
+            countryOfOrigin: { "@type": "Country", name: "Iran" },
+            ...(f.category ? { genre: f.category } : {}),
             url,
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "IRAN", item: "https://ir.show/" },
+              { "@type": "ListItem", position: 2, name: "Browse", item: "https://ir.show/browse" },
+              { "@type": "ListItem", position: 3, name: f.title_en, item: url },
+            ],
           }),
         },
       ],
     };
   },
+
   component: FilmPage,
   errorComponent: ({ error }) => {
     console.error("films.$slug error:", error);
