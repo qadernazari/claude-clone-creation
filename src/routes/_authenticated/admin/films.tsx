@@ -201,7 +201,7 @@ function FilmsAdminPage() {
                     <div className="flex items-center gap-2">
                       <AssetBadge label="Thumb" present={!!f.thumbnail_url} url={f.thumbnail_url} kind="image" icon={<ImageIcon className="h-3 w-3" />} />
                       <AssetBadge label="Trailer" present={!!f.preview_url} url={f.preview_url} kind="video" icon={<Clapperboard className="h-3 w-3" />} />
-                      <AssetBadge label="Video" present={!!f.video_url} url={f.video_url} kind="video" icon={<FilmIcon className="h-3 w-3" />} />
+                      <AssetBadge label="Video" present={videoIdSet.has(f.id)} url={null} kind="video" icon={<FilmIcon className="h-3 w-3" />} />
                     </div>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{f.category ?? "—"}</td>
