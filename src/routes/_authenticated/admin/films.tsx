@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Plus, Pencil, BarChart3, Eye, EyeOff, X } from "lucide-react";
 import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
+import { FileUpload } from "@/components/admin/file-upload";
 import { capitalize } from "@/lib/cms";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
