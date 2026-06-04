@@ -281,6 +281,7 @@ export type Database = {
       films: {
         Row: {
           access_mode: string
+          access_type: Database["public"]["Enums"]["film_access_type"]
           category: string | null
           cover_url: string | null
           created_at: string
@@ -288,6 +289,7 @@ export type Database = {
           director_fa: string | null
           duration_min: number | null
           id: string
+          is_premium: boolean
           poster_gradient: string | null
           preview_url: string | null
           price_cents: number
@@ -306,6 +308,7 @@ export type Database = {
         }
         Insert: {
           access_mode?: string
+          access_type?: Database["public"]["Enums"]["film_access_type"]
           category?: string | null
           cover_url?: string | null
           created_at?: string
@@ -313,6 +316,7 @@ export type Database = {
           director_fa?: string | null
           duration_min?: number | null
           id?: string
+          is_premium?: boolean
           poster_gradient?: string | null
           preview_url?: string | null
           price_cents?: number
@@ -331,6 +335,7 @@ export type Database = {
         }
         Update: {
           access_mode?: string
+          access_type?: Database["public"]["Enums"]["film_access_type"]
           category?: string | null
           cover_url?: string | null
           created_at?: string
@@ -338,6 +343,7 @@ export type Database = {
           director_fa?: string | null
           duration_min?: number | null
           id?: string
+          is_premium?: boolean
           poster_gradient?: string | null
           preview_url?: string | null
           price_cents?: number
@@ -508,6 +514,57 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string
+          id: string
+          price_id: string
+          product_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          trial_end: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          price_id: string
+          product_id: string
+          status?: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          trial_end?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          price_id?: string
+          product_id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          trial_end?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -616,6 +673,10 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      has_active_subscription: {
+        Args: { check_env?: string; user_uuid: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -643,6 +704,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "supporter"
+      film_access_type: "membership" | "ppv_only" | "membership_or_ppv" | "free"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -771,6 +833,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "supporter"],
+      film_access_type: ["membership", "ppv_only", "membership_or_ppv", "free"],
     },
   },
 } as const
