@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { loadCmsKey } from "@/lib/cms-client";
@@ -14,6 +14,15 @@ export function SiteFooter() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const { openPage } = usePageOverlay();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (isHome) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const { data: pages } = useQuery({
     queryKey: ["site_content", CMS_KEYS.PAGES],
@@ -59,7 +68,7 @@ export function SiteFooter() {
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/30">
                 {fa ? "گردش" : "Explore"}
               </span>
-              <Link to="/" className="text-sm text-cream/65 transition-colors hover:text-amber">
+              <Link to="/" onClick={handleHomeClick} className="text-sm text-cream/65 transition-colors hover:text-amber">
                 {fa ? "خانه" : "Home"}
               </Link>
               <Link to="/browse" className="text-sm text-cream/65 transition-colors hover:text-amber">

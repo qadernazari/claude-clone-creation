@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
@@ -41,7 +41,16 @@ function LanguageToggle() {
 
 export function SiteHeader({ current }: { current?: "home" | "browse" | "about" }) {
   const { locale } = useLocale();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   const [scrolled, setScrolled] = useState(false);
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (isHome) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -71,11 +80,11 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
         }`}
       >
         <div className="flex items-center gap-10">
-          <Link to="/" className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
+          <Link to="/" onClick={handleHomeClick} className="inline-flex items-center transition-opacity hover:opacity-80" aria-label="IRAN — home">
             <Logo size={32} />
           </Link>
           <nav className="hidden gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] md:flex">
-            <Link to="/" className={linkCls("home")}>
+            <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
               {locale === "fa" ? "خانه" : "Home"}
             </Link>
             <Link to="/browse" className={linkCls("browse")}>
