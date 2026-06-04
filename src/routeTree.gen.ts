@@ -39,6 +39,7 @@ import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminFooterRouteImport } from './routes/_authenticated/admin/footer'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
+import { Route as AuthenticatedAdminCouponsRouteImport } from './routes/_authenticated/admin/coupons'
 import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin/contributions'
 import { Route as AuthenticatedAdminContactSubmissionsRouteImport } from './routes/_authenticated/admin/contact-submissions'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
@@ -209,6 +210,12 @@ const AuthenticatedAdminFaqRoute = AuthenticatedAdminFaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminCouponsRoute =
+  AuthenticatedAdminCouponsRouteImport.update({
+    id: '/coupons',
+    path: '/coupons',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminContributionsRoute =
   AuthenticatedAdminContributionsRouteImport.update({
     id: '/contributions',
@@ -314,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
+  '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/footer': typeof AuthenticatedAdminFooterRoute
@@ -358,6 +366,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
+  '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/footer': typeof AuthenticatedAdminFooterRoute
@@ -405,6 +414,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
+  '/_authenticated/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/_authenticated/admin/footer': typeof AuthenticatedAdminFooterRoute
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/contact-submissions'
     | '/admin/contributions'
+    | '/admin/coupons'
     | '/admin/faq'
     | '/admin/films'
     | '/admin/footer'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/contact-submissions'
     | '/admin/contributions'
+    | '/admin/coupons'
     | '/admin/faq'
     | '/admin/films'
     | '/admin/footer'
@@ -542,6 +554,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/contact-submissions'
     | '/_authenticated/admin/contributions'
+    | '/_authenticated/admin/coupons'
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/films'
     | '/_authenticated/admin/footer'
@@ -800,6 +813,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFaqRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/coupons': {
+      id: '/_authenticated/admin/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AuthenticatedAdminCouponsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/contributions': {
       id: '/_authenticated/admin/contributions'
       path: '/contributions'
@@ -926,6 +946,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminContactSubmissionsRoute: typeof AuthenticatedAdminContactSubmissionsRoute
   AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
+  AuthenticatedAdminCouponsRoute: typeof AuthenticatedAdminCouponsRoute
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminFilmsRoute: typeof AuthenticatedAdminFilmsRouteWithChildren
   AuthenticatedAdminFooterRoute: typeof AuthenticatedAdminFooterRoute
@@ -949,6 +970,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminContactSubmissionsRoute:
       AuthenticatedAdminContactSubmissionsRoute,
     AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
+    AuthenticatedAdminCouponsRoute: AuthenticatedAdminCouponsRoute,
     AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
     AuthenticatedAdminFilmsRoute: AuthenticatedAdminFilmsRouteWithChildren,
     AuthenticatedAdminFooterRoute: AuthenticatedAdminFooterRoute,
@@ -1011,13 +1033,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

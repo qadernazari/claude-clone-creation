@@ -112,6 +112,119 @@ export type Database = {
           },
         ]
       }
+      coupon_redemptions: {
+        Row: {
+          amount_off: number | null
+          context: string
+          coupon_id: string
+          created_at: string
+          film_id: string | null
+          id: string
+          stripe_coupon_id: string | null
+          stripe_session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_off?: number | null
+          context: string
+          coupon_id: string
+          created_at?: string
+          film_id?: string | null
+          id?: string
+          stripe_coupon_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_off?: number | null
+          context?: string
+          coupon_id?: string
+          created_at?: string
+          film_id?: string | null
+          id?: string
+          stripe_coupon_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          applies_to: Database["public"]["Enums"]["coupon_applies_to"]
+          code: string
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          description: string | null
+          discount_type: Database["public"]["Enums"]["coupon_discount_type"]
+          discount_value: number
+          expires_at: string | null
+          film_id: string | null
+          id: string
+          max_redemptions: number | null
+          redemptions_count: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: Database["public"]["Enums"]["coupon_applies_to"]
+          code: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          discount_type: Database["public"]["Enums"]["coupon_discount_type"]
+          discount_value: number
+          expires_at?: string | null
+          film_id?: string | null
+          id?: string
+          max_redemptions?: number | null
+          redemptions_count?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          applies_to?: Database["public"]["Enums"]["coupon_applies_to"]
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          discount_type?: Database["public"]["Enums"]["coupon_discount_type"]
+          discount_value?: number
+          expires_at?: string | null
+          film_id?: string | null
+          id?: string
+          max_redemptions?: number | null
+          redemptions_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupons_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -777,6 +890,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "supporter"
+      coupon_applies_to: "membership" | "ticket" | "all"
+      coupon_discount_type: "percent" | "amount"
       film_access_type: "membership" | "ppv_only" | "membership_or_ppv" | "free"
     }
     CompositeTypes: {
@@ -906,6 +1021,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "supporter"],
+      coupon_applies_to: ["membership", "ticket", "all"],
+      coupon_discount_type: ["percent", "amount"],
       film_access_type: ["membership", "ppv_only", "membership_or_ppv", "free"],
     },
   },
