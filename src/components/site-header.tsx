@@ -41,7 +41,16 @@ function LanguageToggle() {
 
 export function SiteHeader({ current }: { current?: "home" | "browse" | "about" }) {
   const { locale } = useLocale();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   const [scrolled, setScrolled] = useState(false);
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (isHome) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
