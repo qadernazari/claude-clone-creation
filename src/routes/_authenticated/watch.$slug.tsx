@@ -246,7 +246,7 @@ function WatchPage() {
     aboutFilm: fa ? "درباره فیلم" : "About the film",
   };
 
-  const showPlayer = !isLoading && !!ticket && !!videoUrl;
+  const showPlayer = !isLoading && hasAccess && !!videoUrl;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
