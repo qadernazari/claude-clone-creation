@@ -406,7 +406,9 @@ function FilmPage() {
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          {t.watch}
+                          {resumeSec > 0
+                            ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}`
+                            : t.watch}
                         </Link>
                       ) : isMember ? (
                         // Member viewing a ppv_only premium film
