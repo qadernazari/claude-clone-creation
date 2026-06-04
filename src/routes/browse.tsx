@@ -163,14 +163,14 @@ function BrowsePage() {
       <SiteHeader current="browse" />
       <main className="mx-auto max-w-7xl px-6 pb-28 pt-36 md:pt-40">
 
-        <header className="mb-14 max-w-2xl fade-up">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-amber">
-            {locale === "fa" ? "کاتالوگ" : "Catalog"}
-          </p>
-          <h1 className="mt-4 font-display text-5xl leading-[0.95] text-cream-bright md:text-7xl">
-            {locale === "fa" ? "همه‌ی فیلم‌ها" : "Browse every film"}
+        <header className="mb-14 max-w-3xl fade-up">
+          <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+            {locale === "fa" ? "کاتالوگ" : "The Catalog"}
+          </span>
+          <h1 className="mt-5 font-editorial italic font-normal text-cream-bright text-5xl leading-[1.02] tracking-[-0.02em] md:text-6xl">
+            {locale === "fa" ? "همه‌ی فیلم‌ها" : "Every film, in one place"}
           </h1>
-          <p className="mt-5 max-w-lg text-base text-cream/55">
+          <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-cream/55">
             {locale === "fa"
               ? "با فیلتر دسته‌بندی، جست‌وجو و مرتب‌سازی، اثر بعدی‌ات را پیدا کن."
               : "Filter by category, search by title or director, and sort to find your next watch."}
@@ -185,17 +185,17 @@ function BrowsePage() {
             placeholder={
               locale === "fa" ? "جست‌وجو در عنوان یا کارگردان…" : "Search title or director…"
             }
-            className="w-full max-w-sm rounded-full border border-cream/15 bg-bg-1/60 px-5 py-2.5 text-sm text-cream placeholder:text-cream/35 transition-all focus:border-amber/60 focus:bg-bg-1 focus:outline-none focus:ring-1 focus:ring-amber/30"
+            className="w-full max-w-sm rounded-full border border-cream/10 bg-bg-1/60 px-5 py-2.5 text-sm text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none"
           />
-          <div className="flex items-center gap-3 text-xs text-cream/60">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-cream/45">
+          <div className="flex items-center gap-3 text-xs text-cream/55">
+            <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
               {locale === "fa" ? "مرتب‌سازی" : "Sort"}
             </span>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
               aria-label={locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
-              className="rounded-full border border-cream/15 bg-bg-1/60 px-4 py-2 text-cream transition-colors hover:border-cream/30 focus:border-amber/60 focus:outline-none"
+              className="rounded-full border border-cream/10 bg-bg-1/60 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none"
             >
               {sortOptions.map((o) => (
                 <option key={o.key} value={o.key}>
@@ -269,14 +269,14 @@ function BrowsePage() {
                   setActive(null);
                   setQ("");
                 }}
-                className="mt-6 text-[11px] font-semibold uppercase tracking-[0.25em] text-amber transition-colors hover:text-amber-bright"
+                className="mt-6 text-[11px] font-medium uppercase tracking-[0.25em] text-cream/70 transition-colors hover:text-cream-bright"
               >
                 {locale === "fa" ? "پاک‌سازی فیلترها" : "Clear filters"}
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-5 md:gap-y-10 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4">
             {filtered.map((film) => {
               const ftitle =
                 locale === "fa" ? film.title_fa || film.title_en : film.title_en;
@@ -287,31 +287,17 @@ function BrowsePage() {
                 : film.poster_gradient || fallbackGradient(film.id);
               return (
                 <a key={film.id} href={`/films/${film.slug}`} className="group block">
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-bg-1">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
                     <div className="cine-img absolute inset-0" style={{ background: bg }} />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/85 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    {film.category ? (
-                      <span className="absolute left-3 top-3 rounded-full bg-bg-0/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-cream/85 backdrop-blur-md rtl:left-auto rtl:right-3">
-                        {film.category}
-                      </span>
-                    ) : null}
-                    <span className="pointer-events-none absolute bottom-3 right-3 translate-y-2 rounded-full bg-amber px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-ink opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 rtl:right-auto rtl:left-3">
-                      {locale === "fa" ? "تماشا" : "Watch"}
-                    </span>
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   </div>
                   <div className="mt-4 px-0.5">
-                    <h3 className="font-display text-[15px] leading-tight text-cream-bright transition-colors group-hover:text-amber-bright">
+                    <h3 className="font-display text-[14px] font-medium leading-snug tracking-[-0.01em] text-cream-bright line-clamp-1">
                       {ftitle}
                     </h3>
-                    <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/45">
+                    <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1">
                       {director}
-                      {film.duration_min ? (
-                        <>
-                          {" · "}
-                          {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
-                        </>
-                      ) : null}
-                      {film.year ? <> {" · "} {num(film.year)} </> : null}
+                      {film.year ? <> {" · "} {num(film.year)}</> : null}
                     </p>
                   </div>
                 </a>
