@@ -41,8 +41,8 @@ export function FeaturedFilm() {
     staleTime: 60_000,
   });
 
-  if (isLoading) return <BrandHero />;
-  if (!data) return <BrandHero />;
+  if (isLoading) return <HeroSkeleton />;
+  if (!data) return null;
 
   const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
   const director = t({
