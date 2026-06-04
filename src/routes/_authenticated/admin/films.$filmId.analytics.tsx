@@ -3,26 +3,50 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ArrowLeft, Eye, Users, Clock, Activity, Ticket as TicketIcon,
-  HeartHandshake, DollarSign, Crown, Sparkles, Globe2, BarChart3,
+  ArrowLeft,
+  Eye,
+  Users,
+  Clock,
+  Activity,
+  Ticket as TicketIcon,
+  HeartHandshake,
+  DollarSign,
+  Crown,
+  Sparkles,
+  Globe2,
+  BarChart3,
+  MapPin,
+  MonitorSmartphone,
 } from "lucide-react";
-import { PageHeader } from "@/components/admin/bilingual-field";
 import { capitalize } from "@/lib/cms";
 
 export const Route = createFileRoute("/_authenticated/admin/films/$filmId/analytics")({
   component: FilmAnalyticsPage,
+  errorComponent: ({ error }) => (
+    <div className="p-8 max-w-2xl">
+      <Link to="/admin/films" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4">
+        <ArrowLeft className="h-4 w-4" /> Films
+      </Link>
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+        <h1 className="font-medium text-destructive mb-1">Couldn't open film analytics</h1>
+        <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : "The analytics page could not be rendered."}</p>
+      </div>
+    </div>
+  ),
 });
 
 async function loadAll(filmId: string) {
   const [film, events, tickets, contribs, progress, profiles] = await Promise.all([
-    supabase.from("films").select("id, slug, title_en, title_fa, access_type, is_premium, duration_min").eq("id", filmId).maybeSingle(),
+    supabase.from("films").select("id, slug, title_en, title_fa, cover_url, thumbnail_url, poster_gradient, access_type, is_premium, duration_min").eq("id", filmId).maybeSingle(),
     supabase.from("events").select("id, type, value, country, session_id, created_at").eq("film_id", filmId).order("created_at", { ascending: false }).limit(5000),
     supabase.from("tickets").select("id, status, amount, currency, paid_at, created_at, user_id, provider").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("contributions").select("id, status, amount, currency, paid_at, created_at, user_id, provider, supporter").eq("film_id", filmId).order("created_at", { ascending: false }),
     supabase.from("watch_progress").select("user_id, position_seconds, duration_seconds, completed, updated_at").eq("film_id", filmId),
     supabase.from("profiles").select("id, email, full_name"),
   ]);
-  if (film.error) throw new Error(film.error.message);
+  for (const result of [film, events, tickets, contribs, progress, profiles]) {
+    if (result.error) throw new Error(result.error.message);
+  }
   const profileMap = new Map((profiles.data ?? []).map((p) => [p.id, p]));
   return {
     film: film.data,
@@ -67,7 +91,8 @@ function FilmAnalyticsPage() {
     const views = ev.filter((e) => e.type === "view").length;
     const completes = ev.filter((e) => e.type === "complete").length;
     const sessions = new Set(ev.map((e) => e.session_id).filter(Boolean) as string[]);
-    const uniqueViewers = sessions.size || wp.length || 0;
+    const progressUsers = new Set(wp.map((p) => p.user_id).filter(Boolean) as string[]);
+    const uniqueViewers = sessions.size || progressUsers.size || views;
 
     const watchSeconds = wp.reduce((s, p) => s + (p.position_seconds || 0), 0);
     const avgWatchSeconds = wp.length ? Math.round(watchSeconds / wp.length) : 0;
@@ -86,6 +111,8 @@ function FilmAnalyticsPage() {
     return {
       views, completes, uniqueViewers, completion,
       watchSeconds, avgWatchSeconds,
+      continueWatching: wp.filter((p) => !p.completed && (p.position_seconds || 0) > 15).length,
+      uniqueViewersEstimated: sessions.size === 0 && progressUsers.size === 0 && views > 0,
       ppvCount: paidTickets.length,
       contribCount: paidContribs.length,
       ticketRevUsd, ticketRevToman, contribRevUsd, contribRevToman,
@@ -185,12 +212,12 @@ function FilmAnalyticsPage() {
         </div>
       </div>
 
-      <PageHeader title={film.title_en} subtitle="Per-film performance" />
+      <FilmHero film={film} />
 
       {totallyEmpty ? (
         <div className="rounded-lg border border-border bg-card/40 p-12 text-center">
           <BarChart3 className="mx-auto h-10 w-10 text-muted-foreground/40 mb-3" />
-          <h3 className="font-medium mb-1">No analytics data available yet</h3>
+          <h3 className="font-medium mb-1">No analytics data available for this film yet.</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
             Views, watch time, purchases and contributions will appear here once viewers start
             interacting with this film.
@@ -202,12 +229,12 @@ function FilmAnalyticsPage() {
           <SectionHeader title="Engagement" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard icon={<Eye className="h-4 w-4" />} label="Total views" value={stats.views.toLocaleString()} />
-            <StatCard icon={<Users className="h-4 w-4" />} label="Unique viewers" value={stats.uniqueViewers.toLocaleString()} hint={stats.uniqueViewers === 0 ? "Tracked via sessions" : undefined} />
+            <StatCard icon={<Users className="h-4 w-4" />} label="Unique viewers" value={stats.uniqueViewers.toLocaleString()} hint={stats.uniqueViewersEstimated ? "Estimated from view events" : undefined} />
             <StatCard icon={<Clock className="h-4 w-4" />} label="Total watch time" value={formatDuration(stats.watchSeconds)} />
             <StatCard icon={<Activity className="h-4 w-4" />} label="Avg. watch duration" value={formatDuration(stats.avgWatchSeconds)} />
             <StatCard icon={<Activity className="h-4 w-4" />} label="Completion rate" value={`${stats.completion}%`} />
             <StatCard icon={<Eye className="h-4 w-4" />} label="Completes" value={stats.completes.toLocaleString()} />
-            <StatCard icon={<Users className="h-4 w-4" />} label="Watchers in progress" value={data.progress.length.toLocaleString()} />
+            <StatCard icon={<Users className="h-4 w-4" />} label="Continue watching" value={stats.continueWatching.toLocaleString()} />
             <StatCard icon={<Clock className="h-4 w-4" />} label="Film length" value={film.duration_min ? `${film.duration_min} min` : "—"} />
           </div>
 
@@ -328,6 +355,31 @@ function FilmAnalyticsPage() {
 
 function SectionHeader({ title }: { title: string }) {
   return <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 mt-2">{title}</h2>;
+}
+
+function FilmHero({ film }: { film: { title_en: string; title_fa: string | null; cover_url: string | null; thumbnail_url: string | null; poster_gradient: string | null; duration_min: number | null; access_type: string; is_premium: boolean } }) {
+  const poster = film.cover_url || film.thumbnail_url;
+  return (
+    <header className="mb-6 rounded-lg border border-border bg-card/40 p-4 sm:p-5">
+      <div className="flex items-center gap-4">
+        {poster ? (
+          <img src={poster} alt={`${film.title_en} poster`} className="h-24 w-16 shrink-0 rounded-md object-cover ring-1 ring-border" />
+        ) : (
+          <div className="h-24 w-16 shrink-0 rounded-md ring-1 ring-border" style={{ background: film.poster_gradient ?? "var(--muted)" }} />
+        )}
+        <div className="min-w-0">
+          <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Film analytics</div>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{film.title_en}</h1>
+          {film.title_fa && <p className="mt-1 text-sm text-muted-foreground" dir="rtl">{film.title_fa}</p>}
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-muted px-2 py-0.5">{capitalize(film.access_type.replaceAll("_", " "))}</span>
+            {film.is_premium && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-primary">Premium</span>}
+            <span className="rounded-full bg-muted px-2 py-0.5">{film.duration_min ? `${film.duration_min} min` : "Duration not set"}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
 }
 
 function StatCard({ icon, label, value, hint }: { icon: React.ReactNode; label: string; value: string; hint?: string }) {
