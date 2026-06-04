@@ -314,11 +314,15 @@ function FilmAnalyticsPage() {
             </div>
           </div>
 
-          {/* Not-yet-tracked metrics */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
-            <NotTracked title="City breakdown" hint="Add city to event logging to populate this." />
-            <NotTracked title="Device breakdown" hint="Capture user-agent on view events to populate this." />
-            <NotTracked title="Traffic sources" hint="Log referrer on view events to populate this." />
+          {/* Geo / Device / Traffic breakdowns */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <BreakdownCard icon={<MapPin className="h-4 w-4" />} title="Top cities" rows={cities} emptyText="No city data captured yet." />
+            <BreakdownCard icon={<Globe2 className="h-4 w-4" />} title="Traffic sources" rows={sources} emptyText="No referrer data captured yet." />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <BreakdownCard icon={<MonitorSmartphone className="h-4 w-4" />} title="Devices" rows={devices} emptyText="No device data captured yet." />
+            <BreakdownCard icon={<MonitorSmartphone className="h-4 w-4" />} title="Operating systems" rows={oses} emptyText="No OS data captured yet." />
+            <BreakdownCard icon={<MonitorSmartphone className="h-4 w-4" />} title="Browsers" rows={browsers} emptyText="No browser data captured yet." />
           </div>
 
           {/* Transactions */}
