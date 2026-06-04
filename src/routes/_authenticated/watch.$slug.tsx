@@ -116,12 +116,12 @@ function WatchPage() {
 
   const countdown = useCountdown(ticket?.expires_at);
 
-  // Log a play event once when ticket becomes available
+  // Log a play event once when access is established
   useEffect(() => {
-    if (ticket) {
+    if (hasAccess) {
       supabase.from("events").insert({ type: "play", film_id: film.id }).then(() => {});
     }
-  }, [ticket, film.id]);
+  }, [hasAccess, film.id]);
 
   // Resume position: fetch from DB on mount, sync up every ~10s
   const saveProgress = useServerFn(upsertWatchProgress);
@@ -131,13 +131,13 @@ function WatchPage() {
   const resumedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!ticket) return;
+    if (!hasAccess) return;
     fetchResume({ data: { filmId: film.id } })
       .then((r) => {
         if (!r.completed && r.positionSeconds > 10) resumePosRef.current = r.positionSeconds;
       })
       .catch(() => {});
-  }, [ticket, film.id, fetchResume]);
+  }, [hasAccess, film.id, fetchResume]);
 
   const onLoadedMetadata = useCallback(() => {
     const v = videoRef.current;
