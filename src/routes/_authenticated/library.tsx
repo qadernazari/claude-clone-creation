@@ -346,9 +346,9 @@ function ContinueCard({
         style={{ background: (film.poster_gradient as string) || fallbackGradient }}
         className="hairline relative aspect-video w-full overflow-hidden rounded-xl border bg-bg-1"
       >
-        {film.cover_url && (
+        {(film.thumbnail_url || film.cover_url) && (
           <img
-            src={film.cover_url}
+            src={film.thumbnail_url || film.cover_url || ""}
             alt=""
             loading="lazy"
             decoding="async"
