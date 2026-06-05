@@ -324,3 +324,15 @@ body[data-no-tabbar="true"] {
 .cms-prose a:hover { text-decoration-color: var(--amber); }
 [dir="rtl"] .cms-prose { line-height: 1.95; }
 
+
+/* Account sheet — bottom-sheet slide-up on mobile */
+@keyframes slide-up-sheet {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@utility animate-slide-up-sheet {
+  animation: slide-up-sheet 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up-sheet { animation: none; }
+}
