@@ -341,14 +341,8 @@ export function AuthMenu() {
                 to="/account"
                 onClick={() => setOpen(false)}
                 className={[
-                  "group flex items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors",
-                  membership.tone === "amber"
-                    ? "border-amber/25 bg-amber/[7.000000000000001%] hover:bg-amber/[12%]"
-                    : membership.tone === "green"
-                      ? "border-emerald-400/20 bg-emerald-400/[6%] hover:bg-emerald-400/[10%]"
-                      : membership.tone === "red"
-                        ? "border-red-500/25 bg-red-500/[8%] hover:bg-red-500/[14.000000000000002%]"
-                        : "border-cream/10 bg-cream/[3%] hover:bg-cream/[6%]",
+                  "auth-menu-membership group flex items-center justify-between gap-3 px-4 py-3 transition-colors",
+                  `auth-menu-membership-${membership.tone}`,
                 ].join(" ")}
               >
                 <div className="min-w-0">
