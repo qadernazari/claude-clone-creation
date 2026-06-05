@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
+import { useCurrentUser } from "@/hooks/use-subscription";
 
 type Film = HomeFeaturedFilm;
 
