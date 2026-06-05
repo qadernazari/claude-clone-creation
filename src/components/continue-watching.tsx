@@ -110,9 +110,9 @@ export function ContinueWatching() {
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
               <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
-                {f.cover_url ? (
+                {f.thumbnail_url || f.cover_url ? (
                   <img
-                    src={f.cover_url}
+                    src={f.thumbnail_url || f.cover_url || ""}
                     alt=""
                     loading="lazy"
                     decoding="async"
