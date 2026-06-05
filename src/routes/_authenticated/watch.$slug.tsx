@@ -486,7 +486,7 @@ function WatchPage() {
         </div>
 
         {/* Title block */}
-        <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
+        <div className="mt-5 grid gap-6 px-5 md:mt-6 md:grid-cols-[1fr_auto] md:items-start md:px-0">
           <div>
             <h1 className={`text-2xl md:text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
               {title}
