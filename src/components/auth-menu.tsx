@@ -154,7 +154,6 @@ export function AuthMenu() {
   useEffect(() => {
     if (!user) {
       setIsAdmin(false);
-      setSub(null);
       return;
     }
     supabase
@@ -164,14 +163,6 @@ export function AuthMenu() {
       .eq("role", "admin")
       .maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
-    supabase
-      .from("subscriptions")
-      .select("status, current_period_end, trial_end, cancel_at_period_end")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => setSub((data as SubInfo) ?? null));
   }, [user]);
 
   async function signOut() {
@@ -179,31 +170,53 @@ export function AuthMenu() {
     setOpen(false);
   }
 
-  const trialDaysLeft = (() => {
-    if (!sub || sub.status !== "trialing" || !sub.trial_end) return null;
-    const ms = new Date(sub.trial_end).getTime() - Date.now();
-    if (ms <= 0) return null;
+  const dateFmt = (iso: string) =>
+    new Date(iso).toLocaleDateString(fa ? "fa-IR" : "en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  const daysLeft = (iso: string) => {
+    const ms = new Date(iso).getTime() - Date.now();
+    if (ms <= 0) return 0;
     return Math.max(1, Math.ceil(ms / 86400000));
-  })();
-  const pastDue = sub?.status === "past_due";
-  const isMember =
-    sub?.status === "active" || sub?.status === "trialing";
+  };
+
+  const pastDue = subscription?.status === "past_due";
+  const subActive =
+    !!subscription &&
+    ["active", "trialing"].includes(subscription.status) &&
+    (!subscription.current_period_end ||
+      new Date(subscription.current_period_end) > new Date());
+  const subCanceledButValid =
+    subscription?.status === "canceled" &&
+    !!subscription.current_period_end &&
+    new Date(subscription.current_period_end) > new Date();
 
   const membership: {
     label: string;
     tone: "amber" | "green" | "red" | "neutral";
   } = pastDue
     ? { label: fa ? "پرداخت ناموفق" : "Payment failed", tone: "red" }
-    : trialDaysLeft !== null
+    : isTrialActive && trial
       ? {
           label: fa
-            ? `دوره آزمایشی · ${trialDaysLeft} روز باقی‌مانده`
-            : `Trial · ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left`,
+            ? `دوره آزمایشی فعال · ${daysLeft(trial.ends_at)} روز باقی‌مانده`
+            : `Free Trial Active · ${daysLeft(trial.ends_at)} day${daysLeft(trial.ends_at) === 1 ? "" : "s"} left`,
           tone: "amber",
         }
-      : isMember
-        ? { label: fa ? "عضو فعال" : "Active member", tone: "green" }
-        : { label: fa ? "بدون اشتراک" : "No active plan", tone: "neutral" };
+      : subActive
+        ? { label: fa ? "عضو فعال" : "Membership Active", tone: "green" }
+        : subCanceledButValid && subscription?.current_period_end
+          ? {
+              label: fa
+                ? `فعال تا ${dateFmt(subscription.current_period_end)}`
+                : `Active until ${dateFmt(subscription.current_period_end)}`,
+              tone: "amber",
+            }
+          : isTrialExpired
+            ? { label: fa ? "دوره آزمایشی تمام شد" : "Trial Expired", tone: "red" }
+            : { label: fa ? "بدون اشتراک" : "No active plan", tone: "neutral" };
 
   if (isUserLoading) {
     return (
