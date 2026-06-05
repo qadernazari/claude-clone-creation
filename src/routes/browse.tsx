@@ -72,7 +72,7 @@ function fallbackGradient(seed: string) {
 }
 
 function BrowsePage() {
-  const { locale, num, t } = useLocale();
+  const { locale, num, year, t } = useLocale();
   const [active, setActive] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("curated");
   const [q, setQ] = useState("");

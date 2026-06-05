@@ -6,7 +6,7 @@ import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functio
 type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
-  const { locale, num, t } = useLocale();
+  const { locale, num, year, t } = useLocale();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
 
