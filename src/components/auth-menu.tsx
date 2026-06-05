@@ -33,7 +33,54 @@ export function AuthMenu() {
   const [sub, setSub] = useState<SubInfo>(null);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragStartYRef = useRef<number | null>(null);
   const lockedScrollYRef = useRef(0);
+
+  function resetSheetDrag() {
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+    sheet.style.transform = "";
+    sheet.style.transition = "";
+  }
+
+  function closeSheet() {
+    resetSheetDrag();
+    setOpen(false);
+  }
+
+  function onDragHandleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    const touch = event.touches[0];
+    if (!touch) return;
+    dragStartYRef.current = touch.clientY;
+    if (sheetRef.current) sheetRef.current.style.transition = "none";
+  }
+
+  function onDragHandleTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+    const startY = dragStartYRef.current;
+    const touch = event.touches[0];
+    if (startY === null || !touch || !sheetRef.current) return;
+    const deltaY = touch.clientY - startY;
+    if (deltaY <= 0) return;
+    event.preventDefault();
+    sheetRef.current.style.transform = `translateY(${Math.min(deltaY, 180)}px)`;
+  }
+
+  function onDragHandleTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+    const startY = dragStartYRef.current;
+    dragStartYRef.current = null;
+    if (startY === null) return;
+    const endY = event.changedTouches[0]?.clientY ?? startY;
+    if (endY - startY > 72) {
+      closeSheet();
+      return;
+    }
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+    sheet.style.transition = "transform 180ms ease-out";
+    sheet.style.transform = "translateY(0)";
+    window.setTimeout(resetSheetDrag, 190);
+  }
 
   // Lock page scroll + hide mobile tab bar while the sheet is open.
   // The fixed-body pattern is needed for iOS Safari/Chrome, where overflow:hidden alone can still rubber-band the page.
@@ -67,15 +114,8 @@ export function AuthMenu() {
     html.dataset.authSheetOpen = "true";
     body.dataset.authSheetOpen = "true";
 
-    const preventBackgroundTouch = (event: TouchEvent) => {
-      const target = event.target as Element | null;
-      if (target?.closest?.('[data-auth-scroll="true"]')) return;
-      event.preventDefault();
-    };
-
-    document.addEventListener("touchmove", preventBackgroundTouch, { passive: false });
     return () => {
-      document.removeEventListener("touchmove", preventBackgroundTouch);
+      resetSheetDrag();
       html.style.overflow = previousHtml.overflow;
       html.style.overscrollBehavior = previousHtml.overscrollBehavior;
       body.style.overflow = previousBody.overflow;
@@ -222,32 +262,41 @@ export function AuthMenu() {
           {/* Mobile scrim — fades the page behind the sheet */}
           <div
             className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm animate-fade-in md:hidden"
-            onClick={() => setOpen(false)}
+            onClick={closeSheet}
+            onTouchMove={(event) => event.preventDefault()}
             aria-hidden
           />
 
           {/* Panel — bottom sheet on mobile, anchored dropdown on desktop */}
           <div
+            ref={sheetRef}
             role="dialog"
             data-auth-sheet="true"
             aria-label={fa ? "حساب کاربری" : "Account"}
             className={[
               // Mobile sheet
-              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] touch-pan-y flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
               // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
               "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
           >
 
             {/* Mobile grabber */}
-            <div className="flex justify-center pt-3 md:hidden">
+            <div
+              className="flex justify-center pt-3 pb-2 md:hidden"
+              onTouchStart={onDragHandleTouchStart}
+              onTouchMove={onDragHandleTouchMove}
+              onTouchEnd={onDragHandleTouchEnd}
+              onTouchCancel={resetSheetDrag}
+            >
               <span className="h-1 w-10 rounded-full bg-cream/20" aria-hidden />
             </div>
             {/* Mobile close */}
             <button
               type="button"
-              onClick={() => setOpen(false)}
-              className="absolute end-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 bg-cream/5 text-cream/70 hover:text-cream-bright hover:bg-cream/10 md:hidden"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={closeSheet}
+              className="absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/10 bg-cream/10 text-cream/80 hover:text-cream-bright hover:bg-cream/15 md:hidden"
               aria-label={fa ? "بستن" : "Close"}
             >
               <X size={16} strokeWidth={1.8} />
@@ -255,7 +304,7 @@ export function AuthMenu() {
 
             <div
               data-auth-scroll="true"
-              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-0"
+              className="min-h-0 flex-1 touch-pan-y overflow-y-auto overflow-x-hidden overscroll-contain px-0"
               style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", WebkitOverflowScrolling: "touch" }}
             >
 
