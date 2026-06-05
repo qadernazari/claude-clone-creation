@@ -22,6 +22,16 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
   const { hasUsedTrial, isMember } = useSubscription();
   const showTrialCta = !hasUsedTrial && !isMember;
 
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const result = await createMembershipCheckout({
       data: {
