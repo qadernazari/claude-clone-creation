@@ -153,54 +153,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   );
 }
 
-// Legacy unused mobile-menu fragment removed below — bottom tab bar replaces it.
-function _LegacyMobileMenu({ menuOpen: _o, setMenuOpen: _s, fa: _f }: { menuOpen: boolean; setMenuOpen: (v: boolean) => void; fa: boolean }) {
-  return null;
-
-      {/* Mobile menu overlay */}
-      <div
-        className={`fixed inset-0 z-20 md:hidden transition-opacity duration-300 ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        aria-hidden={!menuOpen}
-      >
-        <div
-          className="absolute inset-0 bg-bg-0/95 backdrop-blur-2xl"
-          onClick={() => setMenuOpen(false)}
-        />
-        <div
-          className={`relative flex h-full flex-col px-6 pb-10 transition-transform duration-500 ease-out ${
-            menuOpen ? "translate-y-0" : "-translate-y-4"
-          }`}
-          style={{
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
-            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 2.5rem)",
-          }}
-          dir={fa ? "rtl" : "ltr"}
-        >
-          <nav className="flex flex-1 flex-col gap-1 border-t border-line pt-6">
-            <Link to="/" onClick={handleHomeClick} className={mobileLinkCls("home")}>
-              {fa ? "خانه" : "Home"}
-            </Link>
-            <Link
-              to="/browse"
-              onClick={() => setMenuOpen(false)}
-              className={mobileLinkCls("browse")}
-            >
-              {fa ? "آثار اختصاصی" : "Originals"}
-            </Link>
-          </nav>
-          <div className="mt-auto flex items-center justify-between border-t border-line pt-6">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/40">
-              {fa ? "زبان" : "Language"}
-            </span>
-            <LanguageToggle size="lg" />
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
 
 function MembershipCta() {
   const { locale } = useLocale();
