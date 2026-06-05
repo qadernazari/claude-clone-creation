@@ -931,6 +931,56 @@ function FilmPage() {
         </div>
       )}
       <SiteFooter />
+
+      {/* Mobile-only sticky bottom CTA — sits above the bottom tab bar.
+          Hidden on desktop; mirrors the primary action from the hero so users
+          can always tap Watch / Buy / Sign-in without scrolling back up. */}
+      <div
+        className="fixed inset-x-0 z-30 md:hidden pointer-events-none"
+        style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
+        aria-hidden={false}
+      >
+        <div className="pointer-events-auto mx-3 mb-2 rounded-2xl border border-cream/10 bg-bg-0/90 px-3 py-2.5 backdrop-blur-xl shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.6)]">
+          {isAuthLoading ? (
+            <div className="h-11 w-full rounded-full bg-cream/10" aria-busy="true" />
+          ) : !user ? (
+            <Link
+              to="/auth"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+              {accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}
+            </Link>
+          ) : showWatchNow ? (
+            <Link
+              to="/watch/$slug"
+              params={{ slug: film.slug }}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+              {resumeSec > 0 ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}` : t.watch}
+            </Link>
+          ) : accessType === "ppv_only" || isMember ? (
+            <button
+              type="button"
+              onClick={() => setCheckoutOpen(true)}
+              disabled={tomanOnly}
+              className="flex h-11 w-full items-center justify-center rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+            >
+              {t.buy} — {priceLabel}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMembershipOpen(true)}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+              {t.startTrial}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
