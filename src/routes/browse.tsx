@@ -85,7 +85,7 @@ function BrowsePage() {
       const { data, error } = await supabase
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, created_at, sort_order",
+          "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, created_at, sort_order",
         )
         .eq("visibility", "published")
         .limit(200);
