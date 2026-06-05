@@ -81,9 +81,10 @@ function fallbackGradient(seed: string) {
 
 function BrowsePage() {
   const { locale, num, year, t } = useLocale();
+  const { q: initialQ } = Route.useSearch();
   const [active, setActive] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("curated");
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(initialQ);
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
   const { data: films, isLoading } = useQuery({
