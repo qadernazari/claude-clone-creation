@@ -455,7 +455,13 @@ function FilmPage() {
 
             {/* CTAs — integrated, not boxed */}
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              {!user ? (
+              {isAuthLoading ? (
+                <span
+                  aria-hidden
+                  className="inline-block h-[44px] w-[180px] rounded-full bg-cream/10 animate-pulse"
+                />
+              ) : !user ? (
+
                 <Link
                   to="/auth"
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
