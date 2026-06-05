@@ -193,7 +193,7 @@ export function AuthMenu() {
               // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
               "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
-            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 88px)" }}
+            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
           >
 
             {/* Mobile grabber */}
