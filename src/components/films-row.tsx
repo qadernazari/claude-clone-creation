@@ -196,7 +196,7 @@ export function FilmsRow() {
           subtitle={r.subtitle}
           films={r.films}
           locale={locale}
-          num={num}
+          year={year}
         />
       ))}
     </div>
