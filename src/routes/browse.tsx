@@ -348,7 +348,7 @@ function BrowsePage() {
         {isLoading ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-video animate-pulse rounded-lg bg-bg-1" aria-hidden />
+              <div key={i} className="aspect-[2/3] animate-pulse rounded-lg bg-bg-1" aria-hidden />
             ))}
           </div>
         ) : filtered.length === 0 ? (
