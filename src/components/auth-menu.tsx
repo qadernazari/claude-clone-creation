@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import {
   User as UserIcon,
@@ -33,20 +34,26 @@ export function AuthMenu() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Lock body scroll while the mobile sheet is open
+  // Lock body scroll + hide mobile tab bar while the sheet is open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    document.body.dataset.authSheetOpen = "true";
     return () => {
       document.body.style.overflow = prev;
+      delete document.body.dataset.authSheetOpen;
     };
   }, [open]);
+
 
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Element | null;
+      if (containerRef.current?.contains(target as Node)) return;
+      if (target?.closest?.('[data-auth-sheet="true"]')) return;
+      setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -166,11 +173,11 @@ export function AuthMenu() {
         )}
       </button>
 
-      {open && (
+      {open && typeof document !== "undefined" && createPortal(
         <>
           {/* Mobile scrim — fades the page behind the sheet */}
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in md:hidden"
+            className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm animate-fade-in md:hidden"
             onClick={() => setOpen(false)}
             aria-hidden
           />
@@ -178,15 +185,17 @@ export function AuthMenu() {
           {/* Panel — bottom sheet on mobile, anchored dropdown on desktop */}
           <div
             role="dialog"
+            data-auth-sheet="true"
             aria-label={fa ? "حساب کاربری" : "Account"}
             className={[
               // Mobile sheet
-              "fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
-              // Desktop dropdown
-              "md:absolute md:bottom-auto md:end-0 md:inset-x-auto md:top-full md:mt-3 md:w-[320px] md:max-h-none md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in md:overflow-hidden",
+              "fixed inset-x-0 bottom-0 z-[100] max-h-[88dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
+              "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
-            style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
           >
+
             {/* Mobile grabber */}
             <div className="flex justify-center pt-3 md:hidden">
               <span className="h-1 w-10 rounded-full bg-cream/20" aria-hidden />
@@ -351,8 +360,10 @@ export function AuthMenu() {
             </Section>
             <div className="h-3" aria-hidden />
           </div>
-        </>
+        </>,
+        document.body,
       )}
+
     </div>
   );
 }
