@@ -469,8 +469,19 @@ function FilmEditorModal({
                 value={d.cover_url ?? null}
                 onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Cover (Poster)"
-                description="Main portrait poster (~2:3). Used on homepage, film page, collections, search and featured sections. Hi-res JPG, PNG, WebP or AVIF."
+                label="Upload Desktop Cover (16:9)"
+                description="Landscape cinematic cover (~16:9). Used as the desktop & tablet hero, the share image, and the main poster on the film page. Hi-res JPG, PNG, WebP or AVIF."
+                maxBytes={25 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-covers"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.mobile_cover_url ?? null}
+                onChange={(u) => set("mobile_cover_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Mobile Cover (9:16)"
+                description="Vertical poster (~9:16) designed for phones. Used as the hero on mobile so faces, titles and key art aren't cropped. Falls back to the desktop cover if unset."
                 maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
