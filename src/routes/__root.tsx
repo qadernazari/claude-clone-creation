@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
+import { MobileTabBar } from "@/components/mobile-tab-bar";
 
 function useFaSafe(): boolean {
   try {
@@ -167,6 +168,7 @@ function RootComponent() {
           <AuthInvalidator />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <MobileTabBar />
           <Toaster richColors position="top-center" />
         </PageOverlayProvider>
       </LocaleProvider>

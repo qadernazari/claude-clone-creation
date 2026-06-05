@@ -225,6 +225,15 @@
   &::-webkit-scrollbar { display: none; }
 }
 
+/* Bottom padding so page content clears the mobile tab bar.
+   Tab bar = 56px + safe-area-inset-bottom. Desktop: 0. */
+@utility pb-tabbar {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  @media (min-width: 768px) {
+    padding-bottom: 0;
+  }
+}
+
 /* ---------------------------------------------------------------
  * Language switching: cinematic cross-fade between EN ⇄ FA (LTR ⇄ RTL).
  * Uses the View Transitions API where available, with a CSS-only
