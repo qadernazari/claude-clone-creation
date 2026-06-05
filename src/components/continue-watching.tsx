@@ -56,17 +56,17 @@ export function ContinueWatching() {
   if (!user || !data || data.length === 0) return null;
 
   return (
-    <section className="relative">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-        <div className="mb-7">
+    <section className="relative" style={{ contentVisibility: "auto", containIntrinsicSize: "1px 320px" }}>
+      <div className="mx-auto max-w-[1400px] px-5 md:px-12">
+        <div className="mb-5 md:mb-7">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
             {fa ? "ادامه‌ی تماشا" : "Continue Watching"}
           </span>
         </div>
       </div>
       <div
-        className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-2 md:gap-6 md:px-12"
-        style={{ scrollPaddingLeft: "1.5rem" }}
+        className="no-scrollbar flex snap-x gap-4 overflow-x-auto overscroll-x-contain px-5 pb-2 md:snap-mandatory md:gap-6 md:px-12"
+        style={{ scrollPaddingLeft: "1.25rem", WebkitOverflowScrolling: "touch" as never }}
       >
         {data.map((row) => {
           if (!row.films) return null;
