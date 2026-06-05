@@ -44,6 +44,7 @@ type TicketRow = {
     title_en: string;
     title_fa: string | null;
     cover_url: string | null;
+    thumbnail_url: string | null;
     ticket_hours: number;
   } | null;
 };
