@@ -55,6 +55,7 @@ type Film = {
   duration_min: number | null;
   poster_gradient: string | null;
   cover_url: string | null;
+  thumbnail_url: string | null;
   created_at: string;
   sort_order: number;
 };
