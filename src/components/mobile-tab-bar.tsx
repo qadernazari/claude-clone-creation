@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState } from "@/hooks/use-subscription";
@@ -25,6 +26,14 @@ export function MobileTabBar() {
     path.startsWith("/reset-password") ||
     path.startsWith("/checkout") ||
     path.startsWith("/admin");
+
+  // Tell the body whether to reserve space for the tab bar.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (hidden) document.body.setAttribute("data-no-tabbar", "true");
+    else document.body.removeAttribute("data-no-tabbar");
+    return () => document.body.removeAttribute("data-no-tabbar");
+  }, [hidden]);
 
   if (hidden) return null;
 
