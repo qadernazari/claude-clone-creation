@@ -11,7 +11,6 @@ import {
   Languages,
   Shield,
   LogOut,
-  X,
   ChevronRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +33,9 @@ export function AuthMenu() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const dragStartYRef = useRef<number | null>(null);
+  const isSheetDraggingRef = useRef(false);
   const lockedScrollYRef = useRef(0);
 
   function resetSheetDrag() {
@@ -42,6 +43,7 @@ export function AuthMenu() {
     if (!sheet) return;
     sheet.style.transform = "";
     sheet.style.transition = "";
+    isSheetDraggingRef.current = false;
   }
 
   function closeSheet() {
@@ -49,27 +51,33 @@ export function AuthMenu() {
     setOpen(false);
   }
 
-  function onDragHandleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+  function onSheetTouchStart(event: React.TouchEvent<HTMLDivElement>) {
     const touch = event.touches[0];
     if (!touch) return;
     dragStartYRef.current = touch.clientY;
     if (sheetRef.current) sheetRef.current.style.transition = "none";
   }
 
-  function onDragHandleTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+  function onSheetTouchMove(event: React.TouchEvent<HTMLDivElement>) {
     const startY = dragStartYRef.current;
     const touch = event.touches[0];
     if (startY === null || !touch || !sheetRef.current) return;
     const deltaY = touch.clientY - startY;
     if (deltaY <= 0) return;
+    const target = event.target as Element | null;
+    const fromHandle = !!target?.closest?.('[data-sheet-drag-handle="true"]');
+    const contentAtTop = (scrollRef.current?.scrollTop ?? 0) <= 0;
+    if (!fromHandle && !contentAtTop) return;
+    if (!fromHandle && deltaY < 10) return;
+    isSheetDraggingRef.current = true;
     event.preventDefault();
     sheetRef.current.style.transform = `translateY(${Math.min(deltaY, 180)}px)`;
   }
 
-  function onDragHandleTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+  function onSheetTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
     const startY = dragStartYRef.current;
     dragStartYRef.current = null;
-    if (startY === null) return;
+    if (startY === null || !isSheetDraggingRef.current) return;
     const endY = event.changedTouches[0]?.clientY ?? startY;
     if (endY - startY > 72) {
       closeSheet();
