@@ -56,24 +56,21 @@ export function ContinueWatching() {
   if (!user || !data || data.length === 0) return null;
 
   return (
-    <section className="relative">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-        <div className="mb-7">
+    <section className="relative" style={{ contentVisibility: "auto", containIntrinsicSize: "1px 320px" }}>
+      <div className="mx-auto max-w-[1400px] px-5 md:px-12">
+        <div className="mb-5 md:mb-7">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
             {fa ? "ادامه‌ی تماشا" : "Continue Watching"}
           </span>
         </div>
       </div>
       <div
-        className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-2 md:gap-6 md:px-12"
-        style={{ scrollPaddingLeft: "1.5rem" }}
+        className="no-scrollbar flex snap-x gap-4 overflow-x-auto overscroll-x-contain px-5 pb-2 md:snap-mandatory md:gap-6 md:px-12"
+        style={{ scrollPaddingLeft: "1.25rem", WebkitOverflowScrolling: "touch" as never }}
       >
         {data.map((row) => {
           if (!row.films) return null;
           const f = row.films;
-          const bg = f.cover_url
-            ? `center / cover no-repeat url(${f.cover_url})`
-            : f.poster_gradient || fallbackGradient(f.id);
           const title = t({ en: f.title_en, fa: f.title_fa || f.title_en });
           const totalSec =
             row.duration_seconds ?? (f.duration_min ? f.duration_min * 60 : null);
@@ -92,7 +89,21 @@ export function ContinueWatching() {
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
               <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
-                <div className="cine-img absolute inset-0" style={{ background: bg }} />
+                {f.cover_url ? (
+                  <img
+                    src={f.cover_url}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="cine-img absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: f.poster_gradient || fallbackGradient(f.id) }}
+                    aria-hidden
+                  />
+                )}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent" />
                 {/* play affordance */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">

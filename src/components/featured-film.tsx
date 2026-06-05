@@ -33,7 +33,7 @@ export function FeaturedFilm() {
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
+      <div className="relative h-[88svh] min-h-[560px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
         {heroImage ? (
           isLandscapeHero ? (
             <img
@@ -42,7 +42,7 @@ export function FeaturedFilm() {
               className="cine-img absolute inset-0 h-full w-full scale-[1.03] object-cover object-center"
               loading="eager"
               fetchPriority="high"
-              decoding="sync"
+              decoding="async"
               aria-hidden
             />
           ) : (
@@ -63,7 +63,7 @@ export function FeaturedFilm() {
                 className="absolute inset-0 h-full w-full object-contain object-center"
                 loading="eager"
                 fetchPriority="high"
-                decoding="sync"
+                decoding="async"
               />
             </>
           )
@@ -94,15 +94,15 @@ export function FeaturedFilm() {
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-2xl">
-              <span className="mb-5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
+              <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-5">
                 {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
               </span>
-              <h1 className="font-display text-5xl font-medium leading-[0.95] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
+              <h1 className="font-display text-[2.5rem] font-medium leading-[0.98] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
                 {title}
               </h1>
-              <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.24em] text-cream/55">
+              <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.24em] text-cream/55 md:mt-5 md:text-[11px]">
                 {director}
                 {data.year ? <> {" · "} {year(data.year)}</> : null}
                 {data.duration_min ? (
@@ -113,15 +113,15 @@ export function FeaturedFilm() {
                 ) : null}
               </p>
               {synopsis ? (
-                <p className="mt-7 max-w-xl text-[15px] leading-relaxed text-cream/75 md:text-base line-clamp-3">
+                <p className="mt-5 max-w-xl text-[14px] leading-relaxed text-cream/75 line-clamp-3 md:mt-7 md:text-base">
                   {synopsis}
                 </p>
               ) : null}
-              <div className="mt-10 flex flex-wrap items-center gap-3">
+              <div className="mt-7 flex flex-wrap items-center gap-2.5 md:mt-10 md:gap-3">
                 <Link
                   to="/films/$slug"
                   params={{ slug: data.slug }}
-                  className="inline-flex items-center gap-2.5 rounded-full bg-cream-bright px-8 py-3.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)]"
+                  className="inline-flex min-h-11 items-center gap-2.5 rounded-full bg-cream-bright px-7 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98] md:px-8 md:py-3.5 md:text-sm"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -131,7 +131,7 @@ export function FeaturedFilm() {
                 <Link
                   to="/films/$slug"
                   params={{ slug: data.slug }}
-                  className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/[0.04] px-7 py-3.5 text-sm font-medium text-cream backdrop-blur-md transition-all duration-300 hover:border-cream/45 hover:bg-cream/10"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cream/20 bg-cream/[0.04] px-6 py-3 text-[13px] font-medium text-cream backdrop-blur-md transition-all duration-300 hover:border-cream/45 hover:bg-cream/10 active:scale-[0.98] md:px-7 md:py-3.5 md:text-sm"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <line x1="12" y1="5" x2="12" y2="19" />
