@@ -76,6 +76,7 @@ function BrowsePage() {
   const [active, setActive] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("curated");
   const [q, setQ] = useState("");
+  const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
   const { data: films, isLoading } = useQuery({
     queryKey: ["films", "browse"],
