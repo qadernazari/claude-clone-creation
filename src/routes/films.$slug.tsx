@@ -352,9 +352,12 @@ function FilmPage() {
           <img
             src={heroArt}
             alt=""
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-x-0 -top-[10%] -z-30 h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none"
             aria-hidden
           />
+
         ) : (
           <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
         )}
