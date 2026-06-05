@@ -1,5 +1,6 @@
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
