@@ -182,6 +182,7 @@ export function AuthMenu() {
           {/* Panel — bottom sheet on mobile, anchored dropdown on desktop */}
           <div
             role="dialog"
+            data-auth-sheet="true"
             aria-label={fa ? "حساب کاربری" : "Account"}
             className={[
               // Mobile sheet
