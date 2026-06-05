@@ -83,10 +83,9 @@ export function AuthMenu() {
     window.setTimeout(resetSheetDrag, 190);
   }
 
-  // Lock page scroll while the sheet is open.
-  // Desktop: compensate for the removed vertical scrollbar with padding-right
-  //   so the layout behind the drawer doesn't shift horizontally.
-  // Touch devices: use the fixed-body pattern so iOS Safari/Chrome don't rubber-band.
+  // Lock page scroll only for the mobile bottom sheet.
+  // On desktop the account panel is a floating layer, so changing document
+  // overflow/padding makes the fixed header visibly shift.
   useEffect(() => {
     if (!open) return;
     const body = document.body;
@@ -94,11 +93,8 @@ export function AuthMenu() {
     const scrollY = window.scrollY || html.scrollTop || 0;
     lockedScrollYRef.current = scrollY;
 
-    const isTouch =
-      typeof window !== "undefined" &&
-      (window.matchMedia?.("(hover: none) and (pointer: coarse)").matches ||
-        "ontouchstart" in window);
-    const scrollbarWidth = Math.max(0, window.innerWidth - html.clientWidth);
+    const isMobileSheet = window.matchMedia?.("(max-width: 767px)").matches ?? false;
+    if (!isMobileSheet) return;
 
     const previousBody = {
       overflow: body.style.overflow,
@@ -121,17 +117,11 @@ export function AuthMenu() {
     html.style.overflow = "hidden";
     html.style.overscrollBehavior = "none";
     body.style.overflow = "hidden";
-
-    if (isTouch) {
-      body.style.position = "fixed";
-      body.style.top = `-${scrollY}px`;
-      body.style.left = "0";
-      body.style.right = "0";
-      body.style.width = "100%";
-    } else if (scrollbarWidth > 0) {
-      // Compensate for the now-missing scrollbar so nothing shifts horizontally.
-      html.style.paddingRight = `${scrollbarWidth}px`;
-    }
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
 
     html.dataset.authSheetOpen = "true";
     body.dataset.authSheetOpen = "true";
@@ -150,9 +140,7 @@ export function AuthMenu() {
       body.style.paddingRight = previousBody.paddingRight;
       delete html.dataset.authSheetOpen;
       delete body.dataset.authSheetOpen;
-      if (isTouch) {
-        window.scrollTo(0, scrollY);
-      }
+      window.scrollTo(0, scrollY);
       // Restore previous scroll-behavior on the next frame so we don't animate the restore.
       requestAnimationFrame(() => {
         html.style.scrollBehavior = previousHtml.scrollBehavior;

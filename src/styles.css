@@ -118,9 +118,6 @@
     -webkit-text-size-adjust: 100%;
     /* Prevent any rogue child from causing horizontal scroll on mobile */
     overflow-x: hidden;
-    /* Reserve scrollbar space so opening overlays (account drawer, modals)
-       doesn't shift the page when the scrollbar is hidden. */
-    scrollbar-gutter: stable;
   }
 
   body {
