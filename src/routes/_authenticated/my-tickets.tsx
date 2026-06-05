@@ -59,7 +59,7 @@ function MyTicketsPage() {
       const { data, error } = await supabase
         .from("tickets")
         .select(
-          "id, status, amount, currency, paid_at, expires_at, created_at, film:films(slug, title_en, title_fa, cover_url, ticket_hours)"
+          "id, status, amount, currency, paid_at, expires_at, created_at, film:films(slug, title_en, title_fa, cover_url, thumbnail_url, ticket_hours)"
         )
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
