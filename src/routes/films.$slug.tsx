@@ -345,7 +345,7 @@ function FilmPage() {
 
 
   return (
-    <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
       <PaymentTestModeBanner />
       <SiteHeader />
 
