@@ -15,6 +15,7 @@ type Row = {
     title_en: string;
     title_fa: string | null;
     cover_url: string | null;
+    thumbnail_url: string | null;
     poster_gradient: string | null;
     duration_min: number | null;
   } | null;
