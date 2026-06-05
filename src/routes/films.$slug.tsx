@@ -421,7 +421,7 @@ function FilmPage() {
           <div className="max-w-2xl">
             {film.category && (
               <span className="inline-flex rounded-full bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-cream/80 backdrop-blur-sm ring-1 ring-cream/10">
-                {film.category}
+                {film.category.charAt(0).toUpperCase() + film.category.slice(1)}
               </span>
             )}
 
@@ -756,7 +756,7 @@ function FilmPage() {
           {film.category && (
             <div>
               <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "ژانر" : "Genre"}</dt>
-              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{film.category}</dd>
+              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{film.category.charAt(0).toUpperCase() + film.category.slice(1)}</dd>
             </div>
           )}
           <div>
