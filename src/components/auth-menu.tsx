@@ -281,9 +281,13 @@ export function AuthMenu() {
             role="dialog"
             data-auth-sheet="true"
             aria-label={fa ? "حساب کاربری" : "Account"}
+            onTouchStart={onSheetTouchStart}
+            onTouchMove={onSheetTouchMove}
+            onTouchEnd={onSheetTouchEnd}
+            onTouchCancel={resetSheetDrag}
             className={[
               // Mobile sheet
-              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] touch-pan-y flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
               // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
               "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
@@ -291,11 +295,8 @@ export function AuthMenu() {
 
             {/* Mobile grabber */}
             <div
-              className="flex justify-center pt-3 pb-2 md:hidden"
-              onTouchStart={onDragHandleTouchStart}
-              onTouchMove={onDragHandleTouchMove}
-              onTouchEnd={onDragHandleTouchEnd}
-              onTouchCancel={resetSheetDrag}
+              data-sheet-drag-handle="true"
+              className="flex min-h-9 touch-none items-center justify-center pt-2 md:hidden"
             >
               <span className="h-1 w-10 rounded-full bg-cream/20" aria-hidden />
             </div>
@@ -304,13 +305,14 @@ export function AuthMenu() {
               type="button"
               onPointerDown={(event) => event.stopPropagation()}
               onClick={closeSheet}
-              className="absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/10 bg-cream/10 text-cream/80 hover:text-cream-bright hover:bg-cream/15 md:hidden"
+              className="auth-menu-close absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-full md:hidden"
               aria-label={fa ? "بستن" : "Close"}
             >
-              <X size={16} strokeWidth={1.8} />
+              <span aria-hidden>×</span>
             </button>
 
             <div
+              ref={scrollRef}
               data-auth-scroll="true"
               className="min-h-0 flex-1 touch-pan-y overflow-y-auto overflow-x-hidden overscroll-contain px-0"
               style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", WebkitOverflowScrolling: "touch" }}
