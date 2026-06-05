@@ -21,6 +21,8 @@ type LocaleContextValue = {
   dir: "ltr" | "rtl";
   /** Format a number with locale-appropriate digits (Persian uses ۰-۹). */
   num: (n: number) => string;
+  /** Format a year (no thousands separators) with locale-appropriate digits. */
+  year: (n: number) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
