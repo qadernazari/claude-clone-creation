@@ -507,7 +507,7 @@ function WatchPage() {
         </div>
 
         {/* About + shortcuts */}
-        <div className="mt-8 grid gap-8 md:grid-cols-3">
+        <div className="mt-7 grid gap-8 px-5 pb-10 md:mt-8 md:grid-cols-3 md:px-0 md:pb-0">
           {synopsis && (
             <section className="md:col-span-2">
               <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.aboutFilm}</h2>
