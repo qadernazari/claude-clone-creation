@@ -614,9 +614,7 @@ function FilmPage() {
               {related.map((r) => {
                 const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
                 const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
-                const bg = r.cover_url
-                  ? { background: `center / cover no-repeat url(${r.cover_url})` }
-                  : { background: (r.poster_gradient as string) || fallbackGradient };
+                const fallbackBg = (r.poster_gradient as string) || fallbackGradient;
                 return (
                   <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
                     <Link
@@ -625,7 +623,18 @@ function FilmPage() {
                       className="group block"
                     >
                       <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
-                        <div className="aspect-[2/3] w-full" style={bg} />
+                        <div className="aspect-[2/3] w-full" style={{ background: fallbackBg }}>
+                          {r.cover_url && (
+                            <img
+                              src={r.cover_url}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              className="h-full w-full object-cover"
+                              aria-hidden
+                            />
+                          )}
+                        </div>
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
                           <div className="inline-flex items-center gap-1.5 rounded-full bg-cream-bright px-3 py-1 text-[10px] font-semibold text-ink">
@@ -634,6 +643,7 @@ function FilmPage() {
                           </div>
                         </div>
                       </div>
+
                       <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
                       {rDirector && (
                         <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
