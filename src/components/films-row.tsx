@@ -51,14 +51,14 @@ function Rail({
   subtitle,
   films,
   locale,
-  num,
+  year,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   films: Film[];
   locale: string;
-  num: (n: number) => string;
+  year: (n: number) => string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroll = (dir: 1 | -1) => {
@@ -109,7 +109,7 @@ function Rail({
         style={{ scrollPaddingLeft: "1.5rem" }}
       >
         {films.map((f) => (
-          <PosterCard key={f.id} film={f} locale={locale} num={num} />
+          <PosterCard key={f.id} film={f} locale={locale} year={year} />
         ))}
         <div className="w-2 shrink-0 md:w-4" aria-hidden />
       </div>
@@ -119,7 +119,7 @@ function Rail({
 
 /* ---------- Multi-rail container ---------- */
 export function FilmsRow() {
-  const { locale, num, t } = useLocale();
+  const { locale, num, year, t } = useLocale();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const films = homeData.films;
   const categories = homeData.categories;
