@@ -51,14 +51,12 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   const isHome = location.pathname === "/";
   const fa = locale === "fa";
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleHomeClick = (e: React.MouseEvent) => {
     if (isHome) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -68,24 +66,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll while mobile menu open
-  useEffect(() => {
-    if (!menuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [menuOpen]);
-
-  // Close menu on route change
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
-
   const linkCls = (key: "home" | "browse" | "about") =>
     `relative py-1 transition-colors duration-300 ${
       current === key ? "text-cream" : "text-cream/55 hover:text-cream"
@@ -93,10 +73,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       current === key ? "after:w-full" : "after:w-0 hover:after:w-full"
     }`;
 
-  const mobileLinkCls = (key: "home" | "browse" | "about") =>
-    `block py-4 text-2xl font-semibold tracking-tight transition-colors ${
-      current === key ? "text-amber" : "text-cream-bright hover:text-amber"
-    } ${fa ? "font-fa text-right" : "font-display"}`;
 
   return (
     <>
