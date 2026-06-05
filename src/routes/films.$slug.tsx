@@ -350,7 +350,7 @@ function FilmPage() {
       <SiteHeader />
 
       {/* Cinematic full-bleed hero */}
-      <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
+      <section className="relative isolate min-h-[78vh] w-full overflow-hidden bg-background md:min-h-[88vh]">
         {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
         {heroArt ? (
           <>
@@ -408,10 +408,10 @@ function FilmPage() {
 
 
         {/* Hero content — anchored bottom-start. Top padding clears the fixed header. */}
-        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-36 md:px-10 md:pb-20 md:pt-44">
+        <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-5 pb-10 pt-24 sm:px-6 md:min-h-[88vh] md:px-10 md:pb-20 md:pt-44">
           <Link
             to="/"
-            className="absolute inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright top-[92px] md:top-[104px]"
+            className="absolute hidden md:inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright top-[104px]"
             style={dir === "rtl" ? { right: "1.5rem" } : { left: "1.5rem" }}
           >
             ← {t.back}
