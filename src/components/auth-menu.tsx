@@ -50,7 +50,6 @@ export function AuthMenu() {
       left: body.style.left,
       right: body.style.right,
       width: body.style.width,
-      touchAction: body.style.touchAction,
     };
     const previousHtml = {
       overflow: html.style.overflow,
@@ -65,7 +64,7 @@ export function AuthMenu() {
     body.style.left = "0";
     body.style.right = "0";
     body.style.width = "100%";
-    body.style.touchAction = "none";
+    html.dataset.authSheetOpen = "true";
     body.dataset.authSheetOpen = "true";
 
     const preventBackgroundTouch = (event: TouchEvent) => {
@@ -85,7 +84,7 @@ export function AuthMenu() {
       body.style.left = previousBody.left;
       body.style.right = previousBody.right;
       body.style.width = previousBody.width;
-      body.style.touchAction = previousBody.touchAction;
+      delete html.dataset.authSheetOpen;
       delete body.dataset.authSheetOpen;
       window.scrollTo(0, lockedScrollYRef.current);
     };
