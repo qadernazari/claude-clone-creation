@@ -136,8 +136,7 @@ function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, dir } = useLocale();
   const fa = locale === "fa";
-  const { isMember } = useSubscription();
-  const [user, setUser] = useState<User | null>(null);
+  const { isMember, isLoading: isAuthLoading, user } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [membershipOpen, setMembershipOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
@@ -145,11 +144,6 @@ function FilmPage() {
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setUser(s?.user ?? null));
-    return () => subscription.unsubscribe();
-  }, []);
 
   // Log a "view" event with geo / device / referrer captured server-side
   useEffect(() => {
