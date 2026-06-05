@@ -224,6 +224,27 @@
     touch-action: manipulation;
   }
 
+  .auth-menu-membership {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(245, 244, 239, 0.12);
+    background: rgba(245, 244, 239, 0.04);
+  }
+
+  .auth-menu-membership-amber {
+    border-color: rgba(201, 168, 76, 0.28);
+    background: rgba(201, 168, 76, 0.10);
+  }
+
+  .auth-menu-membership-green {
+    border-color: rgba(110, 231, 183, 0.24);
+    background: rgba(110, 231, 183, 0.08);
+  }
+
+  .auth-menu-membership-red {
+    border-color: rgba(252, 165, 165, 0.28);
+    background: rgba(252, 165, 165, 0.10);
+  }
+
   .auth-menu-row-icon {
     display: flex;
     width: 2rem;
