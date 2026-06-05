@@ -51,14 +51,12 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   const isHome = location.pathname === "/";
   const fa = locale === "fa";
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleHomeClick = (e: React.MouseEvent) => {
     if (isHome) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -68,24 +66,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll while mobile menu open
-  useEffect(() => {
-    if (!menuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [menuOpen]);
-
-  // Close menu on route change
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
-
   const linkCls = (key: "home" | "browse" | "about") =>
     `relative py-1 transition-colors duration-300 ${
       current === key ? "text-cream" : "text-cream/55 hover:text-cream"
@@ -93,10 +73,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       current === key ? "after:w-full" : "after:w-0 hover:after:w-full"
     }`;
 
-  const mobileLinkCls = (key: "home" | "browse" | "about") =>
-    `block py-4 text-2xl font-semibold tracking-tight transition-colors ${
-      current === key ? "text-amber" : "text-cream-bright hover:text-amber"
-    } ${fa ? "font-fa text-right" : "font-display"}`;
 
   return (
     <>
@@ -135,87 +111,24 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-1 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden md:block">
+              <LanguageToggle />
+            </div>
+            {/* Compact language toggle on mobile (hamburger is gone — nav lives in the bottom tab bar) */}
+            <div className="md:hidden">
               <LanguageToggle />
             </div>
             <MembershipCta />
             <AuthMenu />
-            {/* Hamburger — mobile only */}
-            <button
-              type="button"
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-cream/80 hover:text-cream-bright transition-colors md:hidden"
-            >
-              <span className="relative block h-4 w-5">
-                <span
-                  className={`absolute left-0 top-0 h-px w-5 bg-current transition-all duration-300 ${
-                    menuOpen ? "translate-y-2 rotate-45" : ""
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-2 h-px w-5 bg-current transition-all duration-200 ${
-                    menuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-4 h-px w-5 bg-current transition-all duration-300 ${
-                    menuOpen ? "-translate-y-2 -rotate-45" : ""
-                  }`}
-                />
-              </span>
-            </button>
           </div>
         </div>
         <TrialBanner />
       </header>
-
-      {/* Mobile menu overlay */}
-      <div
-        className={`fixed inset-0 z-20 md:hidden transition-opacity duration-300 ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        aria-hidden={!menuOpen}
-      >
-        <div
-          className="absolute inset-0 bg-bg-0/95 backdrop-blur-2xl"
-          onClick={() => setMenuOpen(false)}
-        />
-        <div
-          className={`relative flex h-full flex-col px-6 pb-10 transition-transform duration-500 ease-out ${
-            menuOpen ? "translate-y-0" : "-translate-y-4"
-          }`}
-          style={{
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
-            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 2.5rem)",
-          }}
-          dir={fa ? "rtl" : "ltr"}
-        >
-          <nav className="flex flex-1 flex-col gap-1 border-t border-line pt-6">
-            <Link to="/" onClick={handleHomeClick} className={mobileLinkCls("home")}>
-              {fa ? "خانه" : "Home"}
-            </Link>
-            <Link
-              to="/browse"
-              onClick={() => setMenuOpen(false)}
-              className={mobileLinkCls("browse")}
-            >
-              {fa ? "آثار اختصاصی" : "Originals"}
-            </Link>
-          </nav>
-          <div className="mt-auto flex items-center justify-between border-t border-line pt-6">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cream/40">
-              {fa ? "زبان" : "Language"}
-            </span>
-            <LanguageToggle size="lg" />
-          </div>
-        </div>
-      </div>
     </>
   );
 }
+
 
 function MembershipCta() {
   const { locale } = useLocale();
