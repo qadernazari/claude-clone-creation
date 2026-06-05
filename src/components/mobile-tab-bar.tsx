@@ -41,8 +41,6 @@ export function MobileTabBar() {
   const isBrowse = path === "/browse";
   const isAccount =
     path.startsWith("/account") ||
-    path.startsWith("/library") ||
-    path.startsWith("/my-tickets") ||
     path === "/auth";
 
   return (
