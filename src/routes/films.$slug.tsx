@@ -598,7 +598,7 @@ function FilmPage() {
 
       {/* More Like This — horizontal poster row, Apple TV style */}
       {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14">
+        <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
           <div className="mb-5 flex items-end justify-between gap-6">
             <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
               {fa ? "آثار مرتبط" : "More Like This"}
@@ -659,7 +659,7 @@ function FilmPage() {
 
       {/* Cast & Crew — Apple TV style circular avatars */}
       {(castCredits.length > 0 || crewCredits.length > 0) && (
-        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
           <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
             {fa ? "بازیگران و عوامل" : "Cast & Crew"}
           </h2>
@@ -712,7 +712,7 @@ function FilmPage() {
       )}
 
       {/* Film Details */}
-      <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+      <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
         <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
           {fa ? "اطلاعات فیلم" : "Film Details"}
         </h2>
@@ -768,7 +768,7 @@ function FilmPage() {
 
       {/* How to Watch — shown for non-members */}
       {!isMember && (
-        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
           <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
             {fa ? "روش تماشا" : "How to Watch"}
           </h2>
