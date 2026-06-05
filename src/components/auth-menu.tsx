@@ -263,7 +263,7 @@ export function AuthMenu() {
         <span className="flex h-full w-full items-center justify-center font-display tracking-wide">
           {initial}
         </span>
-        {(trialDaysLeft !== null || pastDue) && (
+        {(isTrialActive || pastDue) && (
           <span
             className={`absolute -top-0.5 -end-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-bg-0 ${pastDue ? "bg-red-500" : "bg-amber"}`}
             aria-hidden
