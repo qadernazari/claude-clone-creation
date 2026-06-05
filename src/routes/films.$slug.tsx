@@ -283,12 +283,7 @@ function FilmPage() {
 
   const heroArt = film.thumbnail_url || film.cover_url;
   const posterStyle = heroArt
-    ? {
-        backgroundImage: `url(${heroArt})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center center",
-      }
+    ? { backgroundImage: `url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
 
 
@@ -347,12 +342,17 @@ function FilmPage() {
 
       {/* Cinematic full-bleed hero */}
       <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
-        {/* Backdrop — full-bleed cover art with only a subtle vertical composition shift */}
-        <div
-          className="absolute inset-x-0 -top-[7%] -bottom-[7%] -z-30"
-          style={{ ...posterStyle, transform: "translate3d(0, 6%, 0)" }}
-          aria-hidden
-        />
+        {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
+        {heroArt ? (
+          <img
+            src={heroArt}
+            alt=""
+            className="absolute inset-x-0 -top-[10%] -z-30 h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none"
+            aria-hidden
+          />
+        ) : (
+          <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
+        )}
         {/* Very light base tint — keep the image bright and cinematic */}
         <div
           className="absolute inset-0 -z-20 bg-black/10"
