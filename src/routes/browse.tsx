@@ -55,6 +55,7 @@ type Film = {
   duration_min: number | null;
   poster_gradient: string | null;
   cover_url: string | null;
+  thumbnail_url: string | null;
   created_at: string;
   sort_order: number;
 };
@@ -84,7 +85,7 @@ function BrowsePage() {
       const { data, error } = await supabase
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, created_at, sort_order",
+          "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, created_at, sort_order",
         )
         .eq("visibility", "published")
         .limit(200);
@@ -347,7 +348,7 @@ function BrowsePage() {
         {isLoading ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] animate-pulse rounded-lg bg-bg-1" aria-hidden />
+              <div key={i} className="aspect-video animate-pulse rounded-lg bg-bg-1" aria-hidden />
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -387,10 +388,10 @@ function BrowsePage() {
                   params={{ slug: film.slug }}
                   className="group block"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
-                    {film.cover_url ? (
+                  <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+                    {film.thumbnail_url || film.cover_url ? (
                       <img
-                        src={film.cover_url}
+                        src={film.thumbnail_url || film.cover_url || ""}
                         alt=""
                         loading="lazy"
                         decoding="async"

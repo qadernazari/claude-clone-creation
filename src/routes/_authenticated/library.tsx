@@ -231,16 +231,17 @@ function LibraryPage() {
 
 function PosterThumb({ film, size = "md" }: { film: LibraryFilm; size?: "sm" | "md" }) {
   const fallback = (film.poster_gradient as string) || fallbackGradient;
-  const cls = size === "sm" ? "h-16 w-12" : "aspect-[2/3] w-full";
+  const cls = size === "sm" ? "aspect-video w-28" : "aspect-video w-full";
+  const src = film.thumbnail_url || film.cover_url;
   return (
     <div
       aria-hidden
       style={{ background: fallback }}
       className={`hairline relative overflow-hidden rounded-md border bg-bg-1 ${cls}`}
     >
-      {film.cover_url && (
+      {src && (
         <img
-          src={film.cover_url}
+          src={src}
           alt=""
           loading="lazy"
           decoding="async"
@@ -345,9 +346,9 @@ function ContinueCard({
         style={{ background: (film.poster_gradient as string) || fallbackGradient }}
         className="hairline relative aspect-video w-full overflow-hidden rounded-xl border bg-bg-1"
       >
-        {film.cover_url && (
+        {(film.thumbnail_url || film.cover_url) && (
           <img
-            src={film.cover_url}
+            src={film.thumbnail_url || film.cover_url || ""}
             alt=""
             loading="lazy"
             decoding="async"
@@ -462,7 +463,7 @@ function SkeletonGrid() {
     <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="space-y-3">
-          <div className="aspect-[2/3] w-full rounded-md bg-cream/[4%] animate-pulse" />
+          <div className="aspect-video w-full rounded-md bg-cream/[4%] animate-pulse" />
           <div className="h-3 w-3/4 rounded bg-cream/[4%] animate-pulse" />
           <div className="h-2 w-1/2 rounded bg-cream/[4%] animate-pulse" />
         </div>

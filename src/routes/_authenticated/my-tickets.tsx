@@ -44,6 +44,7 @@ type TicketRow = {
     title_en: string;
     title_fa: string | null;
     cover_url: string | null;
+    thumbnail_url: string | null;
     ticket_hours: number;
   } | null;
 };
@@ -58,7 +59,7 @@ function MyTicketsPage() {
       const { data, error } = await supabase
         .from("tickets")
         .select(
-          "id, status, amount, currency, paid_at, expires_at, created_at, film:films(slug, title_en, title_fa, cover_url, ticket_hours)"
+          "id, status, amount, currency, paid_at, expires_at, created_at, film:films(slug, title_en, title_fa, cover_url, thumbnail_url, ticket_hours)"
         )
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
@@ -126,15 +127,15 @@ function MyTicketsPage() {
               return (
                 <li
                   key={tk.id}
-                  className="hairline rounded-xl border bg-bg-1/50 p-4 md:p-5 grid gap-4 md:grid-cols-[80px_1fr_auto] items-center"
+                  className="hairline rounded-xl border bg-bg-1/50 p-4 md:p-5 grid gap-4 md:grid-cols-[160px_1fr_auto] items-center"
                 >
                   <div
-                    className="hairline relative aspect-[2/3] w-20 overflow-hidden rounded-md border bg-bg-1"
+                    className="hairline relative aspect-video w-full md:w-40 overflow-hidden rounded-md border bg-bg-1"
                     aria-hidden
                   >
-                    {tk.film?.cover_url && (
+                    {(tk.film?.thumbnail_url || tk.film?.cover_url) && (
                       <img
-                        src={tk.film.cover_url}
+                        src={tk.film.thumbnail_url || tk.film.cover_url || ""}
                         alt=""
                         loading="lazy"
                         decoding="async"

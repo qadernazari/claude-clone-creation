@@ -70,6 +70,7 @@ export type LibraryFilm = {
   director_en: string | null;
   director_fa: string | null;
   cover_url: string | null;
+  thumbnail_url: string | null;
   poster_gradient: string | null;
   duration_min: number | null;
   year: number | null;
@@ -109,7 +110,8 @@ export type LibraryData = {
 };
 
 const FILM_COLS =
-  "id, slug, title_en, title_fa, director_en, director_fa, cover_url, poster_gradient, duration_min, year, access_type, is_premium";
+  "id, slug, title_en, title_fa, director_en, director_fa, cover_url, thumbnail_url, poster_gradient, duration_min, year, access_type, is_premium";
+
 
 export const getLibrary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
