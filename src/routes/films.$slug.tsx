@@ -393,8 +393,9 @@ function FilmPage() {
             )}
 
             <h1
-              className={`mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.045em] text-cream-bright drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)] md:text-7xl ${fa ? "font-vazir" : "font-display"}`}
+              className={`mt-5 break-words text-4xl font-medium leading-[0.98] tracking-[-0.045em] text-cream-bright drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)] sm:text-5xl md:text-7xl ${fa ? "font-vazir" : "font-display"}`}
             >
+
               {title}
             </h1>
 
