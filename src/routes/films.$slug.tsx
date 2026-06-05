@@ -16,7 +16,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
 import { useEffect, useMemo, useState } from "react";
 
-import type { User } from "@supabase/supabase-js";
+
 
 export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
@@ -136,8 +136,7 @@ function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, dir } = useLocale();
   const fa = locale === "fa";
-  const { isMember } = useSubscription();
-  const [user, setUser] = useState<User | null>(null);
+  const { isMember, isLoading: isAuthLoading, user } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [membershipOpen, setMembershipOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
@@ -145,11 +144,6 @@ function FilmPage() {
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setUser(s?.user ?? null));
-    return () => subscription.unsubscribe();
-  }, []);
 
   // Log a "view" event with geo / device / referrer captured server-side
   useEffect(() => {
@@ -461,7 +455,13 @@ function FilmPage() {
 
             {/* CTAs — integrated, not boxed */}
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              {!user ? (
+              {isAuthLoading ? (
+                <span
+                  aria-hidden
+                  className="inline-block h-[44px] w-[180px] rounded-full bg-cream/10 animate-pulse"
+                />
+              ) : !user ? (
+
                 <Link
                   to="/auth"
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
