@@ -15,6 +15,7 @@ type Row = {
     title_en: string;
     title_fa: string | null;
     cover_url: string | null;
+    thumbnail_url: string | null;
     poster_gradient: string | null;
     duration_min: number | null;
   } | null;
@@ -40,7 +41,7 @@ export function ContinueWatching() {
       const { data, error } = await supabase
         .from("watch_progress")
         .select(
-          "film_id, position_seconds, duration_seconds, last_watched_at, films!inner(id, slug, title_en, title_fa, cover_url, poster_gradient, duration_min)",
+          "film_id, position_seconds, duration_seconds, last_watched_at, films!inner(id, slug, title_en, title_fa, cover_url, thumbnail_url, poster_gradient, duration_min)",
         )
         .eq("user_id", user!.id)
         .eq("completed", false)
@@ -109,9 +110,9 @@ export function ContinueWatching() {
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
               <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
-                {f.cover_url ? (
+                {f.thumbnail_url || f.cover_url ? (
                   <img
-                    src={f.cover_url}
+                    src={f.thumbnail_url || f.cover_url || ""}
                     alt=""
                     loading="lazy"
                     decoding="async"
