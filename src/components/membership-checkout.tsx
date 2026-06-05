@@ -49,23 +49,28 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-bg-0/85 backdrop-blur sm:items-start sm:px-4 sm:py-10"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg-0/85 p-4 backdrop-blur-md sm:p-6"
       onClick={onClose}
-      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+      style={{
+        paddingTop: "max(1rem, env(safe-area-inset-top, 0px))",
+        paddingBottom: "max(1rem, env(safe-area-inset-bottom, 0px))",
+      }}
+      role="dialog"
+      aria-modal="true"
     >
       <div
-        className="relative w-full max-w-2xl rounded-t-2xl bg-bg-1 p-2 shadow-2xl sm:rounded-xl"
+        className="relative my-auto w-full max-w-lg rounded-2xl bg-bg-1 shadow-2xl ring-1 ring-cream/10"
         onClick={(e) => e.stopPropagation()}
-        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))" }}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close checkout"
-          className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-bg-0 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 sm:-top-3 sm:-right-3 sm:h-9 sm:w-9"
+          className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-bg-0/80 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15"
         >
           ✕
         </button>
+
 
         {!started ? (
           <div className="p-6 sm:p-8">
