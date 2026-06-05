@@ -71,6 +71,8 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
     ? fa ? "در فهرست شما" : "In your watchlist"
     : fa ? "افزودن به فهرست" : "Add to watchlist";
 
+  if (!user) return null;
+
   if (variant === "icon") {
     return (
       <button
