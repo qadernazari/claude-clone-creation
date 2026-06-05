@@ -349,34 +349,35 @@ function FilmPage() {
       <section className="relative isolate min-h-[88vh] w-full overflow-hidden">
         {/* Backdrop — full bleed cover art */}
         <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
-        {/* Stronger base darken so any baked-in title artwork in the cover image recedes */}
-        <div className="absolute inset-0 -z-20 bg-black/45" aria-hidden />
-        {/* Header safe zone — solid band that protects the nav from competing artwork */}
+        {/* Light base tint — keep the image bright and cinematic */}
+        <div className="absolute inset-0 -z-20 bg-black/15" aria-hidden />
+        {/* Header safe zone — short, soft gradient that protects nav without darkening the whole hero */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[clamp(160px,22vh,260px)]"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[clamp(96px,14vh,160px)]"
           aria-hidden
           style={{
             background:
-              "linear-gradient(180deg, rgba(8,8,10,1) 0%, rgba(8,8,10,0.98) 45%, rgba(8,8,10,0.75) 75%, rgba(8,8,10,0) 100%)",
+              "linear-gradient(180deg, rgba(8,8,10,0.92) 0%, rgba(8,8,10,0.6) 55%, rgba(8,8,10,0) 100%)",
           }}
         />
-        {/* Cinematic gradients — bottom-to-top + side fade for readability */}
+        {/* Bottom fade for text readability + blend into page background */}
         <div
           className="absolute inset-0 -z-10"
           aria-hidden
           style={{
             background:
-              "linear-gradient(180deg, rgba(8,8,10,0.35) 0%, rgba(8,8,10,0) 30%, rgba(8,8,10,0) 50%, rgba(8,8,10,0.8) 82%, var(--background) 100%)",
+              "linear-gradient(180deg, rgba(8,8,10,0) 0%, rgba(8,8,10,0) 55%, rgba(8,8,10,0.7) 85%, var(--background) 100%)",
           }}
         />
+        {/* Side fade behind the title column only */}
         <div
           className="absolute inset-0 -z-10"
           aria-hidden
           style={{
             background:
               dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.9) 0%, rgba(8,8,10,0.5) 45%, rgba(8,8,10,0.1) 80%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.9) 0%, rgba(8,8,10,0.5) 45%, rgba(8,8,10,0.1) 80%)",
+                ? "linear-gradient(270deg, rgba(8,8,10,0.75) 0%, rgba(8,8,10,0.25) 45%, rgba(8,8,10,0) 75%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.75) 0%, rgba(8,8,10,0.25) 45%, rgba(8,8,10,0) 75%)",
           }}
         />
 
