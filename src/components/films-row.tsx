@@ -1,5 +1,6 @@
 import { useMemo, useRef } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homePageQueryOptions, type HomeCategory, type HomeRailFilm } from "../lib/home.functions";
 
@@ -18,29 +19,41 @@ function fallbackGradient(seed: string) {
 function PosterCard({ film, locale, year }: { film: Film; locale: string; year: (n: number) => string }) {
   const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
   const director = locale === "fa" ? film.director_fa || film.director_en : film.director_en;
-  const bg = film.cover_url
-    ? `center / cover no-repeat url(${film.cover_url})`
-    : film.poster_gradient || fallbackGradient(film.id);
 
   return (
-    <a
-      href={`/films/${film.slug}`}
-      className="group block w-[44vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
+    <Link
+      to="/films/$slug"
+      params={{ slug: film.slug }}
+      className="group block w-[42vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
     >
       <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
-        <div className="cine-img absolute inset-0" style={{ background: bg }} />
+        {film.cover_url ? (
+          <img
+            src={film.cover_url}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="cine-img absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: film.poster_gradient || fallbackGradient(film.id) }}
+            aria-hidden
+          />
+        )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
-      <div className="mt-4 px-0.5">
-        <h3 className="font-display text-[14px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors line-clamp-1">
+      <div className="mt-3 px-0.5 md:mt-4">
+        <h3 className="font-display text-[13px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors line-clamp-1 md:text-[14px]">
           {ftitle}
         </h3>
-        <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1">
+        <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1 md:mt-1.5 md:text-[11px]">
           {director}
           {film.year ? <> {" · "} {year(film.year)}</> : null}
         </p>
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -69,7 +82,10 @@ function Rail({
   if (films.length === 0) return null;
 
   return (
-    <section className="relative mx-auto max-w-[1400px] px-6 md:px-12">
+    <section
+      className="relative mx-auto max-w-[1400px] px-5 md:px-12"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "1px 480px" }}
+    >
       <div className="mb-6 flex items-end justify-between gap-6">
         <div className="max-w-2xl">
           {eyebrow && (
@@ -105,8 +121,8 @@ function Rail({
       </div>
       <div
         ref={ref}
-        className="no-scrollbar -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:-mx-12 md:gap-6 md:px-12"
-        style={{ scrollPaddingLeft: "1.5rem" }}
+        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12"
+        style={{ scrollPaddingLeft: "1.25rem", WebkitOverflowScrolling: "touch" as never }}
       >
         {films.map((f) => (
           <PosterCard key={f.id} film={f} locale={locale} year={year} />
