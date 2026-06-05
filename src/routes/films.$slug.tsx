@@ -287,7 +287,7 @@ function FilmPage() {
         backgroundImage: `url(${heroArt})`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        backgroundPosition: "center center",
+        backgroundPosition: "center 38%",
       }
     : { background: (film.poster_gradient as string) || fallbackGradient };
 
@@ -347,16 +347,15 @@ function FilmPage() {
 
       {/* Cinematic full-bleed hero */}
       <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
-        {/* Backdrop — full bleed cover art, shifted DOWN so baked-in Persian title sits below header */}
+        {/* Backdrop — full-bleed cover art with only a subtle vertical composition shift */}
         <div
-          className="absolute inset-x-0 bottom-0 -z-30"
-          style={{ ...posterStyle, top: "clamp(80px, 12vh, 140px)" }}
+          className="absolute inset-0 -z-30"
+          style={posterStyle}
           aria-hidden
         />
         {/* Very light base tint — keep the image bright and cinematic */}
         <div
-          className="absolute inset-x-0 bottom-0 -z-20 bg-black/10"
-          style={{ top: "clamp(80px, 12vh, 140px)" }}
+          className="absolute inset-0 -z-20 bg-black/10"
           aria-hidden
         />
         {/* Bottom fade for text readability + blend into page background */}
