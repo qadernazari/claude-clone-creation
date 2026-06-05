@@ -161,33 +161,54 @@ function BrowsePage() {
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader current="browse" />
-      <main className="mx-auto max-w-7xl px-5 pb-20 pt-28 sm:px-6 md:pb-28 md:pt-40">
+      <main className="mx-auto max-w-7xl px-5 pb-16 pt-20 sm:px-6 md:pb-28 md:pt-40">
 
-        <header className="mb-10 max-w-3xl fade-up md:mb-14">
+        <header className="mb-6 max-w-3xl fade-up md:mb-14">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
             {locale === "fa" ? "کاتالوگ" : "The Catalog"}
           </span>
-          <h1 className="mt-4 font-display font-medium text-cream-bright text-[2.25rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
+          <h1 className="mt-3 font-display font-medium text-cream-bright text-[1.85rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
             {locale === "fa" ? "همه‌ی فیلم‌ها" : "Every film, in one place"}
           </h1>
-          <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-cream/55 md:mt-5 md:text-[15px]">
+          <p className="mt-3 hidden max-w-xl text-[14px] leading-relaxed text-cream/55 md:mt-5 md:block md:text-[15px]">
             {locale === "fa"
               ? "با فیلتر دسته‌بندی، جست‌وجو و مرتب‌سازی، اثر بعدی‌ات را پیدا کن."
               : "Filter by category, search by title or director, and sort to find your next watch."}
           </p>
         </header>
 
-        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={
-              locale === "fa" ? "جست‌وجو در عنوان یا کارگردان…" : "Search title or director…"
-            }
-            className="w-full max-w-sm rounded-full border border-cream/10 bg-bg-1/60 px-5 py-2.5 text-sm text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none"
-          />
-          <div className="flex items-center gap-3 text-xs text-cream/55">
+        {/* Search — sticky on mobile under the header so it's always reachable */}
+        <div
+          className="sticky z-20 -mx-5 mb-5 bg-bg-0/85 px-5 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:mb-10 md:flex md:items-center md:justify-between md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none"
+          style={{ top: "56px" }}
+        >
+          <div className="relative md:max-w-sm md:flex-1">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-cream/40"
+              aria-hidden
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={
+                locale === "fa" ? "جست‌وجو در عنوان یا کارگردان…" : "Search title or director…"
+              }
+              className="w-full rounded-full border border-cream/10 bg-bg-1/70 ps-11 pe-5 py-3 text-sm text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:py-2.5"
+            />
+          </div>
+          <div className="mt-3 flex items-center gap-3 text-xs text-cream/55 md:mt-0">
             <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
               {locale === "fa" ? "مرتب‌سازی" : "Sort"}
             </span>
@@ -195,7 +216,7 @@ function BrowsePage() {
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
               aria-label={locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
-              className="rounded-full border border-cream/10 bg-bg-1/60 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none"
+              className="flex-1 rounded-full border border-cream/10 bg-bg-1/70 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none md:flex-none"
             >
               {sortOptions.map((o) => (
                 <option key={o.key} value={o.key}>

@@ -345,12 +345,12 @@ function FilmPage() {
 
 
   return (
-    <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
       <PaymentTestModeBanner />
       <SiteHeader />
 
       {/* Cinematic full-bleed hero */}
-      <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
+      <section className="relative isolate min-h-[78vh] w-full overflow-hidden bg-background md:min-h-[88vh]">
         {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
         {heroArt ? (
           <>
@@ -408,10 +408,10 @@ function FilmPage() {
 
 
         {/* Hero content — anchored bottom-start. Top padding clears the fixed header. */}
-        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-36 md:px-10 md:pb-20 md:pt-44">
+        <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-5 pb-10 pt-24 sm:px-6 md:min-h-[88vh] md:px-10 md:pb-20 md:pt-44">
           <Link
             to="/"
-            className="absolute inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright top-[92px] md:top-[104px]"
+            className="absolute hidden md:inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright top-[104px]"
             style={dir === "rtl" ? { right: "1.5rem" } : { left: "1.5rem" }}
           >
             ← {t.back}
@@ -931,6 +931,56 @@ function FilmPage() {
         </div>
       )}
       <SiteFooter />
+
+      {/* Mobile-only sticky bottom CTA — sits above the bottom tab bar.
+          Hidden on desktop; mirrors the primary action from the hero so users
+          can always tap Watch / Buy / Sign-in without scrolling back up. */}
+      <div
+        className="fixed inset-x-0 z-30 md:hidden pointer-events-none"
+        style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
+        aria-hidden={false}
+      >
+        <div className="pointer-events-auto mx-3 mb-2 rounded-2xl border border-cream/10 bg-bg-0/90 px-3 py-2.5 backdrop-blur-xl shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.6)]">
+          {isAuthLoading ? (
+            <div className="h-11 w-full rounded-full bg-cream/10" aria-busy="true" />
+          ) : !user ? (
+            <Link
+              to="/auth"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+              {accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}
+            </Link>
+          ) : showWatchNow ? (
+            <Link
+              to="/watch/$slug"
+              params={{ slug: film.slug }}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+              {resumeSec > 0 ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}` : t.watch}
+            </Link>
+          ) : accessType === "ppv_only" || isMember ? (
+            <button
+              type="button"
+              onClick={() => setCheckoutOpen(true)}
+              disabled={tomanOnly}
+              className="flex h-11 w-full items-center justify-center rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+            >
+              {t.buy} — {priceLabel}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMembershipOpen(true)}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+              {t.startTrial}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
