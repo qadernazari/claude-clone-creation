@@ -378,8 +378,8 @@ function WatchPage() {
         </div>
       </header>
 
-      <main className={theater ? "mx-auto max-w-[1400px] px-4 py-6" : "mx-auto max-w-5xl px-6 py-8"}>
-        <div className="flex items-center justify-between">
+      <main className={theater ? "mx-auto max-w-[1400px] px-0 py-0 md:px-4 md:py-6" : "mx-auto max-w-5xl px-0 py-0 md:px-6 md:py-8"}>
+        <div className="hidden md:flex items-center justify-between">
           <Link
             to="/films/$slug"
             params={{ slug: film.slug }}
