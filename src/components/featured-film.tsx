@@ -37,7 +37,7 @@ export function FeaturedFilm() {
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[88svh] min-h-[560px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
+      <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
         {hasAnyImage ? (
           <>
             {/* Mobile: dedicated 9:16 vertical poster */}
@@ -114,7 +114,7 @@ export function FeaturedFilm() {
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-6 md:px-12 md:pb-20">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-2xl">
               <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-5">
                 {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
