@@ -469,19 +469,8 @@ function FilmEditorModal({
                 value={d.cover_url ?? null}
                 onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Desktop Cover (16:9)"
-                description="Landscape cinematic cover (~16:9). Used as the desktop & tablet hero, the share image, and the main poster on the film page. Hi-res JPG, PNG, WebP or AVIF."
-                maxBytes={25 * 1024 * 1024}
-              />
-              <FileUpload
-                bucket="film-covers"
-                kind="image"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                value={d.mobile_cover_url ?? null}
-                onChange={(u) => set("mobile_cover_url", u ?? "")}
-                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Mobile Cover (9:16)"
-                description="Vertical poster (~9:16) designed for phones. Used as the hero on mobile so faces, titles and key art aren't cropped. Falls back to the desktop cover if unset."
+                label="Upload Cover Poster (Portrait)"
+                description="Main portrait poster (~2:3). Used on homepage rails, collection cards, search results and as the share image. Hi-res JPG, PNG, WebP or AVIF."
                 maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
@@ -491,9 +480,20 @@ function FilmEditorModal({
                 value={d.thumbnail_url ?? null}
                 onChange={(u) => set("thumbnail_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Thumbnail"
-                description="Landscape thumbnail (~16:9) used for grids, suggestions and previews."
+                label="Upload Desktop Cover (16:9)"
+                description="Landscape cinematic art (~16:9). Used as the hero on desktop and tablet, and on grids, suggestions and previews."
                 maxBytes={15 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-covers"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.mobile_cover_url ?? null}
+                onChange={(u) => set("mobile_cover_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Mobile Cover (9:16)"
+                description="Dedicated vertical poster (~9:16) for phones. Used as the hero on mobile so faces, titles and key art aren't cropped from the landscape art. Falls back to the portrait cover if unset."
+                maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
                 bucket="film-trailers"
