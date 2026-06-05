@@ -346,19 +346,18 @@ function FilmPage() {
       <SiteHeader />
 
       {/* Cinematic full-bleed hero */}
-      <section className="relative isolate min-h-[88vh] w-full overflow-hidden">
-        {/* Backdrop — full bleed cover art */}
-        <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
-        {/* Light base tint — keep the image bright and cinematic */}
-        <div className="absolute inset-0 -z-20 bg-black/15" aria-hidden />
-        {/* Header safe zone — short, soft gradient that protects nav without darkening the whole hero */}
+      <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
+        {/* Backdrop — full bleed cover art, shifted DOWN so baked-in Persian title sits below header */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[clamp(96px,14vh,160px)]"
+          className="absolute inset-x-0 bottom-0 -z-30"
+          style={{ ...posterStyle, top: "clamp(80px, 12vh, 140px)" }}
           aria-hidden
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(8,8,10,0.92) 0%, rgba(8,8,10,0.6) 55%, rgba(8,8,10,0) 100%)",
-          }}
+        />
+        {/* Very light base tint — keep the image bright and cinematic */}
+        <div
+          className="absolute inset-x-0 bottom-0 -z-20 bg-black/10"
+          style={{ top: "clamp(80px, 12vh, 140px)" }}
+          aria-hidden
         />
         {/* Bottom fade for text readability + blend into page background */}
         <div
@@ -366,7 +365,7 @@ function FilmPage() {
           aria-hidden
           style={{
             background:
-              "linear-gradient(180deg, rgba(8,8,10,0) 0%, rgba(8,8,10,0) 55%, rgba(8,8,10,0.7) 85%, var(--background) 100%)",
+              "linear-gradient(180deg, rgba(8,8,10,0) 0%, rgba(8,8,10,0) 55%, rgba(8,8,10,0.65) 85%, var(--background) 100%)",
           }}
         />
         {/* Side fade behind the title column only */}
@@ -376,10 +375,11 @@ function FilmPage() {
           style={{
             background:
               dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.75) 0%, rgba(8,8,10,0.25) 45%, rgba(8,8,10,0) 75%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.75) 0%, rgba(8,8,10,0.25) 45%, rgba(8,8,10,0) 75%)",
+                ? "linear-gradient(270deg, rgba(8,8,10,0.7) 0%, rgba(8,8,10,0.2) 45%, rgba(8,8,10,0) 75%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.7) 0%, rgba(8,8,10,0.2) 45%, rgba(8,8,10,0) 75%)",
           }}
         />
+
 
         {/* Hero content — anchored bottom-start. Top padding clears the fixed header. */}
         <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-36 md:px-10 md:pb-20 md:pt-44">
