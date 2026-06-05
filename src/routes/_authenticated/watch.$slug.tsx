@@ -399,7 +399,7 @@ function WatchPage() {
         </div>
 
         <div
-          className="mt-4 relative overflow-hidden rounded-xl border border-cream/10 shadow-2xl shadow-black/60 aspect-video"
+          className="mt-0 relative overflow-hidden border-y border-cream/10 shadow-2xl shadow-black/60 aspect-video md:mt-4 md:rounded-xl md:border"
           style={!showPlayer ? posterStyle : { background: "#000" }}
         >
           {/* subtle vignette for poster states */}
