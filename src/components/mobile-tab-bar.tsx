@@ -1,67 +1,53 @@
-import { useEffect, useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState } from "@/hooks/use-subscription";
 
 /**
  * Native-app-style bottom tab bar for mobile.
  * Visible only on small screens (<md). Hidden on the immersive
- * watch player and on auth routes to maximize content.
+ * watch player and on auth / checkout routes to maximize content.
+ *
+ * Routes:
+ *  - Home    → /
+ *  - Browse  → /browse  (search input lives at the top of /browse)
+ *  - Account → /account if signed in, /auth otherwise
  */
 export function MobileTabBar() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const location = useLocation();
   const { user } = useCurrentUserState();
-  const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    setSignedIn(!!user);
-  }, [user]);
-
-  // Hide on immersive / fullscreen routes
   const path = location.pathname;
   const hidden =
     path.startsWith("/watch/") ||
     path.startsWith("/auth") ||
     path.startsWith("/reset-password") ||
     path.startsWith("/checkout") ||
-    path.startsWith("/admin") ||
-    path.startsWith("/_authenticated/admin");
+    path.startsWith("/admin");
 
   if (hidden) return null;
 
-  const accountTarget = signedIn ? "/account" : "/auth";
-
-  const isActive = (key: "home" | "browse" | "search" | "account") => {
-    if (key === "home") return path === "/";
-    if (key === "browse") return path === "/browse" && !location.search?.toString().includes("q=");
-    if (key === "search") return path === "/browse" && location.search?.toString().includes("q=");
-    if (key === "account")
-      return (
-        path.startsWith("/account") ||
-        path.startsWith("/library") ||
-        path.startsWith("/my-tickets") ||
-        path === "/auth"
-      );
-    return false;
-  };
+  const isHome = path === "/";
+  const isBrowse = path === "/browse";
+  const isAccount =
+    path.startsWith("/account") ||
+    path.startsWith("/library") ||
+    path.startsWith("/my-tickets") ||
+    path === "/auth";
 
   return (
     <nav
       aria-label={fa ? "ناوبری" : "Primary"}
       dir={fa ? "rtl" : "ltr"}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-cream/[0.08] bg-bg-0/85 backdrop-blur-xl md:hidden"
-      style={{
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      }}
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-1.5">
         <TabItem
           to="/"
           label={fa ? "خانه" : "Home"}
-          active={isActive("home")}
+          active={isHome}
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M3 11.5 12 4l9 7.5" />
@@ -72,7 +58,7 @@ export function MobileTabBar() {
         <TabItem
           to="/browse"
           label={fa ? "آثار" : "Browse"}
-          active={isActive("browse")}
+          active={isBrowse}
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <rect x="3" y="4" width="7" height="7" rx="1.4" />
@@ -83,21 +69,9 @@ export function MobileTabBar() {
           }
         />
         <TabItem
-          to="/browse"
-          search={{ q: "" } as any}
-          label={fa ? "جستجو" : "Search"}
-          active={isActive("search")}
-          icon={
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-          }
-        />
-        <TabItem
-          to={accountTarget}
+          to={user ? "/account" : "/auth"}
           label={fa ? "حساب" : "Account"}
-          active={isActive("account")}
+          active={isAccount}
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <circle cx="12" cy="8" r="3.5" />
@@ -115,22 +89,17 @@ function TabItem({
   label,
   icon,
   active,
-  search,
 }: {
   to: string;
   label: string;
   icon: React.ReactNode;
   active: boolean;
-  search?: any;
 }) {
-  // Sign-out / sign-out behaviour: only handle the click for the search tab to
-  // make sure tapping it twice clears the query.
   return (
     <li className="flex-1">
       <Link
         to={to as any}
-        search={search}
-        className={`group relative flex h-14 w-full flex-col items-center justify-center gap-0.5 rounded-lg text-[10px] font-medium tracking-wide transition-colors ${
+        className={`group relative flex h-14 w-full flex-col items-center justify-center gap-1 rounded-lg text-[10px] font-medium tracking-wide transition-colors ${
           active ? "text-cream-bright" : "text-cream/55 active:text-cream"
         }`}
         aria-current={active ? "page" : undefined}
@@ -152,11 +121,4 @@ function TabItem({
       </Link>
     </li>
   );
-}
-
-/**
- * Logout helper used elsewhere; kept here for co-location with the tab bar.
- */
-export async function signOutFromMobile() {
-  await supabase.auth.signOut();
 }
