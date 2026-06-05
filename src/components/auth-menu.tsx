@@ -263,9 +263,9 @@ export function AuthMenu() {
         <span className="flex h-full w-full items-center justify-center font-display tracking-wide">
           {initial}
         </span>
-        {(isTrialActive || pastDue) && (
+        {pastDue && (
           <span
-            className={`absolute -top-0.5 -end-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-bg-0 ${pastDue ? "bg-red-500" : "bg-amber"}`}
+            className="absolute -top-0.5 -end-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-bg-0"
             aria-hidden
           />
         )}
