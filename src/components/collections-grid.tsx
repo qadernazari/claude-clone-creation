@@ -66,30 +66,32 @@ export function CollectionsGrid() {
             </h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {tiles.map((tile) => (
             <Link
               key={tile.id}
               to="/browse"
-              className="group relative block aspect-[16/10] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] transition-all duration-500 hover:ring-cream/20"
+              className="group block"
             >
-              {tile.art ? (
-                <img
-                  src={tile.art}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="cine-img absolute inset-0 h-full w-full object-cover"
-                />
-              ) : (
-                <div className="absolute inset-0" style={{ background: tile.gradient }} aria-hidden />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
-                <h3 className="font-display text-lg font-medium tracking-[-0.01em] text-cream-bright md:text-2xl">
+              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
+                {tile.art ? (
+                  <img
+                    src={tile.art}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="cine-img absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0" style={{ background: tile.gradient }} aria-hidden />
+                )}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent" />
+              </div>
+              <div className="mt-3.5 px-0.5">
+                <h3 className="font-display text-[14px] font-medium tracking-[-0.01em] text-cream-bright line-clamp-1">
                   {tile.name}
                 </h3>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-cream/55 md:text-[11px]">
+                <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-cream/40">
                   {fa ? `${tile.count} اثر` : `${tile.count} ${tile.count === 1 ? "film" : "films"}`}
                 </p>
               </div>
