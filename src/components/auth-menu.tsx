@@ -425,7 +425,7 @@ export function AuthMenu() {
                 onClick={switchLanguage}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] active:bg-cream/[8%]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
+                <span className="auth-menu-row-icon">
                   <Languages size={17} strokeWidth={1.6} />
                 </span>
                 <span className="flex-1">{fa ? "زبان" : "Language"}</span>
@@ -455,7 +455,7 @@ export function AuthMenu() {
                 onClick={signOut}
                 className="group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] hover:text-cream-bright active:bg-cream/[8%]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
+                <span className="auth-menu-row-icon">
                   <LogOut size={17} strokeWidth={1.6} />
                 </span>
                 <span className="flex-1 truncate">{fa ? "خروج از حساب" : "Sign out"}</span>
@@ -520,8 +520,8 @@ function Row({
     >
       <span
         className={[
-          "flex h-8 w-8 items-center justify-center rounded-md",
-          accent ? "bg-amber/[12%] text-amber" : "bg-cream/[6%] text-cream/70",
+          "auth-menu-row-icon",
+          accent ? "auth-menu-row-icon-accent" : "",
         ].join(" ")}
       >
         {icon}
