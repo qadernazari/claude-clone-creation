@@ -8,6 +8,7 @@ type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
   const { locale, num, year, t } = useLocale();
+  const user = useCurrentUser();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
 
