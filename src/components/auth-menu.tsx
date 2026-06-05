@@ -33,16 +33,61 @@ export function AuthMenu() {
   const [sub, setSub] = useState<SubInfo>(null);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lockedScrollYRef = useRef(0);
 
-  // Lock body scroll + hide mobile tab bar while the sheet is open
+  // Lock page scroll + hide mobile tab bar while the sheet is open.
+  // The fixed-body pattern is needed for iOS Safari/Chrome, where overflow:hidden alone can still rubber-band the page.
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.body.dataset.authSheetOpen = "true";
+    const body = document.body;
+    const html = document.documentElement;
+    lockedScrollYRef.current = window.scrollY || html.scrollTop || 0;
+
+    const previousBody = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      touchAction: body.style.touchAction,
+    };
+    const previousHtml = {
+      overflow: html.style.overflow,
+      overscrollBehavior: html.style.overscrollBehavior,
+    };
+
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${lockedScrollYRef.current}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.touchAction = "none";
+    body.dataset.authSheetOpen = "true";
+
+    const preventBackgroundTouch = (event: TouchEvent) => {
+      const target = event.target as Element | null;
+      if (target?.closest?.('[data-auth-scroll="true"]')) return;
+      event.preventDefault();
+    };
+
+    document.addEventListener("touchmove", preventBackgroundTouch, { passive: false });
     return () => {
-      document.body.style.overflow = prev;
-      delete document.body.dataset.authSheetOpen;
+      document.removeEventListener("touchmove", preventBackgroundTouch);
+      html.style.overflow = previousHtml.overflow;
+      html.style.overscrollBehavior = previousHtml.overscrollBehavior;
+      body.style.overflow = previousBody.overflow;
+      body.style.position = previousBody.position;
+      body.style.top = previousBody.top;
+      body.style.left = previousBody.left;
+      body.style.right = previousBody.right;
+      body.style.width = previousBody.width;
+      body.style.touchAction = previousBody.touchAction;
+      delete body.dataset.authSheetOpen;
+      window.scrollTo(0, lockedScrollYRef.current);
     };
   }, [open]);
 
@@ -189,11 +234,10 @@ export function AuthMenu() {
             aria-label={fa ? "حساب کاربری" : "Account"}
             className={[
               // Mobile sheet
-              "fixed inset-x-0 bottom-0 z-[100] max-h-[88dvh] overflow-y-auto overscroll-contain rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] w-full max-w-[100vw] flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
               // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
               "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
-            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
           >
 
             {/* Mobile grabber */}
@@ -209,6 +253,12 @@ export function AuthMenu() {
             >
               <X size={16} strokeWidth={1.8} />
             </button>
+
+            <div
+              data-auth-scroll="true"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-0"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", WebkitOverflowScrolling: "touch" }}
+            >
 
             {/* Profile header */}
             <header className="flex items-center gap-4 px-5 pt-7 pb-5 md:gap-3 md:px-5 md:pt-5 md:pb-4">
@@ -359,6 +409,7 @@ export function AuthMenu() {
               </button>
             </Section>
             <div className="h-3" aria-hidden />
+            </div>
           </div>
         </>,
         document.body,
