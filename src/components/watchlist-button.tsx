@@ -17,8 +17,6 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
   const { locale } = useLocale();
   const fa = locale === "fa";
   const user = useCurrentUser();
-
-  if (!user) return null;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fetchStatus = useServerFn(getWatchlistStatus);
@@ -72,6 +70,8 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
   const label = added
     ? fa ? "در فهرست شما" : "In your watchlist"
     : fa ? "افزودن به فهرست" : "Add to watchlist";
+
+  if (!user) return null;
 
   if (variant === "icon") {
     return (
