@@ -422,7 +422,7 @@ function Empty({ title, cta }: { title: string; cta?: string }) {
   const fa = locale === "fa";
   return (
     <div className="hairline flex flex-col items-center rounded-2xl border bg-bg-1/40 px-6 py-14 text-center md:px-12 md:py-16">
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-cream/10 bg-cream/[0.04] text-cream/40">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-cream/10 bg-cream/[4%] text-cream/40">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M5 4h14a1 1 0 0 1 1 1v15l-8-4-8 4V5a1 1 0 0 1 1-1Z" />
         </svg>
@@ -449,9 +449,9 @@ function SkeletonGrid() {
     <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="space-y-3">
-          <div className="aspect-[2/3] w-full rounded-md bg-cream/[0.04] animate-pulse" />
-          <div className="h-3 w-3/4 rounded bg-cream/[0.04] animate-pulse" />
-          <div className="h-2 w-1/2 rounded bg-cream/[0.04] animate-pulse" />
+          <div className="aspect-[2/3] w-full rounded-md bg-cream/[4%] animate-pulse" />
+          <div className="h-3 w-3/4 rounded bg-cream/[4%] animate-pulse" />
+          <div className="h-2 w-1/2 rounded bg-cream/[4%] animate-pulse" />
         </div>
       ))}
     </div>

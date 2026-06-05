@@ -71,7 +71,7 @@ export function CollectionsGrid() {
             <Link
               key={tile.id}
               to="/browse"
-              className="group relative block aspect-[16/10] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] transition-all duration-500 hover:ring-cream/20"
+              className="group relative block aspect-[16/10] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] transition-all duration-500 hover:ring-cream/20"
             >
               {tile.art ? (
                 <img

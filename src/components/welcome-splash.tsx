@@ -103,7 +103,7 @@ export function WelcomeSplash() {
           <button
             type="button"
             onClick={() => choose("en", "global")}
-            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[0.02] sm:py-10"
+            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
           >
             <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
               English
@@ -117,7 +117,7 @@ export function WelcomeSplash() {
           <button
             type="button"
             onClick={() => choose("fa", "iran")}
-            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[0.02] sm:py-10"
+            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
             dir="rtl"
             lang="fa"
           >

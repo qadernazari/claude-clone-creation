@@ -499,7 +499,7 @@ function WatchPage() {
           </div>
 
           {countdown && (
-            <div className="rounded-lg border border-cream/10 bg-cream/[0.03] px-4 py-3 text-xs text-cream/70 sm:hidden">
+            <div className="rounded-lg border border-cream/10 bg-cream/[3%] px-4 py-3 text-xs text-cream/70 sm:hidden">
               <div className="uppercase tracking-widest text-[10px] text-cream/45">{t.accessRemaining}</div>
               <div className="mt-0.5 text-cream-bright">{num(countdown.h)}h {num(countdown.m)}m</div>
             </div>
@@ -531,7 +531,7 @@ function WatchPage() {
                 { k: "T", v: fa ? "حالت سینما" : "Theater" },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between gap-2">
-                  <kbd className="rounded border border-cream/15 bg-cream/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-cream/80">
+                  <kbd className="rounded border border-cream/15 bg-cream/[4%] px-1.5 py-0.5 font-mono text-[10px] text-cream/80">
                     {k}
                   </kbd>
                   <span className="text-end">{v}</span>
