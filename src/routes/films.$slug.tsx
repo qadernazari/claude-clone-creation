@@ -513,6 +513,7 @@ function FilmPage() {
 
                 <Link
                   to="/auth"
+                  search={{ redirect: `/watch/${film.slug}` }}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -946,6 +947,7 @@ function FilmPage() {
           ) : !user ? (
             <Link
               to="/auth"
+              search={{ redirect: `/watch/${film.slug}` }}
               className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
