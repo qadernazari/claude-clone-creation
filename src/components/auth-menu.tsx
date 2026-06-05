@@ -1,5 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import {
+  User as UserIcon,
+  Library,
+  Bookmark,
+  PlayCircle,
+  CreditCard,
+  Ticket,
+  Languages,
+  Shield,
+  LogOut,
+  X,
+  ChevronRight,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState } from "@/hooks/use-subscription";
@@ -12,7 +25,7 @@ type SubInfo = {
 } | null;
 
 export function AuthMenu() {
-  const { locale } = useLocale();
+  const { locale, setLocale } = useLocale();
   const fa = locale === "fa";
   const { user, isLoading: isUserLoading } = useCurrentUserState();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -20,6 +33,15 @@ export function AuthMenu() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Lock body scroll while the mobile sheet is open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -72,6 +94,25 @@ export function AuthMenu() {
     return Math.max(1, Math.ceil(ms / 86400000));
   })();
   const pastDue = sub?.status === "past_due";
+  const isMember =
+    sub?.status === "active" || sub?.status === "trialing";
+
+  const membership: {
+    label: string;
+    tone: "amber" | "green" | "red" | "neutral";
+  } = pastDue
+    ? { label: fa ? "پرداخت ناموفق" : "Payment failed", tone: "red" }
+    : trialDaysLeft !== null
+      ? {
+          label: fa
+            ? `دوره آزمایشی · ${trialDaysLeft} روز باقی‌مانده`
+            : `Trial · ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left`,
+          tone: "amber",
+        }
+      : isMember
+        ? { label: fa ? "عضو فعال" : "Active member", tone: "green" }
+        : { label: fa ? "بدون اشتراک" : "No active plan", tone: "neutral" };
+
   if (isUserLoading) {
     return (
       <div className="flex w-[78px] justify-end" aria-hidden>
@@ -93,17 +134,30 @@ export function AuthMenu() {
     );
   }
 
+  const displayName =
+    (user.user_metadata?.full_name as string | undefined) ||
+    user.email?.split("@")[0] ||
+    (fa ? "حساب" : "Account");
   const initial = (user.user_metadata?.full_name || user.email || "?")[0]?.toUpperCase();
+
+  const switchLanguage = () => {
+    setLocale(fa ? "en" : "fa");
+    setOpen(false);
+  };
 
   return (
     <div className="relative flex w-[78px] justify-end" ref={containerRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="relative h-10 w-10 rounded-full bg-cream/10 text-cream text-sm font-medium hover:bg-cream/20 transition-colors"
-        aria-label="Account menu"
+        className="group relative h-10 w-10 overflow-hidden rounded-full bg-gradient-to-br from-cream/20 to-cream/5 text-cream text-sm font-medium ring-1 ring-cream/10 transition-all hover:ring-cream/25 hover:from-cream/25"
+        aria-label={fa ? "حساب کاربری" : "Account menu"}
+        aria-haspopup="dialog"
+        aria-expanded={open}
       >
-        {initial}
+        <span className="flex h-full w-full items-center justify-center font-display tracking-wide">
+          {initial}
+        </span>
         {(trialDaysLeft !== null || pastDue) && (
           <span
             className={`absolute -top-0.5 -end-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-bg-0 ${pastDue ? "bg-red-500" : "bg-amber"}`}
@@ -111,70 +165,247 @@ export function AuthMenu() {
           />
         )}
       </button>
+
       {open && (
-        <div className="absolute end-0 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-md border border-cream/15 bg-bg-1 p-1 shadow-lg z-50">
-          <div className="px-3 py-2 text-xs text-cream/60 truncate">{user.email}</div>
-          {trialDaysLeft !== null && (
-            <Link
-              to="/account"
-              onClick={() => setOpen(false)}
-              className="mx-1 mb-1 block rounded-sm bg-amber/15 px-3 py-2 text-xs text-amber hover:bg-amber/25 transition-colors"
-            >
-              {fa
-                ? `${trialDaysLeft} روز از دوره آزمایشی باقی است`
-                : `${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left in trial`}
-            </Link>
-          )}
-          {pastDue && (
-            <Link
-              to="/account"
-              onClick={() => setOpen(false)}
-              className="mx-1 mb-1 block rounded-sm bg-red-500/15 px-3 py-2 text-xs text-red-300 hover:bg-red-500/25 transition-colors"
-            >
-              {fa ? "پرداخت ناموفق — به‌روزرسانی" : "Payment failed — update billing"}
-            </Link>
-          )}
+        <>
+          {/* Mobile scrim — fades the page behind the sheet */}
+          <div
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in md:hidden"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
 
-          <Link
-            to="/account"
-            onClick={() => setOpen(false)}
-            className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
+          {/* Panel — bottom sheet on mobile, anchored dropdown on desktop */}
+          <div
+            role="dialog"
+            aria-label={fa ? "حساب کاربری" : "Account"}
+            className={[
+              // Mobile sheet
+              "fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              // Desktop dropdown
+              "md:absolute md:bottom-auto md:end-0 md:inset-x-auto md:top-full md:mt-3 md:w-[320px] md:max-h-none md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in md:overflow-hidden",
+            ].join(" ")}
+            style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
           >
-            {fa ? "حساب کاربری" : "Account"}
-          </Link>
-          <Link
-            to="/library"
-            onClick={() => setOpen(false)}
-            className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
-          >
-            {fa ? "کتابخانه من" : "My Library"}
-          </Link>
-          <Link
-            to="/my-tickets"
-            onClick={() => setOpen(false)}
-            className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
-          >
-            {fa ? "بلیط‌های من" : "My tickets"}
-          </Link>
-          {isAdmin && (
-            <Link
-              to="/admin"
+            {/* Mobile grabber */}
+            <div className="flex justify-center pt-3 md:hidden">
+              <span className="h-1 w-10 rounded-full bg-cream/20" aria-hidden />
+            </div>
+            {/* Mobile close */}
+            <button
+              type="button"
               onClick={() => setOpen(false)}
-              className="block rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
+              className="absolute end-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 bg-cream/5 text-cream/70 hover:text-cream-bright hover:bg-cream/10 md:hidden"
+              aria-label={fa ? "بستن" : "Close"}
             >
-              {fa ? "پنل مدیریت" : "Admin dashboard"}
-            </Link>
-          )}
-          <button
-            type="button"
-            onClick={signOut}
-            className="w-full text-start rounded-sm px-3 py-2 text-sm hover:bg-cream/10 transition-colors"
-          >
-            {fa ? "خروج" : "Sign out"}
-          </button>
-        </div>
+              <X size={16} strokeWidth={1.8} />
+            </button>
+
+            {/* Profile header */}
+            <header className="flex items-center gap-4 px-5 pt-7 pb-5 md:gap-3 md:px-5 md:pt-5 md:pb-4">
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-amber/30 via-cream/15 to-cream/5 ring-1 ring-cream/15 md:h-12 md:w-12">
+                <span className="flex h-full w-full items-center justify-center font-display text-xl text-cream-bright md:text-lg">
+                  {initial}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display text-[17px] text-cream-bright md:text-[15px]">
+                  {displayName}
+                </p>
+                <p className="mt-0.5 truncate text-[12px] text-cream/55">
+                  {user.email}
+                </p>
+              </div>
+            </header>
+
+            {/* Membership badge */}
+            <div className="px-5 pb-4 md:pb-3">
+              <Link
+                to="/account"
+                onClick={() => setOpen(false)}
+                className={[
+                  "group flex items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors",
+                  membership.tone === "amber"
+                    ? "border-amber/25 bg-amber/[0.07] hover:bg-amber/[0.12]"
+                    : membership.tone === "green"
+                      ? "border-emerald-400/20 bg-emerald-400/[0.06] hover:bg-emerald-400/[0.1]"
+                      : membership.tone === "red"
+                        ? "border-red-500/25 bg-red-500/[0.08] hover:bg-red-500/[0.14]"
+                        : "border-cream/10 bg-cream/[0.03] hover:bg-cream/[0.06]",
+                ].join(" ")}
+              >
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                    {fa ? "وضعیت اشتراک" : "Membership"}
+                  </p>
+                  <p
+                    className={[
+                      "mt-1 truncate text-[13px] font-medium",
+                      membership.tone === "amber"
+                        ? "text-amber-bright"
+                        : membership.tone === "green"
+                          ? "text-emerald-300"
+                          : membership.tone === "red"
+                            ? "text-red-300"
+                            : "text-cream/80",
+                    ].join(" ")}
+                  >
+                    {membership.label}
+                  </p>
+                </div>
+                <ChevronRight
+                  size={16}
+                  className="text-cream/40 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  aria-hidden
+                />
+              </Link>
+            </div>
+
+            {/* Library section */}
+            <Section title={fa ? "کتابخانه" : "Library"}>
+              <Row
+                to="/library"
+                icon={<Library size={17} strokeWidth={1.6} />}
+                label={fa ? "کتابخانه من" : "My Library"}
+                onClick={() => setOpen(false)}
+              />
+              <Row
+                to="/library"
+                icon={<Bookmark size={17} strokeWidth={1.6} />}
+                label={fa ? "فهرست تماشا" : "Watchlist"}
+                onClick={() => setOpen(false)}
+              />
+              <Row
+                to="/library"
+                icon={<PlayCircle size={17} strokeWidth={1.6} />}
+                label={fa ? "ادامه تماشا" : "Continue Watching"}
+                onClick={() => setOpen(false)}
+              />
+            </Section>
+
+            {/* Account section */}
+            <Section title={fa ? "حساب" : "Account"}>
+              <Row
+                to="/account"
+                icon={<UserIcon size={17} strokeWidth={1.6} />}
+                label={fa ? "تنظیمات حساب" : "Account Settings"}
+                onClick={() => setOpen(false)}
+              />
+              <Row
+                to="/account"
+                icon={<CreditCard size={17} strokeWidth={1.6} />}
+                label={fa ? "اشتراک و صورتحساب" : "Subscription & Billing"}
+                onClick={() => setOpen(false)}
+              />
+              <Row
+                to="/my-tickets"
+                icon={<Ticket size={17} strokeWidth={1.6} />}
+                label={fa ? "بلیط‌های من" : "My Tickets"}
+                onClick={() => setOpen(false)}
+              />
+              <button
+                type="button"
+                onClick={switchLanguage}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[0.05] active:bg-cream/[0.08]"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[0.06] text-cream/70">
+                  <Languages size={17} strokeWidth={1.6} />
+                </span>
+                <span className="flex-1">{fa ? "زبان" : "Language"}</span>
+                <span className="text-[12px] uppercase tracking-widest text-cream/45">
+                  {fa ? "EN" : "فا"}
+                </span>
+              </button>
+            </Section>
+
+            {/* Admin */}
+            {isAdmin && (
+              <Section title={fa ? "مدیریت" : "Administration"}>
+                <Row
+                  to="/admin"
+                  icon={<Shield size={17} strokeWidth={1.6} />}
+                  label={fa ? "پنل مدیریت" : "Admin Dashboard"}
+                  onClick={() => setOpen(false)}
+                  accent
+                />
+              </Section>
+            )}
+
+            {/* Footer */}
+            <div className="border-t border-cream/[0.06] px-3 py-3 mt-2">
+              <button
+                type="button"
+                onClick={signOut}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/75 transition-colors hover:bg-cream/[0.05] hover:text-cream-bright active:bg-cream/[0.08]"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[0.06] text-cream/70">
+                  <LogOut size={17} strokeWidth={1.6} />
+                </span>
+                <span>{fa ? "خروج از حساب" : "Sign out"}</span>
+              </button>
+            </div>
+          </div>
+        </>
       )}
-
     </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="px-3 pb-2">
+      <p className="px-3 pb-1.5 pt-2 text-[10px] uppercase tracking-[0.22em] text-cream/40">
+        {title}
+      </p>
+      <div className="flex flex-col">{children}</div>
+    </section>
+  );
+}
+
+function Row({
+  to,
+  icon,
+  label,
+  onClick,
+  accent,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+  accent?: boolean;
+}) {
+  return (
+    <Link
+      to={to as never}
+      onClick={onClick}
+      className={[
+        "group flex items-center gap-3 rounded-lg px-3 py-3 text-[14px] transition-colors active:bg-cream/[0.08]",
+        accent
+          ? "text-amber-bright hover:bg-amber/[0.08]"
+          : "text-cream/85 hover:bg-cream/[0.05] hover:text-cream-bright",
+      ].join(" ")}
+    >
+      <span
+        className={[
+          "flex h-8 w-8 items-center justify-center rounded-md",
+          accent ? "bg-amber/[0.12] text-amber" : "bg-cream/[0.06] text-cream/70",
+        ].join(" ")}
+      >
+        {icon}
+      </span>
+      <span className="flex-1 truncate">{label}</span>
+      <ChevronRight
+        size={15}
+        className="text-cream/30 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+        aria-hidden
+      />
+    </Link>
   );
 }
