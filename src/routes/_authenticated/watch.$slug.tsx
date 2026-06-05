@@ -517,7 +517,7 @@ function WatchPage() {
             </section>
           )}
 
-          <section className={synopsis ? "" : "md:col-span-3"}>
+          <section className={synopsis ? "hidden md:block" : "hidden md:block md:col-span-3"}>
             <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.shortcuts}</h2>
             <dl className="mt-3 grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-cream/70">
               {[
