@@ -70,6 +70,7 @@ export type LibraryFilm = {
   director_en: string | null;
   director_fa: string | null;
   cover_url: string | null;
+  thumbnail_url: string | null;
   poster_gradient: string | null;
   duration_min: number | null;
   year: number | null;
