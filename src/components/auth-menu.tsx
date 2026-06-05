@@ -34,15 +34,18 @@ export function AuthMenu() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Lock body scroll while the mobile sheet is open
+  // Lock body scroll + hide mobile tab bar while the sheet is open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    document.body.dataset.authSheetOpen = "true";
     return () => {
       document.body.style.overflow = prev;
+      delete document.body.dataset.authSheetOpen;
     };
   }, [open]);
+
 
   useEffect(() => {
     if (!open) return;
