@@ -83,13 +83,22 @@ export function AuthMenu() {
     window.setTimeout(resetSheetDrag, 190);
   }
 
-  // Lock page scroll + hide mobile tab bar while the sheet is open.
-  // The fixed-body pattern is needed for iOS Safari/Chrome, where overflow:hidden alone can still rubber-band the page.
+  // Lock page scroll while the sheet is open.
+  // Desktop: compensate for the removed vertical scrollbar with padding-right
+  //   so the layout behind the drawer doesn't shift horizontally.
+  // Touch devices: use the fixed-body pattern so iOS Safari/Chrome don't rubber-band.
   useEffect(() => {
     if (!open) return;
     const body = document.body;
     const html = document.documentElement;
-    lockedScrollYRef.current = window.scrollY || html.scrollTop || 0;
+    const scrollY = window.scrollY || html.scrollTop || 0;
+    lockedScrollYRef.current = scrollY;
+
+    const isTouch =
+      typeof window !== "undefined" &&
+      (window.matchMedia?.("(hover: none) and (pointer: coarse)").matches ||
+        "ontouchstart" in window);
+    const scrollbarWidth = Math.max(0, window.innerWidth - html.clientWidth);
 
     const previousBody = {
       overflow: body.style.overflow,
@@ -98,20 +107,32 @@ export function AuthMenu() {
       left: body.style.left,
       right: body.style.right,
       width: body.style.width,
+      paddingRight: body.style.paddingRight,
     };
     const previousHtml = {
       overflow: html.style.overflow,
       overscrollBehavior: html.style.overscrollBehavior,
+      scrollBehavior: html.style.scrollBehavior,
+      paddingRight: html.style.paddingRight,
     };
 
+    // Disable smooth scroll so the restore on close is instant (no visible jump).
+    html.style.scrollBehavior = "auto";
     html.style.overflow = "hidden";
     html.style.overscrollBehavior = "none";
     body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${lockedScrollYRef.current}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
+
+    if (isTouch) {
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.left = "0";
+      body.style.right = "0";
+      body.style.width = "100%";
+    } else if (scrollbarWidth > 0) {
+      // Compensate for the now-missing scrollbar so nothing shifts horizontally.
+      html.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
     html.dataset.authSheetOpen = "true";
     body.dataset.authSheetOpen = "true";
 
@@ -119,15 +140,23 @@ export function AuthMenu() {
       resetSheetDrag();
       html.style.overflow = previousHtml.overflow;
       html.style.overscrollBehavior = previousHtml.overscrollBehavior;
+      html.style.paddingRight = previousHtml.paddingRight;
       body.style.overflow = previousBody.overflow;
       body.style.position = previousBody.position;
       body.style.top = previousBody.top;
       body.style.left = previousBody.left;
       body.style.right = previousBody.right;
       body.style.width = previousBody.width;
+      body.style.paddingRight = previousBody.paddingRight;
       delete html.dataset.authSheetOpen;
       delete body.dataset.authSheetOpen;
-      window.scrollTo(0, lockedScrollYRef.current);
+      if (isTouch) {
+        window.scrollTo(0, scrollY);
+      }
+      // Restore previous scroll-behavior on the next frame so we don't animate the restore.
+      requestAnimationFrame(() => {
+        html.style.scrollBehavior = previousHtml.scrollBehavior;
+      });
     };
   }, [open]);
 
