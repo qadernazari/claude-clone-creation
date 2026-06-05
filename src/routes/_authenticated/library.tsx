@@ -340,12 +340,25 @@ function ContinueCard({
   const pct = duration > 0 ? Math.min(100, Math.max(2, (position / duration) * 100)) : 5;
   return (
     <Link to="/watch/$slug" params={{ slug: film.slug }} className="group block">
-      <div className="relative">
-        <PosterThumb film={film} />
+      <div
+        aria-hidden
+        style={{ background: (film.poster_gradient as string) || fallbackGradient }}
+        className="hairline relative aspect-video w-full overflow-hidden rounded-xl border bg-bg-1"
+      >
+        {film.cover_url && (
+          <img
+            src={film.cover_url}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/60 via-transparent to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-1.5 bg-black/60">
           <div className="h-full bg-amber" style={{ width: `${pct}%` }} />
         </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-md">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-cream text-bg-0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M8 5v14l11-7z" />
