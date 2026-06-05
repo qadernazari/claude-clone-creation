@@ -33,7 +33,7 @@ export function ContinueWatching() {
   const { locale, t, num } = useLocale();
   const fa = locale === "fa";
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     enabled: !!user,
     queryKey: ["continue-watching", user?.id],
     queryFn: async () => {
@@ -53,7 +53,27 @@ export function ContinueWatching() {
     staleTime: 30_000,
   });
 
-  if (!user || !data || data.length === 0) return null;
+  if (!user) return null;
+  if (isLoading) {
+    return (
+      <section className="relative">
+        <div className="mx-auto max-w-[1400px] px-5 md:px-12">
+          <div className="mb-5 md:mb-7">
+            <span className="block h-3 w-32 animate-pulse rounded-sm bg-cream/10" />
+          </div>
+        </div>
+        <div className="no-scrollbar flex gap-4 overflow-x-hidden px-5 pb-2 md:gap-6 md:px-12">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="aspect-video w-[78vw] shrink-0 animate-pulse rounded-xl bg-cream/[0.04] ring-1 ring-cream/[0.05] sm:w-[360px] md:w-[400px]"
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+  if (!data || data.length === 0) return null;
 
   return (
     <section className="relative" style={{ contentVisibility: "auto", containIntrinsicSize: "1px 320px" }}>
