@@ -132,7 +132,7 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
             </button>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg bg-white">
+          <div className="overflow-hidden rounded-2xl bg-white">
             <EmbeddedCheckoutProvider stripe={getStripe()} options={options}>
               <EmbeddedCheckout />
             </EmbeddedCheckoutProvider>
