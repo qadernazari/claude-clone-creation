@@ -41,7 +41,7 @@ export function ContinueWatching() {
       const { data, error } = await supabase
         .from("watch_progress")
         .select(
-          "film_id, position_seconds, duration_seconds, last_watched_at, films!inner(id, slug, title_en, title_fa, cover_url, poster_gradient, duration_min)",
+          "film_id, position_seconds, duration_seconds, last_watched_at, films!inner(id, slug, title_en, title_fa, cover_url, thumbnail_url, poster_gradient, duration_min)",
         )
         .eq("user_id", user!.id)
         .eq("completed", false)
