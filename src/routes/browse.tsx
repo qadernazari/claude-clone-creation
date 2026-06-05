@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
 import { useLocale } from "../lib/i18n";
@@ -161,16 +161,16 @@ function BrowsePage() {
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader current="browse" />
-      <main className="mx-auto max-w-7xl px-6 pb-28 pt-36 md:pt-40">
+      <main className="mx-auto max-w-7xl px-5 pb-20 pt-28 sm:px-6 md:pb-28 md:pt-40">
 
-        <header className="mb-14 max-w-3xl fade-up">
+        <header className="mb-10 max-w-3xl fade-up md:mb-14">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
             {locale === "fa" ? "کاتالوگ" : "The Catalog"}
           </span>
-          <h1 className="mt-5 font-display font-medium text-cream-bright text-5xl leading-[1.02] tracking-[-0.03em] md:text-6xl">
+          <h1 className="mt-4 font-display font-medium text-cream-bright text-[2.25rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
             {locale === "fa" ? "همه‌ی فیلم‌ها" : "Every film, in one place"}
           </h1>
-          <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-cream/55">
+          <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-cream/55 md:mt-5 md:text-[15px]">
             {locale === "fa"
               ? "با فیلتر دسته‌بندی، جست‌وجو و مرتب‌سازی، اثر بعدی‌ات را پیدا کن."
               : "Filter by category, search by title or director, and sort to find your next watch."}
@@ -207,11 +207,11 @@ function BrowsePage() {
         </div>
 
         {visibleCategories.length > 0 ? (
-          <div className="mb-10 flex flex-wrap gap-1.5">
+          <div className="no-scrollbar -mx-5 mb-8 flex gap-1.5 overflow-x-auto px-5 md:mx-0 md:mb-10 md:flex-wrap md:overflow-visible md:px-0">
             <button
               type="button"
               onClick={() => setActive(null)}
-              className={`rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
                 active === null
                   ? "border-cream bg-cream text-ink"
                   : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
@@ -224,7 +224,7 @@ function BrowsePage() {
                 key={c.id}
                 type="button"
                 onClick={() => setActive(c.id)}
-                className={`rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
+                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
                   active === c.id
                     ? "border-cream bg-cream text-ink"
                     : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
@@ -276,31 +276,47 @@ function BrowsePage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-5 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4">
             {filtered.map((film) => {
               const ftitle =
                 locale === "fa" ? film.title_fa || film.title_en : film.title_en;
               const director =
                 locale === "fa" ? film.director_fa || film.director_en : film.director_en;
-              const bg = film.cover_url
-                ? `center / cover no-repeat url(${film.cover_url})`
-                : film.poster_gradient || fallbackGradient(film.id);
               return (
-                <a key={film.id} href={`/films/${film.slug}`} className="group block">
+                <Link
+                  key={film.id}
+                  to="/films/$slug"
+                  params={{ slug: film.slug }}
+                  className="group block"
+                >
                   <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
-                    <div className="cine-img absolute inset-0" style={{ background: bg }} />
+                    {film.cover_url ? (
+                      <img
+                        src={film.cover_url}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="cine-img absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: film.poster_gradient || fallbackGradient(film.id) }}
+                        aria-hidden
+                      />
+                    )}
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   </div>
-                  <div className="mt-4 px-0.5">
-                    <h3 className="font-display text-[14px] font-medium leading-snug tracking-[-0.01em] text-cream-bright line-clamp-1">
+                  <div className="mt-3 px-0.5 md:mt-4">
+                    <h3 className="font-display text-[13px] font-medium leading-snug tracking-[-0.01em] text-cream-bright line-clamp-1 md:text-[14px]">
                       {ftitle}
                     </h3>
-                    <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1">
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1 md:mt-1.5 md:text-[11px]">
                       {director}
                       {film.year ? <> {" · "} {year(film.year)}</> : null}
                     </p>
                   </div>
-                </a>
+                </Link>
               );
             })}
           </div>
