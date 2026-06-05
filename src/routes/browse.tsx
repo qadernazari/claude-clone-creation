@@ -388,10 +388,10 @@ function BrowsePage() {
                   params={{ slug: film.slug }}
                   className="group block"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
-                    {film.cover_url ? (
+                  <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+                    {film.thumbnail_url || film.cover_url ? (
                       <img
-                        src={film.cover_url}
+                        src={film.thumbnail_url || film.cover_url || ""}
                         alt=""
                         loading="lazy"
                         decoding="async"
