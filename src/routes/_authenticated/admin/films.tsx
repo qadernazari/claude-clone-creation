@@ -36,6 +36,7 @@ type Film = {
   sort_order: number;
   cover_url: string | null;
   thumbnail_url: string | null;
+  mobile_cover_url: string | null;
   poster_gradient: string | null;
   video_url?: string | null;
   preview_url: string | null;
@@ -67,13 +68,13 @@ const EMPTY: FilmDraft = {
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
-  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", poster_gradient: GRADIENTS[0],
+  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
 };
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
@@ -402,6 +403,7 @@ function FilmEditorModal({
         sort_order: Number(d.sort_order) || 0,
         cover_url: d.cover_url?.trim() || null,
         thumbnail_url: d.thumbnail_url?.trim() || null,
+        mobile_cover_url: d.mobile_cover_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
         preview_url: d.preview_url?.trim() || null,
       };
