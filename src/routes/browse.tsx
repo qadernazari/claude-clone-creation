@@ -1,13 +1,20 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { supabase } from "../integrations/supabase/client";
 import { useLocale } from "../lib/i18n";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 
 
+const browseSearchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+});
+
 export const Route = createFileRoute("/browse")({
+  validateSearch: zodValidator(browseSearchSchema),
   head: () => ({
     meta: [
       { title: "Browse films — All originals" },
