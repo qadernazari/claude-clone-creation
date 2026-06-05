@@ -231,17 +231,16 @@ function LibraryPage() {
 
 function PosterThumb({ film, size = "md" }: { film: LibraryFilm; size?: "sm" | "md" }) {
   const fallback = (film.poster_gradient as string) || fallbackGradient;
-  const cls = size === "sm" ? "aspect-video w-28" : "aspect-video w-full";
-  const src = film.thumbnail_url || film.cover_url;
+  const cls = size === "sm" ? "h-16 w-12" : "aspect-[2/3] w-full";
   return (
     <div
       aria-hidden
       style={{ background: fallback }}
       className={`hairline relative overflow-hidden rounded-md border bg-bg-1 ${cls}`}
     >
-      {src && (
+      {film.cover_url && (
         <img
-          src={src}
+          src={film.cover_url}
           alt=""
           loading="lazy"
           decoding="async"
