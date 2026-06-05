@@ -135,42 +135,27 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-1 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden md:block">
+              <LanguageToggle />
+            </div>
+            {/* Compact language toggle on mobile (hamburger is gone — nav lives in the bottom tab bar) */}
+            <div className="md:hidden">
               <LanguageToggle />
             </div>
             <MembershipCta />
             <AuthMenu />
-            {/* Hamburger — mobile only */}
-            <button
-              type="button"
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-cream/80 hover:text-cream-bright transition-colors md:hidden"
-            >
-              <span className="relative block h-4 w-5">
-                <span
-                  className={`absolute left-0 top-0 h-px w-5 bg-current transition-all duration-300 ${
-                    menuOpen ? "translate-y-2 rotate-45" : ""
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-2 h-px w-5 bg-current transition-all duration-200 ${
-                    menuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-4 h-px w-5 bg-current transition-all duration-300 ${
-                    menuOpen ? "-translate-y-2 -rotate-45" : ""
-                  }`}
-                />
-              </span>
-            </button>
           </div>
         </div>
         <TrialBanner />
       </header>
+    </>
+  );
+}
+
+// Legacy unused mobile-menu fragment removed below — bottom tab bar replaces it.
+function _LegacyMobileMenu({ menuOpen: _o, setMenuOpen: _s, fa: _f }: { menuOpen: boolean; setMenuOpen: (v: boolean) => void; fa: boolean }) {
+  return null;
 
       {/* Mobile menu overlay */}
       <div
