@@ -16,7 +16,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
 import { useEffect, useMemo, useState } from "react";
 
-import type { User } from "@supabase/supabase-js";
+
 
 export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
