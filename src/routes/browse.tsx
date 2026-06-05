@@ -164,11 +164,11 @@ function BrowsePage() {
       <SiteHeader current="browse" />
       <main className="mx-auto max-w-7xl px-5 pb-16 pt-20 sm:px-6 md:pb-28 md:pt-40">
 
-        <header className="mb-6 max-w-3xl fade-up md:mb-14">
+        <header className="mb-4 max-w-3xl fade-up md:mb-14">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
             {locale === "fa" ? "کاتالوگ" : "The Catalog"}
           </span>
-          <h1 className="mt-3 font-display font-medium text-cream-bright text-[1.85rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
+          <h1 className="mt-3 font-display font-medium text-cream-bright text-[1.6rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
             {locale === "fa" ? "همه‌ی فیلم‌ها" : "Every film, in one place"}
           </h1>
           <p className="mt-3 hidden max-w-xl text-[14px] leading-relaxed text-cream/55 md:mt-5 md:block md:text-[15px]">
@@ -178,38 +178,57 @@ function BrowsePage() {
           </p>
         </header>
 
-        {/* Search — sticky on mobile under the header so it's always reachable */}
+        {/* Search + Sort — compact on mobile; sticky under the site header */}
         <div
-          className="sticky z-20 -mx-5 mb-5 bg-bg-0/85 px-5 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:mb-10 md:flex md:items-center md:justify-between md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none"
+          className="sticky z-20 -mx-5 mb-3 bg-bg-0/85 px-5 py-2 backdrop-blur-xl sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:mb-10 md:flex md:items-center md:justify-between md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none"
           style={{ top: "56px" }}
         >
-          <div className="relative md:max-w-sm md:flex-1">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-cream/40"
-              aria-hidden
+          <div className="flex items-center gap-2 md:max-w-sm md:flex-1 md:gap-3">
+            <div className="relative flex-1">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-cream/40 md:start-4"
+                aria-hidden
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <input
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={
+                  locale === "fa" ? "جست‌وجو…" : "Search films…"
+                }
+                className="w-full rounded-full border border-cream/10 bg-bg-1/70 ps-10 pe-4 py-2 text-[13px] text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:ps-11 md:pe-5 md:py-2.5 md:text-sm"
+              />
+            </div>
+            {/* Compact filter button (mobile only) */}
+            <button
+              type="button"
+              onClick={() => setSortSheetOpen(true)}
+              aria-label={locale === "fa" ? "مرتب‌سازی" : "Sort"}
+              className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cream/15 bg-bg-1/70 text-cream/70 transition-colors active:scale-95 active:bg-bg-1 md:hidden"
             >
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-            <input
-              type="search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={
-                locale === "fa" ? "جست‌وجو در عنوان یا کارگردان…" : "Search title or director…"
-              }
-              className="w-full rounded-full border border-cream/10 bg-bg-1/70 ps-11 pe-5 py-3 text-sm text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:py-2.5"
-            />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M3 6h18" />
+                <path d="M7 12h10" />
+                <path d="M10 18h4" />
+              </svg>
+              {sort !== "curated" && (
+                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-cream" aria-hidden />
+              )}
+            </button>
           </div>
-          <div className="mt-3 flex items-center gap-3 text-xs text-cream/55 md:mt-0">
+          {/* Desktop-only sort dropdown */}
+          <div className="hidden items-center gap-3 text-xs text-cream/55 md:flex">
             <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
               {locale === "fa" ? "مرتب‌سازی" : "Sort"}
             </span>
@@ -217,7 +236,7 @@ function BrowsePage() {
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
               aria-label={locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
-              className="flex-1 rounded-full border border-cream/10 bg-bg-1/70 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none md:flex-none"
+              className="rounded-full border border-cream/10 bg-bg-1/70 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none"
             >
               {sortOptions.map((o) => (
                 <option key={o.key} value={o.key}>
@@ -229,7 +248,7 @@ function BrowsePage() {
         </div>
 
         {visibleCategories.length > 0 ? (
-          <div className="no-scrollbar -mx-5 mb-8 flex gap-1.5 overflow-x-auto px-5 md:mx-0 md:mb-10 md:flex-wrap md:overflow-visible md:px-0">
+          <div className="no-scrollbar -mx-5 mb-4 flex gap-1.5 overflow-x-auto px-5 md:mx-0 md:mb-10 md:flex-wrap md:overflow-visible md:px-0">
             <button
               type="button"
               onClick={() => setActive(null)}
@@ -258,7 +277,7 @@ function BrowsePage() {
           </div>
         ) : null}
 
-        <p className="mb-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-cream/40">
+        <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-cream/40 md:mb-8">
           {isLoading
             ? locale === "fa"
               ? "در حال بارگذاری…"
@@ -267,6 +286,63 @@ function BrowsePage() {
                 locale === "fa" ? "اثر" : filtered.length === 1 ? "film" : "films"
               }`}
         </p>
+
+        {/* Mobile sort bottom sheet */}
+        {sortSheetOpen && (
+          <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
+            <div
+              className="absolute inset-0 animate-fade-in bg-ink/70 backdrop-blur-sm"
+              onClick={() => setSortSheetOpen(false)}
+              aria-hidden
+            />
+            <div
+              className="absolute inset-x-0 bottom-0 animate-slide-up-sheet rounded-t-3xl border-t border-cream/10 bg-bg-1 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2 shadow-[0_-20px_60px_-10px_rgba(0,0,0,0.6)]"
+            >
+              <div className="mx-auto mt-1 mb-3 h-1 w-10 rounded-full bg-cream/20" aria-hidden />
+              <div className="px-5 pb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/40">
+                  {locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
+                </p>
+              </div>
+              <ul className="px-2 pb-2">
+                {sortOptions.map((o) => {
+                  const selected = sort === o.key;
+                  return (
+                    <li key={o.key}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSort(o.key);
+                          setSortSheetOpen(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[15px] transition-colors active:bg-cream/[0.06] ${
+                          selected ? "text-cream-bright" : "text-cream/80"
+                        }`}
+                      >
+                        <span>{o.label}</span>
+                        {selected && (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="text-cream" aria-hidden>
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="px-5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSortSheetOpen(false)}
+                  className="h-11 w-full rounded-full border border-cream/15 text-[13px] font-medium text-cream/80 transition-colors active:bg-cream/[0.06]"
+                >
+                  {locale === "fa" ? "بستن" : "Close"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {isLoading ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
