@@ -348,3 +348,6 @@ body[data-no-tabbar="true"] {
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in { animation: none; }
 }
+
+/* Hide mobile tab bar while the account sheet is open */
+body[data-auth-sheet-open] .mobile-tab-bar { display: none !important; }
