@@ -16,6 +16,7 @@ export type HomeFeaturedFilm = {
   poster_gradient: string | null;
   cover_url: string | null;
   thumbnail_url: string | null;
+  mobile_cover_url: string | null;
   is_premium: boolean | null;
 };
 
@@ -58,7 +59,7 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
       supabaseAdmin
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, is_premium",
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
         )
         .eq("visibility", "published")
         .order("sort_order", { ascending: true })
