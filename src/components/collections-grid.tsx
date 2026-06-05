@@ -71,7 +71,6 @@ export function CollectionsGrid() {
             <Link
               key={tile.id}
               to="/browse"
-              search={{ category: tile.slug } as never}
               className="group relative block aspect-[16/10] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] transition-all duration-500 hover:ring-cream/20"
             >
               {tile.art ? (
