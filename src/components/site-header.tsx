@@ -112,6 +112,26 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             </nav>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/browse"
+              aria-label={fa ? "جست‌وجو" : "Search"}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
+            >
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+            </Link>
             <div className="hidden md:block">
               <LanguageToggle />
             </div>
