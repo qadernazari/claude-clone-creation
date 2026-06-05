@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homePageQueryOptions, type HomeCategory, type HomeRailFilm } from "../lib/home.functions";
 
@@ -40,9 +41,8 @@ export function CollectionsGrid() {
           id: c.id,
           name: t({ en: c.name_en, fa: c.name_fa || c.name_en }),
           slug: c.id,
-          bg: art
-            ? `center / cover no-repeat url(${art})`
-            : cover?.poster_gradient || fallbackGradient(c.id),
+          art,
+          gradient: cover?.poster_gradient || fallbackGradient(c.id),
           count: list.length,
         };
       });
@@ -51,36 +51,50 @@ export function CollectionsGrid() {
   if (tiles.length === 0) return null;
 
   return (
-    <section className="relative px-6 md:px-12">
+    <section
+      className="relative px-5 md:px-12"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "1px 600px" }}
+    >
       <div className="mx-auto max-w-[1400px]">
-        <div className="mb-6 flex items-end justify-between gap-6">
+        <div className="mb-5 flex items-end justify-between gap-6 md:mb-6">
           <div>
-            <span className="mb-2.5 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+            <span className="mb-2 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40 md:mb-2.5">
               {fa ? "مجموعه‌ها" : "Collections"}
             </span>
-            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
+            <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
               {fa ? "مجموعه‌های منتخب" : "Curated collections"}
             </h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {tiles.map((tile) => (
-            <a
+            <Link
               key={tile.id}
-              href={`/browse?category=${encodeURIComponent(tile.slug)}`}
+              to="/browse"
+              search={{ category: tile.slug } as never}
               className="group relative block aspect-[16/10] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] transition-all duration-500 hover:ring-cream/20"
             >
-              <div className="cine-img absolute inset-0" style={{ background: tile.bg }} />
+              {tile.art ? (
+                <img
+                  src={tile.art}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="cine-img absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0" style={{ background: tile.gradient }} aria-hidden />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-bg-0 via-bg-0/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <h3 className="font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl">
+              <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                <h3 className="font-display text-lg font-medium tracking-[-0.01em] text-cream-bright md:text-2xl">
                   {tile.name}
                 </h3>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-cream/55">
+                <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-cream/55 md:text-[11px]">
                   {fa ? `${tile.count} اثر` : `${tile.count} ${tile.count === 1 ? "film" : "films"}`}
                 </p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
