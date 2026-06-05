@@ -134,7 +134,7 @@ const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.
 
 function FilmPage() {
   const { film } = Route.useLoaderData();
-  const { locale, region, num, dir } = useLocale();
+  const { locale, region, num, year, dir } = useLocale();
   const fa = locale === "fa";
   const { isMember, isLoading: isAuthLoading, user } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -390,7 +390,7 @@ function FilmPage() {
 
             {/* Meta row + quality badges */}
             <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-cream/75">
-              {film.year && <span>{fa ? num(film.year) : String(film.year)}</span>}
+              {film.year && <span>{year(film.year)}</span>}
               {film.year && film.duration_min ? <span className="text-cream/30">·</span> : null}
               {film.duration_min && (
                 <span>
@@ -685,7 +685,7 @@ function FilmPage() {
           {film.year && (
             <div>
               <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "سال" : "Year"}</dt>
-              <dd className="mt-1 text-[14px] text-cream-bright">{fa ? num(film.year) : String(film.year)}</dd>
+              <dd className="mt-1 text-[14px] text-cream-bright">{year(film.year)}</dd>
             </div>
           )}
           {film.duration_min && (

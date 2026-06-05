@@ -6,7 +6,7 @@ import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functio
 type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
-  const { locale, num, t } = useLocale();
+  const { locale, num, year, t } = useLocale();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
 
@@ -104,7 +104,7 @@ export function FeaturedFilm() {
               </h1>
               <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.24em] text-cream/55">
                 {director}
-                {data.year ? <> {" · "} {num(data.year)}</> : null}
+                {data.year ? <> {" · "} {year(data.year)}</> : null}
                 {data.duration_min ? (
                   <>
                     {" · "}

@@ -15,7 +15,7 @@ function fallbackGradient(seed: string) {
 }
 
 /* ---------- Card ---------- */
-function PosterCard({ film, locale, num }: { film: Film; locale: string; num: (n: number) => string }) {
+function PosterCard({ film, locale, year }: { film: Film; locale: string; year: (n: number) => string }) {
   const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
   const director = locale === "fa" ? film.director_fa || film.director_en : film.director_en;
   const bg = film.cover_url
@@ -37,7 +37,7 @@ function PosterCard({ film, locale, num }: { film: Film; locale: string; num: (n
         </h3>
         <p className="mt-1.5 text-[11px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1">
           {director}
-          {film.year ? <> {" · "} {num(film.year)}</> : null}
+          {film.year ? <> {" · "} {year(film.year)}</> : null}
         </p>
       </div>
     </a>
@@ -51,14 +51,14 @@ function Rail({
   subtitle,
   films,
   locale,
-  num,
+  year,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   films: Film[];
   locale: string;
-  num: (n: number) => string;
+  year: (n: number) => string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroll = (dir: 1 | -1) => {
@@ -109,7 +109,7 @@ function Rail({
         style={{ scrollPaddingLeft: "1.5rem" }}
       >
         {films.map((f) => (
-          <PosterCard key={f.id} film={f} locale={locale} num={num} />
+          <PosterCard key={f.id} film={f} locale={locale} year={year} />
         ))}
         <div className="w-2 shrink-0 md:w-4" aria-hidden />
       </div>
@@ -119,7 +119,7 @@ function Rail({
 
 /* ---------- Multi-rail container ---------- */
 export function FilmsRow() {
-  const { locale, num, t } = useLocale();
+  const { locale, num, year, t } = useLocale();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const films = homeData.films;
   const categories = homeData.categories;
@@ -196,7 +196,7 @@ export function FilmsRow() {
           subtitle={r.subtitle}
           films={r.films}
           locale={locale}
-          num={num}
+          year={year}
         />
       ))}
     </div>

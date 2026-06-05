@@ -21,6 +21,8 @@ type LocaleContextValue = {
   dir: "ltr" | "rtl";
   /** Format a number with locale-appropriate digits (Persian uses ۰-۹). */
   num: (n: number) => string;
+  /** Format a year (no thousands separators) with locale-appropriate digits. */
+  year: (n: number) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -107,6 +109,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<LocaleContextValue>(() => {
     const numFmt = new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US");
+    const yearFmt = new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+      useGrouping: false,
+    });
     return {
       locale,
       region,
@@ -120,6 +125,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         return v;
       },
       num: (n) => numFmt.format(n),
+      year: (n) => yearFmt.format(n),
     };
   }, [locale, region, setLocale, setRegion]);
 
