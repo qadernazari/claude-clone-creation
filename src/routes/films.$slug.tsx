@@ -345,13 +345,13 @@ function FilmPage() {
         <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
         {/* Stronger base darken so any baked-in title artwork in the cover image recedes */}
         <div className="absolute inset-0 -z-20 bg-black/45" aria-hidden />
-        {/* Top darkener — hides cover-image artwork from competing with the fixed header */}
+        {/* Header safe zone — solid band that protects the nav from competing artwork */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-48"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[clamp(160px,22vh,260px)]"
           aria-hidden
           style={{
             background:
-              "linear-gradient(180deg, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.55) 55%, rgba(8,8,10,0) 100%)",
+              "linear-gradient(180deg, rgba(8,8,10,1) 0%, rgba(8,8,10,0.98) 45%, rgba(8,8,10,0.75) 75%, rgba(8,8,10,0) 100%)",
           }}
         />
         {/* Cinematic gradients — bottom-to-top + side fade for readability */}
