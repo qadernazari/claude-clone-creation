@@ -11,7 +11,6 @@ import {
   Languages,
   Shield,
   LogOut,
-  X,
   ChevronRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +33,9 @@ export function AuthMenu() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const dragStartYRef = useRef<number | null>(null);
+  const isSheetDraggingRef = useRef(false);
   const lockedScrollYRef = useRef(0);
 
   function resetSheetDrag() {
@@ -42,6 +43,7 @@ export function AuthMenu() {
     if (!sheet) return;
     sheet.style.transform = "";
     sheet.style.transition = "";
+    isSheetDraggingRef.current = false;
   }
 
   function closeSheet() {
@@ -49,27 +51,33 @@ export function AuthMenu() {
     setOpen(false);
   }
 
-  function onDragHandleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+  function onSheetTouchStart(event: React.TouchEvent<HTMLDivElement>) {
     const touch = event.touches[0];
     if (!touch) return;
     dragStartYRef.current = touch.clientY;
     if (sheetRef.current) sheetRef.current.style.transition = "none";
   }
 
-  function onDragHandleTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+  function onSheetTouchMove(event: React.TouchEvent<HTMLDivElement>) {
     const startY = dragStartYRef.current;
     const touch = event.touches[0];
     if (startY === null || !touch || !sheetRef.current) return;
     const deltaY = touch.clientY - startY;
     if (deltaY <= 0) return;
+    const target = event.target as Element | null;
+    const fromHandle = !!target?.closest?.('[data-sheet-drag-handle="true"]');
+    const contentAtTop = (scrollRef.current?.scrollTop ?? 0) <= 0;
+    if (!fromHandle && !contentAtTop) return;
+    if (!fromHandle && deltaY < 10) return;
+    isSheetDraggingRef.current = true;
     event.preventDefault();
     sheetRef.current.style.transform = `translateY(${Math.min(deltaY, 180)}px)`;
   }
 
-  function onDragHandleTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+  function onSheetTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
     const startY = dragStartYRef.current;
     dragStartYRef.current = null;
-    if (startY === null) return;
+    if (startY === null || !isSheetDraggingRef.current) return;
     const endY = event.changedTouches[0]?.clientY ?? startY;
     if (endY - startY > 72) {
       closeSheet();
@@ -273,9 +281,13 @@ export function AuthMenu() {
             role="dialog"
             data-auth-sheet="true"
             aria-label={fa ? "حساب کاربری" : "Account"}
+            onTouchStart={onSheetTouchStart}
+            onTouchMove={onSheetTouchMove}
+            onTouchEnd={onSheetTouchEnd}
+            onTouchCancel={resetSheetDrag}
             className={[
               // Mobile sheet
-              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] touch-pan-y flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
               // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
               "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
@@ -283,11 +295,8 @@ export function AuthMenu() {
 
             {/* Mobile grabber */}
             <div
-              className="flex justify-center pt-3 pb-2 md:hidden"
-              onTouchStart={onDragHandleTouchStart}
-              onTouchMove={onDragHandleTouchMove}
-              onTouchEnd={onDragHandleTouchEnd}
-              onTouchCancel={resetSheetDrag}
+              data-sheet-drag-handle="true"
+              className="flex min-h-9 touch-none items-center justify-center pt-2 md:hidden"
             >
               <span className="h-1 w-10 rounded-full bg-cream/20" aria-hidden />
             </div>
@@ -296,13 +305,14 @@ export function AuthMenu() {
               type="button"
               onPointerDown={(event) => event.stopPropagation()}
               onClick={closeSheet}
-              className="absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/10 bg-cream/10 text-cream/80 hover:text-cream-bright hover:bg-cream/15 md:hidden"
+              className="auth-menu-close absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-full md:hidden"
               aria-label={fa ? "بستن" : "Close"}
             >
-              <X size={16} strokeWidth={1.8} />
+              <span aria-hidden>×</span>
             </button>
 
             <div
+              ref={scrollRef}
               data-auth-scroll="true"
               className="min-h-0 flex-1 touch-pan-y overflow-y-auto overflow-x-hidden overscroll-contain px-0"
               style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", WebkitOverflowScrolling: "touch" }}
@@ -331,14 +341,8 @@ export function AuthMenu() {
                 to="/account"
                 onClick={() => setOpen(false)}
                 className={[
-                  "group flex items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors",
-                  membership.tone === "amber"
-                    ? "border-amber/25 bg-amber/[7.000000000000001%] hover:bg-amber/[12%]"
-                    : membership.tone === "green"
-                      ? "border-emerald-400/20 bg-emerald-400/[6%] hover:bg-emerald-400/[10%]"
-                      : membership.tone === "red"
-                        ? "border-red-500/25 bg-red-500/[8%] hover:bg-red-500/[14.000000000000002%]"
-                        : "border-cream/10 bg-cream/[3%] hover:bg-cream/[6%]",
+                  "auth-menu-membership group flex items-center justify-between gap-3 px-4 py-3 transition-colors",
+                  `auth-menu-membership-${membership.tone}`,
                 ].join(" ")}
               >
                 <div className="min-w-0">
@@ -415,7 +419,7 @@ export function AuthMenu() {
                 onClick={switchLanguage}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] active:bg-cream/[8%]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
+                <span className="auth-menu-row-icon">
                   <Languages size={17} strokeWidth={1.6} />
                 </span>
                 <span className="flex-1">{fa ? "زبان" : "Language"}</span>
@@ -445,7 +449,7 @@ export function AuthMenu() {
                 onClick={signOut}
                 className="group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] hover:text-cream-bright active:bg-cream/[8%]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
+                <span className="auth-menu-row-icon">
                   <LogOut size={17} strokeWidth={1.6} />
                 </span>
                 <span className="flex-1 truncate">{fa ? "خروج از حساب" : "Sign out"}</span>
@@ -510,8 +514,8 @@ function Row({
     >
       <span
         className={[
-          "flex h-8 w-8 items-center justify-center rounded-md",
-          accent ? "bg-amber/[12%] text-amber" : "bg-cream/[6%] text-cream/70",
+          "auth-menu-row-icon",
+          accent ? "auth-menu-row-icon-accent" : "",
         ].join(" ")}
       >
         {icon}
