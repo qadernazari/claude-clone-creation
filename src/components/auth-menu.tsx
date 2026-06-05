@@ -353,8 +353,10 @@ export function AuthMenu() {
             </Section>
             <div className="h-3" aria-hidden />
           </div>
-        </>
+        </>,
+        document.body,
       )}
+
     </div>
   );
 }
