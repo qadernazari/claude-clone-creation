@@ -283,7 +283,13 @@ function FilmPage() {
 
   const heroArt = film.thumbnail_url || film.cover_url;
   const posterStyle = heroArt
-    ? { background: `center / cover no-repeat url(${heroArt})` }
+    ? {
+        backgroundImage: `url(${heroArt})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        // Push artwork downward so baked-in title sits below the header safe zone
+        backgroundPosition: "center 78%",
+      }
     : { background: (film.poster_gradient as string) || fallbackGradient };
 
   const handleShare = async () => {
