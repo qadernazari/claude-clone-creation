@@ -287,10 +287,10 @@ function FilmPage() {
         backgroundImage: `url(${heroArt})`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        // Push artwork downward so baked-in title sits below the header safe zone
-        backgroundPosition: "center 78%",
+        backgroundPosition: "center center",
       }
     : { background: (film.poster_gradient as string) || fallbackGradient };
+
 
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
