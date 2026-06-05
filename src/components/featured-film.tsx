@@ -1,48 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { supabase } from "../integrations/supabase/client";
 import { useLocale } from "../lib/i18n";
+import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 
-type Film = {
-  id: string;
-  slug: string;
-  title_en: string;
-  title_fa: string | null;
-  director_en: string | null;
-  director_fa: string | null;
-  category: string | null;
-  year: number | null;
-  duration_min: number | null;
-  synopsis_en: string | null;
-  synopsis_fa: string | null;
-  poster_gradient: string | null;
-  cover_url: string | null;
-  thumbnail_url: string | null;
-  is_premium: boolean | null;
-};
+type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
   const { locale, num, t } = useLocale();
-  const { data, isLoading } = useQuery({
-    queryKey: ["films", "featured"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, is_premium",
-        )
-        .eq("visibility", "published")
-        .order("sort_order", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data as Film | null;
-    },
-    staleTime: 60_000,
-  });
+  const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
+  const data = homeData.featured;
 
-  if (isLoading) return <HeroSkeleton />;
-  if (!data) return null;
+  if (!data) return <FeaturedFilmFallback />;
 
   const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
   const director = t({
@@ -68,13 +36,13 @@ export function FeaturedFilm() {
       <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
         {heroImage ? (
           isLandscapeHero ? (
-            // 16:9 hero artwork — full-bleed cinematic banner
-            <div
-              className="absolute inset-0 cine-img"
-              style={{
-                background: `center / cover no-repeat url(${heroImage})`,
-                transform: "scale(1.03)",
-              }}
+            <img
+              src={heroImage}
+              alt=""
+              className="cine-img absolute inset-0 h-full w-full scale-[1.03] object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
+              decoding="sync"
               aria-hidden
             />
           ) : (
@@ -94,7 +62,8 @@ export function FeaturedFilm() {
                 alt={title}
                 className="absolute inset-0 h-full w-full object-contain object-center"
                 loading="eager"
-                decoding="async"
+                fetchPriority="high"
+                decoding="sync"
               />
             </>
           )
@@ -126,7 +95,7 @@ export function FeaturedFilm() {
         {/* Content */}
         <div className="relative z-10 flex h-full items-end">
           <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
-            <div className="max-w-2xl fade-up">
+            <div className="max-w-2xl">
               <span className="mb-5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
                 {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
               </span>
@@ -179,20 +148,34 @@ export function FeaturedFilm() {
   );
 }
 
-function HeroSkeleton() {
+function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden">
-      <div
-        className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0"
-        aria-hidden
-      >
+      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
         <div
-          className="absolute inset-0 animate-pulse"
+          className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 30% 60%, oklch(0.22 0.02 60 / 0.6), transparent 60%), var(--bg-0)",
+              "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
           }}
+          aria-hidden
         />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg-0 via-bg-0/60 to-transparent" />
+        <div className="relative z-10 flex h-full items-end">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
+            <div className="max-w-2xl">
+              <span className="mb-5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
+                Original Iranian Cinema
+              </span>
+              <h1 className="font-display text-5xl font-medium leading-[0.95] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
+                ir.show
+              </h1>
+              <p className="mt-7 max-w-xl text-[15px] leading-relaxed text-cream/75 md:text-base">
+                A premium streaming home for Iranian films, documentaries, and curated stories.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

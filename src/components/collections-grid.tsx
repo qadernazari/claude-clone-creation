@@ -1,23 +1,10 @@
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../integrations/supabase/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useLocale } from "../lib/i18n";
+import { homePageQueryOptions, type HomeCategory, type HomeRailFilm } from "../lib/home.functions";
 
-type Category = {
-  id: string;
-  name_en: string;
-  name_fa: string | null;
-  sort_order: number | null;
-};
-
-type Film = {
-  id: string;
-  slug: string;
-  category: string | null;
-  cover_url: string | null;
-  thumbnail_url: string | null;
-  poster_gradient: string | null;
-};
+type Category = HomeCategory;
+type Film = HomeRailFilm;
 
 function fallbackGradient(seed: string) {
   let h = 0;
@@ -30,35 +17,11 @@ function fallbackGradient(seed: string) {
 export function CollectionsGrid() {
   const { locale, t } = useLocale();
   const fa = locale === "fa";
-
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name_en, name_fa, sort_order")
-        .order("sort_order", { ascending: true });
-      if (error) throw error;
-      return (data as Category[]) ?? [];
-    },
-    staleTime: 5 * 60_000,
-  });
-
-  const { data: films } = useQuery({
-    queryKey: ["films", "for-collections"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("films")
-        .select("id, slug, category, cover_url, thumbnail_url, poster_gradient")
-        .eq("visibility", "published");
-      if (error) throw error;
-      return (data as Film[]) ?? [];
-    },
-    staleTime: 60_000,
-  });
+  const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
+  const categories = homeData.categories as Category[];
+  const films = homeData.films as Film[];
 
   const tiles = useMemo(() => {
-    if (!categories || !films) return [];
     const byCat = new Map<string, Film[]>();
     for (const f of films) {
       if (!f.category) continue;

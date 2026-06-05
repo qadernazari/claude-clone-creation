@@ -1,29 +1,10 @@
 import { useMemo, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../integrations/supabase/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useLocale } from "../lib/i18n";
-import type { Database } from "../integrations/supabase/types";
+import { homePageQueryOptions, type HomeCategory, type HomeRailFilm } from "../lib/home.functions";
 
-type AccessType = Database["public"]["Enums"]["film_access_type"];
-
-type Film = {
-  id: string;
-  slug: string;
-  title_en: string;
-  title_fa: string | null;
-  director_en: string | null;
-  director_fa: string | null;
-  category: string | null;
-  year: number | null;
-  duration_min: number | null;
-  poster_gradient: string | null;
-  cover_url: string | null;
-  access_type: AccessType;
-  is_premium: boolean | null;
-  sort_order: number | null;
-};
-
-type Category = { id: string; name_en: string; name_fa: string | null };
+type Film = HomeRailFilm;
+type Category = HomeCategory;
 
 function fallbackGradient(seed: string) {
   let h = 0;
@@ -139,36 +120,9 @@ function Rail({
 /* ---------- Multi-rail container ---------- */
 export function FilmsRow() {
   const { locale, num, t } = useLocale();
-
-  const { data: films, isLoading } = useQuery({
-    queryKey: ["films", "published-multi"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, access_type, is_premium, sort_order",
-        )
-        .eq("visibility", "published")
-        .order("sort_order", { ascending: true })
-        .limit(60);
-      if (error) throw error;
-      return data as Film[];
-    },
-    staleTime: 60_000,
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name_en, name_fa")
-        .order("sort_order", { ascending: true });
-      if (error) throw error;
-      return data as Category[];
-    },
-    staleTime: 5 * 60_000,
-  });
+  const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
+  const films = homeData.films;
+  const categories = homeData.categories;
 
   const rails = useMemo(() => {
     const all = films ?? [];
@@ -221,23 +175,6 @@ export function FilmsRow() {
     out.push(...catRails);
     return out;
   }, [films, categories, locale, t]);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-24">
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="mx-auto max-w-[1400px] px-6 md:px-12">
-            <div className="mb-7 h-6 w-48 animate-pulse rounded-md bg-bg-1" />
-            <div className="flex gap-6 overflow-hidden">
-              {Array.from({ length: 5 }).map((_, j) => (
-                <div key={j} className="aspect-[2/3] w-[240px] shrink-0 animate-pulse rounded-[14px] bg-bg-1" />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   if (rails.length === 0) {
     return (

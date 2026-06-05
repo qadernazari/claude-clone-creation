@@ -38,26 +38,35 @@ function isActiveTrial(t: TrialRow | null | undefined): boolean {
   return t.status === "active" && new Date(t.ends_at) > new Date();
 }
 
-export function useCurrentUser() {
+export function useCurrentUserState() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (mounted) setUser(data.user);
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setUser(data.session?.user ?? null);
+      setIsLoading(false);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
       setUser(s?.user ?? null);
+      setIsLoading(false);
     });
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
   }, []);
+  return { user, isLoading };
+}
+
+export function useCurrentUser() {
+  const { user } = useCurrentUserState();
   return user;
 }
 
 export function useSubscription() {
-  const user = useCurrentUser();
+  const { user, isLoading: isUserLoading } = useCurrentUserState();
   let env: string | null = null;
   try {
     env = getStripeEnvironment();
@@ -112,7 +121,7 @@ export function useSubscription() {
     isTrialActive: isActiveTrial(trial),
     isTrialExpired: trialExpired,
     hasUsedTrial: !!trial,
-    isLoading: subQ.isLoading || trialQ.isLoading,
+    isLoading: isUserLoading || subQ.isLoading || trialQ.isLoading,
   };
 }
 
