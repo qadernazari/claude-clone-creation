@@ -252,6 +252,15 @@ html[data-locale-switching] body {
 body {
   transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1),
               filter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Reserve space for the mobile bottom tab bar so content never sits behind it.
+     Hidden routes (watch/auth/checkout/admin) tag <body data-no-tabbar> to opt out. */
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+}
+body[data-no-tabbar="true"] {
+  padding-bottom: 0;
+}
+@media (min-width: 768px) {
+  body { padding-bottom: 0; }
 }
 
 /* View Transitions API — true snapshot cross-fade */
