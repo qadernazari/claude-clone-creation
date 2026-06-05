@@ -129,14 +129,19 @@ function MyTicketsPage() {
                   className="hairline rounded-xl border bg-bg-1/50 p-4 md:p-5 grid gap-4 md:grid-cols-[80px_1fr_auto] items-center"
                 >
                   <div
-                    className="hairline aspect-[2/3] w-20 overflow-hidden rounded-md border bg-bg-1"
-                    style={
-                      tk.film?.cover_url
-                        ? { background: `center / cover no-repeat url(${tk.film.cover_url})` }
-                        : undefined
-                    }
+                    className="hairline relative aspect-[2/3] w-20 overflow-hidden rounded-md border bg-bg-1"
                     aria-hidden
-                  />
+                  >
+                    {tk.film?.cover_url && (
+                      <img
+                        src={tk.film.cover_url}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    )}
+                  </div>
                   <div className="min-w-0">
                     <div className={`truncate text-cream-bright ${fa ? "font-vazir" : "font-display"} text-lg`}>
                       {title}
