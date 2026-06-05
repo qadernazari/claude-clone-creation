@@ -22,7 +22,7 @@ export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("films")
-      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
+      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
       .eq("slug", params.slug)
       .eq("visibility", "published")
       .maybeSingle();
@@ -286,7 +286,11 @@ function FilmPage() {
     ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&film=${film.slug}`
     : "";
 
-  const heroArt = film.thumbnail_url || film.cover_url;
+  // Desktop hero uses the 16:9 landscape art; mobile uses the dedicated 9:16
+  // vertical poster so faces and titles aren't cropped. Falls back gracefully.
+  const heroArtDesktop = film.thumbnail_url || film.cover_url;
+  const heroArtMobile = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
+  const heroArt = heroArtDesktop || heroArtMobile;
   const posterStyle = heroArt
     ? { backgroundImage: `url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
@@ -349,15 +353,30 @@ function FilmPage() {
       <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
         {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
         {heroArt ? (
-          <img
-            src={heroArt}
-            alt=""
-            fetchPriority="high"
-            decoding="async"
-            className="absolute inset-x-0 -top-[10%] -z-30 h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none"
-            aria-hidden
-          />
-
+          <>
+            {/* Mobile: 9:16 vertical poster */}
+            {heroArtMobile ? (
+              <img
+                src={heroArtMobile}
+                alt=""
+                fetchPriority="high"
+                decoding="async"
+                className="absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
+                aria-hidden
+              />
+            ) : null}
+            {/* Desktop / tablet: 16:9 cinematic art */}
+            {heroArtDesktop ? (
+              <img
+                src={heroArtDesktop}
+                alt=""
+                fetchPriority="high"
+                decoding="async"
+                className="absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"
+                aria-hidden
+              />
+            ) : null}
+          </>
         ) : (
           <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
         )}
