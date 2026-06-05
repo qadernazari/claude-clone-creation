@@ -32,7 +32,7 @@ export function TrialBanner() {
           : `You have ${days} days remaining in your free trial.`;
 
   return (
-    <div className="border-b border-amber/15 bg-amber/[0.06] px-4 py-2 text-center text-[12px] text-cream/85">
+    <div className="border-b border-amber/15 bg-amber/[6%] px-4 py-2 text-center text-[12px] text-cream/85">
       <span className="font-medium text-amber">{msg}</span>
       <a href="/account" className="ml-3 underline-offset-4 hover:underline">
         {fa ? "ادامه دسترسی بدون وقفه" : "Continue your access without interruption"}

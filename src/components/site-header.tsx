@@ -79,7 +79,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       <header
         className={`fixed top-0 z-30 w-full transition-all duration-500 ${
           scrolled
-            ? "border-b border-cream/[0.06] bg-bg-0/85 backdrop-blur-xl"
+            ? "border-b border-cream/[6%] bg-bg-0/85 backdrop-blur-xl"
             : "border-b border-transparent bg-gradient-to-b from-bg-0/60 to-transparent"
         }`}
         style={{

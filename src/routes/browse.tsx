@@ -315,7 +315,7 @@ function BrowsePage() {
                           setSort(o.key);
                           setSortSheetOpen(false);
                         }}
-                        className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[15px] transition-colors active:bg-cream/[0.06] ${
+                        className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[15px] transition-colors active:bg-cream/[6%] ${
                           selected ? "text-cream-bright" : "text-cream/80"
                         }`}
                       >
@@ -334,7 +334,7 @@ function BrowsePage() {
                 <button
                   type="button"
                   onClick={() => setSortSheetOpen(false)}
-                  className="h-11 w-full rounded-full border border-cream/15 text-[13px] font-medium text-cream/80 transition-colors active:bg-cream/[0.06]"
+                  className="h-11 w-full rounded-full border border-cream/15 text-[13px] font-medium text-cream/80 transition-colors active:bg-cream/[6%]"
                 >
                   {locale === "fa" ? "بستن" : "Close"}
                 </button>
@@ -387,7 +387,7 @@ function BrowsePage() {
                   params={{ slug: film.slug }}
                   className="group block"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
                     {film.cover_url ? (
                       <img
                         src={film.cover_url}

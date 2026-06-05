@@ -163,7 +163,7 @@ function MembershipMoment() {
     : ["7 days free", "No payment information required", "Unlimited access to the membership catalog", "Cancel anytime"];
 
   return (
-    <div className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl border border-cream/[0.06] bg-bg-1/40 px-8 py-20 text-center md:px-16 md:py-24">
+    <div className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl border border-cream/[6%] bg-bg-1/40 px-8 py-20 text-center md:px-16 md:py-24">
       {/* very subtle amber glow — only place gold appears in this section */}
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-60"

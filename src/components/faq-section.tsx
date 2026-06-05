@@ -121,9 +121,9 @@ export function FaqSection() {
         </h2>
       </div>
 
-      <ul className="mt-10 border-t border-cream/[0.08]">
+      <ul className="mt-10 border-t border-cream/[8%]">
         {items.map((item, i) => (
-          <li key={i} className="border-b border-cream/[0.08]">
+          <li key={i} className="border-b border-cream/[8%]">
             <details className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-start transition-colors hover:text-cream-bright">
                 <span

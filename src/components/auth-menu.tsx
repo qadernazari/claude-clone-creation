@@ -226,12 +226,12 @@ export function AuthMenu() {
                 className={[
                   "group flex items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors",
                   membership.tone === "amber"
-                    ? "border-amber/25 bg-amber/[0.07] hover:bg-amber/[0.12]"
+                    ? "border-amber/25 bg-amber/[7.000000000000001%] hover:bg-amber/[12%]"
                     : membership.tone === "green"
-                      ? "border-emerald-400/20 bg-emerald-400/[0.06] hover:bg-emerald-400/[0.1]"
+                      ? "border-emerald-400/20 bg-emerald-400/[6%] hover:bg-emerald-400/[10%]"
                       : membership.tone === "red"
-                        ? "border-red-500/25 bg-red-500/[0.08] hover:bg-red-500/[0.14]"
-                        : "border-cream/10 bg-cream/[0.03] hover:bg-cream/[0.06]",
+                        ? "border-red-500/25 bg-red-500/[8%] hover:bg-red-500/[14.000000000000002%]"
+                        : "border-cream/10 bg-cream/[3%] hover:bg-cream/[6%]",
                 ].join(" ")}
               >
                 <div className="min-w-0">
@@ -306,9 +306,9 @@ export function AuthMenu() {
               <button
                 type="button"
                 onClick={switchLanguage}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[0.05] active:bg-cream/[0.08]"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] active:bg-cream/[8%]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[0.06] text-cream/70">
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
                   <Languages size={17} strokeWidth={1.6} />
                 </span>
                 <span className="flex-1">{fa ? "زبان" : "Language"}</span>
@@ -332,13 +332,13 @@ export function AuthMenu() {
             )}
 
             {/* Footer */}
-            <div className="border-t border-cream/[0.06] px-3 py-3 mt-2">
+            <div className="border-t border-cream/[6%] px-3 py-3 mt-2">
               <button
                 type="button"
                 onClick={signOut}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/75 transition-colors hover:bg-cream/[0.05] hover:text-cream-bright active:bg-cream/[0.08]"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/75 transition-colors hover:bg-cream/[5%] hover:text-cream-bright active:bg-cream/[8%]"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[0.06] text-cream/70">
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
                   <LogOut size={17} strokeWidth={1.6} />
                 </span>
                 <span>{fa ? "خروج از حساب" : "Sign out"}</span>
@@ -386,16 +386,16 @@ function Row({
       to={to as never}
       onClick={onClick}
       className={[
-        "group flex items-center gap-3 rounded-lg px-3 py-3 text-[14px] transition-colors active:bg-cream/[0.08]",
+        "group flex items-center gap-3 rounded-lg px-3 py-3 text-[14px] transition-colors active:bg-cream/[8%]",
         accent
-          ? "text-amber-bright hover:bg-amber/[0.08]"
-          : "text-cream/85 hover:bg-cream/[0.05] hover:text-cream-bright",
+          ? "text-amber-bright hover:bg-amber/[8%]"
+          : "text-cream/85 hover:bg-cream/[5%] hover:text-cream-bright",
       ].join(" ")}
     >
       <span
         className={[
           "flex h-8 w-8 items-center justify-center rounded-md",
-          accent ? "bg-amber/[0.12] text-amber" : "bg-cream/[0.06] text-cream/70",
+          accent ? "bg-amber/[12%] text-amber" : "bg-cream/[6%] text-cream/70",
         ].join(" ")}
       >
         {icon}
