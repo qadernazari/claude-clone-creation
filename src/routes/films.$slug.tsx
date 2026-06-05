@@ -287,7 +287,7 @@ function FilmPage() {
         backgroundImage: `url(${heroArt})`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        backgroundPosition: "center 38%",
+        backgroundPosition: "center 28%",
       }
     : { background: (film.poster_gradient as string) || fallbackGradient };
 
@@ -374,8 +374,8 @@ function FilmPage() {
           style={{
             background:
               dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.7) 0%, rgba(8,8,10,0.2) 45%, rgba(8,8,10,0) 75%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.7) 0%, rgba(8,8,10,0.2) 45%, rgba(8,8,10,0) 75%)",
+                ? "linear-gradient(270deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.16) 45%, rgba(8,8,10,0) 75%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.16) 45%, rgba(8,8,10,0) 75%)",
           }}
         />
 
