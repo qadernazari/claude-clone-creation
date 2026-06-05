@@ -340,18 +340,27 @@ function FilmPage() {
       <SiteHeader />
 
       {/* Cinematic full-bleed hero */}
-      <section className="relative isolate -mt-[72px] min-h-[88vh] w-full overflow-hidden">
+      <section className="relative isolate min-h-[88vh] w-full overflow-hidden">
         {/* Backdrop — full bleed cover art */}
         <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
-        {/* Soft blur edge to hide poster seams on ultra-wide */}
-        <div className="absolute inset-0 -z-20 bg-black/10" aria-hidden />
+        {/* Stronger base darken so any baked-in title artwork in the cover image recedes */}
+        <div className="absolute inset-0 -z-20 bg-black/45" aria-hidden />
+        {/* Top darkener — hides cover-image artwork from competing with the fixed header */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-48"
+          aria-hidden
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.55) 55%, rgba(8,8,10,0) 100%)",
+          }}
+        />
         {/* Cinematic gradients — bottom-to-top + side fade for readability */}
         <div
           className="absolute inset-0 -z-10"
           aria-hidden
           style={{
             background:
-              "linear-gradient(180deg, rgba(8,8,10,0.55) 0%, rgba(8,8,10,0) 28%, rgba(8,8,10,0) 50%, rgba(8,8,10,0.75) 82%, var(--background) 100%)",
+              "linear-gradient(180deg, rgba(8,8,10,0.35) 0%, rgba(8,8,10,0) 30%, rgba(8,8,10,0) 50%, rgba(8,8,10,0.8) 82%, var(--background) 100%)",
           }}
         />
         <div
@@ -360,20 +369,21 @@ function FilmPage() {
           style={{
             background:
               dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.35) 45%, rgba(8,8,10,0) 75%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.35) 45%, rgba(8,8,10,0) 75%)",
+                ? "linear-gradient(270deg, rgba(8,8,10,0.9) 0%, rgba(8,8,10,0.5) 45%, rgba(8,8,10,0.1) 80%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.9) 0%, rgba(8,8,10,0.5) 45%, rgba(8,8,10,0.1) 80%)",
           }}
         />
 
-        {/* Hero content — anchored bottom-start */}
-        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-32 md:px-10 md:pb-20 md:pt-40">
+        {/* Hero content — anchored bottom-start. Top padding clears the fixed header. */}
+        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-6 pb-16 pt-36 md:px-10 md:pb-20 md:pt-44">
           <Link
             to="/"
-            className="absolute top-24 inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/55 transition-colors hover:text-cream-bright md:top-28"
+            className="absolute inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright top-[92px] md:top-[104px]"
             style={dir === "rtl" ? { right: "1.5rem" } : { left: "1.5rem" }}
           >
             ← {t.back}
           </Link>
+
 
           <div className="max-w-2xl">
             {film.category && (
