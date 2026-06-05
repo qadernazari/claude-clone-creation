@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import type { User } from "@supabase/supabase-js";
+import { useCurrentUserState } from "@/hooks/use-subscription";
 
 type SubInfo = {
   status: string;
@@ -14,7 +14,7 @@ type SubInfo = {
 export function AuthMenu() {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const [user, setUser] = useState<User | null>(null);
+  const { user, isLoading: isUserLoading } = useCurrentUserState();
   const [isAdmin, setIsAdmin] = useState(false);
   const [sub, setSub] = useState<SubInfo>(null);
   const [open, setOpen] = useState(false);
@@ -36,14 +36,6 @@ export function AuthMenu() {
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ?? null);
-    });
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -80,24 +72,31 @@ export function AuthMenu() {
     return Math.max(1, Math.ceil(ms / 86400000));
   })();
   const pastDue = sub?.status === "past_due";
-
-
+  if (isUserLoading) {
+    return (
+      <div className="flex w-[78px] justify-end" aria-hidden>
+        <span className="h-10 w-10 rounded-full bg-cream/10 opacity-0" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (
-      <Link
-        to="/auth"
-        className="inline-flex min-h-10 items-center justify-center rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/90 hover:bg-cream/10 transition-colors"
-      >
-        {fa ? "ورود" : "Sign in"}
-      </Link>
+      <div className="flex w-[78px] justify-end">
+        <Link
+          to="/auth"
+          className="inline-flex min-h-10 items-center justify-center rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/90 hover:bg-cream/10 transition-colors"
+        >
+          {fa ? "ورود" : "Sign in"}
+        </Link>
+      </div>
     );
   }
 
   const initial = (user.user_metadata?.full_name || user.email || "?")[0]?.toUpperCase();
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div className="relative flex w-[78px] justify-end" ref={containerRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

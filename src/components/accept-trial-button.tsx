@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { activateTrial } from "@/lib/trial.functions";
-import { useCurrentUser } from "@/hooks/use-subscription";
+import { useCurrentUserState } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
 export function AcceptTrialButton({ className, label, fullWidth }: Props) {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const user = useCurrentUser();
+  const { user, isLoading: isUserLoading } = useCurrentUserState();
   const qc = useQueryClient();
   const activate = useServerFn(activateTrial);
   const [loading, setLoading] = useState(false);
@@ -49,6 +49,17 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
       setLoading(false);
     }
   };
+
+  if (isUserLoading) {
+    return (
+      <span
+        className={`${baseCls}${fullWidth ? " w-full justify-center" : ""} pointer-events-none opacity-0`}
+        aria-hidden
+      >
+        {text}
+      </span>
+    );
+  }
 
   if (!user) {
     return (

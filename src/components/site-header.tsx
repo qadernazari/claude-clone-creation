@@ -221,12 +221,14 @@ function MembershipCta() {
   const { locale } = useLocale();
   const { isMember, isLoading } = useSubscription();
 
-  if (isLoading || isMember) return null;
-
   const label = locale === "fa" ? "پذیرش رایگان" : "Accept Free Trial";
 
+  if (isLoading || isMember) {
+    return <div className="hidden h-10 w-[132px] shrink-0 sm:block" aria-hidden />;
+  }
+
   return (
-    <div className="hidden sm:block">
+    <div className="hidden w-[132px] shrink-0 sm:block">
       <AcceptTrialButton
         className="inline-flex items-center rounded-full bg-cream px-4 py-2 text-[12px] font-semibold text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg disabled:opacity-70"
         label={label}
