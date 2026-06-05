@@ -431,6 +431,7 @@ export type Database = {
           has_subtitles: boolean
           id: string
           is_premium: boolean
+          mobile_cover_url: string | null
           poster_gradient: string | null
           preview_url: string | null
           price_cents: number
@@ -463,6 +464,7 @@ export type Database = {
           has_subtitles?: boolean
           id?: string
           is_premium?: boolean
+          mobile_cover_url?: string | null
           poster_gradient?: string | null
           preview_url?: string | null
           price_cents?: number
@@ -495,6 +497,7 @@ export type Database = {
           has_subtitles?: boolean
           id?: string
           is_premium?: boolean
+          mobile_cover_url?: string | null
           poster_gradient?: string | null
           preview_url?: string | null
           price_cents?: number
