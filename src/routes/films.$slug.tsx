@@ -50,7 +50,12 @@ export const Route = createFileRoute("/films/$slug")({
         ...(f.cover_url ? [{ name: "twitter:image" as const, content: f.cover_url }] : []),
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        ...(f.thumbnail_url || f.cover_url
+          ? [{ rel: "preload" as const, as: "image" as const, href: (f.thumbnail_url || f.cover_url) as string, fetchpriority: "high" as const }]
+          : []),
+      ],
       scripts: [
         {
           type: "application/ld+json",
