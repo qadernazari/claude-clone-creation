@@ -36,6 +36,7 @@ type Film = {
   sort_order: number;
   cover_url: string | null;
   thumbnail_url: string | null;
+  mobile_cover_url: string | null;
   poster_gradient: string | null;
   video_url?: string | null;
   preview_url: string | null;
@@ -67,13 +68,13 @@ const EMPTY: FilmDraft = {
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
-  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", poster_gradient: GRADIENTS[0],
+  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
 };
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
@@ -402,6 +403,7 @@ function FilmEditorModal({
         sort_order: Number(d.sort_order) || 0,
         cover_url: d.cover_url?.trim() || null,
         thumbnail_url: d.thumbnail_url?.trim() || null,
+        mobile_cover_url: d.mobile_cover_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
         preview_url: d.preview_url?.trim() || null,
       };
@@ -467,8 +469,8 @@ function FilmEditorModal({
                 value={d.cover_url ?? null}
                 onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Cover (Poster)"
-                description="Main portrait poster (~2:3). Used on homepage, film page, collections, search and featured sections. Hi-res JPG, PNG, WebP or AVIF."
+                label="Upload Cover Poster (Portrait)"
+                description="Main portrait poster (~2:3). Used on homepage rails, collection cards, search results and as the share image. Hi-res JPG, PNG, WebP or AVIF."
                 maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
@@ -478,9 +480,20 @@ function FilmEditorModal({
                 value={d.thumbnail_url ?? null}
                 onChange={(u) => set("thumbnail_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Thumbnail"
-                description="Landscape thumbnail (~16:9) used for grids, suggestions and previews."
+                label="Upload Desktop Cover (16:9)"
+                description="Landscape cinematic art (~16:9). Used as the hero on desktop and tablet, and on grids, suggestions and previews."
                 maxBytes={15 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-covers"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.mobile_cover_url ?? null}
+                onChange={(u) => set("mobile_cover_url", u ?? "")}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Mobile Cover (9:16)"
+                description="Dedicated vertical poster (~9:16) for phones. Used as the hero on mobile so faces, titles and key art aren't cropped from the landscape art. Falls back to the portrait cover if unset."
+                maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
                 bucket="film-trailers"

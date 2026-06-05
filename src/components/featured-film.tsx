@@ -21,10 +21,14 @@ export function FeaturedFilm() {
     en: data.synopsis_en || "",
     fa: data.synopsis_fa || data.synopsis_en || "",
   });
-  // Prefer the dedicated 16:9 hero/thumbnail image for the cinematic banner.
-  // Only fall back to the vertical poster (cover_url) when no landscape art exists.
-  const heroImage = data.thumbnail_url || data.cover_url;
-  const isLandscapeHero = !!data.thumbnail_url;
+  // Desktop hero = 16:9 cinematic art (thumbnail_url) with cover_url as fallback.
+  // Mobile hero = dedicated 9:16 portrait art (mobile_cover_url). When no mobile
+  // art exists, fall back to the portrait cover_url; only as a last resort use the
+  // landscape thumbnail (which will look cropped on a phone).
+  const desktopImage = data.thumbnail_url || data.cover_url;
+  const mobileImage = data.mobile_cover_url || data.cover_url || data.thumbnail_url;
+  const hasAnyImage = !!(desktopImage || mobileImage);
+  const isDesktopLandscape = !!data.thumbnail_url;
   const fallbackBg =
     data.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
@@ -34,39 +38,55 @@ export function FeaturedFilm() {
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
       <div className="relative h-[88svh] min-h-[560px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
-        {heroImage ? (
-          isLandscapeHero ? (
-            <img
-              src={heroImage}
-              alt=""
-              className="cine-img absolute inset-0 h-full w-full scale-[1.03] object-cover object-center"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              aria-hidden
-            />
-          ) : (
-            // Fallback: vertical poster — contain to preserve composition, blurred backdrop fills the frame
-            <>
-              <div
-                className="absolute inset-0 scale-110"
-                style={{
-                  background: `center / cover no-repeat url(${heroImage})`,
-                  filter: "blur(60px) saturate(1.1) brightness(0.55)",
-                  opacity: 0.55,
-                }}
-                aria-hidden
-              />
+        {hasAnyImage ? (
+          <>
+            {/* Mobile: dedicated 9:16 vertical poster */}
+            {mobileImage ? (
               <img
-                src={heroImage}
-                alt={title}
-                className="absolute inset-0 h-full w-full object-contain object-center"
+                src={mobileImage}
+                alt=""
+                className="cine-img absolute inset-0 h-full w-full object-cover object-center md:hidden"
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
+                aria-hidden
               />
-            </>
-          )
+            ) : null}
+            {/* Desktop / tablet: 16:9 cinematic art */}
+            {desktopImage ? (
+              isDesktopLandscape ? (
+                <img
+                  src={desktopImage}
+                  alt=""
+                  className="cine-img absolute inset-0 hidden h-full w-full scale-[1.03] object-cover object-center md:block"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  aria-hidden
+                />
+              ) : (
+                <div className="absolute inset-0 hidden md:block">
+                  <div
+                    className="absolute inset-0 scale-110"
+                    style={{
+                      background: `center / cover no-repeat url(${desktopImage})`,
+                      filter: "blur(60px) saturate(1.1) brightness(0.55)",
+                      opacity: 0.55,
+                    }}
+                    aria-hidden
+                  />
+                  <img
+                    src={desktopImage}
+                    alt={title}
+                    className="absolute inset-0 h-full w-full object-contain object-center"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                </div>
+              )
+            ) : null}
+          </>
         ) : (
           <div
             className="absolute inset-0 cine-img"
