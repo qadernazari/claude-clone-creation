@@ -331,19 +331,25 @@ export function AuthMenu() {
               </Section>
             )}
 
-            {/* Footer */}
-            <div className="border-t border-cream/[6%] px-3 py-3 mt-2">
+            {/* Sign out — same group/styling as other rows */}
+            <Section title={fa ? "نشست" : "Session"}>
               <button
                 type="button"
                 onClick={signOut}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/75 transition-colors hover:bg-cream/[5%] hover:text-cream-bright active:bg-cream/[8%]"
+                className="group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] hover:text-cream-bright active:bg-cream/[8%]"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cream/[6%] text-cream/70">
                   <LogOut size={17} strokeWidth={1.6} />
                 </span>
-                <span>{fa ? "خروج از حساب" : "Sign out"}</span>
+                <span className="flex-1 truncate">{fa ? "خروج از حساب" : "Sign out"}</span>
+                <ChevronRight
+                  size={15}
+                  className="text-cream/30 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  aria-hidden
+                />
               </button>
-            </div>
+            </Section>
+            <div className="h-3" aria-hidden />
           </div>
         </>
       )}
