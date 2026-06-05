@@ -47,7 +47,10 @@ export function AuthMenu() {
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Element | null;
+      if (containerRef.current?.contains(target as Node)) return;
+      if (target?.closest?.('[data-auth-sheet="true"]')) return;
+      setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
