@@ -15,14 +15,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { useCurrentUserState } from "@/hooks/use-subscription";
-
-type SubInfo = {
-  status: string;
-  current_period_end: string | null;
-  trial_end: string | null;
-  cancel_at_period_end: boolean | null;
-} | null;
+import { useCurrentUserState, useSubscription } from "@/hooks/use-subscription";
 
 export function AuthMenu() {
   const { locale, setLocale } = useLocale();
