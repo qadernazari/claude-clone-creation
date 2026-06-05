@@ -71,9 +71,6 @@ export function ContinueWatching() {
         {data.map((row) => {
           if (!row.films) return null;
           const f = row.films;
-          const bg = f.cover_url
-            ? `center / cover no-repeat url(${f.cover_url})`
-            : f.poster_gradient || fallbackGradient(f.id);
           const title = t({ en: f.title_en, fa: f.title_fa || f.title_en });
           const totalSec =
             row.duration_seconds ?? (f.duration_min ? f.duration_min * 60 : null);
@@ -92,7 +89,21 @@ export function ContinueWatching() {
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
               <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
-                <div className="cine-img absolute inset-0" style={{ background: bg }} />
+                {f.cover_url ? (
+                  <img
+                    src={f.cover_url}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="cine-img absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: f.poster_gradient || fallbackGradient(f.id) }}
+                    aria-hidden
+                  />
+                )}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent" />
                 {/* play affordance */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
