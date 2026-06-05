@@ -571,76 +571,84 @@ function FilmPage() {
         </div>
       </section>
 
-      {/* More Like This — horizontal poster row, above the fold of "below hero" */}
+      {/* More Like This — horizontal poster row, Apple TV style */}
       {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pt-14 pb-10 md:px-10 md:pt-16">
-          <div className="mb-6 flex items-end justify-between gap-6">
-            <h2 className={`font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : ""}`}>
-              {fa ? "آثار مرتبط" : "Related"}
+        <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14">
+          <div className="mb-5 flex items-end justify-between gap-6">
+            <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+              {fa ? "آثار مرتبط" : "More Like This"}
             </h2>
             <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
               {fa ? "همه آثار" : "Browse all"} →
             </Link>
           </div>
 
-          <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {related.map((r) => {
-              const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
-              const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
-              const bg = r.cover_url
-                ? { background: `center / cover no-repeat url(${r.cover_url})` }
-                : { background: (r.poster_gradient as string) || fallbackGradient };
-              return (
-                <Link
-                  key={r.id}
-                  to="/films/$slug"
-                  params={{ slug: r.slug }}
-                  className="group block"
-                >
-                  <div
-                    className="aspect-[2/3] w-full overflow-hidden rounded-xl ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20"
-                    style={bg}
-                  />
-                  <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
-                  {rDirector && (
-                    <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
-                  )}
-                </Link>
-              );
-            })}
+          {/* Horizontal scrolling row of posters */}
+          <div className="-mx-6 overflow-x-auto px-6 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ul className="flex gap-4 min-w-max md:gap-5">
+              {related.map((r) => {
+                const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
+                const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
+                const bg = r.cover_url
+                  ? { background: `center / cover no-repeat url(${r.cover_url})` }
+                  : { background: (r.poster_gradient as string) || fallbackGradient };
+                return (
+                  <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
+                    <Link
+                      to="/films/$slug"
+                      params={{ slug: r.slug }}
+                      className="group block"
+                    >
+                      <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
+                        <div className="aspect-[2/3] w-full" style={bg} />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                          <div className="inline-flex items-center gap-1.5 rounded-full bg-cream-bright px-3 py-1 text-[10px] font-semibold text-ink">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                            {fa ? "تماشا" : "Watch"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
+                      {rDirector && (
+                        <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </section>
       )}
 
-      {/* Cast & Crew */}
+      {/* Cast & Crew — Apple TV style circular avatars */}
       {(castCredits.length > 0 || crewCredits.length > 0) && (
-        <section className="mx-auto max-w-7xl px-6 pt-10 pb-10 md:px-10">
-          <div className="mb-6 flex items-end justify-between gap-6">
-            <h2 className={`font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : ""}`}>
-              {fa ? "بازیگران و عوامل" : "Cast & Crew"}
-            </h2>
-          </div>
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+          <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+            {fa ? "بازیگران و عوامل" : "Cast & Crew"}
+          </h2>
 
           {castCredits.length > 0 && (
-            <div className="-mx-6 overflow-x-auto px-6 pb-2 md:-mx-10 md:px-10">
-              <ul className="flex gap-6 min-w-max">
+            <div className="-mx-6 overflow-x-auto px-6 pb-2 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <ul className="flex gap-5 min-w-max md:gap-7">
                 {castCredits.map((c, i) => {
                   const name = fa ? c.value_fa || c.value_en : c.value_en;
                   const role = fa ? c.label_fa || c.label_en : c.label_en;
                   const initial = (name || "?").trim().charAt(0).toUpperCase();
                   return (
-                    <li key={`cast-${i}`} className="flex w-28 flex-col items-center text-center">
+                    <li key={`cast-${i}`} className="flex w-24 flex-col items-center text-center shrink-0">
                       <div
-                        className="flex h-24 w-24 items-center justify-center rounded-full bg-cream/[0.06] ring-1 ring-cream/10 text-2xl font-display text-cream/80"
+                        className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cream/[0.10] to-cream/[0.02] ring-1 ring-cream/15 text-xl font-display text-cream/85 transition-transform hover:scale-105"
                         aria-hidden
                       >
                         {initial}
                       </div>
-                      <div className={`mt-3 text-[13px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
+                      <div className={`mt-3 text-[12px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
                         {name}
                       </div>
                       {role && (
-                        <div className="mt-1 text-[11px] text-cream/50 leading-tight line-clamp-1">
+                        <div className="mt-0.5 text-[10px] text-cream/50 leading-tight line-clamp-1">
                           {role}
                         </div>
                       )}
@@ -652,13 +660,13 @@ function FilmPage() {
           )}
 
           {crewCredits.length > 0 && (
-            <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-3 border-t border-cream/10 pt-6 sm:grid-cols-2 md:grid-cols-3">
+            <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-2 border-t border-cream/10 pt-5 sm:grid-cols-2 md:grid-cols-3">
               {crewCredits.map((c, i) => (
-                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/[0.06] pb-3">
+                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/[0.06] pb-2">
                   <dt className="text-[11px] uppercase tracking-[0.18em] text-cream/45">
                     {fa ? c.label_fa || c.label_en : c.label_en}
                   </dt>
-                  <dd className={`text-[14px] text-cream-bright text-right ${fa ? "font-vazir" : ""}`}>
+                  <dd className={`text-[13px] text-cream-bright text-right ${fa ? "font-vazir" : ""}`}>
                     {fa ? c.value_fa || c.value_en : c.value_en}
                   </dd>
                 </div>
@@ -668,46 +676,130 @@ function FilmPage() {
         </section>
       )}
 
-      {/* How to Watch — only shown for PPV titles where it isn't already covered by the hero membership CTA */}
-      {hasPpv && !isMember && (
-        <section className="mx-auto max-w-3xl px-6 pt-10 pb-6 md:px-10">
-          <div className="hairline flex flex-col gap-2 rounded-2xl border bg-bg-1/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+      {/* Film Details */}
+      <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+        <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+          {fa ? "اطلاعات فیلم" : "Film Details"}
+        </h2>
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 md:grid-cols-4">
+          {film.year && (
             <div>
-              <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
-                {fa ? "خرید این فیلم" : "Buy this film"}
-              </span>
-              <p className="mt-1 text-[13px] text-cream/65">
-                {priceLabel} · {t.accessNote}
-              </p>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "سال" : "Year"}</dt>
+              <dd className="mt-1 text-[14px] text-cream-bright">{fa ? num(film.year) : String(film.year)}</dd>
             </div>
-            <button
-              type="button"
-              onClick={() => setCheckoutOpen(true)}
-              disabled={tomanOnly}
-              className="inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-2.5 text-[13px] font-medium text-cream-bright transition-colors hover:bg-cream/5 disabled:opacity-60"
-            >
-              {t.buy}
-            </button>
+          )}
+          {film.duration_min && (
+            <div>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "مدت" : "Runtime"}</dt>
+              <dd className="mt-1 text-[14px] text-cream-bright">{num(film.duration_min)} {fa ? "دقیقه" : "min"}</dd>
+            </div>
+          )}
+          {film.category && (
+            <div>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "ژانر" : "Genre"}</dt>
+              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{film.category}</dd>
+            </div>
+          )}
+          <div>
+            <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "کشور" : "Country"}</dt>
+            <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "ایران" : "Iran"}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زبان" : "Language"}</dt>
+            <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "فارسی" : "Persian (Farsi)"}</dd>
+          </div>
+          {film.has_subtitles && (
+            <div>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زیرنویس" : "Subtitles"}</dt>
+              <dd className="mt-1 text-[14px] text-cream-bright">{fa ? "انگلیسی" : "English"}</dd>
+            </div>
+          )}
+          {film.age_rating && (
+            <div>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "رده‌بندی" : "Rating"}</dt>
+              <dd className="mt-1 text-[14px] text-cream-bright">{film.age_rating}</dd>
+            </div>
+          )}
+          {(film.has_4k || film.has_captions) && (
+            <div>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "کیفیت" : "Quality"}</dt>
+              <dd className="mt-1 text-[14px] text-cream-bright">
+                {[film.has_4k && "4K", film.has_captions && "CC"].filter(Boolean).join(" · ")}
+              </dd>
+            </div>
+          )}
+        </dl>
+      </section>
+
+      {/* How to Watch — shown for non-members */}
+      {!isMember && (
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+          <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+            {fa ? "روش تماشا" : "How to Watch"}
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Membership / Trial card */}
+            <div className="hairline relative overflow-hidden rounded-2xl border bg-gradient-to-br from-amber/10 via-bg-1/40 to-bg-1/40 p-6">
+              <span className="block text-[10px] uppercase tracking-[0.28em] text-amber">
+                {fa ? "عضویت ایران" : "IRAN Membership"}
+              </span>
+              <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+                {fa ? "۷ روز رایگان امتحان کنید" : "Start with 7 days free"}
+              </h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
+                {fa
+                  ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
+                  : "Unlimited access to the full catalog. Cancel anytime."}
+              </p>
+              <button
+                type="button"
+                onClick={() => user ? setMembershipOpen(true) : (window.location.href = "/auth")}
+                className="mt-4 inline-flex items-center justify-center rounded-full bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink transition-transform hover:scale-[1.02]"
+              >
+                {t.startTrial}
+              </button>
+            </div>
+
+            {/* PPV card if available */}
+            {hasPpv && (
+              <div className="hairline rounded-2xl border bg-bg-1/40 p-6">
+                <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/45">
+                  {fa ? "خرید این فیلم" : "Rent this film"}
+                </span>
+                <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+                  {priceLabel}
+                </h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
+                  {t.accessNote}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setCheckoutOpen(true)}
+                  disabled={tomanOnly}
+                  className="mt-4 inline-flex items-center justify-center rounded-full border border-cream/25 px-5 py-2.5 text-[13px] font-medium text-cream-bright transition-colors hover:bg-cream/5 disabled:opacity-60"
+                >
+                  {t.buy}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}
 
-
-
-      {/* Support the filmmaker */}
-      <section className="mx-auto max-w-3xl px-6 pt-6 pb-20">
-        <div className="hairline rounded-2xl border bg-bg-1/40 px-8 py-8 text-center">
-          <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/40">
-            {fa ? "حمایت" : "Support"}
-          </span>
-          <h3 className={`mt-3 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-            {fa ? "از فیلم‌ساز حمایت کنید" : "Support the filmmaker"}
-          </h3>
-          <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-cream/60">
-            {fa
-              ? "کمک‌های شما مستقیماً به ادامه ساخت سینمای مستقل ایران می‌رسد."
-              : "Your contribution goes directly to keeping independent Iranian cinema alive."}
-          </p>
+      {/* Support the filmmaker — compact inline strip */}
+      <section className="mx-auto max-w-7xl px-6 pt-6 pb-14 md:px-10">
+        <div className="hairline flex flex-col items-start gap-4 rounded-2xl border bg-bg-1/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1">
+            <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/45">
+              {fa ? "حمایت" : "Support"}
+            </span>
+            <p className={`mt-1.5 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>
+              {fa ? "از فیلم‌ساز حمایت کنید" : "Support the filmmaker"}
+              <span className="ms-2 text-cream/55 font-normal">
+                {fa ? "— کمک شما مستقیماً به سینمای مستقل ایران می‌رسد." : "— your contribution goes directly to independent Iranian cinema."}
+              </span>
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -717,7 +809,7 @@ function FilmPage() {
               }
               setContribOpen(true);
             }}
-            className="mt-5 inline-flex items-center justify-center rounded-full border border-cream/20 px-5 py-2.5 text-[13px] font-medium text-cream/85 transition-colors hover:bg-cream/5 hover:text-cream-bright"
+            className="inline-flex shrink-0 items-center justify-center rounded-full border border-cream/20 px-5 py-2.5 text-[13px] font-medium text-cream/85 transition-colors hover:bg-cream/5 hover:text-cream-bright"
           >
             {t.contribute}
           </button>
