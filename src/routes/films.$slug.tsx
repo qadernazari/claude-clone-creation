@@ -283,12 +283,7 @@ function FilmPage() {
 
   const heroArt = film.thumbnail_url || film.cover_url;
   const posterStyle = heroArt
-    ? {
-        backgroundImage: `url(${heroArt})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center center",
-      }
+    ? { backgroundImage: `url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
 
 
@@ -347,16 +342,20 @@ function FilmPage() {
 
       {/* Cinematic full-bleed hero */}
       <section className="relative isolate min-h-[88vh] w-full overflow-hidden bg-background">
-        {/* Backdrop — full bleed cover art, shifted DOWN so baked-in Persian title sits below header */}
-        <div
-          className="absolute inset-x-0 bottom-0 -z-30"
-          style={{ ...posterStyle, top: "clamp(80px, 12vh, 140px)" }}
-          aria-hidden
-        />
+        {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
+        {heroArt ? (
+          <img
+            src={heroArt}
+            alt=""
+            className="absolute inset-x-0 -top-[10%] -z-30 h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none"
+            aria-hidden
+          />
+        ) : (
+          <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
+        )}
         {/* Very light base tint — keep the image bright and cinematic */}
         <div
-          className="absolute inset-x-0 bottom-0 -z-20 bg-black/10"
-          style={{ top: "clamp(80px, 12vh, 140px)" }}
+          className="absolute inset-0 -z-20 bg-black/10"
           aria-hidden
         />
         {/* Bottom fade for text readability + blend into page background */}
@@ -375,8 +374,8 @@ function FilmPage() {
           style={{
             background:
               dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.7) 0%, rgba(8,8,10,0.2) 45%, rgba(8,8,10,0) 75%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.7) 0%, rgba(8,8,10,0.2) 45%, rgba(8,8,10,0) 75%)",
+                ? "linear-gradient(270deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.16) 45%, rgba(8,8,10,0) 75%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.16) 45%, rgba(8,8,10,0) 75%)",
           }}
         />
 
