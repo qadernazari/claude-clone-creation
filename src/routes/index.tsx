@@ -50,7 +50,7 @@ export const Route = createFileRoute("/")({
               rel: "preload" as const,
               as: "image" as const,
               href: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || "",
-              fetchPriority: "high" as const,
+              fetchpriority: "high" as const,
             },
           ]
         : []),
