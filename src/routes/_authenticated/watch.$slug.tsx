@@ -493,7 +493,7 @@ function WatchPage() {
             </h1>
             <p className="mt-1 text-sm text-cream/60">
               {director && <>{fa ? "کارگردان: " : "Directed by "}{director}</>}
-              {film.year ? <> · {num(film.year)}</> : null}
+              {film.year ? <> · {year(film.year)}</> : null}
               {film.duration_min ? <> · {num(film.duration_min)} {fa ? "دقیقه" : "min"}</> : null}
             </p>
           </div>
