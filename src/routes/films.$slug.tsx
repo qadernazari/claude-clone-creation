@@ -50,7 +50,12 @@ export const Route = createFileRoute("/films/$slug")({
         ...(f.cover_url ? [{ name: "twitter:image" as const, content: f.cover_url }] : []),
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        ...(f.thumbnail_url || f.cover_url
+          ? [{ rel: "preload" as const, as: "image" as const, href: (f.thumbnail_url || f.cover_url) as string, fetchpriority: "high" as const }]
+          : []),
+      ],
       scripts: [
         {
           type: "application/ld+json",
@@ -347,9 +352,12 @@ function FilmPage() {
           <img
             src={heroArt}
             alt=""
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-x-0 -top-[10%] -z-30 h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none"
             aria-hidden
           />
+
         ) : (
           <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
         )}
@@ -590,7 +598,7 @@ function FilmPage() {
 
       {/* More Like This — horizontal poster row, Apple TV style */}
       {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14">
+        <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
           <div className="mb-5 flex items-end justify-between gap-6">
             <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
               {fa ? "آثار مرتبط" : "More Like This"}
@@ -606,9 +614,7 @@ function FilmPage() {
               {related.map((r) => {
                 const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
                 const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
-                const bg = r.cover_url
-                  ? { background: `center / cover no-repeat url(${r.cover_url})` }
-                  : { background: (r.poster_gradient as string) || fallbackGradient };
+                const fallbackBg = (r.poster_gradient as string) || fallbackGradient;
                 return (
                   <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
                     <Link
@@ -617,7 +623,18 @@ function FilmPage() {
                       className="group block"
                     >
                       <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/[0.06] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
-                        <div className="aspect-[2/3] w-full" style={bg} />
+                        <div className="aspect-[2/3] w-full" style={{ background: fallbackBg }}>
+                          {r.cover_url && (
+                            <img
+                              src={r.cover_url}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              className="h-full w-full object-cover"
+                              aria-hidden
+                            />
+                          )}
+                        </div>
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
                           <div className="inline-flex items-center gap-1.5 rounded-full bg-cream-bright px-3 py-1 text-[10px] font-semibold text-ink">
@@ -626,6 +643,7 @@ function FilmPage() {
                           </div>
                         </div>
                       </div>
+
                       <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
                       {rDirector && (
                         <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
@@ -641,7 +659,7 @@ function FilmPage() {
 
       {/* Cast & Crew — Apple TV style circular avatars */}
       {(castCredits.length > 0 || crewCredits.length > 0) && (
-        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
           <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
             {fa ? "بازیگران و عوامل" : "Cast & Crew"}
           </h2>
@@ -694,7 +712,7 @@ function FilmPage() {
       )}
 
       {/* Film Details */}
-      <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+      <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
         <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
           {fa ? "اطلاعات فیلم" : "Film Details"}
         </h2>
@@ -750,7 +768,7 @@ function FilmPage() {
 
       {/* How to Watch — shown for non-members */}
       {!isMember && (
-        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10">
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
           <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
             {fa ? "روش تماشا" : "How to Watch"}
           </h2>
