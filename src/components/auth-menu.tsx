@@ -21,8 +21,8 @@ export function AuthMenu() {
   const { locale, setLocale } = useLocale();
   const fa = locale === "fa";
   const { user, isLoading: isUserLoading } = useCurrentUserState();
+  const { subscription, trial, isTrialActive, isTrialExpired } = useSubscription();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [sub, setSub] = useState<SubInfo>(null);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
