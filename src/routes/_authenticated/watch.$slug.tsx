@@ -378,8 +378,8 @@ function WatchPage() {
         </div>
       </header>
 
-      <main className={theater ? "mx-auto max-w-[1400px] px-4 py-6" : "mx-auto max-w-5xl px-6 py-8"}>
-        <div className="flex items-center justify-between">
+      <main className={theater ? "mx-auto max-w-[1400px] px-0 py-0 md:px-4 md:py-6" : "mx-auto max-w-5xl px-0 py-0 md:px-6 md:py-8"}>
+        <div className="hidden md:flex items-center justify-between">
           <Link
             to="/films/$slug"
             params={{ slug: film.slug }}
@@ -399,7 +399,7 @@ function WatchPage() {
         </div>
 
         <div
-          className="mt-4 relative overflow-hidden rounded-xl border border-cream/10 shadow-2xl shadow-black/60 aspect-video"
+          className="mt-0 relative overflow-hidden border-y border-cream/10 shadow-2xl shadow-black/60 aspect-video md:mt-4 md:rounded-xl md:border"
           style={!showPlayer ? posterStyle : { background: "#000" }}
         >
           {/* subtle vignette for poster states */}
@@ -486,7 +486,7 @@ function WatchPage() {
         </div>
 
         {/* Title block */}
-        <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
+        <div className="mt-5 grid gap-6 px-5 md:mt-6 md:grid-cols-[1fr_auto] md:items-start md:px-0">
           <div>
             <h1 className={`text-2xl md:text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
               {title}
@@ -507,7 +507,7 @@ function WatchPage() {
         </div>
 
         {/* About + shortcuts */}
-        <div className="mt-8 grid gap-8 md:grid-cols-3">
+        <div className="mt-7 grid gap-8 px-5 pb-10 md:mt-8 md:grid-cols-3 md:px-0 md:pb-0">
           {synopsis && (
             <section className="md:col-span-2">
               <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.aboutFilm}</h2>
