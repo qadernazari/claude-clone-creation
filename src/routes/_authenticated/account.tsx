@@ -219,7 +219,7 @@ function AccountPage() {
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      <main className="mx-auto max-w-5xl px-6 pt-32 pb-12 space-y-12">
+      <main className="mx-auto max-w-5xl px-5 pt-20 pb-12 space-y-10 md:px-6 md:pt-32 md:space-y-12">
         <div>
           <h1 className={`text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
             {tr.title}

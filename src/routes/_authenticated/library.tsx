@@ -68,7 +68,7 @@ function LibraryPage() {
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      <main className="mx-auto max-w-6xl px-6 pt-28 pb-20">
+      <main className="mx-auto max-w-6xl px-5 pt-20 pb-20 md:px-6 md:pt-28">
         <header className="flex flex-col gap-1">
           <p className="text-[10px] uppercase tracking-[0.22em] text-cream/45">
             {fa ? "حساب من" : "My account"}
@@ -90,7 +90,7 @@ function LibraryPage() {
         </header>
 
         {/* Tabs */}
-        <nav className="mt-10 flex flex-wrap gap-1 border-b border-cream/10">
+        <nav className="no-scrollbar mt-8 -mx-5 flex gap-1 overflow-x-auto border-b border-cream/10 px-5 md:mt-10 md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
           {tabs.map((t) => {
             const active = tab === t.key;
             return (
@@ -98,7 +98,7 @@ function LibraryPage() {
                 key={t.key}
                 type="button"
                 onClick={() => setTab(t.key)}
-                className={`relative px-4 py-3 text-xs uppercase tracking-[0.18em] transition-colors ${
+                className={`relative shrink-0 whitespace-nowrap px-3 py-3 text-[11px] uppercase tracking-[0.18em] transition-colors md:px-4 md:text-xs ${
                   active ? "text-cream-bright" : "text-cream/50 hover:text-cream/85"
                 }`}
               >
