@@ -421,17 +421,21 @@ function Empty({ title, cta }: { title: string; cta?: string }) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   return (
-    <div className="hairline rounded-2xl border bg-bg-1/40 p-12 text-center">
-      <p className="text-cream/80">{title}</p>
-      {cta && (
+    <div className="hairline flex flex-col items-center rounded-2xl border bg-bg-1/40 px-6 py-14 text-center md:px-12 md:py-16">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-cream/10 bg-cream/[0.04] text-cream/40">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M5 4h14a1 1 0 0 1 1 1v15l-8-4-8 4V5a1 1 0 0 1 1-1Z" />
+        </svg>
+      </div>
+      <p className="text-[15px] text-cream/85">{title}</p>
+      {cta ? (
         <Link
           to="/browse"
-          className="mt-5 inline-flex rounded-full bg-cream px-5 py-2.5 text-sm font-semibold text-ink hover:bg-cream-bright"
+          className="mt-5 inline-flex h-11 items-center rounded-full bg-cream px-6 text-sm font-semibold text-ink active:scale-[0.98] transition-transform hover:bg-cream-bright"
         >
           {cta}
         </Link>
-      )}
-      {!cta && (
+      ) : (
         <p className="mt-2 text-xs text-cream/45">
           {fa ? "وقتی شروع به تماشا کنید اینجا ظاهر می‌شود." : "It'll appear here once you start watching."}
         </p>
