@@ -349,5 +349,17 @@ body[data-no-tabbar="true"] {
   .animate-fade-in { animation: none; }
 }
 
-/* Hide mobile tab bar while the account sheet is open */
+/* Account drawer open: freeze the page behind the drawer and keep one active scroll area. */
+html[data-auth-sheet-open],
+html[data-auth-sheet-open] body,
+body[data-auth-sheet-open] {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+}
+html[data-auth-sheet-open]::-webkit-scrollbar,
+html[data-auth-sheet-open] body::-webkit-scrollbar,
+body[data-auth-sheet-open]::-webkit-scrollbar {
+  display: none;
+}
 body[data-auth-sheet-open] .mobile-tab-bar { display: none !important; }
