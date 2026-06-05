@@ -233,7 +233,7 @@ export function AuthMenu() {
             aria-label={fa ? "حساب کاربری" : "Account"}
             className={[
               // Mobile sheet
-              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh-env(safe-area-inset-top,0px)-12px)] w-full max-w-[100vw] flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
+              "fixed inset-x-0 bottom-0 z-[100] flex max-h-[calc(100dvh_-_env(safe-area-inset-top,0px)_-_12px)] w-full max-w-[100vw] flex-col overflow-hidden overscroll-none rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.7)] animate-slide-up-sheet",
               // Desktop dropdown — anchored to the avatar via a fixed wrapper isn't possible from portal, so on md+ we fall back to a top-right positioned panel
               "md:inset-x-auto md:end-4 md:top-20 md:bottom-auto md:w-[320px] md:max-h-[80dvh] md:rounded-2xl md:border md:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] md:animate-fade-in",
             ].join(" ")}
