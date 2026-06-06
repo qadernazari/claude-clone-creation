@@ -343,6 +343,10 @@
     opacity: 0.72;
   }
 
+  .region-sheet-backdrop {
+    background: rgba(var(--rgb-bg-0), 0.80);
+  }
+
   .region-sheet {
     border-top: 1px solid rgba(var(--rgb-cream), 0.10);
     background: rgb(var(--rgb-bg-1));
