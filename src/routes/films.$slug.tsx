@@ -416,14 +416,8 @@ function FilmPage() {
 
   // Pull a "cast" + "crew" view out of grouped credits for the
   // dedicated Cast & Crew row beneath the hero.
-  const castCredits = useMemo(
-    () => credits.filter((c) => (c.credit_type || "other") === "cast"),
-    [credits],
-  );
-  const crewCredits = useMemo(
-    () => credits.filter((c) => (c.credit_type || "other") !== "cast"),
-    [credits],
-  );
+
+
 
 
 
