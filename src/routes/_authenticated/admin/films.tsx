@@ -648,7 +648,7 @@ function FilmEditorModal({
 
           {pricingVisible && (
             <Section title="Pricing">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className="block">
                   <span className="block text-xs font-medium text-muted-foreground mb-1.5">Ticket — International (USD)</span>
                   <input type="number" step="0.01" value={(d.price_cents / 100).toFixed(2)} onChange={(e) => set("price_cents", Math.round(Number(e.target.value) * 100))} className={inp} placeholder="4.99" />
@@ -657,11 +657,10 @@ function FilmEditorModal({
                   <span className="block text-xs font-medium text-muted-foreground mb-1.5">قیمت بلیت — تومان</span>
                   <input type="number" step="1000" dir="rtl" value={d.price_toman} onChange={(e) => set("price_toman", Number(e.target.value))} className={inp} placeholder="120000" />
                 </label>
-                <label className="block">
-                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Viewing window (hours)</span>
-                  <input type="number" value={d.ticket_hours} onChange={(e) => set("ticket_hours", Number(e.target.value))} className={inp} placeholder="48" />
-                </label>
               </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Purchases grant lifetime access — buyers own the film forever in their account.
+              </p>
             </Section>
           )}
 

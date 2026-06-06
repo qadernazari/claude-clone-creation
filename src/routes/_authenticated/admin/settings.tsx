@@ -80,10 +80,9 @@ function GeneralPanel() {
           <span className="block text-xs font-medium text-muted-foreground mb-1.5">Default ticket price — Toman</span>
           <input type="number" value={v.defaultPriceToman} onChange={(e) => setV({ ...v, defaultPriceToman: Number(e.target.value) })} className={inp} />
         </label>
-        <label className="block mt-3">
-          <span className="block text-xs font-medium text-muted-foreground mb-1.5">Viewing window (hours)</span>
-          <input type="number" value={v.defaultTicketHours} onChange={(e) => setV({ ...v, defaultTicketHours: Number(e.target.value) })} className={inp} />
-        </label>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Film purchases grant <strong>lifetime access</strong> — buyers own each film forever in their account.
+        </p>
         <button type="button" onClick={() => save.mutate()} className="mt-4 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90">
           Save defaults
         </button>

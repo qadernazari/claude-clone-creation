@@ -252,8 +252,8 @@ function FilmPage() {
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
     signinToWatch: fa ? "برای تماشا وارد شوید" : "Sign in to watch",
     accessNote: fa
-      ? `دسترسی ${num(film.ticket_hours)} ساعت پس از خرید`
-      : `${film.ticket_hours}-hour access after purchase`,
+      ? "مالکیت دائمی — همیشه در حساب شما"
+      : "Yours forever — saved to your account",
     membershipNote: fa
       ? "با عضویت ایران، نامحدود تماشا کنید"
       : "Unlimited streaming with IRAN membership",
