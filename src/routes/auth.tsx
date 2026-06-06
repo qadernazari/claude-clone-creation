@@ -288,7 +288,7 @@ function AuthPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleCredentials} className="mt-10 space-y-3" noValidate>
+              <form onSubmit={handleCredentials} className="mt-10 space-y-4" noValidate>
                 <fieldset disabled={loading} className="contents">
                   <FloatingInput
                     id="email"
