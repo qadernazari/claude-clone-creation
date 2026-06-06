@@ -60,7 +60,7 @@ type Contribution = {
 };
 
 function AccountPage() {
-  const { locale, num, dir, setLocale, region, setRegion } = useLocale();
+  const { locale, num, dir, region, setRegion } = useLocale();
   const fa = locale === "fa";
   const qc = useQueryClient();
 
@@ -289,7 +289,7 @@ function AccountPage() {
                     <button
                       key={opt.key}
                       type="button"
-                      onClick={() => { setRegion(opt.key); setLocale(opt.loc); }}
+                      onClick={() => setRegion(opt.key)}
                       aria-pressed={active}
                       className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${
                         active ? "bg-cream text-ink" : "text-cream/65 hover:text-cream"
