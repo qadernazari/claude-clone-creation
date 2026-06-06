@@ -277,16 +277,30 @@ function AccountPage() {
                 className="mt-2 w-full rounded-md border border-cream/10 bg-bg-0/60 px-3 py-2 text-cream/60"
               />
             </label>
-            <label className="block">
-              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.language}</span>
-              <select
-                value={locale}
-                onChange={(e) => setLocale(e.target.value as "en" | "fa")}
-                className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
-              >
-                <option value="en">English</option>
-                <option value="fa">فارسی</option>
-              </select>
+            <label className="block md:col-span-2">
+              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.regionLabel}</span>
+              <div className="mt-2 inline-flex w-full max-w-md items-center gap-1 rounded-full border border-cream/10 bg-bg-0 p-1">
+                {([
+                  { key: "iran" as const, label: tr.insideIran, loc: "fa" as const },
+                  { key: "global" as const, label: tr.outsideIran, loc: "en" as const },
+                ]).map((opt) => {
+                  const active = region === opt.key;
+                  return (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => { setRegion(opt.key); setLocale(opt.loc); }}
+                      aria-pressed={active}
+                      className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${
+                        active ? "bg-cream text-ink" : "text-cream/65 hover:text-cream"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[11px] text-cream/45">{tr.regionHint}</p>
             </label>
             <div className="block">
               <span className="text-xs uppercase tracking-widest text-cream/55">{tr.member}</span>
