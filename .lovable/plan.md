@@ -1,27 +1,26 @@
-## Goal
+## Problem
 
-Drop the phone OTP path entirely and use email + password only on `/auth`. This removes the SMS provider dependency that was blocking sign-in.
+On the verify-email step, after the user types each digit the slot turns into a solid cream-colored pill with no digit visible. The digit IS in state (the code auto-submits at 6 chars), but it can't be seen because the filled-slot style is `bg-cream/[0.04]` + `text-cream`, and the near-transparent cream background is rendering as opaque cream — so cream-on-cream hides the digit.
 
-## Changes
+## Fix
 
-**`src/routes/auth.tsx`**
-1. Remove the `Method` type, the `method` state, and the `email`/`phone` segmented toggle from the credentials step.
-2. Remove all phone-related code paths: `phone`/`phoneError` state, `validatePhone`/`normalizePhone`, `sendPhoneOtp`, the phone branch in `handleCredentials`, and the phone branch in `handleVerify`.
-3. Keep the email flow as-is:
-   - Sign in: `signInWithPassword`. If `email not confirmed`, send a fresh email OTP and move to the verify step.
-   - Sign up: `signUp` with `emailRedirectTo`, then verify step.
-   - Verify step: 6-digit code via `verifyOtp({ type: "email" })`, with resend + cooldown.
-4. Simplify copy that branched on `method` (verify title, "use a different email", etc.) so it always reads as email.
-5. Drop the now-unused `phoneError`, phone helper text translations, and the phone error message for `signups not allowed`.
+Edit only the filled-slot styles in `src/routes/auth.tsx` (the `OtpView` component, around lines 519–525):
+
+- Filled slot: dark, slightly-lifted background + bright cream digit
+  - `bg-cream/[0.04]` → `bg-white/5` (uses Tailwind's built-in white token, which reliably produces a faint translucent overlay on the dark page bg)
+  - Keep `text-cream` so the digit stays high-contrast
+  - Keep `border-cream/60`
+- Empty slot: unchanged (`border-cream/12 text-cream/40`)
+- Active ring: unchanged
+
+Result: filled slots show a subtle lighter rounded rectangle with the typed digit clearly visible in cream, matching the original design intent.
 
 ## Out of scope
 
-- No design changes to the auth screen layout (header, logo, fonts, gradient stay the same).
-- No changes to backend, RLS, or the `profiles` trigger.
-- No changes to email templates — default Lovable confirmation emails continue to work.
+- No changes to OTP length (stays at 6), verify logic, resend flow, error handling, or the email template.
+- No layout/spacing changes.
+- No design-token edits in `src/styles.css`.
 
 ## Verification
 
-- Load `/auth`, confirm the phone toggle is gone and only the email + password form renders.
-- Sign up with a new email → receive 6-digit code → verify → redirected home.
-- Sign in with existing confirmed account → redirected home.
+- Open `/auth` on mobile, request a code, type digits — each slot should show the digit in cream over a faint dark background, and auto-submit on the 6th digit as before.

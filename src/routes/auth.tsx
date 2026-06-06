@@ -520,7 +520,7 @@ function VerifyView({
                   "relative flex items-center justify-center",
                   "h-12 w-9 sm:h-14 sm:w-11 rounded-xl border text-[18px] sm:text-[20px] font-semibold tabular-nums transition-all duration-150",
                   filled
-                    ? "border-cream/60 bg-cream/[0.04] text-cream"
+                    ? "border-cream/60 bg-white/5 text-cream"
                     : "border-cream/12 text-cream/40",
                   isActive ? "border-cream ring-2 ring-cream/20" : "",
                   verifying ? "opacity-60" : "",
