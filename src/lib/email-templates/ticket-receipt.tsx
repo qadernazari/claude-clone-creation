@@ -95,11 +95,6 @@ export const template = {
     amountFormatted: '$4.99',
     watchUrl: 'https://ir.show/watch/the-wind',
   },
-    filmTitleEn: 'The Wind Will Carry Us',
-    filmTitleFa: 'باد ما را خواهد برد',
-    amountFormatted: '$4.99',
-    watchUrl: 'https://ir.show/watch/the-wind',
-  },
 } satisfies TemplateEntry
 
 const main = {
