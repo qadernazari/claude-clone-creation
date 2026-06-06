@@ -637,123 +637,8 @@ function FilmPage() {
         </div>
       </section>
 
-      {/* More Like This — horizontal poster row, Apple TV style */}
-      {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
-          <div className="mb-5 flex items-end justify-between gap-6">
-            <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
-              {fa ? "آثار مرتبط" : "More Like This"}
-            </h2>
-            <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
-              {fa ? "همه آثار" : "Browse all"} →
-            </Link>
-          </div>
-
-          {/* Horizontal scrolling row of posters */}
-          <div className="-mx-6 overflow-x-auto px-6 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <ul className="flex gap-4 min-w-max md:gap-5">
-              {related.map((r) => {
-                const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
-                const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
-                const fallbackBg = (r.poster_gradient as string) || fallbackGradient;
-                return (
-                  <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
-                    <Link
-                      to="/films/$slug"
-                      params={{ slug: r.slug }}
-                      className="group block"
-                    >
-                      <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
-                        <div className="aspect-[2/3] w-full" style={{ background: fallbackBg }}>
-                          {r.cover_url && (
-                            <img
-                              src={r.cover_url}
-                              alt=""
-                              loading="lazy"
-                              decoding="async"
-                              className="h-full w-full object-cover"
-                              aria-hidden
-                            />
-                          )}
-                        </div>
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                          <div className="inline-flex items-center gap-1.5 rounded-full bg-cream-bright px-3 py-1 text-[10px] font-semibold text-ink">
-                            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
-                            {fa ? "تماشا" : "Watch"}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
-                      {rDirector && (
-                        <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {/* Cast & Crew — Apple TV style circular avatars */}
-      {(castCredits.length > 0 || crewCredits.length > 0) && (
-        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
-          <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
-            {fa ? "بازیگران و عوامل" : "Cast & Crew"}
-          </h2>
-
-          {castCredits.length > 0 && (
-            <div className="-mx-6 overflow-x-auto px-6 pb-2 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <ul className="flex gap-5 min-w-max md:gap-7">
-                {castCredits.map((c, i) => {
-                  const name = fa ? c.value_fa || c.value_en : c.value_en;
-                  const role = fa ? c.label_fa || c.label_en : c.label_en;
-                  const initial = (name || "?").trim().charAt(0).toUpperCase();
-                  return (
-                    <li key={`cast-${i}`} className="flex w-24 flex-col items-center text-center shrink-0">
-                      <div
-                        className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cream/10 to-cream/2 ring-1 ring-cream/15 text-xl font-display text-cream/85 transition-transform hover:scale-105"
-                        aria-hidden
-                      >
-                        {initial}
-                      </div>
-                      <div className={`mt-3 text-[12px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
-                        {name}
-                      </div>
-                      {role && (
-                        <div className="mt-0.5 text-[10px] text-cream/50 leading-tight line-clamp-1">
-                          {role}
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-
-          {crewCredits.length > 0 && (
-            <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-2 border-t border-cream/10 pt-5 sm:grid-cols-2 md:grid-cols-3">
-              {crewCredits.map((c, i) => (
-                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/6 pb-2">
-                  <dt className="text-[11px] uppercase tracking-[0.18em] text-cream/45">
-                    {fa ? c.label_fa || c.label_en : c.label_en}
-                  </dt>
-                  <dd className={`text-[13px] text-cream-bright text-right ${fa ? "font-vazir" : ""}`}>
-                    {fa ? c.value_fa || c.value_en : c.value_en}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </section>
-      )}
-
       {/* Film Details */}
-      <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
+      <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
         <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
           {fa ? "اطلاعات فیلم" : "Film Details"}
         </h2>
@@ -806,6 +691,71 @@ function FilmPage() {
           )}
         </dl>
       </section>
+
+      {/* Related — horizontal poster row, Apple TV style */}
+      {relatedTop.length > 0 && (
+        <PosterRail
+          heading={fa ? "آثار مرتبط" : "Related"}
+          linkText={fa ? "همه آثار" : "Browse all"}
+          films={relatedTop}
+          fa={fa}
+        />
+      )}
+
+      {/* Cast & Crew — circular avatars for every credit */}
+      {credits.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_300px]">
+          <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+            {fa ? "بازیگران و عوامل" : "Cast & Crew"}
+          </h2>
+          <div className="-mx-6 overflow-x-auto px-6 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ul className="flex gap-5 min-w-max md:gap-7">
+              {credits.map((c, i) => {
+                const name = (fa ? c.value_fa || c.value_en : c.value_en) || "";
+                const role = fa ? c.label_fa || c.label_en : c.label_en;
+                const parts = name.trim().split(/\s+/).filter(Boolean);
+                const initials = ((parts[0]?.[0] ?? "?") + (parts[1]?.[0] ?? "")).toUpperCase();
+                return (
+                  <li key={`cred-${i}`} className="flex w-24 flex-col items-center text-center shrink-0">
+                    <div
+                      className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cream/15 to-cream/[0.03] ring-1 ring-cream/15 text-[15px] font-medium tracking-wider text-cream/85 transition-transform hover:scale-105"
+                      aria-hidden
+                    >
+                      {initials}
+                    </div>
+                    <div className={`mt-3 text-[12px] font-medium text-cream-bright leading-tight line-clamp-2 ${fa ? "font-vazir" : ""}`}>
+                      {name}
+                    </div>
+                    {role && (
+                      <div className="mt-0.5 text-[10px] text-cream/50 leading-tight line-clamp-1">
+                        {role}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* More From This Collection */}
+      {moreFromCollection.length > 0 && (
+        <PosterRail
+          heading={
+            categoryName
+              ? fa
+                ? `بیشتر از ${categoryName.name_fa || categoryName.name_en}`
+                : `More from ${categoryName.name_en}`
+              : fa
+                ? "بیشتر از این مجموعه"
+                : "More from this collection"
+          }
+          films={moreFromCollection}
+          fa={fa}
+        />
+      )}
+
 
       {/* How to Watch — shown for non-members */}
       {!isMember && (
