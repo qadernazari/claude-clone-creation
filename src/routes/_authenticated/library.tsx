@@ -103,7 +103,10 @@ function LibraryPage() {
                 }`}
               >
                 <span>{t.label}</span>
-                <span className="ml-2 rtl:ml-0 rtl:mr-2 rounded-full bg-cream/10 px-1.5 py-0.5 text-[10px] tabular-nums text-cream/65">
+                <span
+                  className="ml-2 rtl:ml-0 rtl:mr-2 rounded-full px-1.5 py-0.5 text-[10px] tabular-nums"
+                  style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+                >
                   {num(t.count)}
                 </span>
                 {active && (
