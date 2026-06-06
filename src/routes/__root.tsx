@@ -147,8 +147,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr" data-region="global" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var r=localStorage.getItem('iran_region');var l=localStorage.getItem('iran_lang');if(r!=='global'&&r!=='iran')r=l==='fa'?'iran':'global';l=r==='iran'?'fa':'en';document.documentElement.lang=l;document.documentElement.dir=l==='fa'?'rtl':'ltr';document.documentElement.dataset.region=r;}catch(e){}",
+          }}
+        />
         <HeadContent />
       </head>
       <body>

@@ -60,7 +60,7 @@ type Contribution = {
 };
 
 function AccountPage() {
-  const { locale, num, dir, setLocale, region, setRegion } = useLocale();
+  const { locale, num, dir, region, setRegion } = useLocale();
   const fa = locale === "fa";
   const qc = useQueryClient();
 
@@ -281,15 +281,15 @@ function AccountPage() {
               <span className="text-xs uppercase tracking-widest text-cream/55">{tr.regionLabel}</span>
               <div className="mt-2 inline-flex w-full max-w-md items-center gap-1 rounded-full border border-cream/10 bg-bg-0 p-1">
                 {([
-                  { key: "iran" as const, label: tr.insideIran, loc: "fa" as const },
-                  { key: "global" as const, label: tr.outsideIran, loc: "en" as const },
+                  { key: "iran" as const, label: tr.insideIran },
+                  { key: "global" as const, label: tr.outsideIran },
                 ]).map((opt) => {
                   const active = region === opt.key;
                   return (
                     <button
                       key={opt.key}
                       type="button"
-                      onClick={() => { setRegion(opt.key); setLocale(opt.loc); }}
+                      onClick={() => setRegion(opt.key)}
                       aria-pressed={active}
                       className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${
                         active ? "bg-cream text-ink" : "text-cream/65 hover:text-cream"

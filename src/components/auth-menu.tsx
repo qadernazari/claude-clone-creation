@@ -8,7 +8,7 @@ import {
   PlayCircle,
   CreditCard,
   Ticket,
-  Languages,
+  Globe2,
   Shield,
   LogOut,
   ChevronRight,
@@ -18,7 +18,7 @@ import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState, useSubscription } from "@/hooks/use-subscription";
 
 export function AuthMenu() {
-  const { locale, setLocale } = useLocale();
+  const { locale, region, setRegion } = useLocale();
   const fa = locale === "fa";
   const { user, isLoading: isUserLoading } = useCurrentUserState();
   const { subscription, trial, isTrialActive, isTrialExpired } = useSubscription();
@@ -262,8 +262,8 @@ export function AuthMenu() {
     (fa ? "حساب" : "Account");
   const initial = (user.user_metadata?.full_name || user.email || "?")[0]?.toUpperCase();
 
-  const switchLanguage = () => {
-    setLocale(fa ? "en" : "fa");
+  const switchRegion = () => {
+    setRegion(region === "iran" ? "global" : "iran");
     setOpen(false);
   };
 
@@ -439,15 +439,15 @@ export function AuthMenu() {
               />
               <button
                 type="button"
-                onClick={switchLanguage}
+                onClick={switchRegion}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] active:bg-cream/[8%]"
               >
                 <span className="auth-menu-row-icon">
-                  <Languages size={17} strokeWidth={1.6} />
+                  <Globe2 size={17} strokeWidth={1.6} />
                 </span>
-                <span className="flex-1">{fa ? "زبان" : "Language"}</span>
-                <span className="text-[12px] uppercase tracking-widest text-cream/45">
-                  {fa ? "EN" : "فا"}
+                <span className="flex-1">{fa ? "منطقه" : "Region"}</span>
+                <span className="text-[12px] font-semibold text-cream/45" lang={region === "iran" ? "fa" : "en"}>
+                  {region === "iran" ? "ایران" : "Global"}
                 </span>
               </button>
             </Section>

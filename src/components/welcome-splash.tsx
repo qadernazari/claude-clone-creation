@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocale, type Locale, type Region } from "../lib/i18n";
+import { useLocale, type Region } from "../lib/i18n";
 import { Logo } from "./logo";
 
 const STORAGE_SEEN = "iran_splash_seen";
@@ -11,7 +11,7 @@ const STORAGE_SEEN = "iran_splash_seen";
  * in the header can still flip locales independently.
  */
 export function WelcomeSplash() {
-  const { setLocale, setRegion } = useLocale();
+  const { setRegion } = useLocale();
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -43,8 +43,7 @@ export function WelcomeSplash() {
 
   if (!visible) return null;
 
-  const choose = (locale: Locale, region: Region) => {
-    setLocale(locale);
+  const choose = (region: Region) => {
     setRegion(region);
     try {
       window.localStorage.setItem(STORAGE_SEEN, "1");
@@ -105,7 +104,7 @@ export function WelcomeSplash() {
         <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4">
           <button
             type="button"
-            onClick={() => choose("fa", "iran")}
+            onClick={() => choose("iran")}
             className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
           >
             <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
@@ -122,7 +121,7 @@ export function WelcomeSplash() {
 
           <button
             type="button"
-            onClick={() => choose("en", "global")}
+            onClick={() => choose("global")}
             className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
           >
             <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">

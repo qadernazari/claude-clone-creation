@@ -50,8 +50,19 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   // Hydrate from localStorage on the client only
   useEffect(() => {
-    setLocaleState(readInitialLocale());
-    setRegionState(readInitialRegion());
+    const storedRegion = window.localStorage.getItem(STORAGE_REGION);
+    const initialRegion = storedRegion === "global" || storedRegion === "iran"
+      ? storedRegion
+      : readInitialLocale() === "fa"
+        ? "iran"
+        : "global";
+    const initialLocale = initialRegion === "iran" ? "fa" : "en";
+    setRegionState(initialRegion);
+    setLocaleState(initialLocale);
+    try {
+      window.localStorage.setItem(STORAGE_REGION, initialRegion);
+      window.localStorage.setItem(STORAGE_LANG, initialLocale);
+    } catch {}
   }, []);
 
   // Reflect locale on <html>
@@ -60,6 +71,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     const html = document.documentElement;
     html.lang = locale;
     html.dir = locale === "fa" ? "rtl" : "ltr";
+    html.dataset.region = locale === "fa" ? "iran" : "global";
   }, [locale]);
 
   const setLocale = useCallback((l: Locale) => {
@@ -75,6 +87,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
       if (typeof document !== "undefined") {
         const html = document.documentElement;
+        html.dataset.region = l === "fa" ? "iran" : "global";
         const doc = document as Document & {
           startViewTransition?: (cb: () => void) => unknown;
         };
@@ -111,9 +124,17 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setRegion = useCallback((r: Region) => {
+    const pairedLocale: Locale = r === "iran" ? "fa" : "en";
     setRegionState(r);
+    setLocaleState(pairedLocale);
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = pairedLocale;
+      document.documentElement.dir = pairedLocale === "fa" ? "rtl" : "ltr";
+      document.documentElement.dataset.region = r;
+    }
     try {
       window.localStorage.setItem(STORAGE_REGION, r);
+      window.localStorage.setItem(STORAGE_LANG, pairedLocale);
     } catch {}
   }, []);
 
