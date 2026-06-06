@@ -478,7 +478,7 @@ function AuthPage() {
                 </button>
               </div>
 
-              {mode === "signin" && (
+              {mode === "signin" && method === "email" && (
                 <div className="mt-3 text-center">
                   <Link
                     to="/reset-password"
