@@ -495,7 +495,7 @@ function AuthPage() {
             </>
           ) : (
             <VerifyView
-              email={email}
+              email={method === "phone" ? normalizePhone(phone) : email}
               fa={fa}
               t={t}
               otp={otp}
