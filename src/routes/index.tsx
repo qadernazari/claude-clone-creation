@@ -70,14 +70,14 @@ export const Route = createFileRoute("/")({
               as: "image" as const,
               href: loaderData.featured.mobile_cover_url || loaderData.featured.cover_url || loaderData.featured.thumbnail_url || "",
               media: "(max-width: 767px)" as const,
-              fetchpriority: "high" as const,
+              fetchPriority: "high" as const,
             },
             {
               rel: "preload" as const,
               as: "image" as const,
               href: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
               media: "(min-width: 768px)" as const,
-              fetchpriority: "high" as const,
+              fetchPriority: "high" as const,
             },
           ]
         : []),
