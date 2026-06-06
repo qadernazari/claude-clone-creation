@@ -1,13 +1,47 @@
 import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Check, ChevronDown, Globe2, X } from "lucide-react";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { AuthMenu } from "./auth-menu";
 import { useSubscription } from "@/hooks/use-subscription";
 import { AcceptTrialButton } from "./accept-trial-button";
 import { TrialBanner } from "./trial-banner";
+
+function RegionGlobeIcon({ className = "", size = 18 }: { className?: string; size?: number }) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3c2.5 2.85 3.75 5.85 3.75 9S14.5 18.15 12 21c-2.5-2.85-3.75-5.85-3.75-9S9.5 5.85 12 3Z" />
+    </svg>
+  );
+}
+
+function RegionCheckIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 12.5l4.2 4L19 7" />
+    </svg>
+  );
+}
+
+function RegionChevronIcon() {
+  return (
+    <svg className="region-trigger-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+function RegionCloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}
 
 function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   const { locale, region, setRegion } = useLocale();
@@ -127,19 +161,19 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber/25 bg-amber/6 px-3 text-[12px] font-semibold text-amber-bright shadow-[0_10px_30px_-18px_rgba(240,215,140,0.55)] transition-colors active:bg-amber/12 md:hidden"
+        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-semibold transition-colors md:hidden"
       >
-        <Globe2 size={15} strokeWidth={1.7} className="text-amber" aria-hidden />
+        <RegionGlobeIcon size={15} className="region-trigger-icon" />
         <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
           {activeLabel}
         </span>
-        <ChevronDown size={14} strokeWidth={1.7} className="text-amber/70" aria-hidden />
+        <RegionChevronIcon />
       </button>
 
       {open && typeof document !== "undefined" && createPortal(
         <>
           <div
-            className="fixed inset-0 z-[100] bg-bg-0/80 animate-fade-in md:hidden"
+            className="region-sheet-backdrop fixed inset-0 z-[100] animate-fade-in md:hidden"
             onClick={() => setOpen(false)}
             onTouchMove={(event) => event.preventDefault()}
             aria-hidden
@@ -149,28 +183,28 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
             aria-modal="true"
             aria-labelledby={titleId}
             dir={fa ? "rtl" : "ltr"}
-            className="fixed inset-x-0 bottom-0 z-[110] overflow-hidden rounded-t-3xl border-t border-cream/10 bg-bg-1 shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.75)] animate-slide-up-sheet md:hidden"
+            className="region-sheet fixed inset-x-0 bottom-0 z-[110] overflow-hidden rounded-t-3xl shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.75)] animate-slide-up-sheet md:hidden"
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
           >
             <div className="flex min-h-9 items-center justify-center pt-2">
-              <span className="h-1 w-10 rounded-full bg-cream/20" aria-hidden />
+              <span className="region-sheet-handle h-1 w-10 rounded-full" aria-hidden />
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="absolute end-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/12 bg-cream/7 text-cream/85 active:bg-cream/12"
+              className="region-sheet-close absolute end-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full"
               aria-label={fa ? "بستن" : "Close"}
             >
-              <X size={18} strokeWidth={1.8} aria-hidden />
+              <RegionCloseIcon />
             </button>
             <div className="px-5 pb-2 pt-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-amber/80">
+              <p className="region-sheet-eyebrow text-[10px] font-semibold uppercase tracking-[0.24em]">
                 {fa ? "منطقه" : "Region"}
               </p>
               <h2 id={titleId} className="mt-2 text-[22px] font-display text-cream-bright">
                 {fa ? "تجربه تماشای خود را انتخاب کنید" : "Choose your viewing region"}
               </h2>
-              <p className="mt-2 max-w-[19rem] text-[13px] leading-6 text-cream/55">
+              <p className="region-sheet-copy mt-2 max-w-[19rem] text-[13px] leading-6">
                 {fa
                   ? "زبان، جهت صفحه، قیمت و روش پرداخت بر اساس منطقه تنظیم می‌شود."
                   : "Language, layout direction, pricing, and payment method update together."}
@@ -186,20 +220,18 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
                     dir={option.dir}
                     onClick={() => choose(option.key)}
                     aria-pressed={active}
-                    className={`flex min-h-[92px] w-full items-center gap-4 rounded-2xl border px-4 py-4 text-start transition-all duration-300 active:scale-[0.99] ${
-                      active
-                        ? "border-amber/45 bg-amber/10 text-cream-bright shadow-[0_18px_45px_-30px_rgba(240,215,140,0.8)]"
-                        : "border-cream/10 bg-bg-0/45 text-cream/82 active:bg-cream/5"
+                    className={`region-card flex min-h-[92px] w-full items-center gap-4 rounded-2xl px-4 py-4 text-start transition-all duration-300 active:scale-[0.99] ${
+                      active ? "region-card-active" : ""
                     }`}
                   >
-                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${active ? "border-amber/35 bg-amber/14 text-amber-bright" : "border-cream/10 bg-cream/5 text-cream/50"}`}>
-                      {active ? <Check size={18} strokeWidth={2} aria-hidden /> : <Globe2 size={18} strokeWidth={1.7} aria-hidden />}
+                    <span className={`region-card-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${active ? "region-card-icon-active" : ""}`}>
+                      {active ? <RegionCheckIcon /> : <RegionGlobeIcon />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span lang={option.key === "iran" ? "fa" : "en"} className={`block text-[17px] font-semibold ${option.key === "iran" ? "font-fa" : "font-display"}`}>
                         {option.title}
                       </span>
-                      <span lang={option.key === "iran" ? "fa" : "en"} className={`mt-1 block text-[13px] ${option.key === "iran" ? "font-fa" : ""} text-cream/68`}>
+                      <span lang={option.key === "iran" ? "fa" : "en"} className={`region-card-subtitle mt-1 block text-[13px] ${option.key === "iran" ? "font-fa" : ""}`}>
                         {option.subtitle}
                       </span>
                     </span>
