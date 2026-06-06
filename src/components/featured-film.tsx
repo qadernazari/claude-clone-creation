@@ -16,7 +16,34 @@ export function FeaturedFilm() {
   const [mobileHeroReady, setMobileHeroReady] = useState(!mobileImageForState);
 
   useEffect(() => {
-    setMobileHeroReady(!mobileImageForState);
+    if (!mobileImageForState) {
+      setMobileHeroReady(true);
+      return;
+    }
+
+    let cancelled = false;
+    const img = new Image();
+    const markReady = () => {
+      if (!cancelled) setMobileHeroReady(true);
+    };
+
+    setMobileHeroReady(false);
+    img.decoding = "async";
+    img.src = mobileImageForState;
+
+    if (img.complete && img.naturalWidth > 0) {
+      markReady();
+    } else {
+      img.onload = markReady;
+      img.onerror = markReady;
+      img.decode?.().then(markReady).catch(() => undefined);
+    }
+
+    return () => {
+      cancelled = true;
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [mobileImageForState]);
 
   if (!data) return <FeaturedFilmFallback />;
