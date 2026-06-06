@@ -78,14 +78,14 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
       key: "global" as const,
       title: "Global",
       subtitle: "English interface",
-      detail: "USD · International cards",
+      detail: "International payments",
       dir: "ltr" as const,
     },
     {
       key: "iran" as const,
       title: "ایران",
       subtitle: "رابط فارسی",
-      detail: "تومان · درگاه پرداخت ایرانی",
+      detail: "پرداخت داخل ایران",
       dir: "rtl" as const,
     },
   ];
@@ -129,13 +129,13 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-cream/15 bg-cream/[7%] px-3 text-[12px] font-semibold text-cream/90 shadow-[0_10px_30px_-18px_rgba(240,215,140,0.55)] transition-colors active:bg-cream/[12%] md:hidden"
+        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber/25 bg-amber/[6%] px-3 text-[12px] font-semibold text-amber-bright shadow-[0_10px_30px_-18px_rgba(240,215,140,0.55)] transition-colors active:bg-amber/[12%] md:hidden"
       >
-        <Globe2 size={15} strokeWidth={1.7} aria-hidden />
+        <Globe2 size={15} strokeWidth={1.7} className="text-amber" aria-hidden />
         <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
           {activeLabel}
         </span>
-        <ChevronDown size={14} strokeWidth={1.7} className="text-cream/55" aria-hidden />
+        <ChevronDown size={14} strokeWidth={1.7} className="text-amber/70" aria-hidden />
       </button>
 
       {open && typeof document !== "undefined" && createPortal(
