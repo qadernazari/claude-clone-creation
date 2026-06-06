@@ -27,7 +27,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
       preload="intent"
       className="group block w-[42vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1.5 md:group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
         {film.cover_url ? (
           <img
             src={film.cover_url}
