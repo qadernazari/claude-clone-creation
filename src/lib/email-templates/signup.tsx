@@ -53,5 +53,3 @@ const link = { color: '#0a0807', textDecoration: 'underline' }
 const codeStyle = { fontFamily: 'Menlo, Courier, monospace', fontSize: '32px', letterSpacing: '0.35em', fontWeight: 'bold' as const, color: '#0a0807', margin: '8px 0 20px' }
 const hint = { fontSize: '13px', color: '#666', lineHeight: '1.6', margin: '0 0 16px' }
 const footer = { fontSize: '12px', color: '#999', margin: '24px 0 0' }
-// Keep Button import side-effect safe
-const _btn = Button
