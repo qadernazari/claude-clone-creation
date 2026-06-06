@@ -27,7 +27,6 @@ export const Route = createFileRoute("/auth")({
 
 type Step = "credentials" | "verify";
 type Mode = "signin" | "signup";
-type Method = "email" | "phone";
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -36,15 +35,12 @@ function AuthPage() {
   const fa = locale === "fa";
 
   const [mode, setMode] = useState<Mode>("signin");
-  const [method, setMethod] = useState<Method>("email");
   const [step, setStep] = useState<Step>("credentials");
 
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pwError, setPwError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,10 +85,6 @@ function AuthPage() {
         ? "حساب جدید بسازید و تماشا را شروع کنید."
         : "Create your account to start watching.",
       email: fa ? "ایمیل" : "Email address",
-      phone: fa ? "شماره موبایل" : "Phone number",
-      phoneHelp: fa ? "با کد کشور، مثلاً +989123456789" : "Include country code, e.g. +14155552671",
-      methodEmail: fa ? "ایمیل" : "Email",
-      methodPhone: fa ? "موبایل" : "Phone",
       password: fa ? "رمز عبور" : "Password",
       continueBtn: fa ? "ادامه" : "Continue",
       signin: fa ? "ورود" : "Sign in",
@@ -104,27 +96,22 @@ function AuthPage() {
         ? "با ادامه، شرایط استفاده و سیاست حریم خصوصی را می‌پذیرید."
         : "By continuing, you agree to our Terms and Privacy Policy.",
       invalidEmail: fa ? "ایمیل معتبر وارد کنید." : "Please enter a valid email address.",
-      invalidPhone: fa ? "شماره معتبر با کد کشور وارد کنید." : "Enter a valid phone number with country code.",
       shortPw: fa ? "رمز باید حداقل ۸ نویسه باشد." : "Password must be at least 8 characters.",
       hasAccount: fa ? "حساب دارید؟" : "Already have an account?",
       noAccount: fa ? "حساب ندارید؟" : "Don't have an account?",
       forgot: fa ? "رمز را فراموش کرده‌اید؟" : "Forgot password?",
       // OTP
-      verifyTitle: fa
-        ? method === "phone" ? "شماره خود را تأیید کنید" : "ایمیل خود را تأیید کنید"
-        : method === "phone" ? "Verify your phone" : "Verify your email",
+      verifyTitle: fa ? "ایمیل خود را تأیید کنید" : "Verify your email",
       verifySub: fa ? "کد ۶ رقمی ارسال‌شده را وارد کنید:" : "Enter the 6-digit code we sent to:",
       verifyBtn: fa ? "تأیید" : "Verify",
       verifying: fa ? "در حال تأیید…" : "Verifying…",
       resend: fa ? "ارسال مجدد کد" : "Resend code",
       resendIn: (n: number) => (fa ? `ارسال مجدد در ${n} ثانیه` : `Resend in ${n}s`),
       resent: fa ? "کد دوباره ارسال شد" : "Code resent",
-      changeEmail: fa
-        ? method === "phone" ? "تغییر شماره" : "تغییر ایمیل"
-        : method === "phone" ? "Use a different number" : "Use a different email",
+      changeEmail: fa ? "تغییر ایمیل" : "Use a different email",
       otpInvalid: fa ? "کد ۶ رقمی را وارد کنید." : "Enter the 6-digit code.",
     }),
-    [fa, method],
+    [fa],
   );
 
   function humanizeError(message: string): string {
@@ -134,9 +121,6 @@ function AuthPage() {
     }
     if (m.includes("user already registered") || m.includes("already exists")) {
       return fa ? "این ایمیل قبلاً ثبت شده است. وارد شوید." : "This email is already registered. Try signing in.";
-    }
-    if (m.includes("signups not allowed") || m.includes("otp_disabled")) {
-      return fa ? "ثبت‌نام با شماره تلفن هنوز فعال نیست." : "Phone signups are not enabled yet.";
     }
     if (m.includes("token has expired") || m.includes("invalid token") || m.includes("otp")) {
       return fa ? "کد نامعتبر یا منقضی شده است." : "That code is invalid or expired.";
@@ -151,34 +135,12 @@ function AuthPage() {
   }
 
   const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-  const normalizePhone = (v: string) => "+" + v.replace(/[^\d]/g, "");
-  const validatePhone = (v: string) => /^\+[1-9]\d{6,14}$/.test(normalizePhone(v));
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setEmailError(null);
-    setPhoneError(null);
     setPwError(null);
-
-    if (method === "phone") {
-      if (!validatePhone(phone)) return setPhoneError(t.invalidPhone);
-      setLoading(true);
-      try {
-        const { error } = await supabase.auth.signInWithOtp({
-          phone: normalizePhone(phone),
-          options: { shouldCreateUser: true },
-        });
-        if (error) throw error;
-        setStep("verify");
-        setResendCooldown(30);
-      } catch (err) {
-        setError(humanizeError(err instanceof Error ? err.message : String(err)));
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
 
     if (!validateEmail(email)) return setEmailError(t.invalidEmail);
     if (password.length < 8) return setPwError(t.shortPw);
@@ -190,7 +152,6 @@ function AuthPage() {
           password,
         });
         if (error) {
-          // If email not confirmed, jump to OTP step and resend code
           if (/email not confirmed/i.test(error.message)) {
             await sendSignupOtp();
             setStep("verify");
@@ -199,7 +160,6 @@ function AuthPage() {
           }
           throw error;
         }
-        // onAuthStateChange will redirect
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -209,7 +169,6 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        // If user already exists but confirmed, signUp returns identities=[] (Supabase quirk)
         if (data.user && data.user.identities && data.user.identities.length === 0) {
           throw new Error("User already registered");
         }
@@ -234,31 +193,16 @@ function AuthPage() {
     if (error) throw error;
   }
 
-  async function sendPhoneOtp() {
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: normalizePhone(phone),
-      options: { shouldCreateUser: true },
-    });
-    if (error) throw error;
-  }
-
   async function handleVerify(code: string) {
     setError(null);
     setVerifying(true);
     try {
-      const { error } = method === "phone"
-        ? await supabase.auth.verifyOtp({
-            phone: normalizePhone(phone),
-            token: code,
-            type: "sms",
-          })
-        : await supabase.auth.verifyOtp({
-            email: email.trim(),
-            token: code,
-            type: "email",
-          });
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: code,
+        type: "email",
+      });
       if (error) throw error;
-      // onAuthStateChange redirects on success
     } catch (err) {
       setError(humanizeError(err instanceof Error ? err.message : String(err)));
       setOtp("");
@@ -272,8 +216,7 @@ function AuthPage() {
     setResending(true);
     setError(null);
     try {
-      if (method === "phone") await sendPhoneOtp();
-      else await sendSignupOtp();
+      await sendSignupOtp();
       setResendCooldown(30);
       setJustResent(true);
       window.setTimeout(() => setJustResent(false), 2500);
@@ -342,100 +285,52 @@ function AuthPage() {
                 </p>
               </div>
 
-              <div className="mt-8 grid grid-cols-2 gap-1 p-1 rounded-full border border-cream/12 bg-cream/[0.02]">
-                {(["email", "phone"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => {
-                      setMethod(m);
-                      setError(null);
-                      setEmailError(null);
-                      setPhoneError(null);
-                      setPwError(null);
-                    }}
-                    className={`h-9 rounded-full text-[13px] font-medium transition-all ${
-                      method === m
-                        ? "bg-cream text-ink"
-                        : "text-cream/60 hover:text-cream"
-                    }`}
-                  >
-                    {m === "email" ? t.methodEmail : t.methodPhone}
-                  </button>
-                ))}
-              </div>
-
-              <form onSubmit={handleCredentials} className="mt-5 space-y-4" noValidate>
+              <form onSubmit={handleCredentials} className="mt-8 space-y-4" noValidate>
                 <fieldset disabled={loading} className="space-y-3">
-                  {method === "email" ? (
-                    <>
-                      <FloatingInput
-                        id="email"
-                        type="email"
-                        label={t.email}
-                        value={email}
-                        onChange={(v) => {
-                          setEmail(v);
-                          if (emailError) setEmailError(null);
-                        }}
-                        onBlur={() => {
-                          if (email && !validateEmail(email)) setEmailError(t.invalidEmail);
-                        }}
-                        autoComplete="email"
-                        inputMode="email"
-                        enterKeyHint="next"
-                        required
-                        error={emailError}
-                      />
-                      <FloatingInput
-                        id="password"
-                        type={showPw ? "text" : "password"}
-                        label={t.password}
-                        value={password}
-                        onChange={(v) => {
-                          setPassword(v);
-                          if (pwError) setPwError(null);
-                        }}
-                        autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                        enterKeyHint="go"
-                        required
-                        error={pwError}
-                        trailing={
-                          <button
-                            type="button"
-                            onClick={() => setShowPw((v) => !v)}
-                            aria-label={showPw ? "Hide password" : "Show password"}
-                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
-                          >
-                            {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <FloatingInput
-                        id="phone"
-                        type="tel"
-                        label={t.phone}
-                        value={phone}
-                        onChange={(v) => {
-                          setPhone(v);
-                          if (phoneError) setPhoneError(null);
-                        }}
-                        onBlur={() => {
-                          if (phone && !validatePhone(phone)) setPhoneError(t.invalidPhone);
-                        }}
-                        autoComplete="tel"
-                        inputMode="tel"
-                        enterKeyHint="go"
-                        required
-                        error={phoneError}
-                      />
-                      <p className="px-1 text-[11.5px] text-cream/40">{t.phoneHelp}</p>
-                    </>
-                  )}
+                  <FloatingInput
+                    id="email"
+                    type="email"
+                    label={t.email}
+                    value={email}
+                    onChange={(v) => {
+                      setEmail(v);
+                      if (emailError) setEmailError(null);
+                    }}
+                    onBlur={() => {
+                      if (email && !validateEmail(email)) setEmailError(t.invalidEmail);
+                    }}
+                    autoComplete="email"
+                    inputMode="email"
+                    enterKeyHint="next"
+                    required
+                    error={emailError}
+                  />
+                  <FloatingInput
+                    id="password"
+                    type={showPw ? "text" : "password"}
+                    label={t.password}
+                    value={password}
+                    onChange={(v) => {
+                      setPassword(v);
+                      if (pwError) setPwError(null);
+                    }}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    enterKeyHint="go"
+                    required
+                    error={pwError}
+                    trailing={
+                      <button
+                        type="button"
+                        onClick={() => setShowPw((v) => !v)}
+                        aria-label={showPw ? "Hide password" : "Show password"}
+                        className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
+                      >
+                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    }
+                  />
                 </fieldset>
+
 
 
                 {error && (
@@ -481,7 +376,7 @@ function AuthPage() {
                 </button>
               </div>
 
-              {mode === "signin" && method === "email" && (
+              {mode === "signin" && (
                 <div className="mt-3 text-center">
                   <Link
                     to="/reset-password"
@@ -492,13 +387,14 @@ function AuthPage() {
                 </div>
               )}
 
+
               <p className="mt-8 text-center text-[11px] leading-relaxed text-cream/30 px-4">
                 {t.terms}
               </p>
             </>
           ) : (
             <VerifyView
-              email={method === "phone" ? normalizePhone(phone) : email}
+              email={email}
               fa={fa}
               t={t}
               otp={otp}
