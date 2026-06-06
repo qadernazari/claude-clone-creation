@@ -116,11 +116,11 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
             >
               <svg
                 width="17"
@@ -137,15 +137,11 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 <path d="m20 20-3.5-3.5" />
               </svg>
             </Link>
-            <div className="hidden md:block">
-              <RegionToggle />
-            </div>
-            <div className="md:hidden">
-              <RegionToggle />
-            </div>
+            <RegionToggle />
             <MembershipCta />
             <AuthMenu />
           </div>
+
         </div>
         <TrialBanner />
       </header>
