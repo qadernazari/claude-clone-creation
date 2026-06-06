@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text,
+  Body, Container, Head, Heading, Html, Link, Preview, Section, Text,
 } from '@react-email/components'
 
 interface SignupEmailProps {
