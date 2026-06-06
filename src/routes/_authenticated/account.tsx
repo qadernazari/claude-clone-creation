@@ -60,7 +60,7 @@ type Contribution = {
 };
 
 function AccountPage() {
-  const { locale, num, dir, setLocale } = useLocale();
+  const { locale, num, dir, setLocale, region, setRegion } = useLocale();
   const fa = locale === "fa";
   const qc = useQueryClient();
 
