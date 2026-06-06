@@ -70,7 +70,7 @@ export function CollectionsGrid() {
               to="/browse"
               className="group block"
             >
-              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
+              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1 md:group-hover:ring-cream/20">
                 {tile.art ? (
                   <img
                     src={tile.art}
