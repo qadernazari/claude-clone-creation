@@ -100,13 +100,17 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
       aria-modal="true"
       dir={dir}
     >
+      {/* Solid backdrop — no fade so the home page never shows through during open */}
       <button
         type="button"
         aria-label={fa ? "بستن" : "Close"}
         onClick={onClose}
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+        className="absolute inset-0 bg-bg-0"
       />
-      <div className="relative my-0 md:my-10 w-full md:max-w-3xl bg-bg-0 md:rounded-2xl md:border border-line shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-300">
+      <div
+        key={slug}
+        className="relative my-0 md:my-10 w-full md:max-w-3xl bg-bg-0 md:rounded-2xl md:border border-line shadow-2xl overflow-hidden flex flex-col animate-in fade-in duration-150"
+      >
         <button
           type="button"
           onClick={onClose}
