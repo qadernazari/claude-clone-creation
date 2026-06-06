@@ -78,6 +78,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         const doc = document as Document & {
           startViewTransition?: (cb: () => void) => unknown;
         };
+        const isMobileSafariPath = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+
+        // Real iPhone Safari can drop composited hero images during root view
+        // transitions. On mobile, flip language/RTL synchronously so the poster
+        // layer never disappears into a black snapshot.
+        if (isMobileSafariPath) {
+          html.lang = l;
+          html.dir = l === "fa" ? "rtl" : "ltr";
+          return l;
+        }
 
         // Prefer the View Transitions API: a true cross-fade between LTR/RTL snapshots.
         if (typeof doc.startViewTransition === "function") {
