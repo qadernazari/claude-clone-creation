@@ -135,6 +135,9 @@ function AuthPage() {
     if (m.includes("user already registered") || m.includes("already exists")) {
       return fa ? "این ایمیل قبلاً ثبت شده است. وارد شوید." : "This email is already registered. Try signing in.";
     }
+    if (m.includes("signups not allowed") || m.includes("otp_disabled")) {
+      return fa ? "ثبت‌نام با شماره تلفن هنوز فعال نیست." : "Phone signups are not enabled yet.";
+    }
     if (m.includes("token has expired") || m.includes("invalid token") || m.includes("otp")) {
       return fa ? "کد نامعتبر یا منقضی شده است." : "That code is invalid or expired.";
     }
@@ -164,7 +167,7 @@ function AuthPage() {
       try {
         const { error } = await supabase.auth.signInWithOtp({
           phone: normalizePhone(phone),
-          options: { shouldCreateUser: mode === "signup" },
+          options: { shouldCreateUser: true },
         });
         if (error) throw error;
         setStep("verify");
