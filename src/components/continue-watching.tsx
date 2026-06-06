@@ -80,9 +80,12 @@ export function ContinueWatching() {
     <section className="relative" style={{ contentVisibility: "auto", containIntrinsicSize: "1px 320px" }}>
       <div className="mx-auto max-w-[1400px] px-5 md:px-12">
         <div className="mb-5 md:mb-7">
-          <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+          <span className="hidden text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40 md:block">
             {fa ? "ادامه‌ی تماشا" : "Continue Watching"}
           </span>
+          <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:hidden">
+            {fa ? "ادامه‌ی تماشا" : "Continue Watching"}
+          </h2>
         </div>
       </div>
       <div

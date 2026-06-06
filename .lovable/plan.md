@@ -1,51 +1,37 @@
-# Launch Sweep Plan
+## Problem
 
-I'll execute this in 4 phases across separate turns so each turn stays stable and reviewable. After each phase you can test, then say "continue" for the next.
+On mobile, every section renders two headings that say the same thing:
 
-## Phase 1 — User Library & Watch (this turn)
-The biggest user-facing gap today. After this, members and PPV buyers have a real "home" inside the product.
+- A small uppercase eyebrow (e.g. `IRANIAN ORIGINALS`, `NEW RELEASES`, `COLLECTIONS`, `CONTINUE WATCHING`)
+- The real `<h2>` title right below it (e.g. `Iranian Originals`)
 
-- **My Library** route (`/library`) replacing/extending `My Tickets` with tabs:
-  - Continue Watching (resume from last position)
-  - Watchlist / Favorites
-  - Purchased (active PPV tickets)
-  - Membership catalog shortcut
-  - Watch history
-  - Expired tickets
-- DB additions: `watch_progress`, `watchlist` tables with RLS + GRANTs
-- Server fns: `getLibrary`, `toggleWatchlist`, `upsertWatchProgress`
-- Hook watch page to write progress every ~10s
-- Add "Add to Watchlist" + "Continue Watching" badges on film cards/detail
+This duplicates the section name and crowds the mobile layout. Desktop has more room and the eyebrow looks intentional there, so it should stay.
 
-## Phase 2 — Video Player & Film Detail polish
-- Custom controls overlay (play/pause, scrub, volume, fullscreen, subtitles, speed, quality if HLS)
-- Resume-from-position dialog
-- Subtitle track switching (uses existing `subtitles` field)
-- Mobile gestures, keyboard shortcuts, error/loading states
-- Film detail: clearer access badge (Included / Premium / PPV / Free), trailer modal, cast & crew section, "More like this" rail
+## Fix
 
-## Phase 3 — Admin Dashboard depth
-- Overview KPIs (MRR, active subs, trials, churn, PPV sales, refunds, failed payments) backed by real queries
-- Film access controls (membership inclusion toggle, PPV price USD/IRR, region, age rating, scheduled publish)
-- Coupons / promo codes table + Stripe coupon sync
-- Analytics (watch time, top films, search terms, country/device)
-- Activity log table
-- Admin roles already exist; add audit trail
+Keep one clean title on mobile, keep the eyebrow on desktop. No copy changes, no layout restructure — just hide the eyebrow under `md`.
 
-## Phase 4 — Trust, Email, Legal, Edge cases
-- Legal pages (Terms, Privacy, Cookies, Refund, DMCA, Copyright, Filmmaker terms) editable via existing CMS
-- Email templates: trial-started, trial-ending, payment-failed, subscription-cancelled, premium-purchase, refund, welcome
-- Trial countdown + cancel/refund flows in account
-- Empty / error / loading state pass across the app
-- RTL Persian audit
-- Security scan + linter fixes before publish
+### Files to update
 
-## What this turn ships
-Just Phase 1 (Library + watch progress + watchlist). I will:
-1. Create migration for `watch_progress` + `watchlist`
-2. Add server fns and hook
-3. Build `/library` route with tabbed UI
-4. Wire watch page to record progress
-5. Add Watchlist/Continue Watching surfaces on home + film detail
+1. **`src/components/films-row.tsx`** (Rail header)
+   - The `<span>` rendering `eyebrow` ("Iranian Originals" / "Iranian Originals" / "Collection" / "New Releases") → add `hidden md:block` so it only shows from `md` up.
 
-Reply **continue** after testing to move to Phase 2.
+2. **`src/components/collections-grid.tsx`**
+   - The `<span>` rendering "Collections" / "مجموعه‌ها" above the `Curated collections` h2 → add `hidden md:block`.
+
+3. **`src/components/continue-watching.tsx`**
+   - If it renders an uppercase eyebrow above its title, hide it on mobile the same way. (Will verify the exact markup when implementing.)
+
+4. **Any other section with the same pattern** (e.g. browse page section headers, featured rails) — audit during implementation and apply the same `hidden md:block` rule to the eyebrow `<span>` only. The h2 stays visible on all viewports.
+
+### What stays the same
+
+- Desktop (`md` and up) is unchanged — eyebrow + title as today.
+- Titles, spacing scale, font sizes, and RTL/LTR behavior are untouched.
+- No changes to data, i18n strings, or component structure.
+
+### Out of scope
+
+- No redesign of the section header.
+- No changes to card layout or rails themselves.
+- No copy edits to titles or eyebrows.
