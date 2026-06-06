@@ -86,7 +86,7 @@ function AuthPage() {
         : "Create your account to start watching.",
       email: fa ? "ایمیل" : "Email address",
       password: fa ? "رمز عبور" : "Password",
-      signinBtn: fa ? "ورود" : "Sign in",
+      continueBtn: fa ? "ادامه" : "Continue",
       signin: fa ? "ورود" : "Sign in",
       signup: fa ? "ساخت حساب" : "Create account",
       sending: fa ? "در حال ارسال…" : "Sending…",
