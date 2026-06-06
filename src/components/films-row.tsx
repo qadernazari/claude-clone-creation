@@ -27,7 +27,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
       preload="intent"
       className="group block w-[42vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1.5 md:group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
         {film.cover_url ? (
           <img
             src={film.cover_url}
@@ -45,9 +45,9 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
             aria-hidden
           />
         )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 md:group-hover:opacity-100" />
         {/* Consistent hairline border on top of the image so it never washes out against light areas or gets clipped by overflow */}
-        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/15 transition-[--tw-ring-color] duration-500 group-hover:ring-white/30" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/15 transition-[--tw-ring-color] duration-500 md:group-hover:ring-white/30" aria-hidden />
       </div>
       <div className="mt-3 px-0.5 md:mt-4">
         <h3 className="font-display text-[13px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors line-clamp-1 md:text-[14px]">
