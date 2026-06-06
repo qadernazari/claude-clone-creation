@@ -137,11 +137,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </svg>
             </Link>
             <div className="hidden md:block">
-              <LanguageToggle />
+              <RegionToggle />
             </div>
-            {/* Compact language toggle on mobile (hamburger is gone — nav lives in the bottom tab bar) */}
             <div className="md:hidden">
-              <LanguageToggle />
+              <RegionToggle />
             </div>
             <MembershipCta />
             <AuthMenu />
