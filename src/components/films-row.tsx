@@ -32,6 +32,8 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
           <img
             src={film.cover_url}
             alt=""
+            width={520}
+            height={780}
             loading="lazy"
             decoding="async"
             fetchPriority="low"
