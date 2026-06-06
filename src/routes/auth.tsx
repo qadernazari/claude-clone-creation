@@ -109,7 +109,7 @@ function AuthPage() {
       resendIn: (n: number) => (fa ? `ارسال مجدد در ${n} ثانیه` : `Resend in ${n}s`),
       resent: fa ? "کد دوباره ارسال شد" : "Code resent",
       changeEmail: fa ? "تغییر ایمیل" : "Use a different email",
-      otpInvalid: fa ? "کد ۶ رقمی را وارد کنید." : "Enter the 6-digit code.",
+      otpInvalid: fa ? "کد ۸ رقمی را وارد کنید." : "Enter the 8-digit code.",
     }),
     [fa],
   );
@@ -466,16 +466,16 @@ function VerifyView({
     return () => window.clearTimeout(id);
   }, []);
 
-  // Auto-submit once 6 digits are entered
+  // Auto-submit once 8 digits are entered
   useEffect(() => {
-    if (otp.length === 6 && !verifying && submittedFor.current !== otp) {
+    if (otp.length === 8 && !verifying && submittedFor.current !== otp) {
       submittedFor.current = otp;
       onVerify(otp);
     }
   }, [otp, verifying, onVerify]);
 
-  const digits = Array.from({ length: 6 }, (_, i) => otp[i] ?? "");
-  const activeIndex = Math.min(otp.length, 5);
+  const digits = Array.from({ length: 8 }, (_, i) => otp[i] ?? "");
+  const activeIndex = Math.min(otp.length, 7);
 
   return (
     <div className={`text-center ${fa ? "font-fa" : ""}`}>
@@ -498,12 +498,12 @@ function VerifyView({
           inputMode="numeric"
           autoComplete="one-time-code"
           pattern="[0-9]*"
-          maxLength={6}
+          maxLength={8}
           value={otp}
           onChange={(e) => {
-            const v = e.target.value.replace(/\D/g, "").slice(0, 6);
+            const v = e.target.value.replace(/\D/g, "").slice(0, 8);
             setOtp(v);
-            if (v.length < 6) submittedFor.current = "";
+            if (v.length < 8) submittedFor.current = "";
           }}
           disabled={verifying}
           aria-label="Verification code"
@@ -518,7 +518,7 @@ function VerifyView({
                 key={i}
                 className={[
                   "relative flex items-center justify-center",
-                  "h-12 w-10 sm:h-14 sm:w-12 rounded-xl border text-[20px] font-semibold tabular-nums transition-all duration-150",
+                  "h-12 w-9 sm:h-14 sm:w-11 rounded-xl border text-[18px] sm:text-[20px] font-semibold tabular-nums transition-all duration-150",
                   filled
                     ? "border-cream/60 bg-cream/[0.04] text-cream"
                     : "border-cream/12 text-cream/40",
