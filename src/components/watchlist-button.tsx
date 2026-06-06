@@ -95,7 +95,8 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
       type="button"
       onClick={onClick}
       disabled={pending}
-      className={`inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/4 px-4 py-2 text-sm text-cream/85 hover:border-cream/40 hover:text-cream-bright transition-colors disabled:opacity-50 ${className}`}
+      style={{ backgroundColor: "rgba(255, 255, 255, 0.04)" }}
+      className={`inline-flex items-center gap-2 rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/85 hover:border-cream/40 hover:text-cream-bright transition-colors disabled:opacity-50 ${className}`}
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill={added ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" aria-hidden>
         <path d="M5 3h14a1 1 0 0 1 1 1v17l-8-4.5L4 21V4a1 1 0 0 1 1-1z" />
