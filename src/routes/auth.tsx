@@ -466,16 +466,16 @@ function VerifyView({
     return () => window.clearTimeout(id);
   }, []);
 
-  // Auto-submit once 6 digits are entered
+  // Auto-submit once 8 digits are entered
   useEffect(() => {
-    if (otp.length === 6 && !verifying && submittedFor.current !== otp) {
+    if (otp.length === 8 && !verifying && submittedFor.current !== otp) {
       submittedFor.current = otp;
       onVerify(otp);
     }
   }, [otp, verifying, onVerify]);
 
-  const digits = Array.from({ length: 6 }, (_, i) => otp[i] ?? "");
-  const activeIndex = Math.min(otp.length, 5);
+  const digits = Array.from({ length: 8 }, (_, i) => otp[i] ?? "");
+  const activeIndex = Math.min(otp.length, 7);
 
   return (
     <div className={`text-center ${fa ? "font-fa" : ""}`}>
@@ -498,12 +498,12 @@ function VerifyView({
           inputMode="numeric"
           autoComplete="one-time-code"
           pattern="[0-9]*"
-          maxLength={6}
+          maxLength={8}
           value={otp}
           onChange={(e) => {
-            const v = e.target.value.replace(/\D/g, "").slice(0, 6);
+            const v = e.target.value.replace(/\D/g, "").slice(0, 8);
             setOtp(v);
-            if (v.length < 6) submittedFor.current = "";
+            if (v.length < 8) submittedFor.current = "";
           }}
           disabled={verifying}
           aria-label="Verification code"
