@@ -25,7 +25,7 @@ export const SignupEmail = ({
           <Text style={text}>
             Welcome to{' '}
             <Link href={siteUrl} style={link}><strong>{siteName}</strong></Link>
-            . Enter this 6-digit code to confirm <strong>{recipient}</strong>{' '}
+            . Enter this code to confirm <strong>{recipient}</strong>{' '}
             and start streaming independent Iranian cinema.
           </Text>
           {token && <Text style={codeStyle}>{token}</Text>}
