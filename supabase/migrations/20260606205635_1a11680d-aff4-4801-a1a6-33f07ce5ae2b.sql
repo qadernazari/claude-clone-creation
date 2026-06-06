@@ -1,0 +1,1 @@
+UPDATE public.tickets SET expires_at = NULL WHERE status = 'paid';
