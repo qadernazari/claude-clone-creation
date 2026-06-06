@@ -173,7 +173,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
       {open && typeof document !== "undefined" && createPortal(
         <>
           <div
-            className="fixed inset-0 z-[100] bg-bg-0/80 animate-fade-in md:hidden"
+            className="region-sheet-backdrop fixed inset-0 z-[100] animate-fade-in md:hidden"
             onClick={() => setOpen(false)}
             onTouchMove={(event) => event.preventDefault()}
             aria-hidden
