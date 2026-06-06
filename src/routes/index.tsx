@@ -44,7 +44,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://ir.show/" },
-      ...(loaderData?.featured?.thumbnail_url || loaderData?.featured?.cover_url
+      ...(loaderData?.featured?.thumbnail_url || loaderData?.featured?.cover_url || loaderData?.featured?.mobile_cover_url
         ? [
             {
               rel: "preload" as const,
