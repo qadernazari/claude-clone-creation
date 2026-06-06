@@ -114,6 +114,8 @@ export function ContinueWatching() {
                   <img
                     src={f.thumbnail_url || f.cover_url || ""}
                     alt=""
+                    width={800}
+                    height={450}
                     loading="lazy"
                     decoding="async"
                     className="cine-img absolute inset-0 h-full w-full object-cover"
