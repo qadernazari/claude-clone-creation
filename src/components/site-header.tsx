@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
@@ -51,9 +51,50 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   const fa = locale === "fa";
   const lg = size === "lg";
 
+  const sheetRef = useRef<HTMLDivElement | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const dragCurrentY = useRef(0);
+  const dragging = useRef(false);
+
   const choose = (next: "global" | "iran") => {
     setRegion(next);
     setOpen(false);
+  };
+
+  const onDragStart = (e: React.TouchEvent | React.PointerEvent) => {
+    const y = "touches" in e ? e.touches[0].clientY : e.clientY;
+    dragStartY.current = y;
+    dragCurrentY.current = 0;
+    dragging.current = true;
+    if (sheetRef.current) sheetRef.current.style.transition = "none";
+  };
+
+  const onDragMove = (e: React.TouchEvent | React.PointerEvent) => {
+    if (!dragging.current || dragStartY.current == null) return;
+    const y = "touches" in e ? e.touches[0].clientY : e.clientY;
+    const dy = Math.max(0, y - dragStartY.current);
+    dragCurrentY.current = dy;
+    if (sheetRef.current) {
+      sheetRef.current.style.transform = `translateY(${dy}px)`;
+    }
+  };
+
+  const onDragEnd = () => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const dy = dragCurrentY.current;
+    const el = sheetRef.current;
+    if (el) {
+      el.style.transition = "transform 240ms cubic-bezier(0.22, 1, 0.36, 1)";
+      if (dy > 90) {
+        const h = el.getBoundingClientRect().height || 600;
+        el.style.transform = `translateY(${h}px)`;
+        window.setTimeout(() => setOpen(false), 200);
+      } else {
+        el.style.transform = "translateY(0)";
+      }
+    }
+    dragStartY.current = null;
   };
 
   useEffect(() => {
@@ -179,6 +220,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
             aria-hidden
           />
           <div
+            ref={sheetRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
@@ -186,8 +228,27 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
             className="region-sheet fixed inset-x-0 bottom-0 z-[110] overflow-hidden rounded-t-3xl shadow-[0_-30px_80px_-20px_rgba(0,0,0,0.75)] animate-slide-up-sheet md:hidden"
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
           >
-            <div className="flex min-h-9 items-center justify-center pt-2">
-              <span className="region-sheet-handle h-1 w-10 rounded-full" aria-hidden />
+            <div
+              className="region-sheet-grab flex min-h-12 cursor-grab items-center justify-center pt-2 active:cursor-grabbing"
+              style={{ touchAction: "none" }}
+              onTouchStart={onDragStart}
+              onTouchMove={onDragMove}
+              onTouchEnd={onDragEnd}
+              onTouchCancel={onDragEnd}
+              onPointerDown={(e) => {
+                if (e.pointerType === "mouse") return;
+                onDragStart(e);
+              }}
+              onPointerMove={(e) => {
+                if (!dragging.current) return;
+                onDragMove(e);
+              }}
+              onPointerUp={onDragEnd}
+              onPointerCancel={onDragEnd}
+              role="button"
+              aria-label={fa ? "برای بستن به پایین بکشید" : "Swipe down to close"}
+            >
+              <span className="region-sheet-handle h-1.5 w-11 rounded-full" aria-hidden />
             </div>
             <button
               type="button"
