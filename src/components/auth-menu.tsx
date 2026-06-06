@@ -290,9 +290,9 @@ export function AuthMenu() {
 
       {open && typeof document !== "undefined" && createPortal(
         <>
-          {/* Mobile scrim — fades the page behind the sheet */}
+          {/* Mobile scrim — plain dark layer (no backdrop-blur; expensive on phones) */}
           <div
-            className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm animate-fade-in md:hidden"
+            className="fixed inset-0 z-[90] bg-black/70 animate-fade-in md:hidden"
             onClick={closeSheet}
             onTouchMove={(event) => event.preventDefault()}
             aria-hidden
