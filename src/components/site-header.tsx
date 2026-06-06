@@ -78,14 +78,12 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
       key: "global" as const,
       title: "Global",
       subtitle: "English interface",
-      detail: "International payments",
       dir: "ltr" as const,
     },
     {
       key: "iran" as const,
       title: "ایران",
       subtitle: "رابط فارسی",
-      detail: "پرداخت داخل ایران",
       dir: "rtl" as const,
     },
   ];
@@ -203,9 +201,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
                       </span>
                       <span lang={option.key === "iran" ? "fa" : "en"} className={`mt-1 block text-[13px] ${option.key === "iran" ? "font-fa" : ""} text-cream/68`}>
                         {option.subtitle}
-                      </span>
-                      <span lang={option.key === "iran" ? "fa" : "en"} className={`mt-1 block text-[11px] ${option.key === "iran" ? "font-fa" : "uppercase tracking-[0.14em]"} text-cream/38`}>
-                        {option.detail}
                       </span>
                     </span>
                   </button>
