@@ -109,7 +109,7 @@ function AuthPage() {
       resendIn: (n: number) => (fa ? `ارسال مجدد در ${n} ثانیه` : `Resend in ${n}s`),
       resent: fa ? "کد دوباره ارسال شد" : "Code resent",
       changeEmail: fa ? "تغییر ایمیل" : "Use a different email",
-      otpInvalid: fa ? "کد ۶ رقمی را وارد کنید." : "Enter the 6-digit code.",
+      otpInvalid: fa ? "کد ۸ رقمی را وارد کنید." : "Enter the 8-digit code.",
     }),
     [fa],
   );
