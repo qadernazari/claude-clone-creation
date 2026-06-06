@@ -1,24 +1,22 @@
-I found the exact issue: the small grey line at the top of the Region bottom sheet is only visual right now. It does not have any drag/swipe behavior attached.
+## Issue
 
-Plan:
+The Phone tab on `/auth` is now reaching Twilio successfully, but Supabase is rejecting the request with:
 
-1. Add mobile drag-to-dismiss behavior to the Region bottom sheet only.
-   - Track touch start/move/end on the sheet handle/top area.
-   - If the user swipes downward past a small threshold, close the sheet.
-   - If the swipe is too small, snap the sheet back into place.
+```
+422: Signups not allowed for otp
+```
 
-2. Keep existing behavior unchanged.
-   - The X close button will still work.
-   - Tapping the dark backdrop will still close it.
-   - Selecting Global/Iran will still close it.
-   - No changes to desktop region controls.
+This means phone provider is enabled, but **new user signups via phone are disabled** in auth settings. Only existing users with a phone number could sign in — brand new users cannot create an account.
 
-3. Improve the handle affordance slightly.
-   - Make the handle/top strip behave like a real draggable target.
-   - Use touch-action settings so mobile browsers do not block the gesture.
-   - Keep the same visual design unless needed for usability.
+## Fix
 
-Technical details:
-- Edit `src/components/site-header.tsx` to add touch gesture state and handlers to the Region sheet.
-- Edit `src/styles.css` only if needed for `touch-action`, cursor/handle affordance, and smooth snap-back transition.
-- Scope the fix only to the Region bottom sheet shown in your screenshot.
+Update the auth configuration to allow phone signups by calling `supabase--configure_auth` with the phone signup option enabled.
+
+That's the only change needed — the frontend code in `src/routes/auth.tsx` is already correct (sends OTP, verifies code). Once signups are allowed, entering a phone number on the Phone tab will:
+1. Send a 6-digit SMS code via Twilio
+2. Verify the code
+3. Create the user account and sign them in
+
+## Verify
+
+After the config change, test the Phone tab in the preview with a real phone number (verified in your Twilio trial account) and confirm the SMS arrives and login completes.
