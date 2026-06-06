@@ -53,7 +53,6 @@ export function CollectionsGrid() {
   return (
     <section
       className="relative px-5 md:px-12"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "1px 600px" }}
     >
       <div className="mx-auto max-w-[1400px]">
         <div className="mb-5 flex items-end justify-between gap-6 md:mb-6">
