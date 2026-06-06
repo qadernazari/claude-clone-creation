@@ -92,7 +92,7 @@ function Rail({
       <div className="mb-6 flex items-end justify-between gap-6">
         <div className="max-w-2xl">
           {eyebrow && (
-            <span className="mb-2.5 block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+            <span className="mb-2.5 hidden text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40 md:block">
               {eyebrow}
             </span>
           )}
