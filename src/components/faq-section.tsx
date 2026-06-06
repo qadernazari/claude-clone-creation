@@ -101,7 +101,7 @@ export function FaqSection() {
         {items.map((item, i) => (
           <li key={i} className="border-b border-cream/8">
             <details className="group">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-start transition-colors hover:text-cream-bright">
+              <summary className="faq-summary flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-start transition-colors hover:text-cream-bright [&::-webkit-details-marker]:hidden">
                 <span
                   className={`text-[16px] font-medium leading-snug text-cream/90 md:text-[18px] ${fa ? "font-vazir" : ""}`}
                 >
