@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
@@ -11,6 +12,12 @@ export function FeaturedFilm() {
   const user = useCurrentUser();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
+  const mobileImageForState = data?.mobile_cover_url || data?.cover_url || data?.thumbnail_url || "";
+  const [mobileHeroReady, setMobileHeroReady] = useState(!mobileImageForState);
+
+  useEffect(() => {
+    setMobileHeroReady(!mobileImageForState);
+  }, [mobileImageForState]);
 
   if (!data) return <FeaturedFilmFallback />;
 
@@ -34,23 +41,44 @@ export function FeaturedFilm() {
   const fallbackBg =
     data.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
+  const safeMobileImage = mobileImage?.replace(/"/g, "%22");
 
 
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
+      <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }}>
         {hasAnyImage ? (
           <>
+            <div
+              className="hero-mobile-poster absolute inset-0 bg-cover bg-center md:hidden"
+              style={{
+                backgroundImage: safeMobileImage
+                  ? `linear-gradient(180deg, rgba(13,13,13,0.08) 0%, rgba(13,13,13,0.36) 72%, var(--bg-0) 100%), url(\"${safeMobileImage}\")`
+                  : fallbackBg,
+              }}
+              aria-hidden
+            />
+            <div
+              className={`hero-mobile-skeleton absolute inset-0 md:hidden ${
+                mobileHeroReady ? "opacity-0" : "opacity-100"
+              }`}
+              aria-hidden
+            />
             {/* Mobile: dedicated 9:16 vertical poster */}
             {mobileImage ? (
               <img
                 src={mobileImage}
                 alt=""
-                className="cine-img absolute inset-0 h-full w-full object-cover object-center md:hidden"
+                className={`hero-mobile-img cine-img absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 md:hidden ${
+                  mobileHeroReady ? "opacity-100" : "opacity-0"
+                }`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
+                sizes="100vw"
+                onLoad={() => setMobileHeroReady(true)}
+                onError={() => setMobileHeroReady(true)}
                 aria-hidden
               />
             ) : null}
@@ -115,7 +143,7 @@ export function FeaturedFilm() {
 
 
         {/* Content */}
-        <div className="relative z-10 flex h-full items-end">
+        <div className={`relative z-10 flex h-full items-end transition-opacity duration-300 ${mobileHeroReady || !mobileImage ? "opacity-100" : "opacity-0 md:opacity-100"}`}>
           <div className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-2xl">
               <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-5">
