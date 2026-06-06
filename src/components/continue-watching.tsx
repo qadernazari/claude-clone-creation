@@ -67,7 +67,7 @@ export function ContinueWatching() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="aspect-video w-[78vw] shrink-0 animate-pulse rounded-xl bg-cream/[4%] ring-1 ring-cream/[5%] sm:w-[360px] md:w-[400px]"
+              className="aspect-video w-[78vw] shrink-0 animate-pulse rounded-xl bg-cream/4 ring-1 ring-cream/5 sm:w-[360px] md:w-[400px]"
             />
           ))}
         </div>
@@ -109,7 +109,7 @@ export function ContinueWatching() {
               params={{ slug: f.slug }}
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
-              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
+              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1 group-hover:ring-cream/20">
                 {f.thumbnail_url || f.cover_url ? (
                   <img
                     src={f.thumbnail_url || f.cover_url || ""}

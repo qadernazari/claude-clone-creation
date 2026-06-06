@@ -647,7 +647,7 @@ function FilmPage() {
                       params={{ slug: r.slug }}
                       className="group block"
                     >
-                      <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
+                      <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
                         <div className="aspect-[2/3] w-full" style={{ background: fallbackBg }}>
                           {r.cover_url && (
                             <img
@@ -699,7 +699,7 @@ function FilmPage() {
                   return (
                     <li key={`cast-${i}`} className="flex w-24 flex-col items-center text-center shrink-0">
                       <div
-                        className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cream/[10%] to-cream/[2%] ring-1 ring-cream/15 text-xl font-display text-cream/85 transition-transform hover:scale-105"
+                        className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-cream/10 to-cream/2 ring-1 ring-cream/15 text-xl font-display text-cream/85 transition-transform hover:scale-105"
                         aria-hidden
                       >
                         {initial}
@@ -722,7 +722,7 @@ function FilmPage() {
           {crewCredits.length > 0 && (
             <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-2 border-t border-cream/10 pt-5 sm:grid-cols-2 md:grid-cols-3">
               {crewCredits.map((c, i) => (
-                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/[6%] pb-2">
+                <div key={`crew-${i}`} className="flex items-baseline justify-between gap-4 border-b border-cream/6 pb-2">
                   <dt className="text-[11px] uppercase tracking-[0.18em] text-cream/45">
                     {fa ? c.label_fa || c.label_en : c.label_en}
                   </dt>
