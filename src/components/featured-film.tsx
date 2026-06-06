@@ -170,7 +170,7 @@ export function FeaturedFilm() {
 
 
         {/* Content */}
-        <div className={`relative z-10 flex h-full items-end transition-opacity duration-300 ${mobileHeroReady || !mobileImage ? "opacity-100" : "opacity-0 md:opacity-100"}`}>
+        <div className="relative z-10 flex h-full items-end">
           <div className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-2xl">
               <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-5">

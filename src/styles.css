@@ -221,6 +221,10 @@
     will-change: opacity;
   }
 
+  .hero-mobile-poster {
+    background-color: var(--bg-1);
+  }
+
   .hero-mobile-skeleton {
     background:
       linear-gradient(180deg, oklch(0.24 0.01 80 / 0.22), transparent 46%, var(--bg-0) 100%),
