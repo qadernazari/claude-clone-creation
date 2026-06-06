@@ -52,11 +52,11 @@ export const Route = createFileRoute("/")({
         ? [
             {
               property: "og:image" as const,
-              content: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || "",
+              content: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
             },
             {
               name: "twitter:image" as const,
-              content: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || "",
+              content: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
             },
           ]
         : []),
