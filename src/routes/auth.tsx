@@ -285,100 +285,52 @@ function AuthPage() {
                 </p>
               </div>
 
-              <div className="mt-8 grid grid-cols-2 gap-1 p-1 rounded-full border border-cream/12 bg-cream/[0.02]">
-                {(["email", "phone"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => {
-                      setMethod(m);
-                      setError(null);
-                      setEmailError(null);
-                      setPhoneError(null);
-                      setPwError(null);
-                    }}
-                    className={`h-9 rounded-full text-[13px] font-medium transition-all ${
-                      method === m
-                        ? "bg-cream text-ink"
-                        : "text-cream/60 hover:text-cream"
-                    }`}
-                  >
-                    {m === "email" ? t.methodEmail : t.methodPhone}
-                  </button>
-                ))}
-              </div>
-
-              <form onSubmit={handleCredentials} className="mt-5 space-y-4" noValidate>
+              <form onSubmit={handleCredentials} className="mt-8 space-y-4" noValidate>
                 <fieldset disabled={loading} className="space-y-3">
-                  {method === "email" ? (
-                    <>
-                      <FloatingInput
-                        id="email"
-                        type="email"
-                        label={t.email}
-                        value={email}
-                        onChange={(v) => {
-                          setEmail(v);
-                          if (emailError) setEmailError(null);
-                        }}
-                        onBlur={() => {
-                          if (email && !validateEmail(email)) setEmailError(t.invalidEmail);
-                        }}
-                        autoComplete="email"
-                        inputMode="email"
-                        enterKeyHint="next"
-                        required
-                        error={emailError}
-                      />
-                      <FloatingInput
-                        id="password"
-                        type={showPw ? "text" : "password"}
-                        label={t.password}
-                        value={password}
-                        onChange={(v) => {
-                          setPassword(v);
-                          if (pwError) setPwError(null);
-                        }}
-                        autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                        enterKeyHint="go"
-                        required
-                        error={pwError}
-                        trailing={
-                          <button
-                            type="button"
-                            onClick={() => setShowPw((v) => !v)}
-                            aria-label={showPw ? "Hide password" : "Show password"}
-                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
-                          >
-                            {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <FloatingInput
-                        id="phone"
-                        type="tel"
-                        label={t.phone}
-                        value={phone}
-                        onChange={(v) => {
-                          setPhone(v);
-                          if (phoneError) setPhoneError(null);
-                        }}
-                        onBlur={() => {
-                          if (phone && !validatePhone(phone)) setPhoneError(t.invalidPhone);
-                        }}
-                        autoComplete="tel"
-                        inputMode="tel"
-                        enterKeyHint="go"
-                        required
-                        error={phoneError}
-                      />
-                      <p className="px-1 text-[11.5px] text-cream/40">{t.phoneHelp}</p>
-                    </>
-                  )}
+                  <FloatingInput
+                    id="email"
+                    type="email"
+                    label={t.email}
+                    value={email}
+                    onChange={(v) => {
+                      setEmail(v);
+                      if (emailError) setEmailError(null);
+                    }}
+                    onBlur={() => {
+                      if (email && !validateEmail(email)) setEmailError(t.invalidEmail);
+                    }}
+                    autoComplete="email"
+                    inputMode="email"
+                    enterKeyHint="next"
+                    required
+                    error={emailError}
+                  />
+                  <FloatingInput
+                    id="password"
+                    type={showPw ? "text" : "password"}
+                    label={t.password}
+                    value={password}
+                    onChange={(v) => {
+                      setPassword(v);
+                      if (pwError) setPwError(null);
+                    }}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    enterKeyHint="go"
+                    required
+                    error={pwError}
+                    trailing={
+                      <button
+                        type="button"
+                        onClick={() => setShowPw((v) => !v)}
+                        aria-label={showPw ? "Hide password" : "Show password"}
+                        className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
+                      >
+                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    }
+                  />
                 </fieldset>
+
 
 
                 {error && (
@@ -424,7 +376,7 @@ function AuthPage() {
                 </button>
               </div>
 
-              {mode === "signin" && method === "email" && (
+              {mode === "signin" && (
                 <div className="mt-3 text-center">
                   <Link
                     to="/reset-password"
@@ -435,13 +387,14 @@ function AuthPage() {
                 </div>
               )}
 
+
               <p className="mt-8 text-center text-[11px] leading-relaxed text-cream/30 px-4">
                 {t.terms}
               </p>
             </>
           ) : (
             <VerifyView
-              email={method === "phone" ? normalizePhone(phone) : email}
+              email={email}
               fa={fa}
               t={t}
               otp={otp}
