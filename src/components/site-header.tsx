@@ -10,7 +10,7 @@ import { AcceptTrialButton } from "./accept-trial-button";
 import { TrialBanner } from "./trial-banner";
 
 function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
-  const { locale, region, setRegion, setLocale } = useLocale();
+  const { locale, region, setRegion } = useLocale();
   const [open, setOpen] = useState(false);
   const titleId = useId();
   const isIran = region === "iran";
@@ -19,7 +19,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
 
   const choose = (next: "global" | "iran") => {
     setRegion(next);
-    setLocale(next === "iran" ? "fa" : "en");
     setOpen(false);
   };
 

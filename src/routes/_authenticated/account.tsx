@@ -281,8 +281,8 @@ function AccountPage() {
               <span className="text-xs uppercase tracking-widest text-cream/55">{tr.regionLabel}</span>
               <div className="mt-2 inline-flex w-full max-w-md items-center gap-1 rounded-full border border-cream/10 bg-bg-0 p-1">
                 {([
-                  { key: "iran" as const, label: tr.insideIran, loc: "fa" as const },
-                  { key: "global" as const, label: tr.outsideIran, loc: "en" as const },
+                  { key: "iran" as const, label: tr.insideIran },
+                  { key: "global" as const, label: tr.outsideIran },
                 ]).map((opt) => {
                   const active = region === opt.key;
                   return (
