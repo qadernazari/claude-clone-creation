@@ -234,7 +234,7 @@ function AuthPage() {
   async function sendPhoneOtp() {
     const { error } = await supabase.auth.signInWithOtp({
       phone: normalizePhone(phone),
-      options: { shouldCreateUser: mode === "signup" },
+      options: { shouldCreateUser: true },
     });
     if (error) throw error;
   }
