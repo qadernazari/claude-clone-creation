@@ -121,7 +121,7 @@ function Rail({
       </div>
       <div
         ref={ref}
-        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12"
+        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12 md:pt-3"
         style={{ scrollPaddingLeft: "1.25rem", WebkitOverflowScrolling: "touch" as never }}
       >
         {films.map((f) => (
