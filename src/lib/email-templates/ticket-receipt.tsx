@@ -19,8 +19,6 @@ interface TicketReceiptProps {
   filmTitleEn?: string
   filmTitleFa?: string
   amountFormatted?: string
-  ticketHours?: number
-  expiresAtFormatted?: string
   watchUrl?: string
 }
 
@@ -28,8 +26,6 @@ const TicketReceiptEmail = ({
   filmTitleEn = 'your film',
   filmTitleFa,
   amountFormatted = '',
-  ticketHours = 48,
-  expiresAtFormatted = '',
   watchUrl = '#',
 }: TicketReceiptProps) => (
   <Html lang="en" dir="ltr">
@@ -51,13 +47,7 @@ const TicketReceiptEmail = ({
           <Text style={meta}>
             Amount paid: <strong>{amountFormatted}</strong>
             <br />
-            Watch window: <strong>{ticketHours} hours</strong>
-            {expiresAtFormatted ? (
-              <>
-                <br />
-                Expires: <strong>{expiresAtFormatted}</strong>
-              </>
-            ) : null}
+            Access: <strong>Lifetime — yours forever</strong>
           </Text>
           <Section style={{ textAlign: 'center', margin: '28px 0' }}>
             <Button href={watchUrl} style={button}>
@@ -78,13 +68,7 @@ const TicketReceiptEmail = ({
           <Text style={meta}>
             مبلغ پرداخت‌شده: <strong>{amountFormatted}</strong>
             <br />
-            مدت تماشا: <strong>{ticketHours} ساعت</strong>
-            {expiresAtFormatted ? (
-              <>
-                <br />
-                انقضا: <strong>{expiresAtFormatted}</strong>
-              </>
-            ) : null}
+            دسترسی: <strong>مادام‌العمر — همیشه در حساب شما</strong>
           </Text>
           <Section style={{ textAlign: 'center', margin: '28px 0' }}>
             <Button href={watchUrl} style={button}>
@@ -109,8 +93,6 @@ export const template = {
     filmTitleEn: 'The Wind Will Carry Us',
     filmTitleFa: 'باد ما را خواهد برد',
     amountFormatted: '$4.99',
-    ticketHours: 48,
-    expiresAtFormatted: 'Jun 5, 2026, 10:00 AM',
     watchUrl: 'https://ir.show/watch/the-wind',
   },
 } satisfies TemplateEntry

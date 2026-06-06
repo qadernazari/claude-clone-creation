@@ -24,18 +24,6 @@ const EN: QA[] = [
     a: "Any film marked as included in membership streams unlimited for active members. Films marked Premium are sold separately as pay-per-view. The film page always shows whether a title is included or premium.",
   },
   {
-    q: "How long do I have access after purchasing a film?",
-    a: "Pay-per-view rentals come with a fixed access window shown on the film page and at checkout — typically 48 hours from your first play. You can rewatch as many times as you want during that window.",
-  },
-  {
-    q: "Can I watch from inside Iran?",
-    a: "Yes. The platform is designed to be accessible from inside Iran, with local payment options where available. Some titles may be region-restricted by their rights holders.",
-  },
-  {
-    q: "Which payment methods are supported?",
-    a: "International payments are processed by Stripe and support major credit and debit cards. For viewers inside Iran, Toman checkout via ZarinPal is rolling out for supported titles.",
-  },
-  {
     q: "Can I watch on mobile, tablet, and TV?",
     a: "Yes. IRAN streams in any modern browser on phone, tablet, laptop, and smart TV. AirPlay and Chromecast are supported on devices that allow casting from the browser.",
   },
@@ -65,18 +53,6 @@ const FA: QA[] = [
   {
     q: "چه فیلم‌هایی در عضویت قرار دارند؟",
     a: "هر فیلمی که با عنوان «شامل عضویت» مشخص شده، برای اعضای فعال به‌صورت نامحدود قابل تماشاست. آثار «ویژه» جداگانه به‌صورت تک‌فیلم به فروش می‌رسند. وضعیت دسترسی همیشه در صفحه‌ی فیلم درج شده است.",
-  },
-  {
-    q: "پس از خرید فیلم تا چه مدت دسترسی خواهم داشت؟",
-    a: "اجاره‌ی تک‌فیلم دارای بازه‌ی دسترسی مشخصی است که در صفحه‌ی فیلم و هنگام پرداخت نمایش داده می‌شود — معمولاً ۴۸ ساعت از نخستین پخش. در این بازه به هر تعداد که بخواهید می‌توانید تماشا کنید.",
-  },
-  {
-    q: "آیا از داخل ایران می‌توان تماشا کرد؟",
-    a: "بله. این پلتفرم به‌گونه‌ای طراحی شده که از داخل ایران در دسترس باشد و در صورت امکان روش‌های پرداخت داخلی نیز پشتیبانی می‌شود. برخی آثار ممکن است بر اساس قوانین حقوقی محدودیت منطقه‌ای داشته باشند.",
-  },
-  {
-    q: "چه روش‌های پرداختی پشتیبانی می‌شود؟",
-    a: "پرداخت‌های بین‌المللی از طریق Stripe و با کارت‌های اعتباری و نقدی معتبر انجام می‌شود. برای مخاطبان داخل ایران، پرداخت تومانی از طریق زرین‌پال برای آثار پشتیبانی‌شده در حال راه‌اندازی است.",
   },
   {
     q: "آیا روی موبایل، تبلت و تلویزیون قابل تماشا است؟",

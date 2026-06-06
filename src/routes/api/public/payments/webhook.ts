@@ -193,7 +193,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
   const userId: string | undefined = meta.userId;
   const filmId: string | undefined = meta.film_id;
   const filmSlug: string | undefined = meta.film_slug;
-  const ticketHours = Number(meta.ticket_hours ?? 48) || 48;
+  // Lifetime ownership — tickets never expire.
 
   if (!userId || !filmId) {
     console.error("checkout.session.completed missing userId/film_id metadata", session.id);
@@ -206,7 +206,6 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
   }
 
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + ticketHours * 60 * 60 * 1000);
   const amount = session.amount_total ?? null;
   const currency = (session.currency ?? "usd").toLowerCase();
   const providerRef = (session.payment_intent as string | null) ?? session.id;
@@ -224,7 +223,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
         amount,
         currency,
         paid_at: now.toISOString(),
-        expires_at: expiresAt.toISOString(),
+        expires_at: null,
       },
       { onConflict: "provider,provider_ref" },
     );
@@ -254,8 +253,6 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: str
       filmTitleEn: filmTitleEn ?? "your film",
       filmTitleFa: film?.title_fa ?? null,
       amountFormatted: amount ? formatUsd(amount, currency) : "",
-      ticketHours,
-      expiresAtFormatted: formatExpiry(expiresAt),
       watchUrl: slug ? `${origin}/watch/${slug}` : origin,
     });
 

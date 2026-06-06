@@ -155,7 +155,6 @@ export const createFilmCheckout = createServerFn({ method: "POST" })
             userId,
             film_id: film.id,
             film_slug: film.slug,
-            ticket_hours: String(film.ticket_hours ?? 48),
             ...(resolvedCoupon && { coupon_id: resolvedCoupon.couponId }),
           },
         },
@@ -163,7 +162,7 @@ export const createFilmCheckout = createServerFn({ method: "POST" })
           userId,
           film_id: film.id,
           film_slug: film.slug,
-          ticket_hours: String(film.ticket_hours ?? 48),
+          
           ...(resolvedCoupon && { coupon_id: resolvedCoupon.couponId }),
         },
       });
