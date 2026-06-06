@@ -92,47 +92,54 @@ export function WelcomeSplash() {
             Welcome
           </p>
           <h2 className="font-display text-2xl font-light tracking-tight text-cream-bright sm:text-[28px]">
-            Choose your experience
+            Choose your region
           </h2>
-          <p className="text-xs tracking-[0.18em] text-cream/45" lang="fa" dir="rtl">
-            تجربه‌ی خود را انتخاب کنید
+          <p className="mx-auto max-w-sm text-[13px] leading-relaxed text-cream/55">
+            Select where you're watching from so we can show the right language, pricing, and payment options.
+          </p>
+          <p className="font-fa text-xs tracking-[0.05em] text-cream/40" lang="fa" dir="rtl">
+            منطقه‌ی خود را انتخاب کنید
           </p>
         </div>
 
         <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4">
           <button
             type="button"
-            onClick={() => choose("en", "global")}
+            onClick={() => choose("fa", "iran")}
             className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
           >
             <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
-              English
+              Inside Iran
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-cream/40 transition-colors group-hover:text-cream/70">
-              International
+            <span className="font-fa text-[15px] tracking-wide text-cream/70 transition-colors group-hover:text-cream" dir="rtl" lang="fa">
+              داخل ایران
+            </span>
+            <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/40 transition-colors group-hover:text-cream/70">
+              Persian · Toman · Local pay
             </span>
             <span className="mt-3 block h-px w-6 bg-cream/15 transition-all duration-500 group-hover:w-12 group-hover:bg-amber/60" />
           </button>
 
           <button
             type="button"
-            onClick={() => choose("fa", "iran")}
+            onClick={() => choose("en", "global")}
             className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
-            dir="rtl"
-            lang="fa"
           >
-            <span className="font-fa text-2xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
-              فارسی
+            <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
+              Outside Iran
             </span>
-            <span className="font-fa text-[12px] tracking-[0.15em] text-cream/40 transition-colors group-hover:text-cream/70">
-              ایران
+            <span className="text-[13px] tracking-wide text-cream/70 transition-colors group-hover:text-cream">
+              International
+            </span>
+            <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/40 transition-colors group-hover:text-cream/70">
+              English · USD · Card
             </span>
             <span className="mt-3 block h-px w-6 bg-cream/15 transition-all duration-500 group-hover:w-12 group-hover:bg-amber/60" />
           </button>
         </div>
 
         <p className="mt-10 text-[10px] font-medium uppercase tracking-[0.3em] text-cream/30 sm:mt-12">
-          You can change language anytime
+          You can change this anytime in Account
         </p>
       </div>
     </div>

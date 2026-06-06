@@ -7,39 +7,43 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { AcceptTrialButton } from "./accept-trial-button";
 import { TrialBanner } from "./trial-banner";
 
-function LanguageToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
-  const { locale, setLocale } = useLocale();
-  const isEn = locale === "en";
+function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
+  const { region, setRegion, setLocale } = useLocale();
+  const isIran = region === "iran";
   const lg = size === "lg";
+
+  const choose = (next: "global" | "iran") => {
+    setRegion(next);
+    setLocale(next === "iran" ? "fa" : "en");
+  };
+
   return (
     <div
       role="group"
-      aria-label="Language"
-      className={`inline-flex items-center gap-2 font-medium tracking-[0.18em] text-cream/45 ${
-        lg ? "text-[13px]" : "text-[11px]"
+      aria-label="Region"
+      className={`inline-flex items-center gap-1 rounded-full border border-cream/10 bg-cream/[3%] p-0.5 font-medium tracking-[0.16em] uppercase ${
+        lg ? "text-[11px]" : "text-[10px]"
       }`}
     >
       <button
         type="button"
-        onClick={() => setLocale("en")}
-        aria-pressed={isEn}
-        className={`rounded-sm transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-          lg ? "min-h-11 min-w-11 px-3 py-2" : "px-1 py-0.5"
-        } ${isEn ? "text-amber" : "hover:text-cream/85"}`}
+        onClick={() => choose("global")}
+        aria-pressed={!isIran}
+        className={`rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
+        } ${!isIran ? "bg-cream text-ink" : "text-cream/55 hover:text-cream"}`}
       >
-        EN
+        Global
       </button>
-      <span aria-hidden="true" className="h-3 w-px bg-cream/15" />
       <button
         type="button"
-        onClick={() => setLocale("fa")}
-        aria-pressed={!isEn}
-        lang="fa"
-        className={`rounded-sm font-fa leading-none tracking-normal transition-colors duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-          lg ? "min-h-11 min-w-11 px-3 py-2 text-[15px]" : "px-1 py-0.5 text-[13px]"
-        } ${!isEn ? "text-amber" : "hover:text-cream/85"}`}
+        onClick={() => choose("iran")}
+        aria-pressed={isIran}
+        className={`rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
+        } ${isIran ? "bg-cream text-ink" : "text-cream/55 hover:text-cream"}`}
       >
-        فا
+        <span lang="fa" className="font-fa tracking-normal">ایران</span>
       </button>
     </div>
   );
@@ -133,11 +137,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </svg>
             </Link>
             <div className="hidden md:block">
-              <LanguageToggle />
+              <RegionToggle />
             </div>
-            {/* Compact language toggle on mobile (hamburger is gone — nav lives in the bottom tab bar) */}
             <div className="md:hidden">
-              <LanguageToggle />
+              <RegionToggle />
             </div>
             <MembershipCta />
             <AuthMenu />
