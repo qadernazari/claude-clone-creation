@@ -111,9 +111,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setRegion = useCallback((r: Region) => {
+    const pairedLocale: Locale = r === "iran" ? "fa" : "en";
     setRegionState(r);
+    setLocaleState(pairedLocale);
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = pairedLocale;
+      document.documentElement.dir = pairedLocale === "fa" ? "rtl" : "ltr";
+    }
     try {
       window.localStorage.setItem(STORAGE_REGION, r);
+      window.localStorage.setItem(STORAGE_LANG, pairedLocale);
     } catch {}
   }, []);
 
