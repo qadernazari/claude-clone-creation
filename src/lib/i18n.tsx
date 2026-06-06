@@ -50,8 +50,19 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   // Hydrate from localStorage on the client only
   useEffect(() => {
-    setLocaleState(readInitialLocale());
-    setRegionState(readInitialRegion());
+    const storedRegion = window.localStorage.getItem(STORAGE_REGION);
+    const initialRegion = storedRegion === "global" || storedRegion === "iran"
+      ? storedRegion
+      : readInitialLocale() === "fa"
+        ? "iran"
+        : "global";
+    const initialLocale = initialRegion === "iran" ? "fa" : "en";
+    setRegionState(initialRegion);
+    setLocaleState(initialLocale);
+    try {
+      window.localStorage.setItem(STORAGE_REGION, initialRegion);
+      window.localStorage.setItem(STORAGE_LANG, initialLocale);
+    } catch {}
   }, []);
 
   // Reflect locale on <html>
