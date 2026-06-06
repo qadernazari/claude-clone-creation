@@ -721,7 +721,7 @@ function FilmPage() {
           {film.category && (
             <div>
               <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "ژانر" : "Genre"}</dt>
-              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{film.category.charAt(0).toUpperCase() + film.category.slice(1)}</dd>
+              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? (categoryName?.name_fa || categoryName?.name_en || film.category) : (categoryName?.name_en || (film.category.charAt(0).toUpperCase() + film.category.slice(1)))}</dd>
             </div>
           )}
           <div>
