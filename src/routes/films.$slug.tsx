@@ -238,7 +238,7 @@ function FilmPage() {
 
   const priceLabel =
     region === "iran" && film.price_toman > 0
-      ? `${num(film.price_toman)} ${fa ? "تومان" : "Toman"}`
+      ? num(film.price_toman)
       : `$${(film.price_cents / 100).toFixed(2)}`;
 
 

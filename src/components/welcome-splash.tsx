@@ -114,7 +114,7 @@ export function WelcomeSplash() {
               داخل ایران
             </span>
             <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/40 transition-colors group-hover:text-cream/70">
-              Persian · Toman · Local pay
+              Persian interface · Local payment
             </span>
             <span className="mt-3 block h-px w-6 bg-cream/15 transition-all duration-500 group-hover:w-12 group-hover:bg-amber/60" />
           </button>
@@ -131,7 +131,7 @@ export function WelcomeSplash() {
               International
             </span>
             <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/40 transition-colors group-hover:text-cream/70">
-              English · USD · Card
+              English interface · International payment
             </span>
             <span className="mt-3 block h-px w-6 bg-cream/15 transition-all duration-500 group-hover:w-12 group-hover:bg-amber/60" />
           </button>
