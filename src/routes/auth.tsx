@@ -119,10 +119,12 @@ function AuthPage() {
       resend: fa ? "ارسال مجدد کد" : "Resend code",
       resendIn: (n: number) => (fa ? `ارسال مجدد در ${n} ثانیه` : `Resend in ${n}s`),
       resent: fa ? "کد دوباره ارسال شد" : "Code resent",
-      changeEmail: fa ? "تغییر ایمیل" : "Use a different email",
+      changeEmail: fa
+        ? method === "phone" ? "تغییر شماره" : "تغییر ایمیل"
+        : method === "phone" ? "Use a different number" : "Use a different email",
       otpInvalid: fa ? "کد ۶ رقمی را وارد کنید." : "Enter the 6-digit code.",
     }),
-    [fa],
+    [fa, method],
   );
 
   function humanizeError(message: string): string {
