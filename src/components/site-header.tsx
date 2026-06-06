@@ -353,8 +353,8 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       >
         <div
           dir="ltr"
-          className={`mx-auto flex max-w-7xl items-center justify-between px-4 transition-all duration-500 sm:px-6 md:px-10 ${
-            scrolled ? "py-2.5 md:py-3" : "py-3.5 md:py-5"
+          className={`mx-auto flex max-w-7xl items-center justify-between px-4 transition-all duration-500 sm:px-6 md:px-10 py-3 md:${
+            scrolled ? "py-3" : "py-5"
           }`}
         >
           <div className="flex items-center gap-10">
