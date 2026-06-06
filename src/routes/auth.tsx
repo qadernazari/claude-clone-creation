@@ -148,12 +148,35 @@ function AuthPage() {
   }
 
   const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+  const normalizePhone = (v: string) => "+" + v.replace(/[^\d]/g, "");
+  const validatePhone = (v: string) => /^\+[1-9]\d{6,14}$/.test(normalizePhone(v));
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setEmailError(null);
+    setPhoneError(null);
     setPwError(null);
+
+    if (method === "phone") {
+      if (!validatePhone(phone)) return setPhoneError(t.invalidPhone);
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          phone: normalizePhone(phone),
+          options: { shouldCreateUser: mode === "signup" },
+        });
+        if (error) throw error;
+        setStep("verify");
+        setResendCooldown(30);
+      } catch (err) {
+        setError(humanizeError(err instanceof Error ? err.message : String(err)));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!validateEmail(email)) return setEmailError(t.invalidEmail);
     if (password.length < 8) return setPwError(t.shortPw);
     setLoading(true);
@@ -208,15 +231,29 @@ function AuthPage() {
     if (error) throw error;
   }
 
+  async function sendPhoneOtp() {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: normalizePhone(phone),
+      options: { shouldCreateUser: mode === "signup" },
+    });
+    if (error) throw error;
+  }
+
   async function handleVerify(code: string) {
     setError(null);
     setVerifying(true);
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
-        token: code,
-        type: "email",
-      });
+      const { error } = method === "phone"
+        ? await supabase.auth.verifyOtp({
+            phone: normalizePhone(phone),
+            token: code,
+            type: "sms",
+          })
+        : await supabase.auth.verifyOtp({
+            email: email.trim(),
+            token: code,
+            type: "email",
+          });
       if (error) throw error;
       // onAuthStateChange redirects on success
     } catch (err) {
@@ -232,7 +269,8 @@ function AuthPage() {
     setResending(true);
     setError(null);
     try {
-      await sendSignupOtp();
+      if (method === "phone") await sendPhoneOtp();
+      else await sendSignupOtp();
       setResendCooldown(30);
       setJustResent(true);
       window.setTimeout(() => setJustResent(false), 2500);
