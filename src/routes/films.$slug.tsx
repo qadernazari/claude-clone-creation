@@ -224,13 +224,29 @@ function FilmPage() {
         .eq("visibility", "published")
         .neq("id", film.id)
         .order("sort_order", { ascending: true })
-        .limit(6);
+        .limit(18);
       if (film.category) q.eq("category", film.category);
       const { data, error } = await q;
       if (error) throw new Error(error.message);
       return (data as RelatedFilm[]) ?? [];
     },
   });
+
+  const { data: categoryName } = useQuery({
+    queryKey: ["category-name", film.category],
+    enabled: !!film.category,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("categories")
+        .select("name_en, name_fa")
+        .eq("id", film.category!)
+        .maybeSingle();
+      return data as { name_en: string; name_fa: string | null } | null;
+    },
+  });
+
+  const relatedTop = useMemo(() => related.slice(0, 6), [related]);
+  const moreFromCollection = useMemo(() => related.slice(6), [related]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
