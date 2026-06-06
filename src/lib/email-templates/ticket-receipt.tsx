@@ -98,8 +98,6 @@ export const template = {
     filmTitleEn: 'The Wind Will Carry Us',
     filmTitleFa: 'باد ما را خواهد برد',
     amountFormatted: '$4.99',
-    ticketHours: 48,
-    expiresAtFormatted: 'Jun 5, 2026, 10:00 AM',
     watchUrl: 'https://ir.show/watch/the-wind',
   },
 } satisfies TemplateEntry
