@@ -93,8 +93,8 @@ function WatchPage() {
         .select("id, status, expires_at")
         .eq("film_id", film.id)
         .eq("status", "paid")
-        .gt("expires_at", new Date().toISOString())
-        .order("expires_at", { ascending: false })
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+        .order("paid_at", { ascending: false, nullsFirst: false })
         .limit(1)
         .maybeSingle();
       if (error) throw new Error(error.message);

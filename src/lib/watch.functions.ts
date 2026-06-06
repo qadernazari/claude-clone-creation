@@ -76,7 +76,7 @@ export const getFilmStreamUrl = createServerFn({ method: "POST" })
           .eq("film_id", film.id)
           .eq("user_id", userId)
           .eq("status", "paid")
-          .gt("expires_at", new Date().toISOString())
+          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
           .limit(1)
           .maybeSingle();
         if (ticketErr) throw new Error(ticketErr.message);

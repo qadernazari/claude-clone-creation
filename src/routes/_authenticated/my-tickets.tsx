@@ -86,7 +86,7 @@ function MyTicketsPage() {
 
   function statusLabel(s: string, exp: string | null) {
     if (s === "paid" && exp && new Date(exp).getTime() < now) return t.expired;
-    if (s === "paid") return t.paid;
+    if (s === "paid") return fa ? "مالکیت دائمی" : "Owned";
     if (s === "pending") return t.pending;
     if (s === "refunded") return t.refunded;
     return s;
@@ -118,7 +118,7 @@ function MyTicketsPage() {
           <ul className="mt-8 space-y-4">
             {tickets.map((tk) => {
               const exp = tk.expires_at ? new Date(tk.expires_at) : null;
-              const active = tk.status === "paid" && exp && exp.getTime() > now;
+              const active = tk.status === "paid" && (!exp || exp.getTime() > now);
               const title = tk.film
                 ? fa
                   ? tk.film.title_fa || tk.film.title_en
