@@ -71,6 +71,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     const html = document.documentElement;
     html.lang = locale;
     html.dir = locale === "fa" ? "rtl" : "ltr";
+    html.dataset.region = locale === "fa" ? "iran" : "global";
   }, [locale]);
 
   const setLocale = useCallback((l: Locale) => {
@@ -86,6 +87,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
       if (typeof document !== "undefined") {
         const html = document.documentElement;
+        html.dataset.region = l === "fa" ? "iran" : "global";
         const doc = document as Document & {
           startViewTransition?: (cb: () => void) => unknown;
         };
@@ -128,6 +130,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     if (typeof document !== "undefined") {
       document.documentElement.lang = pairedLocale;
       document.documentElement.dir = pairedLocale === "fa" ? "rtl" : "ltr";
+      document.documentElement.dataset.region = r;
     }
     try {
       window.localStorage.setItem(STORAGE_REGION, r);
