@@ -94,7 +94,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         role="group"
         aria-label="Region"
         dir="ltr"
-        className={`hidden shrink-0 items-center gap-0.5 rounded-full border border-cream/15 bg-cream/[6%] p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap md:inline-flex ${
+        className={`hidden shrink-0 items-center gap-0.5 rounded-full border border-cream/15 bg-cream/6 p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap md:inline-flex ${
           lg ? "text-[11px]" : "text-[10px]"
         }`}
       >
@@ -127,7 +127,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber/25 bg-amber/[6%] px-3 text-[12px] font-semibold text-amber-bright shadow-[0_10px_30px_-18px_rgba(240,215,140,0.55)] transition-colors active:bg-amber/[12%] md:hidden"
+        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber/25 bg-amber/6 px-3 text-[12px] font-semibold text-amber-bright shadow-[0_10px_30px_-18px_rgba(240,215,140,0.55)] transition-colors active:bg-amber/12 md:hidden"
       >
         <Globe2 size={15} strokeWidth={1.7} className="text-amber" aria-hidden />
         <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
@@ -158,7 +158,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="absolute end-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/12 bg-cream/[7%] text-cream/85 active:bg-cream/[12%]"
+              className="absolute end-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/12 bg-cream/7 text-cream/85 active:bg-cream/12"
               aria-label={fa ? "بستن" : "Close"}
             >
               <X size={18} strokeWidth={1.8} aria-hidden />
@@ -188,11 +188,11 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
                     aria-pressed={active}
                     className={`flex min-h-[92px] w-full items-center gap-4 rounded-2xl border px-4 py-4 text-start transition-all duration-300 active:scale-[0.99] ${
                       active
-                        ? "border-amber/45 bg-amber/[10%] text-cream-bright shadow-[0_18px_45px_-30px_rgba(240,215,140,0.8)]"
-                        : "border-cream/10 bg-bg-0/45 text-cream/82 active:bg-cream/[5%]"
+                        ? "border-amber/45 bg-amber/10 text-cream-bright shadow-[0_18px_45px_-30px_rgba(240,215,140,0.8)]"
+                        : "border-cream/10 bg-bg-0/45 text-cream/82 active:bg-cream/5"
                     }`}
                   >
-                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${active ? "border-amber/35 bg-amber/[14%] text-amber-bright" : "border-cream/10 bg-cream/[5%] text-cream/50"}`}>
+                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${active ? "border-amber/35 bg-amber/14 text-amber-bright" : "border-cream/10 bg-cream/5 text-cream/50"}`}>
                       {active ? <Check size={18} strokeWidth={2} aria-hidden /> : <Globe2 size={18} strokeWidth={1.7} aria-hidden />}
                     </span>
                     <span className="min-w-0 flex-1">
@@ -249,7 +249,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       <header
         className={`fixed top-0 z-30 w-full transition-all duration-500 ${
           scrolled
-            ? "border-b border-cream/[6%] bg-bg-0/85 backdrop-blur-xl"
+            ? "border-b border-cream/6 bg-bg-0/85 backdrop-blur-xl"
             : "border-b border-transparent bg-gradient-to-b from-bg-0/60 to-transparent"
         }`}
         style={{
