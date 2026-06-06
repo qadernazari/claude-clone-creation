@@ -47,7 +47,7 @@ export function FeaturedFilm() {
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }}>
+      <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
         {hasAnyImage ? (
           <>
             <div
