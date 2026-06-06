@@ -27,6 +27,7 @@ export const Route = createFileRoute("/auth")({
 
 type Step = "credentials" | "verify";
 type Mode = "signin" | "signup";
+type Method = "email" | "phone";
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -35,12 +36,15 @@ function AuthPage() {
   const fa = locale === "fa";
 
   const [mode, setMode] = useState<Mode>("signin");
+  const [method, setMethod] = useState<Method>("email");
   const [step, setStep] = useState<Step>("credentials");
 
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pwError, setPwError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
