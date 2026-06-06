@@ -74,6 +74,8 @@ export function CollectionsGrid() {
                   <img
                     src={tile.art}
                     alt=""
+                    width={800}
+                    height={450}
                     loading="lazy"
                     decoding="async"
                     className="cine-img absolute inset-0 h-full w-full object-cover"
