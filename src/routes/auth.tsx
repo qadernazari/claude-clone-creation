@@ -89,6 +89,10 @@ function AuthPage() {
         ? "حساب جدید بسازید و تماشا را شروع کنید."
         : "Create your account to start watching.",
       email: fa ? "ایمیل" : "Email address",
+      phone: fa ? "شماره موبایل" : "Phone number",
+      phoneHelp: fa ? "با کد کشور، مثلاً +989123456789" : "Include country code, e.g. +14155552671",
+      methodEmail: fa ? "ایمیل" : "Email",
+      methodPhone: fa ? "موبایل" : "Phone",
       password: fa ? "رمز عبور" : "Password",
       continueBtn: fa ? "ادامه" : "Continue",
       signin: fa ? "ورود" : "Sign in",
@@ -100,13 +104,16 @@ function AuthPage() {
         ? "با ادامه، شرایط استفاده و سیاست حریم خصوصی را می‌پذیرید."
         : "By continuing, you agree to our Terms and Privacy Policy.",
       invalidEmail: fa ? "ایمیل معتبر وارد کنید." : "Please enter a valid email address.",
+      invalidPhone: fa ? "شماره معتبر با کد کشور وارد کنید." : "Enter a valid phone number with country code.",
       shortPw: fa ? "رمز باید حداقل ۸ نویسه باشد." : "Password must be at least 8 characters.",
       hasAccount: fa ? "حساب دارید؟" : "Already have an account?",
       noAccount: fa ? "حساب ندارید؟" : "Don't have an account?",
       forgot: fa ? "رمز را فراموش کرده‌اید؟" : "Forgot password?",
       // OTP
-      verifyTitle: fa ? "ایمیل خود را تأیید کنید" : "Verify your email",
-      verifySub: fa ? "کد ۶ رقمی ارسال‌شده به این آدرس را وارد کنید:" : "Enter the 6-digit code we sent to:",
+      verifyTitle: fa
+        ? method === "phone" ? "شماره خود را تأیید کنید" : "ایمیل خود را تأیید کنید"
+        : method === "phone" ? "Verify your phone" : "Verify your email",
+      verifySub: fa ? "کد ۶ رقمی ارسال‌شده را وارد کنید:" : "Enter the 6-digit code we sent to:",
       verifyBtn: fa ? "تأیید" : "Verify",
       verifying: fa ? "در حال تأیید…" : "Verifying…",
       resend: fa ? "ارسال مجدد کد" : "Resend code",
