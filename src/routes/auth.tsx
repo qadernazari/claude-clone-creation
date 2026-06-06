@@ -352,11 +352,13 @@ function AuthPage() {
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                   <span>
-                    {loading
-                      ? mode === "signin"
-                        ? t.working
-                        : t.sending
-                      : t.continueBtn}
+                  {loading
+                    ? mode === "signin"
+                      ? t.working
+                      : t.sending
+                    : mode === "signin"
+                      ? t.signin
+                      : t.signup}
                   </span>
                 </button>
               </form>
