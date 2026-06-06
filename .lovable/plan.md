@@ -1,31 +1,27 @@
-## Plan
+## Goal
 
-1. **Fix the active phone OTP path**
-   - Update the phone submit handler in `src/routes/auth.tsx` so the first OTP request always allows account creation for phone login.
-   - The resend helper already uses `shouldCreateUser: true`, but the initial submit handler still uses `mode === "signup"`, which is why the network request shows `create_user: false`.
+Drop the phone OTP path entirely and use email + password only on `/auth`. This removes the SMS provider dependency that was blocking sign-in.
 
-2. **Keep the existing UI flow**
-   - Do not change the auth screen design or verification flow.
-   - Keep the Phone tab as a sign-in/create-account-by-SMS flow.
+## Changes
 
-3. **Improve the error copy for this specific case**
-   - Map `Signups not allowed for otp` / `otp_disabled` to a clearer phone setup message instead of showing “That code is invalid or expired.”
+**`src/routes/auth.tsx`**
+1. Remove the `Method` type, the `method` state, and the `email`/`phone` segmented toggle from the credentials step.
+2. Remove all phone-related code paths: `phone`/`phoneError` state, `validatePhone`/`normalizePhone`, `sendPhoneOtp`, the phone branch in `handleCredentials`, and the phone branch in `handleVerify`.
+3. Keep the email flow as-is:
+   - Sign in: `signInWithPassword`. If `email not confirmed`, send a fresh email OTP and move to the verify step.
+   - Sign up: `signUp` with `emailRedirectTo`, then verify step.
+   - Verify step: 6-digit code via `verifyOtp({ type: "email" })`, with resend + cooldown.
+4. Simplify copy that branched on `method` (verify title, "use a different email", etc.) so it always reads as email.
+5. Drop the now-unused `phoneError`, phone helper text translations, and the phone error message for `signups not allowed`.
 
-## Technical detail
+## Out of scope
 
-Current live request:
-```json
-{"phone":"+971521080180","create_user":false,"channel":"sms"}
-```
+- No design changes to the auth screen layout (header, logo, fonts, gradient stay the same).
+- No changes to backend, RLS, or the `profiles` trigger.
+- No changes to email templates — default Lovable confirmation emails continue to work.
 
-The code still has this in the main phone submit path:
-```ts
-options: { shouldCreateUser: mode === "signup" }
-```
+## Verification
 
-I will change it to:
-```ts
-options: { shouldCreateUser: true }
-```
-
-After this, the outgoing request should become `create_user: true`.
+- Load `/auth`, confirm the phone toggle is gone and only the email + password form renders.
+- Sign up with a new email → receive 6-digit code → verify → redirected home.
+- Sign in with existing confirmed account → redirected home.
