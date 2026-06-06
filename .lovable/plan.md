@@ -1,37 +1,57 @@
-## Problem
+## Goal
 
-On mobile, every section renders two headings that say the same thing:
+Make the sign-in / create-account flow feel like a modern streaming app — clear states, smooth transitions, and a premium success screen instead of the tiny "Check your inbox" text.
 
-- A small uppercase eyebrow (e.g. `IRANIAN ORIGINALS`, `NEW RELEASES`, `COLLECTIONS`, `CONTINUE WATCHING`)
-- The real `<h2>` title right below it (e.g. `Iranian Originals`)
+## Scope
 
-This duplicates the section name and crowds the mobile layout. Desktop has more room and the eyebrow looks intentional there, so it should stay.
+Only `src/routes/auth.tsx` (frontend). No auth logic, schema, or provider changes.
 
-## Fix
+## Changes
 
-Keep one clean title on mobile, keep the eyebrow on desktop. No copy changes, no layout restructure — just hide the eyebrow under `md`.
+### 1. Replace inline `info` text with a full success state
+After a successful `signUp` or `resetPasswordForEmail`, swap the form area for a dedicated success view (same page, animated transition — no route change, no modal needed because the auth page already owns the viewport).
 
-### Files to update
+Success view contents:
+- Animated email/check icon (amber glow, scale+fade in)
+- Headline: "Check your inbox"
+- Subline: "We've sent a secure link to **{email}**. This window will update automatically once you're signed in."
+- Buttons:
+  - **Open email app** (mobile only, ≤md): deep link to `mailto:` and common providers (Gmail / Apple Mail) detected from the email domain; falls back to `mailto:`
+  - **Resend email** (30s cooldown with countdown)
+  - **Use a different email** (returns to the form, preserves mode)
+- Subtle "Waiting for confirmation…" pulsing indicator (since `onAuthStateChange` already auto-redirects on confirm)
 
-1. **`src/components/films-row.tsx`** (Rail header)
-   - The `<span>` rendering `eyebrow` ("Iranian Originals" / "Iranian Originals" / "Collection" / "New Releases") → add `hidden md:block` so it only shows from `md` up.
+Reuse for both signup confirmation and password-reset confirmation (different copy).
 
-2. **`src/components/collections-grid.tsx`**
-   - The `<span>` rendering "Collections" / "مجموعه‌ها" above the `Curated collections` h2 → add `hidden md:block`.
+### 2. Smoother transitions between modes
+- Wrap the heading + form block in a keyed container so switching signin ↔ signup ↔ forgot ↔ success cross-fades (existing `animate-fade-in` + a short translate-y).
+- Tab switch (Sign in / Create account): animate the active pill with a sliding background instead of instant swap.
 
-3. **`src/components/continue-watching.tsx`**
-   - If it renders an uppercase eyebrow above its title, hide it on mobile the same way. (Will verify the exact markup when implementing.)
+### 3. Better loading states
+- Primary button: replace bare spinner with spinner + label ("Signing you in…", "Creating your account…", "Sending link…") so the button doesn't look frozen.
+- OAuth buttons: dim the non-active provider while one is loading (already partially done) and add a subtle shimmer on the active one.
+- Disable form inputs (not just buttons) during submit to prevent edits mid-request.
 
-4. **Any other section with the same pattern** (e.g. browse page section headers, featured rails) — audit during implementation and apply the same `hidden md:block` rule to the eyebrow `<span>` only. The h2 stays visible on all viewports.
+### 4. Inline field validation + friendlier errors
+- Email field: validate format on blur, show inline hint instead of waiting for server error.
+- Map common Supabase errors to human copy ("Invalid login credentials" → "That email and password don't match.", "User already registered" → "An account with this email exists — try signing in.").
+- Error banner: add an icon and a slide-down animation instead of appearing abruptly.
 
-### What stays the same
+### 5. Mobile polish
+- Success screen uses the full safe-area height with the action buttons pinned near the bottom for thumb reach.
+- Add `enterkeyhint="next" / "done"` and proper `autoComplete` (already mostly there) so iOS keyboard flows naturally between fields.
+- Slightly larger tap targets on the resend/change-email buttons (h-12, full width on mobile).
 
-- Desktop (`md` and up) is unchanged — eyebrow + title as today.
-- Titles, spacing scale, font sizes, and RTL/LTR behavior are untouched.
-- No changes to data, i18n strings, or component structure.
+### 6. Bilingual (fa/en)
+All new copy added to the existing `t` object with Farsi translations; RTL respected (icons, button order, animations mirrored where needed).
 
-### Out of scope
+## Out of scope
 
-- No redesign of the section header.
-- No changes to card layout or rails themselves.
-- No copy edits to titles or eyebrows.
+- No changes to Supabase auth config, magic-link vs password mode, OAuth providers, or routes.
+- No new dependencies. Animations use Tailwind + existing keyframes in `styles.css` (add 1–2 keyframes if needed).
+- No changes to the reset-password landing page (separate route).
+
+## Files touched
+
+- `src/routes/auth.tsx` (main work)
+- `src/styles.css` (only if a new keyframe like `success-pop` is needed)
