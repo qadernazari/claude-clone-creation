@@ -21,7 +21,8 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     <div
       role="group"
       aria-label="Region"
-      className={`inline-flex items-center gap-1 rounded-full border border-cream/10 bg-cream/[3%] p-0.5 font-medium tracking-[0.16em] uppercase ${
+      dir="ltr"
+      className={`inline-flex shrink-0 items-center gap-0.5 rounded-full border border-cream/15 bg-cream/[6%] p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap ${
         lg ? "text-[11px]" : "text-[10px]"
       }`}
     >
@@ -31,7 +32,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-pressed={!isIran}
         className={`rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
           lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
-        } ${!isIran ? "bg-cream text-ink" : "text-cream/55 hover:text-cream"}`}
+        } ${!isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
       >
         Global
       </button>
@@ -41,9 +42,9 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-pressed={isIran}
         className={`rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
           lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
-        } ${isIran ? "bg-cream text-ink" : "text-cream/55 hover:text-cream"}`}
+        } ${isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
       >
-        <span lang="fa" className="font-fa tracking-normal">ایران</span>
+        <span lang="fa" className="font-fa tracking-normal text-[12px] leading-none">ایران</span>
       </button>
     </div>
   );
@@ -115,11 +116,11 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
             >
               <svg
                 width="17"
@@ -136,15 +137,11 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 <path d="m20 20-3.5-3.5" />
               </svg>
             </Link>
-            <div className="hidden md:block">
-              <RegionToggle />
-            </div>
-            <div className="md:hidden">
-              <RegionToggle />
-            </div>
+            <RegionToggle />
             <MembershipCta />
             <AuthMenu />
           </div>
+
         </div>
         <TrialBanner />
       </header>
