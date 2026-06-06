@@ -24,7 +24,7 @@ function daysUntil(iso: string | null): number | null {
 export function MembershipPanel() {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { subscription: sub, isMember, isLoading, hasUsedTrial, isTrialExpired } = useSubscription();
+  const { subscription: sub, trial, isMember, isTrialActive, isLoading, hasUsedTrial, isTrialExpired } = useSubscription();
   const openPortal = useServerFn(createMembershipPortalSession);
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +109,53 @@ export function MembershipPanel() {
             {fa ? "ارتقا به عضویت" : "Become a member"}
           </button>
         </div>
+        {checkoutOpen && (
+          <MembershipCheckout
+            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
+            onClose={() => setCheckoutOpen(false)}
+          />
+        )}
+      </section>
+    );
+  }
+
+  // In-app free trial (no Stripe subscription yet) — show trial status.
+  if (!sub && isTrialActive && trial) {
+    const days = daysUntil(trial.ends_at);
+    return (
+      <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+              {t.title}
+            </h2>
+            <span className="mt-2 inline-flex items-center rounded-full border border-amber/30 bg-amber/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-amber">
+              {fa ? "دوره آزمایشی فعال" : "Free Trial Active"}
+              {days !== null && days > 0 ? ` · ${t.daysLeft(days)}` : ""}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCheckoutOpen(true)}
+            className="rounded-full bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+          >
+            {fa ? "ارتقا به عضویت" : "Become a member"}
+          </button>
+        </div>
+        <dl className="mt-6 grid gap-4 sm:grid-cols-2 text-sm">
+          <div>
+            <dt className="text-[11px] uppercase tracking-widest text-cream/55">
+              {fa ? "شروع دوره" : "Started on"}
+            </dt>
+            <dd className="mt-1 text-cream-bright">{fmtDate(trial.started_at, fa)}</dd>
+          </div>
+          <div>
+            <dt className="text-[11px] uppercase tracking-widest text-cream/55">
+              {t.trialEnds}
+            </dt>
+            <dd className="mt-1 text-cream-bright">{fmtDate(trial.ends_at, fa)}</dd>
+          </div>
+        </dl>
         {checkoutOpen && (
           <MembershipCheckout
             returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
