@@ -498,7 +498,9 @@ function FilmPage() {
           <div className="max-w-2xl">
             {film.category && (
               <span className="inline-flex rounded-full bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-cream/80 backdrop-blur-sm ring-1 ring-cream/10">
-                {film.category.charAt(0).toUpperCase() + film.category.slice(1)}
+                {fa
+                  ? (categoryName?.name_fa || categoryName?.name_en || film.category)
+                  : (categoryName?.name_en || (film.category.charAt(0).toUpperCase() + film.category.slice(1)))}
               </span>
             )}
 
