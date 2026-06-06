@@ -169,7 +169,7 @@ function PosterRail({
             return (
               <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
                 <Link to="/films/$slug" params={{ slug: r.slug }} className="group block">
-                  <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
+                  <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1.5 md:group-hover:ring-cream/25 md:group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
                     <div className="aspect-[2/3] w-full" style={{ background: bg }}>
                       {r.cover_url && (
                         <img
