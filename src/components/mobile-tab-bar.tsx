@@ -119,6 +119,7 @@ function TabItem({
     <li className="flex-1">
       <Link
         to={to as any}
+        preload="intent"
         className={`group relative flex h-14 w-full flex-col items-center justify-center gap-1 rounded-lg text-[10px] font-medium tracking-wide transition-colors ${
           active ? "text-cream-bright" : "text-cream/55 active:text-cream"
         }`}
