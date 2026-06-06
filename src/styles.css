@@ -207,6 +207,35 @@
     filter: brightness(1.05);
   }
 
+  .hero-mobile-poster,
+  .hero-mobile-img,
+  .hero-mobile-skeleton {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    contain: paint;
+  }
+
+  .hero-mobile-img {
+    will-change: opacity;
+  }
+
+  .hero-mobile-skeleton {
+    background:
+      linear-gradient(180deg, oklch(0.24 0.01 80 / 0.22), transparent 46%, var(--bg-0) 100%),
+      linear-gradient(110deg, oklch(0.96 0.005 80 / 0.03) 8%, oklch(0.96 0.005 80 / 0.08) 18%, oklch(0.96 0.005 80 / 0.03) 33%),
+      var(--bg-1);
+    background-size: 100% 100%, 240% 100%, 100% 100%;
+    animation: hero-skeleton-sweep 1.2s ease-in-out infinite;
+    transition: opacity 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes hero-skeleton-sweep {
+    from { background-position: 0 0, 110% 0, 0 0; }
+    to { background-position: 0 0, -110% 0, 0 0; }
+  }
+
   /* Soft fade-up entrance */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(12px); }

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
           "A premium streaming destination for Iranian cinema. Originals, award-winners, documentaries, and curated collections.",
       },
       { property: "og:url", content: "https://ir.show/" },
-      ...(loaderData?.featured?.thumbnail_url || loaderData?.featured?.cover_url
+      ...(loaderData?.featured?.thumbnail_url || loaderData?.featured?.cover_url || loaderData?.featured?.mobile_cover_url
         ? [
             {
               property: "og:image" as const,
@@ -49,7 +49,15 @@ export const Route = createFileRoute("/")({
             {
               rel: "preload" as const,
               as: "image" as const,
-              href: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || "",
+              href: loaderData.featured.mobile_cover_url || loaderData.featured.cover_url || loaderData.featured.thumbnail_url || "",
+              media: "(max-width: 767px)" as const,
+              fetchpriority: "high" as const,
+            },
+            {
+              rel: "preload" as const,
+              as: "image" as const,
+              href: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
+              media: "(min-width: 768px)" as const,
               fetchpriority: "high" as const,
             },
           ]
