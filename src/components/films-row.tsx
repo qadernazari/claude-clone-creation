@@ -24,6 +24,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
     <Link
       to="/films/$slug"
       params={{ slug: film.slug }}
+      preload="intent"
       className="group block w-[42vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
     >
       <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/[6%] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/20 group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
@@ -33,6 +34,8 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
             alt=""
             loading="lazy"
             decoding="async"
+            fetchPriority="low"
+            sizes="(min-width: 1024px) 260px, (min-width: 768px) 240px, (min-width: 640px) 220px, 42vw"
             className="cine-img absolute inset-0 h-full w-full object-cover"
           />
         ) : (
