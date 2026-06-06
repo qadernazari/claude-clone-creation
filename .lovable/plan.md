@@ -1,26 +1,18 @@
 ## Problem
 
-On the verify-email step, after the user types each digit the slot turns into a solid cream-colored pill with no digit visible. The digit IS in state (the code auto-submits at 6 chars), but it can't be seen because the filled-slot style is `bg-cream/[0.04]` + `text-cream`, and the near-transparent cream background is rendering as opaque cream — so cream-on-cream hides the digit.
+On desktop, hovering a film poster in the home page rails plays the lift animation (`-translate-y-1.5` + larger shadow), but the top of the card gets clipped. The cause is the scroll container in `src/components/films-row.tsx` (around line 110):
+
+```
+className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overscroll-x-contain px-5 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12"
+```
+
+`overflow-x-auto` implies `overflow-y: auto`, so the vertical lift gets cut by the rail's bounds. The shadow grow is also clipped for the same reason.
 
 ## Fix
 
-Edit only the filled-slot styles in `src/routes/auth.tsx` (the `OtpView` component, around lines 519–525):
+In `src/components/films-row.tsx`, update the rail's scroll container so vertical overflow is not clipped while horizontal scrolling still works, and add a small top breathing room so the lifted card has space:
 
-- Filled slot: dark, slightly-lifted background + bright cream digit
-  - `bg-cream/[0.04]` → `bg-white/5` (uses Tailwind's built-in white token, which reliably produces a faint translucent overlay on the dark page bg)
-  - Keep `text-cream` so the digit stays high-contrast
-  - Keep `border-cream/60`
-- Empty slot: unchanged (`border-cream/12 text-cream/40`)
-- Active ring: unchanged
+- Add `overflow-y-visible` (explicit) alongside `overflow-x-auto`.
+- Add `pt-2 md:pt-3` so the lifted poster + its enlarged shadow have room above.
 
-Result: filled slots show a subtle lighter rounded rectangle with the typed digit clearly visible in cream, matching the original design intent.
-
-## Out of scope
-
-- No changes to OTP length (stays at 6), verify logic, resend flow, error handling, or the email template.
-- No layout/spacing changes.
-- No design-token edits in `src/styles.css`.
-
-## Verification
-
-- Open `/auth` on mobile, request a code, type digits — each slot should show the digit in cream over a faint dark background, and auto-submit on the 6th digit as before.
+No other files change. Mobile behavior stays the same (hover effects are already gated to `md:`).
