@@ -127,9 +127,10 @@ function TabItem({
       >
         <span className="relative flex h-[26px] w-[44px] items-center justify-center">
           <span
-            className={`absolute inset-0 rounded-full bg-cream/10 transition-all duration-300 ${
+            className={`absolute inset-0 rounded-full transition-all duration-300 ${
               active ? "opacity-100 scale-100" : "opacity-0 scale-90"
             }`}
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }}
             aria-hidden
           />
           <span className="relative h-[20px] w-[20px]">{icon}</span>
