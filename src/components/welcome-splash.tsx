@@ -105,7 +105,7 @@ export function WelcomeSplash() {
           <button
             type="button"
             onClick={() => choose("iran")}
-            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
+            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/2 sm:py-10"
           >
             <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
               Inside Iran
@@ -122,7 +122,7 @@ export function WelcomeSplash() {
           <button
             type="button"
             onClick={() => choose("global")}
-            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/[2%] sm:py-10"
+            className="group relative flex flex-col items-center gap-2 rounded-none border border-cream/10 bg-transparent px-6 py-8 text-center transition-all duration-500 hover:border-amber/50 hover:bg-cream/2 sm:py-10"
           >
             <span className="font-display text-xl font-light tracking-wide text-cream-bright transition-colors group-hover:text-amber">
               Outside Iran

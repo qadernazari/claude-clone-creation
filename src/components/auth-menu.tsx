@@ -440,7 +440,7 @@ export function AuthMenu() {
               <button
                 type="button"
                 onClick={switchRegion}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] active:bg-cream/[8%]"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/5 active:bg-cream/8"
               >
                 <span className="auth-menu-row-icon">
                   <Globe2 size={17} strokeWidth={1.6} />
@@ -470,7 +470,7 @@ export function AuthMenu() {
               <button
                 type="button"
                 onClick={signOut}
-                className="group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/[5%] hover:text-cream-bright active:bg-cream/[8%]"
+                className="group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-start text-[14px] text-cream/85 transition-colors hover:bg-cream/5 hover:text-cream-bright active:bg-cream/8"
               >
                 <span className="auth-menu-row-icon">
                   <LogOut size={17} strokeWidth={1.6} />
@@ -529,10 +529,10 @@ function Row({
       to={to as never}
       onClick={onClick}
       className={[
-        "group flex items-center gap-3 rounded-lg px-3 py-3 text-[14px] transition-colors active:bg-cream/[8%]",
+        "group flex items-center gap-3 rounded-lg px-3 py-3 text-[14px] transition-colors active:bg-cream/8",
         accent
-          ? "text-amber-bright hover:bg-amber/[8%]"
-          : "text-cream/85 hover:bg-cream/[5%] hover:text-cream-bright",
+          ? "text-amber-bright hover:bg-amber/8"
+          : "text-cream/85 hover:bg-cream/5 hover:text-cream-bright",
       ].join(" ")}
     >
       <span
