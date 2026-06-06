@@ -137,6 +137,73 @@ type RelatedFilm = {
 
 const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.18 0.03 240))";
 
+function PosterRail({
+  heading,
+  linkText,
+  films,
+  fa,
+}: {
+  heading: string;
+  linkText?: string;
+  films: RelatedFilm[];
+  fa: boolean;
+}) {
+  return (
+    <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
+      <div className="mb-5 flex items-end justify-between gap-6">
+        <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+          {heading}
+        </h2>
+        {linkText && (
+          <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
+            {linkText} →
+          </Link>
+        )}
+      </div>
+      <div className="-mx-6 overflow-x-auto px-6 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex gap-4 min-w-max md:gap-5">
+          {films.map((r) => {
+            const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
+            const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
+            const bg = (r.poster_gradient as string) || fallbackGradient;
+            return (
+              <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
+                <Link to="/films/$slug" params={{ slug: r.slug }} className="group block">
+                  <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 group-hover:-translate-y-1.5 group-hover:ring-cream/25 group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
+                    <div className="aspect-[2/3] w-full" style={{ background: bg }}>
+                      {r.cover_url && (
+                        <img
+                          src={r.cover_url}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover"
+                          aria-hidden
+                        />
+                      )}
+                    </div>
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-cream-bright px-3 py-1 text-[10px] font-semibold text-ink">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                        {fa ? "تماشا" : "Watch"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
+                  {rDirector && (
+                    <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, year, dir } = useLocale();
