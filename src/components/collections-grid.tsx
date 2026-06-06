@@ -58,9 +58,6 @@ export function CollectionsGrid() {
       <div className="mx-auto max-w-[1400px]">
         <div className="mb-5 flex items-end justify-between gap-6 md:mb-6">
           <div>
-            <span className="mb-2 hidden text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40 md:mb-2.5 md:block">
-              {fa ? "مجموعه‌ها" : "Collections"}
-            </span>
             <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
               {fa ? "مجموعه‌های منتخب" : "Curated collections"}
             </h2>
