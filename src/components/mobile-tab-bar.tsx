@@ -120,25 +120,21 @@ function TabItem({
       <Link
         to={to as any}
         preload="intent"
-        className={`group relative flex h-14 w-full flex-col items-center justify-center gap-1 rounded-lg text-[10px] font-medium tracking-wide transition-colors ${
+        className={`group relative flex h-14 w-full flex-col items-center justify-center gap-1 text-[10px] font-medium tracking-wide transition-colors ${
           active ? "text-cream-bright" : "text-cream/55 active:text-cream"
         }`}
         aria-current={active ? "page" : undefined}
       >
-        <span
-          className={`h-[22px] w-[22px] transition-transform ${
-            active ? "scale-105" : "group-active:scale-95"
-          }`}
-        >
-          {icon}
+        <span className="relative flex h-[26px] w-[44px] items-center justify-center">
+          <span
+            className={`absolute inset-0 rounded-full bg-cream/10 transition-all duration-300 ${
+              active ? "opacity-100 scale-100" : "opacity-0 scale-90"
+            }`}
+            aria-hidden
+          />
+          <span className="relative h-[20px] w-[20px]">{icon}</span>
         </span>
         <span className="leading-none">{label}</span>
-        <span
-          className={`absolute top-0 h-[2px] w-7 rounded-full bg-amber transition-opacity ${
-            active ? "opacity-100" : "opacity-0"
-          }`}
-          aria-hidden
-        />
       </Link>
     </li>
   );

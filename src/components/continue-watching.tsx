@@ -77,7 +77,7 @@ export function ContinueWatching() {
   if (!data || data.length === 0) return null;
 
   return (
-    <section className="relative" style={{ contentVisibility: "auto", containIntrinsicSize: "1px 320px" }}>
+    <section className="relative">
       <div className="mx-auto max-w-[1400px] px-5 md:px-12">
         <div className="mb-5 md:mb-7">
           <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
@@ -114,6 +114,8 @@ export function ContinueWatching() {
                   <img
                     src={f.thumbnail_url || f.cover_url || ""}
                     alt=""
+                    width={800}
+                    height={450}
                     loading="lazy"
                     decoding="async"
                     className="cine-img absolute inset-0 h-full w-full object-cover"

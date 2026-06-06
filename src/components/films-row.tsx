@@ -32,6 +32,8 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
           <img
             src={film.cover_url}
             alt=""
+            width={520}
+            height={780}
             loading="lazy"
             decoding="async"
             fetchPriority="low"
@@ -89,7 +91,6 @@ function Rail({
   return (
     <section
       className="relative mx-auto max-w-[1400px] px-5 md:px-12"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "1px 480px" }}
     >
       <div className="mb-6 flex items-end justify-between gap-6">
         <div className="max-w-2xl">
