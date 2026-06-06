@@ -11,6 +11,25 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { AcceptTrialButton } from "@/components/accept-trial-button";
 import { homePageQueryOptions } from "@/lib/home.functions";
 
+function HomePendingShell() {
+  return (
+    <div className="min-h-screen bg-bg-0 text-cream">
+      <SiteHeader current="home" />
+      <main className="relative h-[82svh] min-h-[520px] overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]">
+        <div className="hero-mobile-skeleton absolute inset-0" aria-hidden />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(13,13,13,0.12) 0%, rgba(13,13,13,0.48) 70%, var(--bg-0) 100%)",
+          }}
+          aria-hidden
+        />
+      </main>
+    </div>
+  );
+}
+
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(homePageQueryOptions),
@@ -78,6 +97,7 @@ export const Route = createFileRoute("/")({
     ],
   }),
   component: Home,
+  pendingComponent: HomePendingShell,
   errorComponent: ({ error }) => {
     console.error("home route error:", error);
     return <HomeLoadFallback />;
