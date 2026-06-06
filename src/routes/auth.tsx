@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  ExternalLink,
-  Loader2,
-  MailCheck,
-  RefreshCw,
-} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Eye, EyeOff, Loader2, CheckCircle2, RefreshCw } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
@@ -32,17 +25,29 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+type Step = "credentials" | "verify";
+type Mode = "signin" | "signup";
+
 function AuthPage() {
   const navigate = useNavigate();
   const { redirect: redirectTo } = Route.useSearch();
   const { locale, dir } = useLocale();
   const fa = locale === "fa";
 
+  const [mode, setMode] = useState<Mode>("signin");
+  const [step, setStep] = useState<Step>("credentials");
+
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [pwError, setPwError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<null | { email: string }>(null);
+
+  // OTP step
+  const [otp, setOtp] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resending, setResending] = useState(false);
   const [justResent, setJustResent] = useState(false);
@@ -74,74 +79,104 @@ function AuthPage() {
 
   const t = useMemo(
     () => ({
-      title: fa ? "ورود به ایران" : "Enter IRAN",
-      sub: fa
-        ? "ایمیل خود را وارد کنید تا لینک امن ورود برایتان ارسال شود."
-        : "Enter your email and we'll send you a secure sign-in link.",
+      welcome: fa ? "ورود به ایران" : "Enter IRAN",
+      signinSub: fa ? "وارد حساب خود شوید." : "Sign in to continue.",
+      signupSub: fa
+        ? "حساب جدید بسازید و تماشا را شروع کنید."
+        : "Create your account to start watching.",
       email: fa ? "ایمیل" : "Email address",
+      password: fa ? "رمز عبور" : "Password",
       continueBtn: fa ? "ادامه" : "Continue",
-      sending: fa ? "در حال ارسال…" : "Sending link…",
+      signin: fa ? "ورود" : "Sign in",
+      signup: fa ? "ساخت حساب" : "Create account",
+      sending: fa ? "در حال ارسال…" : "Sending…",
+      working: fa ? "در حال ورود…" : "Signing in…",
       back: fa ? "بازگشت" : "Back",
       terms: fa
         ? "با ادامه، شرایط استفاده و سیاست حریم خصوصی را می‌پذیرید."
         : "By continuing, you agree to our Terms and Privacy Policy.",
-      successTitle: fa ? "ایمیل خود را بررسی کنید" : "Check your inbox",
-      successBody: fa
-        ? "لینک امن ورود را به این آدرس ارسال کردیم:"
-        : "We've sent a secure sign-in link to:",
-      autoUpdate: fa
-        ? "این صفحه پس از تأیید به‌صورت خودکار به‌روز می‌شود."
-        : "This window will update automatically once you're signed in.",
-      openMail: fa ? "باز کردن برنامه ایمیل" : "Open email app",
-      openGmail: fa ? "باز کردن Gmail" : "Open Gmail",
-      resend: fa ? "ارسال مجدد ایمیل" : "Resend email",
-      resendIn: (n: number) => (fa ? `ارسال مجدد در ${n} ثانیه` : `Resend in ${n}s`),
-      resent: fa ? "ایمیل دوباره ارسال شد" : "Email resent",
-      changeEmail: fa ? "تغییر ایمیل" : "Use a different email",
-      waiting: fa ? "در انتظار تأیید…" : "Waiting for confirmation…",
       invalidEmail: fa ? "ایمیل معتبر وارد کنید." : "Please enter a valid email address.",
+      shortPw: fa ? "رمز باید حداقل ۸ نویسه باشد." : "Password must be at least 8 characters.",
+      hasAccount: fa ? "حساب دارید؟" : "Already have an account?",
+      noAccount: fa ? "حساب ندارید؟" : "Don't have an account?",
+      forgot: fa ? "رمز را فراموش کرده‌اید؟" : "Forgot password?",
+      // OTP
+      verifyTitle: fa ? "ایمیل خود را تأیید کنید" : "Verify your email",
+      verifySub: fa ? "کد ۶ رقمی ارسال‌شده به این آدرس را وارد کنید:" : "Enter the 6-digit code we sent to:",
+      verifyBtn: fa ? "تأیید" : "Verify",
+      verifying: fa ? "در حال تأیید…" : "Verifying…",
+      resend: fa ? "ارسال مجدد کد" : "Resend code",
+      resendIn: (n: number) => (fa ? `ارسال مجدد در ${n} ثانیه` : `Resend in ${n}s`),
+      resent: fa ? "کد دوباره ارسال شد" : "Code resent",
+      changeEmail: fa ? "تغییر ایمیل" : "Use a different email",
+      otpInvalid: fa ? "کد ۶ رقمی را وارد کنید." : "Enter the 6-digit code.",
     }),
     [fa],
   );
 
   function humanizeError(message: string): string {
     const m = message.toLowerCase();
+    if (m.includes("invalid login") || m.includes("invalid credentials")) {
+      return fa ? "ایمیل یا رمز عبور نادرست است." : "Incorrect email or password.";
+    }
+    if (m.includes("user already registered") || m.includes("already exists")) {
+      return fa ? "این ایمیل قبلاً ثبت شده است. وارد شوید." : "This email is already registered. Try signing in.";
+    }
+    if (m.includes("token has expired") || m.includes("invalid token") || m.includes("otp")) {
+      return fa ? "کد نامعتبر یا منقضی شده است." : "That code is invalid or expired.";
+    }
     if (m.includes("rate limit") || m.includes("too many")) {
-      return fa
-        ? "تعداد درخواست‌ها زیاد است. لطفاً کمی صبر کنید."
-        : "Too many attempts — please wait a moment and try again.";
+      return fa ? "تعداد درخواست‌ها زیاد است. کمی صبر کنید." : "Too many attempts — please wait a moment.";
+    }
+    if (m.includes("email not confirmed")) {
+      return fa ? "ابتدا ایمیل خود را تأیید کنید." : "Please verify your email first.";
     }
     return message;
   }
 
-  function validateEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-  }
+  const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
-  async function sendMagicLink(target: string) {
-    const { error } = await supabase.auth.signInWithOtp({
-      email: target,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        shouldCreateUser: true,
-      },
-    });
-    if (error) throw error;
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setEmailError(null);
-    if (!validateEmail(email)) {
-      setEmailError(t.invalidEmail);
-      return;
-    }
+    setPwError(null);
+    if (!validateEmail(email)) return setEmailError(t.invalidEmail);
+    if (password.length < 8) return setPwError(t.shortPw);
     setLoading(true);
     try {
-      await sendMagicLink(email.trim());
-      setSuccess({ email: email.trim() });
-      setResendCooldown(30);
+      if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (error) {
+          // If email not confirmed, jump to OTP step and resend code
+          if (/email not confirmed/i.test(error.message)) {
+            await sendSignupOtp();
+            setStep("verify");
+            setResendCooldown(30);
+            return;
+          }
+          throw error;
+        }
+        // onAuthStateChange will redirect
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        });
+        if (error) throw error;
+        // If user already exists but confirmed, signUp returns identities=[] (Supabase quirk)
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          throw new Error("User already registered");
+        }
+        setStep("verify");
+        setResendCooldown(30);
+      }
     } catch (err) {
       setError(humanizeError(err instanceof Error ? err.message : String(err)));
     } finally {
@@ -149,12 +184,42 @@ function AuthPage() {
     }
   }
 
+  async function sendSignupOtp() {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/`,
+      },
+    });
+    if (error) throw error;
+  }
+
+  async function handleVerify(code: string) {
+    setError(null);
+    setVerifying(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: code,
+        type: "email",
+      });
+      if (error) throw error;
+      // onAuthStateChange redirects on success
+    } catch (err) {
+      setError(humanizeError(err instanceof Error ? err.message : String(err)));
+      setOtp("");
+    } finally {
+      setVerifying(false);
+    }
+  }
+
   async function handleResend() {
-    if (!success || resendCooldown > 0 || resending) return;
+    if (resendCooldown > 0 || resending) return;
     setResending(true);
     setError(null);
     try {
-      await sendMagicLink(success.email);
+      await sendSignupOtp();
       setResendCooldown(30);
       setJustResent(true);
       window.setTimeout(() => setJustResent(false), 2500);
@@ -165,29 +230,27 @@ function AuthPage() {
     }
   }
 
-  function backToForm() {
-    setSuccess(null);
+  function backFromVerify() {
+    setStep("credentials");
+    setOtp("");
     setError(null);
   }
-
-  const viewKey = success ? "success" : "form";
 
   return (
     <div
       dir={dir}
       className="relative min-h-[100svh] bg-bg-0 text-cream overflow-hidden flex flex-col"
     >
-      {/* Subtle cinematic vignette — no color, just depth */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),transparent_60%)]" />
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
 
       <header className="relative z-10 flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-3 md:px-8 md:pt-6">
-        {success ? (
+        {step === "verify" ? (
           <button
             type="button"
-            onClick={backToForm}
+            onClick={backFromVerify}
             aria-label={t.back}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/10 text-cream/70 transition-colors hover:bg-cream/5 active:scale-95"
           >
@@ -209,20 +272,8 @@ function AuthPage() {
       </header>
 
       <main className="relative z-10 flex-1 flex items-center justify-center px-6 pb-[max(env(safe-area-inset-bottom),2rem)] md:px-8">
-        <div key={viewKey} className="w-full max-w-[400px] mx-auto animate-fade-in">
-          {success ? (
-            <SuccessView
-              email={success.email}
-              fa={fa}
-              t={t}
-              resendCooldown={resendCooldown}
-              resending={resending}
-              justResent={justResent}
-              onResend={handleResend}
-              onChangeEmail={backToForm}
-              error={error}
-            />
-          ) : (
+        <div key={step} className="w-full max-w-[400px] mx-auto animate-fade-in">
+          {step === "credentials" ? (
             <>
               <div className="text-center">
                 <h1
@@ -230,14 +281,14 @@ function AuthPage() {
                     fa ? "font-fa" : "font-display"
                   }`}
                 >
-                  {t.title}
+                  {t.welcome}
                 </h1>
                 <p className="mt-4 text-[14px] leading-relaxed text-cream/55 md:text-[15px] max-w-[340px] mx-auto">
-                  {t.sub}
+                  {mode === "signin" ? t.signinSub : t.signupSub}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="mt-10 space-y-4" noValidate>
+              <form onSubmit={handleCredentials} className="mt-10 space-y-3" noValidate>
                 <fieldset disabled={loading} className="contents">
                   <FloatingInput
                     id="email"
@@ -253,9 +304,33 @@ function AuthPage() {
                     }}
                     autoComplete="email"
                     inputMode="email"
-                    enterKeyHint="go"
+                    enterKeyHint="next"
                     required
                     error={emailError}
+                  />
+                  <FloatingInput
+                    id="password"
+                    type={showPw ? "text" : "password"}
+                    label={t.password}
+                    value={password}
+                    onChange={(v) => {
+                      setPassword(v);
+                      if (pwError) setPwError(null);
+                    }}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    enterKeyHint="go"
+                    required
+                    error={pwError}
+                    trailing={
+                      <button
+                        type="button"
+                        onClick={() => setShowPw((v) => !v)}
+                        aria-label={showPw ? "Hide password" : "Show password"}
+                        className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
+                      >
+                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    }
                   />
                 </fieldset>
 
@@ -277,14 +352,62 @@ function AuthPage() {
                   className="mt-2 w-full h-12 inline-flex items-center justify-center gap-2 rounded-full bg-cream text-ink text-[14px] font-semibold tracking-wide transition-all hover:bg-cream-bright active:scale-[0.98] disabled:opacity-70"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  <span>{loading ? t.sending : t.continueBtn}</span>
+                  <span>
+                    {loading
+                      ? mode === "signin"
+                        ? t.working
+                        : t.sending
+                      : t.continueBtn}
+                  </span>
                 </button>
               </form>
+
+              <div className="mt-6 flex items-center justify-center text-[13px] text-cream/55">
+                <span>{mode === "signin" ? t.noAccount : t.hasAccount}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode(mode === "signin" ? "signup" : "signin");
+                    setError(null);
+                    setPwError(null);
+                  }}
+                  className="ms-2 text-cream hover:underline font-medium"
+                >
+                  {mode === "signin" ? t.signup : t.signin}
+                </button>
+              </div>
+
+              {mode === "signin" && (
+                <div className="mt-3 text-center">
+                  <Link
+                    to="/reset-password"
+                    className="text-[12px] text-cream/40 hover:text-cream/70 transition-colors"
+                  >
+                    {t.forgot}
+                  </Link>
+                </div>
+              )}
 
               <p className="mt-8 text-center text-[11px] leading-relaxed text-cream/30 px-4">
                 {t.terms}
               </p>
             </>
+          ) : (
+            <VerifyView
+              email={email}
+              fa={fa}
+              t={t}
+              otp={otp}
+              setOtp={setOtp}
+              verifying={verifying}
+              onVerify={handleVerify}
+              resendCooldown={resendCooldown}
+              resending={resending}
+              justResent={justResent}
+              onResend={handleResend}
+              onChangeEmail={backFromVerify}
+              error={error}
+            />
           )}
         </div>
       </main>
@@ -292,12 +415,16 @@ function AuthPage() {
   );
 }
 
-/* ---------- Success view ---------- */
+/* ---------- Verify (OTP) view ---------- */
 
-function SuccessView({
+function VerifyView({
   email,
   fa,
   t,
+  otp,
+  setOtp,
+  verifying,
+  onVerify,
   resendCooldown,
   resending,
   justResent,
@@ -308,17 +435,20 @@ function SuccessView({
   email: string;
   fa: boolean;
   t: {
-    successTitle: string;
-    successBody: string;
-    autoUpdate: string;
-    openMail: string;
-    openGmail: string;
+    verifyTitle: string;
+    verifySub: string;
+    verifyBtn: string;
+    verifying: string;
     resend: string;
     resendIn: (n: number) => string;
     resent: string;
     changeEmail: string;
-    waiting: string;
+    otpInvalid: string;
   };
+  otp: string;
+  setOtp: (v: string) => void;
+  verifying: boolean;
+  onVerify: (code: string) => void;
   resendCooldown: number;
   resending: boolean;
   justResent: boolean;
@@ -326,94 +456,108 @@ function SuccessView({
   onChangeEmail: () => void;
   error: string | null;
 }) {
-  const domain = email.split("@")[1]?.toLowerCase() ?? "";
-  const provider = useMemo(() => {
-    if (/gmail\.com|googlemail\.com/.test(domain)) return "gmail" as const;
-    if (/outlook\.|hotmail\.|live\.|msn\./.test(domain)) return "outlook" as const;
-    if (/yahoo\./.test(domain)) return "yahoo" as const;
-    if (/icloud\.com|me\.com|mac\.com/.test(domain)) return "icloud" as const;
-    return null;
-  }, [domain]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const submittedFor = useRef<string>("");
 
-  const providerUrl =
-    provider === "gmail"
-      ? "https://mail.google.com/mail/u/0/#inbox"
-      : provider === "outlook"
-        ? "https://outlook.live.com/mail/0/inbox"
-        : provider === "yahoo"
-          ? "https://mail.yahoo.com/"
-          : provider === "icloud"
-            ? "https://www.icloud.com/mail"
-            : null;
-  const providerLabel =
-    provider === "gmail"
-      ? t.openGmail
-      : provider
-        ? fa
-          ? `باز کردن ${provider}`
-          : `Open ${provider.charAt(0).toUpperCase() + provider.slice(1)}`
-        : t.openMail;
+  useEffect(() => {
+    const id = window.setTimeout(() => inputRef.current?.focus(), 80);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  // Auto-submit once 6 digits are entered
+  useEffect(() => {
+    if (otp.length === 6 && !verifying && submittedFor.current !== otp) {
+      submittedFor.current = otp;
+      onVerify(otp);
+    }
+  }, [otp, verifying, onVerify]);
+
+  const digits = Array.from({ length: 6 }, (_, i) => otp[i] ?? "");
+  const activeIndex = Math.min(otp.length, 5);
 
   return (
     <div className={`text-center ${fa ? "font-fa" : ""}`}>
-      <div className="relative mx-auto mb-7 inline-flex h-16 w-16 items-center justify-center">
-        <span
-          aria-hidden
-          className="absolute inset-0 rounded-full border border-cream/15 animate-pulse-ring"
-        />
-        <span className="relative inline-flex h-16 w-16 items-center justify-center rounded-full border border-cream/20 bg-bg-1 text-cream animate-success-pop">
-          <MailCheck className="h-7 w-7" strokeWidth={1.8} />
-        </span>
-      </div>
-
       <h1 className="text-[26px] md:text-[30px] font-semibold tracking-tight">
-        {t.successTitle}
+        {t.verifyTitle}
       </h1>
-      <p className="mt-4 text-[14px] leading-relaxed text-cream/55">
-        {t.successBody}
+      <p className="mt-3 text-[14px] leading-relaxed text-cream/55">
+        {t.verifySub}
       </p>
-      <p className="mt-2 text-[15px] font-medium text-cream break-all">{email}</p>
+      <p className="mt-1 text-[15px] font-medium text-cream break-all">{email}</p>
 
-      <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-cream/10 px-3 py-1.5 text-[12px] text-cream/55">
-        <span className="relative inline-flex h-1.5 w-1.5">
-          <span className="absolute inset-0 rounded-full bg-cream/60 animate-ping" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cream/80" />
-        </span>
-        {t.waiting}
+      {/* OTP boxes */}
+      <div
+        className="mt-8 relative"
+        onClick={() => inputRef.current?.focus()}
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="[0-9]*"
+          maxLength={6}
+          value={otp}
+          onChange={(e) => {
+            const v = e.target.value.replace(/\D/g, "").slice(0, 6);
+            setOtp(v);
+            if (v.length < 6) submittedFor.current = "";
+          }}
+          disabled={verifying}
+          aria-label="Verification code"
+          className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+        />
+        <div dir="ltr" className="flex items-center justify-center gap-2 sm:gap-2.5 pointer-events-none">
+          {digits.map((d, i) => {
+            const isActive = i === activeIndex && !verifying;
+            const filled = d !== "";
+            return (
+              <div
+                key={i}
+                className={[
+                  "relative flex items-center justify-center",
+                  "h-12 w-10 sm:h-14 sm:w-12 rounded-xl border text-[20px] font-semibold tabular-nums transition-all duration-150",
+                  filled
+                    ? "border-cream/60 bg-cream/[0.04] text-cream"
+                    : "border-cream/12 text-cream/40",
+                  isActive ? "border-cream ring-2 ring-cream/20" : "",
+                  verifying ? "opacity-60" : "",
+                ].join(" ")}
+              >
+                <span>{d}</span>
+                {isActive && !filled && (
+                  <span className="absolute h-5 w-px bg-cream animate-caret-blink" />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <p className="mt-4 text-[12px] leading-relaxed text-cream/35 max-w-[320px] mx-auto">
-        {t.autoUpdate}
-      </p>
+      <div className="mt-5 min-h-[24px] flex items-center justify-center">
+        {verifying ? (
+          <span className="inline-flex items-center gap-2 text-[13px] text-cream/60">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t.verifying}
+          </span>
+        ) : null}
+      </div>
 
       {error && (
         <div
           role="alert"
-          className="mt-5 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-[13px] text-destructive-foreground text-left animate-slide-down-in"
+          className="mt-1 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-[13px] text-destructive-foreground text-left animate-slide-down-in"
         >
           <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-destructive/25 text-[10px] font-bold">!</span>
           <span>{error}</span>
         </div>
       )}
 
-      <div className="mt-8 space-y-2.5">
-        {providerUrl && (
-          <a
-            href={providerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="md:hidden w-full h-12 inline-flex items-center justify-center gap-2 rounded-full bg-cream text-ink text-[14px] font-semibold transition-all hover:bg-cream-bright active:scale-[0.98]"
-          >
-            <ExternalLink className="h-4 w-4" />
-            {providerLabel}
-          </a>
-        )}
-
+      <div className="mt-6 space-y-2.5">
         <button
           type="button"
           onClick={onResend}
           disabled={resendCooldown > 0 || resending}
-          className="w-full h-12 inline-flex items-center justify-center gap-2 rounded-full border border-cream/12 text-cream/85 text-[14px] font-medium transition-all hover:bg-cream/5 active:scale-[0.98] disabled:opacity-50"
+          className="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full border border-cream/12 text-cream/85 text-[13px] font-medium transition-all hover:bg-cream/5 active:scale-[0.98] disabled:opacity-50"
         >
           {resending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -434,7 +578,7 @@ function SuccessView({
         <button
           type="button"
           onClick={onChangeEmail}
-          className="w-full h-11 inline-flex items-center justify-center rounded-full text-[13px] text-cream/55 hover:text-cream transition-colors"
+          className="w-full h-10 inline-flex items-center justify-center rounded-full text-[12.5px] text-cream/55 hover:text-cream transition-colors"
         >
           {t.changeEmail}
         </button>
@@ -457,6 +601,7 @@ function FloatingInput({
   enterKeyHint,
   required,
   error,
+  trailing,
 }: {
   id: string;
   type: string;
@@ -469,6 +614,7 @@ function FloatingInput({
   enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
   required?: boolean;
   error?: string | null;
+  trailing?: React.ReactNode;
 }) {
   const has = value.length > 0;
   return (
@@ -502,9 +648,12 @@ function FloatingInput({
           required={required}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-err` : undefined}
-          className="block w-full h-14 bg-transparent px-4 pt-5 pb-1 text-[15px] text-cream outline-none placeholder:text-transparent"
+          className={`block w-full h-14 bg-transparent px-4 pt-5 pb-1 text-[15px] text-cream outline-none placeholder:text-transparent ${
+            trailing ? "pe-12" : ""
+          }`}
           placeholder={label}
         />
+        {trailing}
       </label>
       {error && (
         <p
