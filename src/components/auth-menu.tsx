@@ -249,6 +249,14 @@ export function AuthMenu() {
         <Link
           to="/auth"
           className="mobile-signin-trigger inline-flex min-h-10 items-center justify-center rounded-full border border-cream/35 bg-cream/8 px-4 py-2 text-sm font-medium text-cream hover:bg-cream/15 hover:border-cream/50 transition-colors"
+          style={{
+            WebkitAppearance: "none",
+            appearance: "none",
+            background: "rgba(var(--rgb-bg-0), 0.76)",
+            borderColor: "rgba(var(--rgb-cream), 0.30)",
+            color: "rgb(var(--rgb-cream))",
+            boxShadow: "inset 0 1px 0 rgba(var(--rgb-cream), 0.08), 0 8px 22px -18px rgba(0, 0, 0, 0.85)",
+          }}
         >
           {fa ? "ورود" : "Sign in"}
         </Link>

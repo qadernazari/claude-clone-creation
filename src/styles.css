@@ -338,6 +338,25 @@
     background: rgba(245, 244, 239, 0.10);
   }
 
+  @media (max-width: 767px) {
+    .site-header .region-mobile-trigger,
+    .site-header .mobile-signin-trigger {
+      -webkit-appearance: none !important;
+      appearance: none !important;
+      background: rgba(var(--rgb-bg-0), 0.78) !important;
+      background-color: rgba(var(--rgb-bg-0), 0.78) !important;
+      border-color: rgba(var(--rgb-cream), 0.30) !important;
+      color: rgb(var(--rgb-cream)) !important;
+      box-shadow: inset 0 1px 0 rgba(var(--rgb-cream), 0.08), 0 8px 22px -18px rgba(0, 0, 0, 0.85) !important;
+    }
+
+    .site-header .region-mobile-trigger:active,
+    .site-header .mobile-signin-trigger:active {
+      background: rgba(var(--rgb-cream), 0.10) !important;
+      background-color: rgba(var(--rgb-cream), 0.10) !important;
+    }
+  }
+
   .region-trigger-icon,
   .region-trigger-chevron,
   .region-sheet-close svg,
