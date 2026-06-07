@@ -799,11 +799,60 @@ function FilmPage() {
         </div>
       </section>
 
+      {/* Editorial Narrative — extended synopsis as a cinematic essay block.
+          Renders only when full synopsis exists; bilingual stacking when both
+          EN and FA are present so the page reads like a Criterion booklet. */}
+      {(film.synopsis_en || film.synopsis_fa) && (
+        <section className="mx-auto max-w-3xl px-6 pt-16 pb-4 md:px-10 md:pt-20">
+          <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
+            {fa ? "روایت" : "The Narrative"}
+          </span>
+          <h2
+            className={`mt-4 text-[26px] font-medium leading-[1.15] tracking-[-0.02em] text-cream-bright md:text-[34px] ${fa ? "font-vazir" : "font-display italic"}`}
+          >
+            {fa
+              ? "فرود به اعماقِ ناپیدا."
+              : (
+                <>
+                  A descent into the <span className="text-amber not-italic">unseen</span>.
+                </>
+              )}
+          </h2>
+          <div className="mt-7 space-y-6">
+            {film.synopsis_en && (
+              <p
+                className="border-s border-amber/30 ps-4 text-[15px] leading-[1.75] text-cream/85 md:text-[16px]"
+                dir="ltr"
+              >
+                {film.synopsis_en}
+              </p>
+            )}
+            {film.synopsis_fa && (
+              <p
+                className="font-vazir text-right text-[16px] leading-[2] text-cream/90 md:text-[17px]"
+                dir="rtl"
+              >
+                {film.synopsis_fa}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Hairline section divider — gradient amber, signals editorial chapter break */}
+      <div className="mx-auto max-w-3xl px-6 py-8 md:px-10" aria-hidden>
+        <div className="h-px bg-gradient-to-r from-transparent via-amber/30 to-transparent" />
+      </div>
+
       {/* Film Details */}
-      <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
-        <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+      <section className="mx-auto max-w-7xl px-6 pt-4 pb-8 md:px-10 md:pt-6 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
+        <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
+          {fa ? "ساخت" : "The Particulars"}
+        </span>
+        <h2 className={`mt-3 mb-6 text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : "font-display italic"}`}>
           {fa ? "اطلاعات فیلم" : "Film Details"}
         </h2>
+
         <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 md:grid-cols-4">
           {film.year && (
             <div>
