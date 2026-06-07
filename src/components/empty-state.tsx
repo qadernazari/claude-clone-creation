@@ -1,0 +1,55 @@
+import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+
+/**
+ * Brand-aligned empty state used across library, watchlist, search results,
+ * admin lists. Editorial copy + amber line-art glyph + optional CTA.
+ */
+export function EmptyState({
+  eyebrow,
+  title,
+  description,
+  icon,
+  cta,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  icon?: ReactNode;
+  cta?: { label: string; to: string };
+}) {
+  return (
+    <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
+      <div
+        className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber"
+        aria-hidden
+      >
+        {icon ?? (
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="6" width="18" height="12" rx="2" />
+            <path d="M8 6V4m8 2V4M3 10h18" />
+          </svg>
+        )}
+      </div>
+      {eyebrow && (
+        <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+          {eyebrow}
+        </span>
+      )}
+      <h3 className="font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl">
+        {title}
+      </h3>
+      {description && (
+        <p className="mt-3 text-sm leading-relaxed text-cream/55">{description}</p>
+      )}
+      {cta && (
+        <Link
+          to={cta.to as any}
+          className="mt-7 inline-flex min-h-11 items-center rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
+        >
+          {cta.label}
+        </Link>
+      )}
+    </div>
+  );
+}
