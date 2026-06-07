@@ -190,9 +190,15 @@ function AuthInvalidator() {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session?.user) captureMemberGeo().catch(() => {});
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only react to real identity transitions. Without this filter we also
+      // run on TOKEN_REFRESHED (~hourly + every tab focus) and INITIAL_SESSION
+      // (every mount), which thrashes the router and query cache on mobile.
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      queryClient.invalidateQueries();
+      // On sign-out, refetching protected queries against the cleared session
+      // produces a 401 storm — skip the cache invalidation in that case.
+      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
       if (session?.user) captureMemberGeo().catch(() => {});
     });
     return () => subscription.unsubscribe();
