@@ -87,7 +87,7 @@ export function FeaturedFilm() {
               aria-hidden
             />
             <div
-              className={`hero-mobile-skeleton absolute inset-x-0 bottom-0 top-14 md:hidden ${
+              className={`hero-mobile-skeleton absolute inset-x-0 bottom-0 top-0 md:hidden ${
                 mobileHeroReady ? "opacity-0" : "opacity-100"
               }`}
               aria-hidden
