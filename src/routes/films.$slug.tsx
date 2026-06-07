@@ -1,15 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FilmReviewsSection } from "@/components/film-reviews-section";
 import { SeriesEpisodes } from "@/components/series-episodes";
-import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { WatchlistButton } from "@/components/watchlist-button";
-import { PromoBannerList } from "@/components/promo-banner";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
@@ -17,7 +15,6 @@ import { getResumePosition } from "@/lib/library.functions";
 // Lazy-loaded — Stripe SDK is ~200KB; only load when user opens checkout.
 const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
 const MembershipCheckout = lazy(() => import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })));
-const ContributeModal = lazy(() => import("@/components/contribute-modal").then((m) => ({ default: m.ContributeModal })));
 
 
 
@@ -216,7 +213,7 @@ function FilmPage() {
   const { isMember, isLoading: isAuthLoading, user } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [membershipOpen, setMembershipOpen] = useState(false);
-  const [contribOpen, setContribOpen] = useState(false);
+  
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
@@ -457,7 +454,6 @@ function FilmPage() {
 
   return (
     <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
-      <PaymentTestModeBanner />
       <SiteHeader />
 
       {/* Condensed sticky cinematic header — appears after the hero scrolls past.
@@ -787,16 +783,6 @@ function FilmPage() {
               )}
             </p>
             {tomanOnly && <p className="mt-1.5 text-[11px] text-cream/40">{t.tomanSoon}</p>}
-
-            {!showWatchNow && (hasPpv || accessType !== "ppv_only") && (
-              <div className="mt-4 max-w-md">
-                <PromoBannerList
-                  context={isMember || accessType === "ppv_only" ? "ticket" : "membership"}
-                  filmId={film.id}
-                  fa={fa}
-                />
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -1001,36 +987,6 @@ function FilmPage() {
         </section>
       )}
 
-      {/* Support the filmmaker — compact inline strip */}
-      <section className="mx-auto max-w-7xl px-6 pt-6 pb-14 md:px-10">
-        <div className="hairline flex flex-col items-start gap-4 rounded-2xl border bg-bg-1/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex-1">
-            <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/45">
-              {fa ? "حمایت" : "Support"}
-            </span>
-            <p className={`mt-1.5 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>
-              {fa ? "از فیلم‌ساز حمایت کنید" : "Support the filmmaker"}
-              <span className="ms-2 text-cream/55 font-normal">
-                {fa ? "— کمک شما مستقیماً به سینمای مستقل ایران می‌رسد." : "— your contribution goes directly to independent Iranian cinema."}
-              </span>
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (!user) {
-                window.location.href = "/auth";
-                return;
-              }
-              setContribOpen(true);
-            }}
-            className="inline-flex shrink-0 items-center justify-center rounded-full border border-cream/20 px-5 py-2.5 text-[13px] font-medium text-cream/85 transition-colors hover:bg-cream/5 hover:text-cream-bright"
-          >
-            {t.contribute}
-          </button>
-        </div>
-      </section>
-
       {checkoutOpen && (
         <Suspense fallback={null}>
           <FilmCheckout
@@ -1047,17 +1003,6 @@ function FilmPage() {
           <MembershipCheckout
             returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
             onClose={() => setMembershipOpen(false)}
-          />
-        </Suspense>
-      )}
-
-      {contribOpen && (
-        <Suspense fallback={null}>
-          <ContributeModal
-            filmSlug={film.slug}
-            filmTitle={title}
-            returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&kind=contribution&film=${film.slug}` : ""}
-            onClose={() => setContribOpen(false)}
           />
         </Suspense>
       )}

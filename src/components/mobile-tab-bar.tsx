@@ -125,20 +125,17 @@ function TabItem({
         }`}
         aria-current={active ? "page" : undefined}
       >
-        {/* Amber active indicator dot — sits above the icon, Apple TV+ style */}
+        {/* Single, calm amber dot above active icon */}
         <span
-          className={`pointer-events-none absolute top-0 h-[3px] w-[3px] rounded-full bg-amber transition-all duration-300 ${
-            active ? "opacity-100 scale-100" : "opacity-0 scale-50"
+          className={`pointer-events-none absolute top-0 h-[3px] w-[3px] rounded-full bg-amber transition-opacity duration-200 ${
+            active ? "opacity-100" : "opacity-0"
           }`}
-          style={{ boxShadow: active ? "0 0 8px rgba(201,168,76,0.7)" : "none" }}
           aria-hidden
         />
         <span className="relative flex h-[26px] w-[44px] items-center justify-center">
-          <span className={`relative h-[20px] w-[20px] transition-transform duration-200 ${active ? "scale-105" : "group-active:scale-90"}`}>
-            {icon}
-          </span>
+          <span className="relative h-[20px] w-[20px]">{icon}</span>
         </span>
-        <span className={`leading-none transition-opacity ${active ? "opacity-100" : "opacity-70"}`}>{label}</span>
+        <span className="leading-none">{label}</span>
       </Link>
     </li>
   );

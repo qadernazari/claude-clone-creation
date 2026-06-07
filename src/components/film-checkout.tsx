@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createFilmCheckout } from "@/lib/payments.functions";
 import { CouponField } from "@/components/coupon-field";
-import { PromoBannerList } from "@/components/promo-banner";
+
 import { useLocale } from "@/lib/i18n";
 
 interface FilmCheckoutProps {
@@ -70,11 +70,7 @@ export function FilmCheckout({ filmSlug, filmId, returnUrl, onClose }: FilmCheck
               <p className="mb-2 text-[11px] uppercase tracking-widest text-cream/55">
                 {fa ? "کد تخفیف (اختیاری)" : "Promo code (optional)"}
               </p>
-              {!applied && (
-                <div className="mb-3">
-                  <PromoBannerList context="ticket" filmId={filmId} fa={fa} onApply={setApplied} />
-                </div>
-              )}
+              {/* coupon field below — promo banner list removed */}
               <CouponField
                 context="ticket"
                 filmId={filmId}
