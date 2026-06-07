@@ -248,11 +248,140 @@ function WatchPage() {
   const onVolumeChange = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
+    setMuted(v.muted);
     try {
       localStorage.setItem("player:volume", String(v.volume));
       localStorage.setItem("player:muted", v.muted ? "1" : "0");
     } catch {}
   }, []);
+
+  /* ---------- Custom player overlay state ---------- */
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [buffered, setBuffered] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [overlayVisible, setOverlayVisible] = useState(true);
+  const [scrubbing, setScrubbing] = useState(false);
+  const overlayTimerRef = useRef<number | null>(null);
+  const playerShellRef = useRef<HTMLDivElement>(null);
+  const scrubRef = useRef<HTMLDivElement>(null);
+  const tapStateRef = useRef<{ t: number; x: number } | null>(null);
+  const [seekRipple, setSeekRipple] = useState<{ side: "left" | "right"; key: number } | null>(null);
+
+  const revealOverlay = useCallback(() => {
+    setOverlayVisible(true);
+    if (overlayTimerRef.current) window.clearTimeout(overlayTimerRef.current);
+    overlayTimerRef.current = window.setTimeout(() => {
+      // Don't auto-hide while paused
+      if (videoRef.current && !videoRef.current.paused) setOverlayVisible(false);
+    }, 3000);
+  }, []);
+
+  useEffect(() => () => {
+    if (overlayTimerRef.current) window.clearTimeout(overlayTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    const onFs = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) v.play().catch(() => {});
+    else v.pause();
+    revealOverlay();
+  }, [revealOverlay]);
+
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    revealOverlay();
+  }, [revealOverlay]);
+
+  const toggleFullscreen = useCallback(() => {
+    const shell = playerShellRef.current;
+    if (!shell) return;
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else shell.requestFullscreen?.().catch(() => {});
+  }, []);
+
+  const scrubToClientX = useCallback((clientX: number) => {
+    const v = videoRef.current;
+    const bar = scrubRef.current;
+    if (!v || !bar || !v.duration || !isFinite(v.duration)) return;
+    const rect = bar.getBoundingClientRect();
+    let pct = (clientX - rect.left) / rect.width;
+    if (dir === "rtl") pct = 1 - pct;
+    pct = Math.max(0, Math.min(1, pct));
+    v.currentTime = v.duration * pct;
+    setCurrentTime(v.currentTime);
+  }, [dir]);
+
+  const onScrubPointerDown = useCallback((e: React.PointerEvent) => {
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setScrubbing(true);
+    scrubToClientX(e.clientX);
+  }, [scrubToClientX]);
+
+  const onScrubPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!scrubbing) return;
+    scrubToClientX(e.clientX);
+  }, [scrubbing, scrubToClientX]);
+
+  const onScrubPointerUp = useCallback((e: React.PointerEvent) => {
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    setScrubbing(false);
+    revealOverlay();
+  }, [revealOverlay]);
+
+  // Double-tap left / right edge → ±10s seek (mobile)
+  const onPlayerPointerDown = useCallback((e: React.PointerEvent) => {
+    if (e.pointerType !== "touch") return;
+    const now = Date.now();
+    const prev = tapStateRef.current;
+    if (prev && now - prev.t < 280 && Math.abs(prev.x - e.clientX) < 40) {
+      const v = videoRef.current;
+      const shell = playerShellRef.current;
+      if (v && shell && v.duration && isFinite(v.duration)) {
+        const rect = shell.getBoundingClientRect();
+        let side: "left" | "right" = e.clientX < rect.left + rect.width / 2 ? "left" : "right";
+        if (dir === "rtl") side = side === "left" ? "right" : "left";
+        const delta = side === "right" ? 10 : -10;
+        v.currentTime = Math.min(v.duration, Math.max(0, v.currentTime + delta));
+        setCurrentTime(v.currentTime);
+        setSeekRipple({ side: side === "right" ? "right" : "left", key: now });
+        window.setTimeout(() => setSeekRipple((r) => (r && r.key === now ? null : r)), 600);
+      }
+      tapStateRef.current = null;
+      return;
+    }
+    tapStateRef.current = { t: now, x: e.clientX };
+  }, [dir]);
+
+  const onPlayEvt = useCallback(() => { setPlaying(true); revealOverlay(); }, [revealOverlay]);
+  const onPauseEvt = useCallback(() => { setPlaying(false); setOverlayVisible(true); }, []);
+  const onDurationChangeEvt = useCallback(() => {
+    const v = videoRef.current;
+    if (v && isFinite(v.duration)) setDuration(v.duration);
+  }, []);
+  const onProgressEvt = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || v.buffered.length === 0) return;
+    setBuffered(v.buffered.end(v.buffered.length - 1));
+  }, []);
+  const onTimeTick = useCallback(() => {
+    const v = videoRef.current;
+    if (v) setCurrentTime(v.currentTime);
+  }, []);
+
+  const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const bufPct = duration > 0 ? (buffered / duration) * 100 : 0;
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -404,8 +533,11 @@ function WatchPage() {
         </div>
 
         <div
-          className="mt-0 relative overflow-hidden border-y border-cream/10 shadow-2xl shadow-black/60 aspect-video md:mt-4 md:rounded-xl md:border"
+          ref={playerShellRef}
+          className="group/player mt-0 relative overflow-hidden border-y border-cream/10 shadow-2xl shadow-black/60 aspect-video md:mt-4 md:rounded-xl md:border"
           style={!showPlayer ? posterStyle : { background: "#000" }}
+          onPointerMove={() => showPlayer && revealOverlay()}
+          onPointerDown={onPlayerPointerDown}
         >
           {/* subtle vignette for poster states */}
           {!showPlayer && (
@@ -443,16 +575,187 @@ function WatchPage() {
                 ref={videoRef}
                 src={videoUrl}
                 poster={film.cover_url || undefined}
-                controls
                 autoPlay={resumePrompt === null}
                 playsInline
                 controlsList="nodownload"
                 onLoadedMetadata={onLoadedMetadata}
-                onTimeUpdate={onTimeUpdate}
-                onEnded={onEnded}
+                onTimeUpdate={() => { onTimeUpdate(); onTimeTick(); }}
+                onEnded={() => { onEnded(); setPlaying(false); setOverlayVisible(true); }}
                 onVolumeChange={onVolumeChange}
-                className="absolute inset-0 h-full w-full bg-black"
+                onPlay={onPlayEvt}
+                onPause={onPauseEvt}
+                onDurationChange={onDurationChangeEvt}
+                onProgress={onProgressEvt}
+                onClick={togglePlay}
+                className="absolute inset-0 h-full w-full bg-black cursor-pointer"
               />
+
+              {/* ---- Cinematic overlay ---- */}
+              <div
+                className={`pointer-events-none absolute inset-0 z-[5] transition-opacity duration-300 ${
+                  overlayVisible || !playing ? "opacity-100" : "opacity-0"
+                }`}
+                aria-hidden={!overlayVisible && playing}
+              >
+                {/* Top gradient + back/title bar */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/75 to-transparent" />
+                <div className={`pointer-events-auto absolute inset-x-0 top-0 flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 ${overlayVisible || !playing ? "" : "pointer-events-none"}`}>
+                  <Link
+                    to="/films/$slug"
+                    params={{ slug: film.slug }}
+                    aria-label={t.back}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/15 bg-black/30 text-cream/85 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-amber/50 hover:text-amber"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={dir === "rtl" ? { transform: "scaleX(-1)" } : undefined}>
+                      <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <div className={`truncate text-[14px] font-medium text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] md:text-[15px] ${fa ? "font-vazir" : "font-display"}`}>
+                      {title}
+                    </div>
+                    {director && (
+                      <div className="truncate text-[11px] text-cream/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+                        {fa ? "کارگردان " : "Dir. "}{director}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Center play / pause (only show big icon when paused) */}
+                {!playing && (
+                  <button
+                    type="button"
+                    onClick={togglePlay}
+                    aria-label={fa ? "پخش" : "Play"}
+                    className="pointer-events-auto absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/20 bg-black/45 text-cream-bright backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-amber/60 hover:text-amber"
+                  >
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                )}
+
+                {/* Bottom gradient + control bar */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                <div className={`pointer-events-auto absolute inset-x-0 bottom-0 px-4 pb-3 pt-2 md:px-6 md:pb-5 ${overlayVisible || !playing ? "" : "pointer-events-none"}`}>
+                  {/* Scrubber */}
+                  <div
+                    ref={scrubRef}
+                    onPointerDown={onScrubPointerDown}
+                    onPointerMove={onScrubPointerMove}
+                    onPointerUp={onScrubPointerUp}
+                    onPointerCancel={onScrubPointerUp}
+                    className="group/scrub relative h-6 cursor-pointer touch-none select-none"
+                    role="slider"
+                    aria-label={fa ? "موقعیت پخش" : "Playback position"}
+                    aria-valuemin={0}
+                    aria-valuemax={Math.floor(duration) || 0}
+                    aria-valuenow={Math.floor(currentTime) || 0}
+                  >
+                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-cream/15 transition-all group-hover/scrub:h-[5px]" />
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-cream/25 transition-all group-hover/scrub:h-[5px]"
+                      style={dir === "rtl" ? { right: 0, width: `${bufPct}%` } : { left: 0, width: `${bufPct}%` }}
+                    />
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.6)] transition-all group-hover/scrub:h-[5px]"
+                      style={dir === "rtl" ? { right: 0, width: `${pct}%` } : { left: 0, width: `${pct}%` }}
+                    />
+                    <div
+                      className={`absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-amber shadow-[0_0_10px_rgba(201,168,76,0.8)] transition-transform ${scrubbing ? "scale-125" : "scale-0 group-hover/scrub:scale-100"}`}
+                      style={dir === "rtl"
+                        ? { right: `calc(${pct}% - 7px)` }
+                        : { left: `calc(${pct}% - 7px)` }}
+                    />
+                  </div>
+
+                  {/* Time + buttons row */}
+                  <div className="mt-2 flex items-center gap-3 text-[12px] text-cream/85">
+                    <button
+                      type="button"
+                      onClick={togglePlay}
+                      aria-label={playing ? (fa ? "مکث" : "Pause") : (fa ? "پخش" : "Play")}
+                      className="flex h-9 w-9 items-center justify-center rounded-full text-cream-bright transition-all hover:scale-110 hover:text-amber"
+                    >
+                      {playing ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                          <rect x="6" y="5" width="4" height="14" rx="1" />
+                          <rect x="14" y="5" width="4" height="14" rx="1" />
+                        </svg>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={toggleMute}
+                      aria-label={muted ? (fa ? "صدادار" : "Unmute") : (fa ? "بی‌صدا" : "Mute")}
+                      className="hidden h-9 w-9 items-center justify-center rounded-full text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
+                    >
+                      {muted ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M11 5 6 9H2v6h4l5 4Z" />
+                          <path d="m22 9-6 6M16 9l6 6" />
+                        </svg>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M11 5 6 9H2v6h4l5 4Z" />
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                        </svg>
+                      )}
+                    </button>
+                    <span className="tabular-nums tracking-wide text-cream-bright drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+                      {fmtTime(currentTime)}
+                    </span>
+                    <span className="text-cream/40">/</span>
+                    <span className="tabular-nums tracking-wide text-cream/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+                      {fmtTime(duration)}
+                    </span>
+                    <div className="flex-1" />
+                    <button
+                      type="button"
+                      onClick={toggleFullscreen}
+                      aria-label={isFullscreen ? (fa ? "خروج از تمام‌صفحه" : "Exit fullscreen") : (fa ? "تمام‌صفحه" : "Fullscreen")}
+                      className="flex h-9 w-9 items-center justify-center rounded-full text-cream/85 transition-all hover:scale-110 hover:text-amber"
+                    >
+                      {isFullscreen ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M8 3v5H3M21 8h-5V3M3 16h5v5M16 21v-5h5" />
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Double-tap seek ripple */}
+              {seekRipple && (
+                <div
+                  key={seekRipple.key}
+                  className={`pointer-events-none absolute top-1/2 z-[6] -translate-y-1/2 flex h-24 w-24 items-center justify-center rounded-full border border-amber/40 bg-amber/10 text-amber backdrop-blur-sm animate-fade-in ${
+                    seekRipple.side === "right" ? "right-[15%]" : "left-[15%]"
+                  }`}
+                >
+                  <div className="text-center">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden style={seekRipple.side === "left" ? { transform: "scaleX(-1)" } : undefined}>
+                      <path d="M5 4v16l7-5-7-5 7-3-7-3z" opacity="0.6" />
+                      <path d="M13 4v16l7-5-7-5 7-3-7-3z" />
+                    </svg>
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em]">
+                      {seekRipple.side === "right" ? "+10s" : "−10s"}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {resumePrompt !== null && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
                   <div className="rounded-xl border border-cream/15 bg-bg-0/90 p-6 max-w-sm text-center shadow-2xl">
@@ -482,7 +785,7 @@ function WatchPage() {
                 </div>
               )}
               {hud && (
-                <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
+                <div className="pointer-events-none absolute top-4 left-1/2 z-[7] -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
                   {hud}
                 </div>
               )}
