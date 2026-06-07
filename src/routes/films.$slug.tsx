@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FilmReviewsSection } from "@/components/film-reviews-section";
 import { SeriesEpisodes } from "@/components/series-episodes";
-import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { PromoBannerList } from "@/components/promo-banner";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
