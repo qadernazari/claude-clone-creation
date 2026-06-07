@@ -48,7 +48,7 @@ export const Route = createFileRoute("/browse")({
   ),
 });
 
-type Film = {
+type Film = BrowseFilm;
   id: string;
   slug: string;
   title_en: string;
