@@ -53,40 +53,6 @@ export type HomePageData = {
 
 type RawFilm = Record<string, unknown>;
 
-function parseSigned(u: string | null | undefined): { bucket: string; path: string } | null {
-  if (!u) return null;
-  const m = u.match(/\/storage\/v1\/object\/sign\/([^/]+)\/([^?]+)/);
-  return m ? { bucket: m[1], path: decodeURIComponent(m[2]) } : null;
-}
-
-const ONE_YEAR = 60 * 60 * 24 * 365;
-
-async function renderUrl(
-  supabaseAdmin: any,
-  cache: Map<string, Promise<string | null>>,
-  original: string | null | undefined,
-  width: number,
-  quality = 68,
-): Promise<string | null> {
-  if (!original) return null;
-  const parsed = parseSigned(original);
-  if (!parsed) return original;
-  const key = `${parsed.bucket}|${parsed.path}|${width}|${quality}`;
-  const existing = cache.get(key);
-  if (existing) return existing;
-  const promise = (async () => {
-    const { data, error } = await supabaseAdmin.storage
-      .from(parsed.bucket)
-      .createSignedUrl(parsed.path, ONE_YEAR, {
-        transform: { width, quality, resize: "cover" },
-      });
-    if (error || !data?.signedUrl) return original;
-    return data.signedUrl as string;
-  })();
-  cache.set(key, promise);
-  return promise;
-}
-
 export const getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageData> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
