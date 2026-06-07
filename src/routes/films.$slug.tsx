@@ -441,18 +441,18 @@ function FilmPage() {
                 alt=""
                 fetchPriority="high"
                 decoding="async"
-                className="absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
+                className="film-hero-kenburns absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
                 aria-hidden
               />
             ) : null}
-            {/* Desktop / tablet: 16:9 cinematic art */}
+            {/* Desktop / tablet: 16:9 cinematic art with slow Ken Burns drift */}
             {heroArtDesktop ? (
               <img
                 src={heroArtDesktop}
                 alt=""
                 fetchPriority="high"
                 decoding="async"
-                className="absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"
+                className="film-hero-kenburns absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"
                 aria-hidden
               />
             ) : null}
