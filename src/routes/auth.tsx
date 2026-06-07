@@ -350,6 +350,7 @@ function AuthPage() {
                       />
                     </div>
                   </div>
+                </fieldset>
 
 
 
