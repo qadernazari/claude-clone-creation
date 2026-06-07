@@ -21,7 +21,13 @@ export function EmptyState({
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
       <div
-        className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber"
+        className="mb-6 flex items-center justify-center rounded-full text-amber"
+        style={{
+          width: "64px",
+          height: "64px",
+          border: "1px solid rgba(var(--rgb-amber), 0.30)",
+          background: "rgba(var(--rgb-amber), 0.06)",
+        }}
         aria-hidden
       >
         {icon ?? (
@@ -32,7 +38,10 @@ export function EmptyState({
         )}
       </div>
       {eyebrow && (
-        <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+        <span
+          className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em]"
+          style={{ color: "rgba(var(--rgb-amber), 0.9)" }}
+        >
           {eyebrow}
         </span>
       )}

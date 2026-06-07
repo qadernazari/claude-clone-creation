@@ -438,18 +438,34 @@ function Empty({ title, cta }: { title: string; cta?: string }) {
   const fa = locale === "fa";
   return (
     <div className="relative mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
-      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber" aria-hidden>
+      <div
+        className="mb-6 flex items-center justify-center rounded-full text-amber"
+        style={{
+          width: "64px",
+          height: "64px",
+          border: "1px solid rgba(var(--rgb-amber), 0.30)",
+          background: "rgba(var(--rgb-amber), 0.06)",
+        }}
+        aria-hidden
+      >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 4h14a1 1 0 0 1 1 1v15l-8-4-8 4V5a1 1 0 0 1 1-1Z" />
         </svg>
       </div>
-      <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+      <span
+        className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em]"
+        style={{ color: "rgba(var(--rgb-amber), 0.9)" }}
+      >
         {fa ? "کتابخانه" : "Library"}
       </span>
       <h3 className={`font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl ${fa ? "font-vazir" : ""}`}>
         {title}
       </h3>
-      <div className="mx-auto mt-5 h-px w-12 bg-amber/40" aria-hidden />
+      <div
+        className="mx-auto mt-5 h-px w-12"
+        style={{ background: "rgba(var(--rgb-amber), 0.40)" }}
+        aria-hidden
+      />
       {cta ? (
         <Link
           to="/browse"
