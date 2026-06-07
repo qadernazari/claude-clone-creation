@@ -7,17 +7,17 @@ import { SiteFooter } from "../components/site-footer";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About IRAN — A home for original Iranian short films" },
+      { title: "About — IRAN" },
       {
         name: "description",
         content:
-          "Our mission, the team behind IRAN, and how to reach us. A premium, ticket-based home for original Persian short films.",
+          "IRAN is a streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals. Fair pay for filmmakers.",
       },
-      { property: "og:title", content: "About IRAN" },
+      { property: "og:title", content: "About — IRAN" },
       {
         property: "og:description",
         content:
-          "Our mission, the team, and how to reach us — a premium home for original Iranian short films.",
+          "Iranian short films, streaming worldwide. Membership with a free trial, plus Premium rentals. Fair pay for filmmakers.",
       },
       { property: "og:url", content: "https://ir.show/about" },
     ],
