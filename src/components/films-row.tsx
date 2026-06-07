@@ -94,7 +94,12 @@ function Rail({
     >
       <div className="mb-6 flex items-end justify-between gap-6">
         <div className="max-w-2xl">
-          <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
+          {eyebrow && (
+            <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+              {eyebrow}
+            </span>
+          )}
+          <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[28px]">
             {title}
           </h2>
           {subtitle && (
@@ -106,7 +111,7 @@ function Rail({
             type="button"
             onClick={() => scroll(-1)}
             aria-label="Previous"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
           </button>
@@ -114,16 +119,24 @@ function Rail({
             type="button"
             onClick={() => scroll(1)}
             aria-label="Next"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-cream/30 hover:text-cream-bright hover:bg-cream/5"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/50 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
           </button>
         </div>
       </div>
+      {/* Edge-fade mask: posters dissolve into background instead of hard-clipping */}
       <div
         ref={ref}
         className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12 md:pt-3"
-        style={{ scrollPaddingLeft: "1.25rem", WebkitOverflowScrolling: "touch" as never }}
+        style={{
+          scrollPaddingLeft: "1.25rem",
+          WebkitOverflowScrolling: "touch" as never,
+          maskImage:
+            "linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 56px), transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 56px), transparent 100%)",
+        }}
       >
         {films.map((f) => (
           <PosterCard key={f.id} film={f} locale={locale} year={year} />

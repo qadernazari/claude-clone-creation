@@ -179,13 +179,16 @@ export function FeaturedFilm() {
               <h1 className="font-display text-[2.5rem] font-medium leading-[0.98] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
                 {title}
               </h1>
-              <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.24em] text-cream/55 md:mt-5 md:text-[11px]">
-                {director}
-                {data.year ? <> {" · "} {year(data.year)}</> : null}
+              <p className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-medium uppercase tracking-[0.24em] text-cream/60 md:mt-5 md:text-[11px]">
+                {director && <span>{director}</span>}
+                {director && data.year ? <span className="text-amber/60">·</span> : null}
+                {data.year ? <span>{year(data.year)}</span> : null}
                 {data.duration_min ? (
                   <>
-                    {" · "}
-                    {num(data.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
+                    <span className="text-amber/60">·</span>
+                    <span>
+                      {num(data.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
+                    </span>
                   </>
                 ) : null}
               </p>
@@ -198,18 +201,25 @@ export function FeaturedFilm() {
                 <Link
                   to="/films/$slug"
                   params={{ slug: data.slug }}
-                  className="inline-flex min-h-11 items-center gap-2.5 rounded-full bg-cream-bright px-7 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98] md:px-8 md:py-3.5 md:text-sm"
+                  className="group/cta relative inline-flex min-h-11 items-center gap-2.5 overflow-hidden rounded-full bg-cream-bright px-7 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_14px_50px_-10px_rgba(240,215,140,0.55)] active:scale-[0.98] md:px-8 md:py-3.5 md:text-sm"
                 >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  {/* Subtle amber sheen on hover */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-amber/30 to-transparent opacity-0 transition-all duration-700 group-hover/cta:translate-x-full group-hover/cta:opacity-100"
+                  />
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden className="relative">
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                  {locale === "fa" ? "تماشای فیلم" : "Watch Now"}
+                  <span className="relative">
+                    {locale === "fa" ? "تماشای فیلم" : "Watch Now"}
+                  </span>
                 </Link>
                 {user && (
                   <Link
                     to="/films/$slug"
                     params={{ slug: data.slug }}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-all duration-300 hover:border-cream/55 hover:bg-bg-0/85 active:scale-[0.98] md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm md:hover:bg-cream/15"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-all duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <line x1="12" y1="5" x2="12" y2="19" />
