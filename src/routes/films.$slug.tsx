@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { FilmReviewsSection } from "@/components/film-reviews-section";
 
 // Lazy-loaded — Stripe SDK is ~200KB; only load when user opens checkout.
 const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
@@ -988,6 +989,7 @@ function FilmPage() {
           </div>
         </div>
       )}
+      <FilmReviewsSection filmId={film.id} />
       <SiteFooter />
 
       {/* Mobile-only sticky bottom CTA — sits above the bottom tab bar.
