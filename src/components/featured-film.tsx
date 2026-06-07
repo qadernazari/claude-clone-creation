@@ -78,7 +78,7 @@ export function FeaturedFilm() {
         {hasAnyImage ? (
           <>
             <div
-              className="hero-mobile-poster absolute inset-x-0 bottom-0 top-14 bg-cover bg-center md:hidden"
+              className="hero-mobile-poster absolute inset-x-0 bottom-0 top-0 bg-cover bg-top md:hidden"
               style={{
                 backgroundImage: safeMobileImage
                   ? `linear-gradient(180deg, rgba(13,13,13,0.08) 0%, rgba(13,13,13,0.36) 72%, var(--bg-0) 100%), url(\"${safeMobileImage}\")`
@@ -87,7 +87,7 @@ export function FeaturedFilm() {
               aria-hidden
             />
             <div
-              className={`hero-mobile-skeleton absolute inset-x-0 bottom-0 top-14 md:hidden ${
+              className={`hero-mobile-skeleton absolute inset-x-0 bottom-0 top-0 md:hidden ${
                 mobileHeroReady ? "opacity-0" : "opacity-100"
               }`}
               aria-hidden
@@ -97,7 +97,7 @@ export function FeaturedFilm() {
               <img
                 src={mobileImage}
                 alt=""
-                className={`hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-14 w-full object-cover object-center transition-opacity duration-500 md:hidden ${
+                className={`hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 w-full object-cover object-top transition-opacity duration-500 md:hidden ${
                   mobileHeroReady ? "opacity-100" : "opacity-0"
                 }`}
                 loading="eager"
