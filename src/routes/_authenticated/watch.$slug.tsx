@@ -248,11 +248,140 @@ function WatchPage() {
   const onVolumeChange = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
+    setMuted(v.muted);
     try {
       localStorage.setItem("player:volume", String(v.volume));
       localStorage.setItem("player:muted", v.muted ? "1" : "0");
     } catch {}
   }, []);
+
+  /* ---------- Custom player overlay state ---------- */
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [buffered, setBuffered] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [overlayVisible, setOverlayVisible] = useState(true);
+  const [scrubbing, setScrubbing] = useState(false);
+  const overlayTimerRef = useRef<number | null>(null);
+  const playerShellRef = useRef<HTMLDivElement>(null);
+  const scrubRef = useRef<HTMLDivElement>(null);
+  const tapStateRef = useRef<{ t: number; x: number } | null>(null);
+  const [seekRipple, setSeekRipple] = useState<{ side: "left" | "right"; key: number } | null>(null);
+
+  const revealOverlay = useCallback(() => {
+    setOverlayVisible(true);
+    if (overlayTimerRef.current) window.clearTimeout(overlayTimerRef.current);
+    overlayTimerRef.current = window.setTimeout(() => {
+      // Don't auto-hide while paused
+      if (videoRef.current && !videoRef.current.paused) setOverlayVisible(false);
+    }, 3000);
+  }, []);
+
+  useEffect(() => () => {
+    if (overlayTimerRef.current) window.clearTimeout(overlayTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    const onFs = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) v.play().catch(() => {});
+    else v.pause();
+    revealOverlay();
+  }, [revealOverlay]);
+
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    revealOverlay();
+  }, [revealOverlay]);
+
+  const toggleFullscreen = useCallback(() => {
+    const shell = playerShellRef.current;
+    if (!shell) return;
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else shell.requestFullscreen?.().catch(() => {});
+  }, []);
+
+  const scrubToClientX = useCallback((clientX: number) => {
+    const v = videoRef.current;
+    const bar = scrubRef.current;
+    if (!v || !bar || !v.duration || !isFinite(v.duration)) return;
+    const rect = bar.getBoundingClientRect();
+    let pct = (clientX - rect.left) / rect.width;
+    if (dir === "rtl") pct = 1 - pct;
+    pct = Math.max(0, Math.min(1, pct));
+    v.currentTime = v.duration * pct;
+    setCurrentTime(v.currentTime);
+  }, [dir]);
+
+  const onScrubPointerDown = useCallback((e: React.PointerEvent) => {
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setScrubbing(true);
+    scrubToClientX(e.clientX);
+  }, [scrubToClientX]);
+
+  const onScrubPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!scrubbing) return;
+    scrubToClientX(e.clientX);
+  }, [scrubbing, scrubToClientX]);
+
+  const onScrubPointerUp = useCallback((e: React.PointerEvent) => {
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    setScrubbing(false);
+    revealOverlay();
+  }, [revealOverlay]);
+
+  // Double-tap left / right edge → ±10s seek (mobile)
+  const onPlayerPointerDown = useCallback((e: React.PointerEvent) => {
+    if (e.pointerType !== "touch") return;
+    const now = Date.now();
+    const prev = tapStateRef.current;
+    if (prev && now - prev.t < 280 && Math.abs(prev.x - e.clientX) < 40) {
+      const v = videoRef.current;
+      const shell = playerShellRef.current;
+      if (v && shell && v.duration && isFinite(v.duration)) {
+        const rect = shell.getBoundingClientRect();
+        let side: "left" | "right" = e.clientX < rect.left + rect.width / 2 ? "left" : "right";
+        if (dir === "rtl") side = side === "left" ? "right" : "left";
+        const delta = side === "right" ? 10 : -10;
+        v.currentTime = Math.min(v.duration, Math.max(0, v.currentTime + delta));
+        setCurrentTime(v.currentTime);
+        setSeekRipple({ side: side === "right" ? "right" : "left", key: now });
+        window.setTimeout(() => setSeekRipple((r) => (r && r.key === now ? null : r)), 600);
+      }
+      tapStateRef.current = null;
+      return;
+    }
+    tapStateRef.current = { t: now, x: e.clientX };
+  }, [dir]);
+
+  const onPlayEvt = useCallback(() => { setPlaying(true); revealOverlay(); }, [revealOverlay]);
+  const onPauseEvt = useCallback(() => { setPlaying(false); setOverlayVisible(true); }, []);
+  const onDurationChangeEvt = useCallback(() => {
+    const v = videoRef.current;
+    if (v && isFinite(v.duration)) setDuration(v.duration);
+  }, []);
+  const onProgressEvt = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || v.buffered.length === 0) return;
+    setBuffered(v.buffered.end(v.buffered.length - 1));
+  }, []);
+  const onTimeTick = useCallback(() => {
+    const v = videoRef.current;
+    if (v) setCurrentTime(v.currentTime);
+  }, []);
+
+  const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const bufPct = duration > 0 ? (buffered / duration) * 100 : 0;
 
   // Keyboard shortcuts
   useEffect(() => {
