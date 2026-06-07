@@ -45,7 +45,7 @@ export function EmptyState({
       {cta && (
         <Link
           to={cta.to as any}
-          className="mt-7 inline-flex min-h-11 items-center rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
+          className="mt-7 inline-flex min-h-11 items-center rounded-full bg-amber px-6 py-3 text-[13px] font-semibold text-bg-0 transition-all duration-300 hover:bg-amber/90 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(201,168,76,0.4)] active:scale-[0.98]"
         >
           {cta.label}
         </Link>
