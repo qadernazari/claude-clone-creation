@@ -105,11 +105,23 @@ function MyTicketsPage() {
         {isLoading ? (
           <p className="mt-10 text-sm text-cream/60">{t.loading}</p>
         ) : tickets.length === 0 ? (
-          <div className="mt-10 hairline rounded-xl border bg-bg-1/60 p-8 text-center">
-            <p className="text-cream/80">{t.empty}</p>
+          <div className="mx-auto mt-10 flex max-w-md flex-col items-center px-6 py-16 text-center">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4Z" />
+                <path d="M14 5v14" strokeDasharray="2 2" />
+              </svg>
+            </div>
+            <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+              {fa ? "بلیط‌ها" : "Tickets"}
+            </span>
+            <h3 className={`font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl ${fa ? "font-vazir" : ""}`}>
+              {t.empty}
+            </h3>
+            <div className="mx-auto mt-5 h-px w-12 bg-amber/40" aria-hidden />
             <Link
               to="/"
-              className="mt-4 inline-block rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+              className="mt-7 inline-flex min-h-11 items-center rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
             >
               {t.browse}
             </Link>

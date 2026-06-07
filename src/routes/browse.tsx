@@ -319,11 +319,21 @@ function BrowsePage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-cream/10 bg-bg-1/40 px-8 py-20 text-center">
-            <p className="font-display text-xl text-cream-bright">
+          <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber" aria-hidden>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+            </div>
+            <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+              {locale === "fa" ? "جست‌وجو" : "Search"}
+            </span>
+            <h3 className={`font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl ${locale === "fa" ? "font-vazir" : ""}`}>
               {locale === "fa" ? "چیزی پیدا نشد" : "No films match"}
-            </p>
-            <p className="mt-2 text-sm text-cream/55">
+            </h3>
+            <div className="mx-auto mt-5 h-px w-12 bg-amber/40" aria-hidden />
+            <p className="mt-5 text-sm leading-relaxed text-cream/55">
               {locale === "fa"
                 ? "فیلترها یا واژه‌ی جست‌وجو را تغییر بده."
                 : "Try clearing filters or searching for something else."}
@@ -335,7 +345,7 @@ function BrowsePage() {
                   setActive(null);
                   setQ("");
                 }}
-                className="mt-6 text-[11px] font-medium uppercase tracking-[0.25em] text-cream/70 transition-colors hover:text-cream-bright"
+                className="mt-7 inline-flex min-h-11 items-center rounded-full border border-cream/25 px-6 py-3 text-[13px] font-medium text-cream/85 transition-all duration-300 hover:border-amber/50 hover:text-amber"
               >
                 {locale === "fa" ? "پاک‌سازی فیلترها" : "Clear filters"}
               </button>

@@ -437,22 +437,28 @@ function Empty({ title, cta }: { title: string; cta?: string }) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   return (
-    <div className="hairline flex flex-col items-center rounded-2xl border bg-bg-1/40 px-6 py-14 text-center md:px-12 md:py-16">
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-cream/10 bg-cream/4 text-cream/40">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <div className="relative mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber" aria-hidden>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 4h14a1 1 0 0 1 1 1v15l-8-4-8 4V5a1 1 0 0 1 1-1Z" />
         </svg>
       </div>
-      <p className="text-[15px] text-cream/85">{title}</p>
+      <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
+        {fa ? "کتابخانه" : "Library"}
+      </span>
+      <h3 className={`font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl ${fa ? "font-vazir" : ""}`}>
+        {title}
+      </h3>
+      <div className="mx-auto mt-5 h-px w-12 bg-amber/40" aria-hidden />
       {cta ? (
         <Link
           to="/browse"
-          className="mt-5 inline-flex h-11 items-center rounded-full bg-cream px-6 text-sm font-semibold text-ink active:scale-[0.98] transition-transform hover:bg-cream-bright"
+          className="mt-7 inline-flex min-h-11 items-center rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
         >
           {cta}
         </Link>
       ) : (
-        <p className="mt-2 text-xs text-cream/45">
+        <p className="mt-5 text-xs text-cream/45">
           {fa ? "وقتی شروع به تماشا کنید اینجا ظاهر می‌شود." : "It'll appear here once you start watching."}
         </p>
       )}
