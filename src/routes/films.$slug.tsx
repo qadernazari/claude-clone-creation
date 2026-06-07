@@ -152,22 +152,18 @@ function PosterRail({
   fa: boolean;
 }) {
   return (
-    <section className="mx-auto max-w-7xl px-6 pt-10 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
-      <div className="mb-6 flex items-end justify-between gap-6">
-        <div>
-          <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
-            {fa ? "بیشتر" : "Related Perspectives"}
-          </span>
-          <h2 className={`mt-3 text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : "font-display italic"}`}>
-            {heading}
-          </h2>
-        </div>
+    <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
+      <div className="mb-5 flex items-end justify-between gap-6">
+        <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
+          {heading}
+        </h2>
         {linkText && (
-          <Link to="/browse" className="shrink-0 text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
+          <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
             {linkText} →
           </Link>
         )}
       </div>
+
 
       <div className="-mx-6 overflow-x-auto overflow-y-visible px-6 pt-2 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <ul className="flex gap-4 min-w-max md:gap-5">
@@ -805,59 +801,12 @@ function FilmPage() {
         </div>
       </section>
 
-      {/* Editorial Narrative — extended synopsis as a cinematic essay block.
-          Renders only when full synopsis exists; bilingual stacking when both
-          EN and FA are present so the page reads like a Criterion booklet. */}
-      {(film.synopsis_en || film.synopsis_fa) && (
-        <section className="mx-auto max-w-3xl px-6 pt-16 pb-4 md:px-10 md:pt-20">
-          <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
-            {fa ? "روایت" : "The Narrative"}
-          </span>
-          <h2
-            className={`mt-4 text-[26px] font-medium leading-[1.15] tracking-[-0.02em] text-cream-bright md:text-[34px] ${fa ? "font-vazir" : "font-display italic"}`}
-          >
-            {fa
-              ? "فرود به اعماقِ ناپیدا."
-              : (
-                <>
-                  A descent into the <span className="text-amber not-italic">unseen</span>.
-                </>
-              )}
-          </h2>
-          <div className="mt-7 space-y-6">
-            {film.synopsis_en && (
-              <p
-                className="border-s border-amber/30 ps-4 text-[15px] leading-[1.75] text-cream/85 md:text-[16px]"
-                dir="ltr"
-              >
-                {film.synopsis_en}
-              </p>
-            )}
-            {film.synopsis_fa && (
-              <p
-                className="font-vazir text-right text-[16px] leading-[2] text-cream/90 md:text-[17px]"
-                dir="rtl"
-              >
-                {film.synopsis_fa}
-              </p>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* Hairline section divider — gradient amber, signals editorial chapter break */}
-      <div className="mx-auto max-w-3xl px-6 py-8 md:px-10" aria-hidden>
-        <div className="h-px bg-gradient-to-r from-transparent via-amber/30 to-transparent" />
-      </div>
-
       {/* Film Details */}
-      <section className="mx-auto max-w-7xl px-6 pt-4 pb-8 md:px-10 md:pt-6 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
-        <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
-          {fa ? "ساخت" : "The Particulars"}
-        </span>
-        <h2 className={`mt-3 mb-6 text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : "font-display italic"}`}>
+      <section className="mx-auto max-w-7xl px-6 pt-12 pb-8 md:px-10 md:pt-14 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
+        <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
           {fa ? "اطلاعات فیلم" : "Film Details"}
         </h2>
+
 
         <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 md:grid-cols-4">
           {film.year && (
@@ -921,13 +870,11 @@ function FilmPage() {
 
       {/* Cast & Crew — circular avatars for every credit */}
       {credits.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pt-10 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_300px]">
-          <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
-            {fa ? "چهره‌ها" : "The Faces"}
-          </span>
-          <h2 className={`mt-3 mb-6 text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : "font-display italic"}`}>
+        <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_300px]">
+          <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
             {fa ? "بازیگران و عوامل" : "Cast & Crew"}
           </h2>
+
 
           <div className="-mx-6 overflow-x-auto overflow-y-visible px-6 pt-2 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <ul className="flex gap-5 min-w-max md:gap-7">
