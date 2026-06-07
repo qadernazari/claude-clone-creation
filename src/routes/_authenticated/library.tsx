@@ -239,7 +239,7 @@ function PosterThumb({ film, size = "md" }: { film: LibraryFilm; size?: "sm" | "
     <div
       aria-hidden
       style={{ background: fallback }}
-      className={`hairline relative overflow-hidden rounded-md border bg-bg-1 ${cls}`}
+      className={`relative overflow-hidden rounded-md bg-bg-1 ring-1 ring-cream/10 ${cls}`}
     >
       {film.cover_url && (
         <img
@@ -346,7 +346,7 @@ function ContinueCard({
       <div
         aria-hidden
         style={{ background: (film.poster_gradient as string) || fallbackGradient }}
-        className="hairline relative aspect-video w-full overflow-hidden rounded-xl border bg-bg-1"
+        className="relative aspect-video w-full overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/10"
       >
         {(film.thumbnail_url || film.cover_url) && (
           <img
