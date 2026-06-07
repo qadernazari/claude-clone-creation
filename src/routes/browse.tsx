@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { browsePageQueryOptions } from "../lib/browse.functions";
-import type { BrowseFilm, BrowseCategory } from "../lib/browse.functions";
+import type { BrowseFilm, BrowseCategory } from "../lib/browse.types";
 import { useLocale } from "../lib/i18n";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
