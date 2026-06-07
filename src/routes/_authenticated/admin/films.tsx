@@ -688,6 +688,48 @@ function FilmEditorModal({
               ))}
             </div>
           </Section>
+
+          <Section
+            title="Series & Episodes"
+            description="Mark this as a standalone movie, a series (parent that lists episodes), or an episode of a series."
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {([
+                { v: "movie", t: "Movie", s: "Standalone film" },
+                { v: "series", t: "Series", s: "Parent that holds episodes" },
+                { v: "episode", t: "Episode", s: "Belongs to a series" },
+              ] as const).map((o) => (
+                <label key={o.v} className={`cursor-pointer rounded-md border p-3 transition-colors ${(d.film_type ?? "movie") === o.v ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                  <input type="radio" name="fType" checked={(d.film_type ?? "movie") === o.v} onChange={() => set("film_type", o.v)} className="sr-only" />
+                  <div className="text-sm font-medium">{o.t}</div>
+                  <div className="text-xs text-muted-foreground">{o.s}</div>
+                </label>
+              ))}
+            </div>
+            {d.film_type === "episode" && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label className="block sm:col-span-3">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Parent series</span>
+                  <select
+                    value={d.parent_film_id ?? ""}
+                    onChange={(e) => set("parent_film_id", e.target.value || null)}
+                    className={inp}
+                  >
+                    <option value="">— select a series —</option>
+                    {/* parent options injected by parent component via window prop */}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Season #</span>
+                  <input type="number" min={1} value={d.season_number ?? ""} onChange={(e) => set("season_number", e.target.value === "" ? null : Number(e.target.value))} className={inp} placeholder="1" />
+                </label>
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Episode #</span>
+                  <input type="number" min={1} value={d.episode_number ?? ""} onChange={(e) => set("episode_number", e.target.value === "" ? null : Number(e.target.value))} className={inp} placeholder="1" />
+                </label>
+              </div>
+            )}
+          </Section>
         </div>
 
         <footer className="px-6 py-4 border-t border-border flex items-center gap-3 sticky bottom-0 bg-background">
