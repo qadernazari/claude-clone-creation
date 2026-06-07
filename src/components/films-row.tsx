@@ -186,7 +186,6 @@ export function FilmsRow() {
 
     out.push({
       key: "originals",
-      eyebrow: locale === "fa" ? "اختصاصی ایران" : "Iranian Originals",
       title: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
       subtitle:
         locale === "fa"
@@ -197,10 +196,10 @@ export function FilmsRow() {
 
     out.push({
       key: "new",
-      eyebrow: locale === "fa" ? "تازه‌ها" : "New Releases",
       title: locale === "fa" ? "آثار تازه" : "New Releases",
       films: newReleases,
     });
+
 
     out.push(...catRails);
     return out;
