@@ -377,7 +377,7 @@ function AuthPage() {
                     ? mode === "signin"
                       ? t.working
                       : t.sending
-                    : !revealPassword
+                    : mode === "signin" && !revealPassword
                       ? t.continueBtn
                       : mode === "signin"
                         ? t.signin
