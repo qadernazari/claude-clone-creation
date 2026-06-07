@@ -99,14 +99,31 @@ async function processReminders() {
   return { ok: true, processed, total: trials?.length ?? 0 };
 }
 
+function authorize(request: Request): Response | null {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    return Response.json({ error: "Server not configured" }, { status: 500 });
+  }
+  const authHeader = request.headers.get("Authorization") ?? "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice("Bearer ".length).trim() : "";
+  if (!token || token !== serviceKey) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
 export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const denied = authorize(request);
+        if (denied) return denied;
         const result = await processReminders();
         return Response.json(result);
       },
-      GET: async () => {
+      GET: async ({ request }) => {
+        const denied = authorize(request);
+        if (denied) return denied;
         const result = await processReminders();
         return Response.json(result);
       },
