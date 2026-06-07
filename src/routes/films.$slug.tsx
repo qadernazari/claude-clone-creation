@@ -386,7 +386,7 @@ function FilmPage() {
     tomanSoon: fa ? "پرداخت با تومان (زرین‌پال) به‌زودی." : "Toman checkout (ZarinPal) coming soon.",
     playPreview: fa ? "پخش تیزر" : "Watch trailer",
     share: fa ? "هم‌رسانی" : "Share",
-    copied: fa ? "لینک کپی شد" : "Link copied",
+    copied: fa ? "پیوند کپی شد" : "Link copied",
     moreFromCat: fa ? "بیشتر از این دسته" : "More to explore",
     orBuy: fa ? "یا فقط این فیلم را بخرید" : "Or buy this film",
     creditGroups: {
@@ -963,7 +963,7 @@ function FilmPage() {
               </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
                 {fa
-                  ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
+                  ? "تماشای نامحدودِ همه‌ی آثار. هر زمان لغو کنید."
                   : "Unlimited access to the full catalog. Cancel anytime."}
               </p>
               <button

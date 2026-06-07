@@ -69,7 +69,7 @@ function AboutPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-cream/70">
             {fa
-              ? "ایران خانه‌ای آنلاین برای سینمای کوتاه ایران است. عضویت ماهانه با ۷ روز آزمایش رایگان، به‌علاوه‌ی بلیت‌های ویژه برای انتشارهای منتخب. پرداختِ منصفانه و شفاف به سازندگانِ فیلم."
+              ? "ایران خانه‌ای اینترنتی برای سینمای کوتاه ایران است. عضویت ماهانه با ۷ روز آزمایش رایگان، به‌علاوه‌ی بلیت‌های ویژه برای انتشارهای منتخب. پرداختِ منصفانه و شفاف به سازندگانِ فیلم."
               : "A streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals for select releases. Fair, transparent pay for the people who made the film."}
           </p>
         </div>
