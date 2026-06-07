@@ -44,6 +44,8 @@ function AuthPage() {
   const [pwError, setPwError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [revealPassword, setRevealPassword] = useState(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   // OTP step
   const [otp, setOtp] = useState("");
