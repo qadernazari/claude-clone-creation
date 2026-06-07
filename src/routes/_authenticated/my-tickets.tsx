@@ -142,7 +142,7 @@ function MyTicketsPage() {
                   className="hairline rounded-xl border bg-bg-1/50 p-4 md:p-5 grid gap-4 md:grid-cols-[80px_1fr_auto] items-center"
                 >
                   <div
-                    className="hairline relative aspect-[2/3] w-20 overflow-hidden rounded-md border bg-bg-1"
+                    className="relative aspect-[2/3] w-20 overflow-hidden rounded-md bg-bg-1 ring-1 ring-cream/10"
                     aria-hidden
                   >
                     {tk.film?.cover_url && (
