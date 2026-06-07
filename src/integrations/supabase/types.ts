@@ -464,16 +464,20 @@ export type Database = {
           director_en: string | null
           director_fa: string | null
           duration_min: number | null
+          episode_number: number | null
+          film_type: string
           has_4k: boolean
           has_captions: boolean
           has_subtitles: boolean
           id: string
           is_premium: boolean
           mobile_cover_url: string | null
+          parent_film_id: string | null
           poster_gradient: string | null
           preview_url: string | null
           price_cents: number
           price_toman: number
+          season_number: number | null
           slug: string
           sort_order: number
           synopsis_en: string | null
@@ -497,16 +501,20 @@ export type Database = {
           director_en?: string | null
           director_fa?: string | null
           duration_min?: number | null
+          episode_number?: number | null
+          film_type?: string
           has_4k?: boolean
           has_captions?: boolean
           has_subtitles?: boolean
           id?: string
           is_premium?: boolean
           mobile_cover_url?: string | null
+          parent_film_id?: string | null
           poster_gradient?: string | null
           preview_url?: string | null
           price_cents?: number
           price_toman?: number
+          season_number?: number | null
           slug: string
           sort_order?: number
           synopsis_en?: string | null
@@ -530,16 +538,20 @@ export type Database = {
           director_en?: string | null
           director_fa?: string | null
           duration_min?: number | null
+          episode_number?: number | null
+          film_type?: string
           has_4k?: boolean
           has_captions?: boolean
           has_subtitles?: boolean
           id?: string
           is_premium?: boolean
           mobile_cover_url?: string | null
+          parent_film_id?: string | null
           poster_gradient?: string | null
           preview_url?: string | null
           price_cents?: number
           price_toman?: number
+          season_number?: number | null
           slug?: string
           sort_order?: number
           synopsis_en?: string | null
@@ -559,6 +571,13 @@ export type Database = {
             columns: ["category"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "films_parent_film_id_fkey"
+            columns: ["parent_film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
             referencedColumns: ["id"]
           },
         ]
@@ -653,6 +672,8 @@ export type Database = {
           last_active_at: string | null
           last_ip: string | null
           locale: string
+          max_age_rating: string | null
+          parental_pin: string | null
           signup_city: string | null
           signup_country: string | null
           signup_ip: string | null
@@ -667,6 +688,8 @@ export type Database = {
           last_active_at?: string | null
           last_ip?: string | null
           locale?: string
+          max_age_rating?: string | null
+          parental_pin?: string | null
           signup_city?: string | null
           signup_country?: string | null
           signup_ip?: string | null
@@ -681,6 +704,8 @@ export type Database = {
           last_active_at?: string | null
           last_ip?: string | null
           locale?: string
+          max_age_rating?: string | null
+          parental_pin?: string | null
           signup_city?: string | null
           signup_country?: string | null
           signup_ip?: string | null
