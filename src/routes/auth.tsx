@@ -145,8 +145,8 @@ function AuthPage() {
 
     if (!validateEmail(email)) return setEmailError(t.invalidEmail);
 
-    // Phase 1: reveal password after valid email
-    if (!revealPassword) {
+    // Phase 1: reveal password after valid email (signin only)
+    if (mode === "signin" && !revealPassword) {
       setRevealPassword(true);
       window.setTimeout(() => document.getElementById("password")?.focus(), 220);
       return;
