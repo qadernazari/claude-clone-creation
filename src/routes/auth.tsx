@@ -377,9 +377,11 @@ function AuthPage() {
                     ? mode === "signin"
                       ? t.working
                       : t.sending
-                    : mode === "signin"
-                      ? t.signin
-                      : t.signup}
+                    : !revealPassword
+                      ? t.continueBtn
+                      : mode === "signin"
+                        ? t.signin
+                        : t.signup}
                   </span>
                 </button>
               </form>
