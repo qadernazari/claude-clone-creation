@@ -1,5 +1,5 @@
 import { useLocale } from "../lib/i18n";
-import logoAsset from "../assets/iran-logo.png.asset.json";
+import logoAsset from "../assets/iran-logo.webp.asset.json";
 
 type Props = {
   className?: string;
