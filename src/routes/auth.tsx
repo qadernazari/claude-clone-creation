@@ -304,6 +304,7 @@ function AuthPage() {
                     onChange={(v) => {
                       setEmail(v);
                       if (emailError) setEmailError(null);
+                      if (revealPassword) setRevealPassword(false);
                     }}
                     onBlur={() => {
                       if (email && !validateEmail(email)) setEmailError(t.invalidEmail);
@@ -314,31 +315,41 @@ function AuthPage() {
                     required
                     error={emailError}
                   />
-                  <FloatingInput
-                    id="password"
-                    type={showPw ? "text" : "password"}
-                    label={t.password}
-                    value={password}
-                    onChange={(v) => {
-                      setPassword(v);
-                      if (pwError) setPwError(null);
-                    }}
-                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                    enterKeyHint="go"
-                    required
-                    error={pwError}
-                    trailing={
-                      <button
-                        type="button"
-                        onClick={() => setShowPw((v) => !v)}
-                        aria-label={showPw ? "Hide password" : "Show password"}
-                        className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
-                      >
-                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    }
-                  />
-                </fieldset>
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${
+                      revealPassword
+                        ? "grid-rows-[1fr] opacity-100 translate-y-0"
+                        : "grid-rows-[0fr] opacity-0 -translate-y-1 pointer-events-none"
+                    }`}
+                    aria-hidden={!revealPassword}
+                  >
+                    <div className="overflow-hidden">
+                      <FloatingInput
+                        id="password"
+                        type={showPw ? "text" : "password"}
+                        label={t.password}
+                        value={password}
+                        onChange={(v) => {
+                          setPassword(v);
+                          if (pwError) setPwError(null);
+                        }}
+                        autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                        enterKeyHint="go"
+                        required
+                        error={pwError}
+                        trailing={
+                          <button
+                            type="button"
+                            onClick={() => setShowPw((v) => !v)}
+                            aria-label={showPw ? "Hide password" : "Show password"}
+                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
+                          >
+                            {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        }
+                      />
+                    </div>
+                  </div>
 
 
 
