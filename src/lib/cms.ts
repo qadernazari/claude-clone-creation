@@ -144,8 +144,8 @@ export const DEFAULT_WHY_IRAN: { cards: WhyIranCard[] } = {
     },
     {
       icon: "💝",
-      heading: { en: "Pay per film", fa: "پرداخت برای هر فیلم" },
-      body: { en: "No subscription required.", fa: "بدون نیاز به اشتراک." },
+      heading: { en: "7-day free trial", fa: "۷ روز رایگان" },
+      body: { en: "Membership unlocks the full catalog.", fa: "اشتراک، دسترسی به کلِ کاتالوگ." },
     },
     {
       icon: "🌍",
