@@ -218,6 +218,35 @@ function FilmPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
+  const [stickyHeader, setStickyHeader] = useState(false);
+
+  // Reveal a condensed cinematic header once the hero has scrolled out
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onScroll = () => {
+      // ~88vh hero on desktop, ~78vh on mobile — trigger near the end
+      const trigger = window.innerHeight * 0.72;
+      setStickyHeader(window.scrollY > trigger);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Trap body scroll + ESC-to-close while the trailer modal is open
+  useEffect(() => {
+    if (!previewOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPreviewOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [previewOpen]);
 
 
   // Log a "view" event with geo / device / referrer captured server-side
