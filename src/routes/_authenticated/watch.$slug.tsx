@@ -6,11 +6,12 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
 import { useSubscription, memberCanAccess } from "@/hooks/use-subscription";
-// Lazy — only loads if the user's trial actually expires mid-watch.
-const TrialExpiredModal = lazy(() => import("@/components/trial-expired-modal").then((m) => ({ default: m.TrialExpiredModal })));
 import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { upsertWatchProgress, getResumePosition } from "@/lib/library.functions";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+// Lazy — only loads if the user's trial actually expires mid-watch.
+const TrialExpiredModal = lazy(() => import("@/components/trial-expired-modal").then((m) => ({ default: m.TrialExpiredModal })));
 
 export const Route = createFileRoute("/_authenticated/watch/$slug")({
   loader: async ({ params }) => {
