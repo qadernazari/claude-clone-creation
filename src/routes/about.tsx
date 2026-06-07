@@ -118,7 +118,7 @@ function AboutPage() {
           <div className="grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
             {[
               {
-                en: ["Fair to filmmakers", "The majority of every ticket goes directly to the artist. Transparent payouts, no hidden cuts."],
+                en: ["Fair to filmmakers", "Filmmakers receive transparent revenue from every ticket and every membership stream, plus 100% of viewer tips. No hidden cuts."],
                 fa: ["عدالت با فیلم‌ساز", "بخش عمده‌ی هر بلیت به‌طور مستقیم به هنرمند می‌رسد. پرداخت شفاف، بدون کسر پنهان."],
               },
               {
