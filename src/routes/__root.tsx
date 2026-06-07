@@ -135,7 +135,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Vazirmatn:wght@300;400;500;600;700&display=swap",
+        // Trimmed to the weights actually used in the app (3-2-1-3 instead of
+        // 5-5-4-5). Halves the font CSS + font file count on first paint.
+        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,400&family=Vazirmatn:wght@400;500;600&display=swap",
       },
     ],
   }),
