@@ -7,17 +7,17 @@ import { SiteFooter } from "../components/site-footer";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About IRAN — A home for original Iranian short films" },
+      { title: "About — IRAN" },
       {
         name: "description",
         content:
-          "Our mission, the team behind IRAN, and how to reach us. A premium, ticket-based home for original Persian short films.",
+          "IRAN is a streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals. Fair pay for filmmakers.",
       },
-      { property: "og:title", content: "About IRAN" },
+      { property: "og:title", content: "About — IRAN" },
       {
         property: "og:description",
         content:
-          "Our mission, the team, and how to reach us — a premium home for original Iranian short films.",
+          "Iranian short films, streaming worldwide. Membership with a free trial, plus Premium rentals. Fair pay for filmmakers.",
       },
       { property: "og:url", content: "https://ir.show/about" },
     ],
@@ -65,12 +65,12 @@ function AboutPage() {
           <h1 className="font-display text-5xl leading-[1.05] text-cream-bright md:text-6xl">
             {fa
               ? "خانه‌ای برای سینمای کوتاهِ ایران."
-              : "A home for original Iranian short films."}
+              : "Iranian short films, streaming worldwide."}
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-cream/70">
             {fa
               ? "ایران یک پلتفرم پخش بلیتی، دو زبانه و بدون اشتراک است. شما هزینه‌ی همان فیلمی را می‌پردازید که می‌خواهید ببینید — و بخش بزرگی از آن مستقیم به فیلم‌ساز می‌رسد."
-              : "IRAN is a ticket-based, bilingual streaming home with no subscription. You pay only for the film you want to watch — and the lion's share goes directly to the filmmaker."}
+              : "A streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals for select releases. Fair, transparent pay for the people who made the film."}
           </p>
         </div>
       </section>
@@ -84,12 +84,12 @@ function AboutPage() {
             <p>
               {fa
                 ? "ما باور داریم سینمای کوتاهِ ایران شایسته‌ی خانه‌ای‌ست که در آن صدای حقیقی‌اش شنیده شود — بدون الگوریتم، بدون اشتراک، و بدون واسطه‌های ناعادلانه."
-                : "We believe Iranian short cinema deserves a home where its authentic voice is heard — without algorithms, without subscriptions, and without unfair middlemen."}
+                : "Iranian short cinema deserves a home where its authentic voice is heard — without algorithms, without ad pre-rolls, and without unfair middlemen between filmmakers and the audience."}
             </p>
             <p>
               {fa
                 ? "هر فیلم با وسواس انتخاب می‌شود. هر بلیت یک حمایت مستقیم است. هر تماشاگر، بخشی از یک جامعه‌ی کوچک اما واقعی‌ست."
-                : "Every film is selected with care. Every ticket is a direct act of support. Every viewer is part of a small but real community."}
+                : "Every film is hand-picked. Every membership and ticket supports the artist directly. Every viewer is part of a small but real community."}
             </p>
           </div>
 
@@ -118,7 +118,7 @@ function AboutPage() {
           <div className="grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
             {[
               {
-                en: ["Fair to filmmakers", "The majority of every ticket goes directly to the artist. Transparent payouts, no hidden cuts."],
+                en: ["Fair to filmmakers", "Filmmakers receive transparent revenue from every ticket and every membership stream, plus 100% of viewer tips. No hidden cuts."],
                 fa: ["عدالت با فیلم‌ساز", "بخش عمده‌ی هر بلیت به‌طور مستقیم به هنرمند می‌رسد. پرداخت شفاف، بدون کسر پنهان."],
               },
               {
@@ -188,10 +188,10 @@ function AboutPage() {
                   {fa ? "ایمیل عمومی" : "General"}
                 </p>
                 <a
-                  href="mailto:hello@iran.film"
+                  href="mailto:info@ir.show"
                   className="mt-1 block text-lg text-cream-bright hover:text-amber"
                 >
-                  hello@iran.film
+                  info@ir.show
                 </a>
               </div>
               <div>
@@ -199,10 +199,10 @@ function AboutPage() {
                   {fa ? "فیلم‌سازان" : "Filmmakers"}
                 </p>
                 <a
-                  href="mailto:submissions@iran.film"
+                  href="mailto:info@ir.show"
                   className="mt-1 block text-lg text-cream-bright hover:text-amber"
                 >
-                  submissions@iran.film
+                  info@ir.show
                 </a>
               </div>
             </div>

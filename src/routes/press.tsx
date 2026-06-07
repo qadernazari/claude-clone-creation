@@ -152,7 +152,7 @@ function PressPage() {
           <p className="mt-10 max-w-3xl text-cream/75">
             {fa
               ? "ایران یک پلتفرم پخش بلیتی و بدون اشتراک برای فیلم‌های کوتاهِ اختصاصی ایرانی است. هر بلیت یک حمایت مستقیم از فیلم‌ساز است."
-              : "IRAN is a bilingual, ticket-based streaming home for original Iranian short films. There is no subscription — every ticket is a direct act of support for the filmmaker."}
+              : "IRAN is a bilingual streaming home for Iranian short films. Monthly membership with a 7-day free trial, plus Premium rentals for select releases. Filmmakers are paid transparently on every stream and every ticket."}
           </p>
         </div>
       </section>

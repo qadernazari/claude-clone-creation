@@ -532,7 +532,7 @@ function FilmEditorModal({
             </div>
 
             <div className="mt-5 rounded-md border border-border p-3">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Fallback colour cover</div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Fallback color cover</div>
               <p className="text-xs text-muted-foreground mb-2">Used only when no cover image is uploaded.</p>
               <div className="flex gap-2">
                 {GRADIENTS.map((g) => (
