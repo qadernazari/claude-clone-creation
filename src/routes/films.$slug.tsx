@@ -213,7 +213,7 @@ function FilmPage() {
   const { isMember, isLoading: isAuthLoading, user } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [membershipOpen, setMembershipOpen] = useState(false);
-  const [contribOpen, setContribOpen] = useState(false);
+  
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
@@ -987,36 +987,6 @@ function FilmPage() {
         </section>
       )}
 
-      {/* Support the filmmaker — compact inline strip */}
-      <section className="mx-auto max-w-7xl px-6 pt-6 pb-14 md:px-10">
-        <div className="hairline flex flex-col items-start gap-4 rounded-2xl border bg-bg-1/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex-1">
-            <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/45">
-              {fa ? "حمایت" : "Support"}
-            </span>
-            <p className={`mt-1.5 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>
-              {fa ? "از فیلم‌ساز حمایت کنید" : "Support the filmmaker"}
-              <span className="ms-2 text-cream/55 font-normal">
-                {fa ? "— کمک شما مستقیماً به سینمای مستقل ایران می‌رسد." : "— your contribution goes directly to independent Iranian cinema."}
-              </span>
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (!user) {
-                window.location.href = "/auth";
-                return;
-              }
-              setContribOpen(true);
-            }}
-            className="inline-flex shrink-0 items-center justify-center rounded-full border border-cream/20 px-5 py-2.5 text-[13px] font-medium text-cream/85 transition-colors hover:bg-cream/5 hover:text-cream-bright"
-          >
-            {t.contribute}
-          </button>
-        </div>
-      </section>
-
       {checkoutOpen && (
         <Suspense fallback={null}>
           <FilmCheckout
@@ -1033,17 +1003,6 @@ function FilmPage() {
           <MembershipCheckout
             returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
             onClose={() => setMembershipOpen(false)}
-          />
-        </Suspense>
-      )}
-
-      {contribOpen && (
-        <Suspense fallback={null}>
-          <ContributeModal
-            filmSlug={film.slug}
-            filmTitle={title}
-            returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&kind=contribution&film=${film.slug}` : ""}
-            onClose={() => setContribOpen(false)}
           />
         </Suspense>
       )}
