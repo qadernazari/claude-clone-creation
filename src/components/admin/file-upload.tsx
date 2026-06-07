@@ -45,6 +45,39 @@ function accepts(file: File, accept: string) {
   });
 }
 
+/**
+ * Re-encode an image to WebP at a sensible max width before upload.
+ * Cuts a typical 2-5 MB JPEG cover down to 100-250 KB and lets every
+ * mobile client paint the poster in a single TCP window.
+ */
+async function compressImage(file: File, maxWidth = 1600, quality = 0.82): Promise<File> {
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml") return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, maxWidth / bitmap.width);
+    const w = Math.round(bitmap.width * scale);
+    const h = Math.round(bitmap.height * scale);
+    const canvas = typeof OffscreenCanvas !== "undefined"
+      ? new OffscreenCanvas(w, h)
+      : Object.assign(document.createElement("canvas"), { width: w, height: h });
+    const ctx = (canvas as HTMLCanvasElement | OffscreenCanvas).getContext("2d") as
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D
+      | null;
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close?.();
+    const blob: Blob | null = "convertToBlob" in canvas
+      ? await (canvas as OffscreenCanvas).convertToBlob({ type: "image/webp", quality })
+      : await new Promise((res) => (canvas as HTMLCanvasElement).toBlob(res, "image/webp", quality));
+    if (!blob || blob.size >= file.size) return file;
+    const baseName = file.name.replace(/\.[^.]+$/, "");
+    return new File([blob], `${baseName}.webp`, { type: "image/webp" });
+  } catch {
+    return file;
+  }
+}
+
 export function FileUpload({
   bucket, kind, accept, value, onChange, pathPrefix, label, description, maxBytes,
 }: FileUploadProps) {
@@ -52,8 +85,10 @@ export function FileUpload({
   const [progress, setProgress] = useState<number | null>(null);
   const [meta, setMeta] = useState<{ size?: number; duration?: number } | null>(null);
 
-  async function upload(file: File) {
+  async function upload(rawFile: File) {
+    const file = kind === "image" ? await compressImage(rawFile) : rawFile;
     if (maxBytes && file.size > maxBytes) {
+
       toast.error(`File too large — max ${fmtBytes(maxBytes)}`);
       return;
     }
