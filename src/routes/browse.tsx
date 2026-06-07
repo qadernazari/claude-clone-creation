@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { supabase } from "../integrations/supabase/client";
+import { browsePageQueryOptions, type BrowseFilm, type BrowseCategory } from "../lib/browse.functions";
 import { useLocale } from "../lib/i18n";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
@@ -48,26 +48,9 @@ export const Route = createFileRoute("/browse")({
   ),
 });
 
-type Film = {
-  id: string;
-  slug: string;
-  title_en: string;
-  title_fa: string | null;
-  director_en: string | null;
-  director_fa: string | null;
-  synopsis_en: string | null;
-  synopsis_fa: string | null;
-  category: string | null;
-  year: number | null;
-  duration_min: number | null;
-  poster_gradient: string | null;
-  cover_url: string | null;
-  thumbnail_url: string | null;
-  created_at: string;
-  sort_order: number;
-};
+type Film = BrowseFilm;
 
-type Category = { id: string; name_en: string; name_fa: string | null };
+type Category = BrowseCategory;
 
 type SortKey = "curated" | "newest" | "shortest" | "longest" | "title";
 
@@ -87,34 +70,9 @@ function BrowsePage() {
   const [q, setQ] = useState(initialQ);
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
-  const { data: films, isLoading } = useQuery({
-    queryKey: ["films", "browse"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, created_at, sort_order",
-        )
-        .eq("visibility", "published")
-        .limit(200);
-      if (error) throw error;
-      return data as Film[];
-    },
-    staleTime: 60_000,
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name_en, name_fa")
-        .order("sort_order", { ascending: true });
-      if (error) throw error;
-      return data as Category[];
-    },
-    staleTime: 5 * 60_000,
-  });
+  const { data, isLoading } = useQuery(browsePageQueryOptions);
+  const films = data?.films as Film[] | undefined;
+  const categories = data?.categories as Category[] | undefined;
 
   const usedCategoryIds = useMemo(
     () => new Set((films ?? []).map((f) => f.category).filter(Boolean) as string[]),
