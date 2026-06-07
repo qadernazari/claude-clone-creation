@@ -188,7 +188,8 @@ export function FilmsRow() {
 
     out.push({
       key: "originals",
-      title: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
+      eyebrow: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
+      title: "",
       subtitle:
         locale === "fa"
           ? "آثار منتخب، با امضای فیلم‌سازان."
@@ -198,7 +199,8 @@ export function FilmsRow() {
 
     out.push({
       key: "new",
-      title: locale === "fa" ? "آثار تازه" : "New Releases",
+      eyebrow: locale === "fa" ? "آثار تازه" : "New Releases",
+      title: "",
       films: newReleases,
     });
 
