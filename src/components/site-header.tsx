@@ -203,6 +203,14 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
         className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
+        style={{
+          WebkitAppearance: "none",
+          appearance: "none",
+          background: "rgba(var(--rgb-bg-0), 0.76)",
+          borderColor: "rgba(var(--rgb-cream), 0.28)",
+          color: "rgb(var(--rgb-cream))",
+          boxShadow: "inset 0 1px 0 rgba(var(--rgb-cream), 0.08), 0 8px 22px -18px rgba(0, 0, 0, 0.85)",
+        }}
       >
         <RegionGlobeIcon size={15} className="region-trigger-icon" />
         <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
