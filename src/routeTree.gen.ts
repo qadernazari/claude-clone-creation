@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PressRouteImport } from './routes/press'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -43,7 +42,6 @@ import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
 import { Route as AuthenticatedAdminCouponsRouteImport } from './routes/_authenticated/admin/coupons'
 import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin/contributions'
-import { Route as AuthenticatedAdminContactSubmissionsRouteImport } from './routes/_authenticated/admin/contact-submissions'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as AuthenticatedAdminBannerRouteImport } from './routes/_authenticated/admin/banner'
 import { Route as AuthenticatedAdminAppearanceRouteImport } from './routes/_authenticated/admin/appearance'
@@ -71,11 +69,6 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PressRoute = PressRouteImport.update({
-  id: '/press',
-  path: '/press',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -236,12 +229,6 @@ const AuthenticatedAdminContributionsRoute =
     path: '/contributions',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
-const AuthenticatedAdminContactSubmissionsRoute =
-  AuthenticatedAdminContactSubmissionsRouteImport.update({
-    id: '/contact-submissions',
-    path: '/contact-submissions',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
 const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/categories',
@@ -325,7 +312,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
-  '/press': typeof PressRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -340,7 +326,6 @@ export interface FileRoutesByFullPath {
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
-  '/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
@@ -374,7 +359,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
-  '/press': typeof PressRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -388,7 +372,6 @@ export interface FileRoutesByTo {
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
-  '/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
@@ -424,7 +407,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
-  '/press': typeof PressRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -439,7 +421,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/_authenticated/admin/banner': typeof AuthenticatedAdminBannerRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
-  '/_authenticated/admin/contact-submissions': typeof AuthenticatedAdminContactSubmissionsRoute
   '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/_authenticated/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
@@ -475,7 +456,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/contact'
-    | '/press'
     | '/reset-password'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -490,7 +470,6 @@ export interface FileRouteTypes {
     | '/admin/appearance'
     | '/admin/banner'
     | '/admin/categories'
-    | '/admin/contact-submissions'
     | '/admin/contributions'
     | '/admin/coupons'
     | '/admin/faq'
@@ -524,7 +503,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/contact'
-    | '/press'
     | '/reset-password'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -538,7 +516,6 @@ export interface FileRouteTypes {
     | '/admin/appearance'
     | '/admin/banner'
     | '/admin/categories'
-    | '/admin/contact-submissions'
     | '/admin/contributions'
     | '/admin/coupons'
     | '/admin/faq'
@@ -573,7 +550,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/contact'
-    | '/press'
     | '/reset-password'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -588,7 +564,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/appearance'
     | '/_authenticated/admin/banner'
     | '/_authenticated/admin/categories'
-    | '/_authenticated/admin/contact-submissions'
     | '/_authenticated/admin/contributions'
     | '/_authenticated/admin/coupons'
     | '/_authenticated/admin/faq'
@@ -624,7 +599,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrowseRoute: typeof BrowseRoute
   ContactRoute: typeof ContactRoute
-  PressRoute: typeof PressRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -662,13 +636,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/press': {
-      id: '/press'
-      path: '/press'
-      fullPath: '/press'
-      preLoaderRoute: typeof PressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -881,13 +848,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminContributionsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/admin/contact-submissions': {
-      id: '/_authenticated/admin/contact-submissions'
-      path: '/contact-submissions'
-      fullPath: '/admin/contact-submissions'
-      preLoaderRoute: typeof AuthenticatedAdminContactSubmissionsRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
     '/_authenticated/admin/categories': {
       id: '/_authenticated/admin/categories'
       path: '/categories'
@@ -1005,7 +965,6 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAppearanceRoute: typeof AuthenticatedAdminAppearanceRoute
   AuthenticatedAdminBannerRoute: typeof AuthenticatedAdminBannerRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
-  AuthenticatedAdminContactSubmissionsRoute: typeof AuthenticatedAdminContactSubmissionsRoute
   AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
   AuthenticatedAdminCouponsRoute: typeof AuthenticatedAdminCouponsRoute
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
@@ -1029,8 +988,6 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAppearanceRoute: AuthenticatedAdminAppearanceRoute,
     AuthenticatedAdminBannerRoute: AuthenticatedAdminBannerRoute,
     AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
-    AuthenticatedAdminContactSubmissionsRoute:
-      AuthenticatedAdminContactSubmissionsRoute,
     AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
     AuthenticatedAdminCouponsRoute: AuthenticatedAdminCouponsRoute,
     AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
@@ -1079,7 +1036,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrowseRoute: BrowseRoute,
   ContactRoute: ContactRoute,
-  PressRoute: PressRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   UnsubscribeRoute: UnsubscribeRoute,
@@ -1098,3 +1054,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
