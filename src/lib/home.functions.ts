@@ -58,6 +58,8 @@ type RawFilm = Record<string, unknown>;
 export const getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageData> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { makeRenderCache, renderResizedUrl } = await import("./storage-render.server");
+
 
     const [featuredRes, filmsRes, categoriesRes] = await Promise.all([
       supabaseAdmin
