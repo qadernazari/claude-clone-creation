@@ -239,7 +239,7 @@ function PosterThumb({ film, size = "md" }: { film: LibraryFilm; size?: "sm" | "
     <div
       aria-hidden
       style={{ background: fallback }}
-      className={`hairline relative overflow-hidden rounded-md border bg-bg-1 ${cls}`}
+      className={`relative overflow-hidden rounded-md bg-bg-1 ring-1 ring-cream/10 ${cls}`}
     >
       {film.cover_url && (
         <img
