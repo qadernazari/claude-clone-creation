@@ -5,31 +5,31 @@ type QA = { q: string; a: string };
 const EN: QA[] = [
   {
     q: "What is IRAN Membership?",
-    a: "IRAN Membership is our monthly subscription that gives you unlimited streaming access to the full membership catalog — originals, documentaries, and curated collections from Iranian filmmakers. New titles are added regularly.",
+    a: "A monthly subscription that unlocks our full catalog — originals, documentaries, and curated collections. New titles added regularly. Start with a 7-day free trial.",
   },
   {
-    q: "How much does membership cost?",
-    a: "Membership pricing is shown at checkout in your local currency. You can cancel anytime from your account, and your access continues until the end of the current billing period.",
+    q: "How much does it cost? Is there a free trial?",
+    a: "Pricing is shown at checkout in your local currency. New members get a 7-day free trial — no charge during the trial, cancel anytime.",
   },
   {
-    q: "Is there a free trial?",
-    a: "Yes. New members get a 7-day free trial. You will not be charged during the trial, and you can cancel at any point before it ends with no charge.",
+    q: "What's included in membership vs. Premium tickets?",
+    a: "Most films stream unlimited with membership. Premium films are sold separately as a 48-hour rental, even for members. Each film page shows which it is.",
   },
   {
-    q: "Can I watch films without a membership?",
-    a: "Yes. Selected films are available as pay-per-view rentals, and some titles are free to watch. Premium releases may be sold separately even for members. Each film page shows exactly how it is available.",
+    q: "Can I cancel anytime?",
+    a: "Yes. Cancel from Account → Manage subscription. Your access continues until the end of the current billing period.",
   },
   {
-    q: "Which films are included in membership?",
-    a: "Any film marked as included in membership streams unlimited for active members. Films marked Premium are sold separately as pay-per-view. The film page always shows whether a title is included or premium.",
+    q: "Which devices are supported?",
+    a: "Any modern browser on phone, tablet, laptop, or smart TV. AirPlay and Chromecast work where the browser allows it.",
   },
   {
-    q: "Can I watch on mobile, tablet, and TV?",
-    a: "Yes. IRAN streams in any modern browser on phone, tablet, laptop, and smart TV. AirPlay and Chromecast are supported on devices that allow casting from the browser.",
+    q: "Are subtitles available?",
+    a: "Yes. Every Persian-language film ships with high-quality English subtitles. Persian subtitles are added where available.",
   },
   {
-    q: "How can I support filmmakers?",
-    a: "Every film page has a Support the Filmmaker option. Your contribution goes directly toward keeping independent Iranian cinema alive and funding new work.",
+    q: "How do filmmakers get paid?",
+    a: "Directly, with transparent revenue sharing on every ticket and membership stream. Tips left through Support the filmmaker go straight to the artist.",
   },
 ];
 
