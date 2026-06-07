@@ -202,7 +202,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-semibold transition-colors md:hidden"
+        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
       >
         <RegionGlobeIcon size={15} className="region-trigger-icon" />
         <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
@@ -340,10 +340,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   return (
     <>
       <header
-        className={`fixed top-0 z-30 w-full transition-all duration-500 ${
+        className={`site-header fixed top-0 z-30 w-full transition-all duration-500 ${
           scrolled
-            ? "border-b border-cream/6 bg-bg-0/85 backdrop-blur-xl"
-            : "border-b border-transparent bg-gradient-to-b from-bg-0/60 to-transparent"
+            ? "border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl"
+            : "border-b border-cream/5 bg-bg-0/70 backdrop-blur-md md:border-transparent md:bg-gradient-to-b md:from-bg-0/60 md:to-transparent md:backdrop-blur-none"
         }`}
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
