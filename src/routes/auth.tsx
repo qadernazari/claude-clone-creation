@@ -148,7 +148,7 @@ function AuthPage() {
     // Phase 1: reveal password after valid email
     if (!revealPassword) {
       setRevealPassword(true);
-      window.setTimeout(() => passwordRef.current?.focus(), 220);
+      window.setTimeout(() => document.getElementById("password")?.focus(), 220);
       return;
     }
 
