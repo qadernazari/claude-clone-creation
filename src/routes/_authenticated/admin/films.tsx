@@ -40,6 +40,10 @@ type Film = {
   poster_gradient: string | null;
   video_url?: string | null;
   preview_url: string | null;
+  film_type?: "movie" | "series" | "episode";
+  parent_film_id?: string | null;
+  season_number?: number | null;
+  episode_number?: number | null;
 };
 
 type CreditDraft = {
@@ -70,11 +74,12 @@ const EMPTY: FilmDraft = {
   access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
+  film_type: "movie", parent_film_id: null, season_number: null, episode_number: null,
 };
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
@@ -274,6 +279,7 @@ function FilmsAdminPage() {
         <FilmEditorModal
           draft={editing}
           categories={categories}
+          allFilms={films ?? []}
           onCancel={() => setEditing(null)}
           onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); qc.invalidateQueries({ queryKey: ["admin", "films-with-video"] }); }}
         />
@@ -348,16 +354,18 @@ const CREDIT_TYPES: { value: string; label: string }[] = [
 ];
 
 function FilmEditorModal({
-  draft, categories, onCancel, onSaved,
+  draft, categories, allFilms, onCancel, onSaved,
 }: {
   draft: FilmDraft;
   categories: string[];
+  allFilms: Film[];
   onCancel: () => void;
   onSaved: () => void;
 }) {
   const [d, setD] = useState<FilmDraft>(draft);
   const [credits, setCredits] = useState<CreditDraft[]>([]);
   const [saving, setSaving] = useState(false);
+  const seriesOptions = allFilms.filter((f) => f.film_type === "series" && f.id !== d.id);
   const set = <K extends keyof FilmDraft>(k: K, v: FilmDraft[K]) => setD((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
@@ -406,6 +414,10 @@ function FilmEditorModal({
         mobile_cover_url: d.mobile_cover_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
         preview_url: d.preview_url?.trim() || null,
+        film_type: d.film_type ?? "movie",
+        parent_film_id: d.film_type === "episode" ? (d.parent_film_id || null) : null,
+        season_number: d.film_type === "episode" ? (d.season_number ?? null) : null,
+        episode_number: d.film_type === "episode" ? (d.episode_number ?? null) : null,
       };
 
       let filmId = d.id;
@@ -678,6 +690,50 @@ function FilmEditorModal({
                 </label>
               ))}
             </div>
+          </Section>
+
+          <Section
+            title="Series & Episodes"
+            description="Mark this as a standalone movie, a series (parent that lists episodes), or an episode of a series."
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {([
+                { v: "movie", t: "Movie", s: "Standalone film" },
+                { v: "series", t: "Series", s: "Parent that holds episodes" },
+                { v: "episode", t: "Episode", s: "Belongs to a series" },
+              ] as const).map((o) => (
+                <label key={o.v} className={`cursor-pointer rounded-md border p-3 transition-colors ${(d.film_type ?? "movie") === o.v ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                  <input type="radio" name="fType" checked={(d.film_type ?? "movie") === o.v} onChange={() => set("film_type", o.v)} className="sr-only" />
+                  <div className="text-sm font-medium">{o.t}</div>
+                  <div className="text-xs text-muted-foreground">{o.s}</div>
+                </label>
+              ))}
+            </div>
+            {d.film_type === "episode" && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label className="block sm:col-span-3">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Parent series</span>
+                  <select
+                    value={d.parent_film_id ?? ""}
+                    onChange={(e) => set("parent_film_id", e.target.value || null)}
+                    className={inp}
+                  >
+                    <option value="">— select a series —</option>
+                    {seriesOptions.map((s) => (
+                      <option key={s.id} value={s.id}>{s.title_en}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Season #</span>
+                  <input type="number" min={1} value={d.season_number ?? ""} onChange={(e) => set("season_number", e.target.value === "" ? null : Number(e.target.value))} className={inp} placeholder="1" />
+                </label>
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Episode #</span>
+                  <input type="number" min={1} value={d.episode_number ?? ""} onChange={(e) => set("episode_number", e.target.value === "" ? null : Number(e.target.value))} className={inp} placeholder="1" />
+                </label>
+              </div>
+            )}
           </Section>
         </div>
 

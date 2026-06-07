@@ -37,6 +37,8 @@ type Profile = {
   full_name: string | null;
   locale: string;
   created_at: string;
+  parental_pin: string | null;
+  max_age_rating: string | null;
 };
 
 type Ticket = {
@@ -74,7 +76,7 @@ function AccountPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, email, full_name, locale, created_at")
+        .select("id, email, full_name, locale, created_at, parental_pin, max_age_rating")
         .maybeSingle();
       if (error) throw new Error(error.message);
       return data as Profile | null;
@@ -331,6 +333,10 @@ function AccountPage() {
         {/* Membership */}
         <MembershipPanel />
 
+        {/* Parental controls */}
+        <ParentalControlsPanel profile={profile ?? null} />
+
+
         {/* Password */}
         <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
           <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
@@ -509,5 +515,120 @@ function AccountPage() {
       </main>
       <SiteFooter />
     </div>
+  );
+}
+
+const AGE_RATINGS = ["G", "PG", "PG-13", "R", "NC-17", "TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"] as const;
+
+type ProfileLite = {
+  parental_pin: string | null;
+  max_age_rating: string | null;
+} | null;
+
+function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
+  const { locale } = useLocale();
+  const fa = locale === "fa";
+  const qc = useQueryClient();
+  const [pin, setPin] = useState<string>(profile?.parental_pin ?? "");
+  const [maxAge, setMaxAge] = useState<string>(profile?.max_age_rating ?? "");
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPin(profile?.parental_pin ?? "");
+    setMaxAge(profile?.max_age_rating ?? "");
+  }, [profile?.parental_pin, profile?.max_age_rating]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      setErr(null);
+      const trimmed = pin.trim();
+      if (trimmed && !/^[0-9]{4,6}$/.test(trimmed)) {
+        throw new Error(fa ? "پین باید ۴ تا ۶ رقم باشد" : "PIN must be 4–6 digits");
+      }
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          parental_pin: trimmed || null,
+          max_age_rating: maxAge || null,
+        })
+        .eq("id", (await supabase.auth.getUser()).data.user!.id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["account", "profile"] }),
+    onError: (e) => setErr((e as Error).message),
+  });
+
+  return (
+    <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
+      <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+        {fa ? "کنترل والدین" : "Parental Controls"}
+      </h2>
+      <p className="mt-1 text-xs text-cream/55">
+        {fa
+          ? "محتوای بزرگ‌سال را مخفی کنید و با پین قفل کنید."
+          : "Hide mature content and lock it behind a PIN."}
+      </p>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <label className="block">
+          <span className="text-xs uppercase tracking-widest text-cream/55">
+            {fa ? "بیشترین رده سنی مجاز" : "Max age rating"}
+          </span>
+          <select
+            value={maxAge}
+            onChange={(e) => setMaxAge(e.target.value)}
+            className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+          >
+            <option value="">{fa ? "بدون محدودیت" : "No limit"}</option>
+            {AGE_RATINGS.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+          <span className="mt-2 block text-[11px] text-cream/45">
+            {fa
+              ? "فیلم‌های بالاتر از این رده در فهرست مخفی می‌شوند."
+              : "Films above this rating are hidden from browse."}
+          </span>
+        </label>
+
+        <label className="block">
+          <span className="text-xs uppercase tracking-widest text-cream/55">
+            {fa ? "پین والدین (۴ تا ۶ رقم)" : "Parental PIN (4–6 digits)"}
+          </span>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+            placeholder={fa ? "اختیاری" : "Optional"}
+            className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+          />
+          <span className="mt-2 block text-[11px] text-cream/45">
+            {fa
+              ? "برای دور زدن محدودیت رده سنی پرسیده می‌شود."
+              : "Required to bypass the age rating limit."}
+          </span>
+        </label>
+      </div>
+
+      <div className="mt-6 flex items-center gap-4">
+        <button
+          type="button"
+          disabled={save.isPending}
+          onClick={() => save.mutate()}
+          className="rounded-full bg-amber px-5 py-2 text-sm font-medium text-ink disabled:opacity-50"
+        >
+          {save.isPending ? "…" : fa ? "ذخیره" : "Save"}
+        </button>
+        {save.isSuccess && (
+          <span className="text-xs text-amber">
+            {fa ? "ذخیره شد" : "Saved"}
+          </span>
+        )}
+        {err && <span className="text-xs text-rose-400">{err}</span>}
+      </div>
+    </section>
   );
 }

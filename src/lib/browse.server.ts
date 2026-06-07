@@ -51,6 +51,7 @@ export async function fetchBrowsePageData(): Promise<BrowsePageData> {
         "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, created_at, sort_order",
       )
       .eq("visibility", "published")
+      .neq("film_type", "episode")
       .limit(200),
     supabaseAdmin
       .from("categories")
