@@ -1,6 +1,51 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+function parseSignedObjectUrl(u: string | null | undefined) {
+  if (!u) return null;
+  const m = u.match(/\/storage\/v1\/object\/sign\/([^/]+)\/([^?]+)/);
+  return m ? { bucket: m[1], path: decodeURIComponent(m[2]) } : null;
+}
+
+function makeRenderCache() {
+  return new Map<string, Promise<string | null>>();
+}
+
+async function renderResizedUrl(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client: any,
+  cache: Map<string, Promise<string | null>>,
+  original: string | null | undefined,
+  width: number,
+  quality = 68,
+): Promise<string | null> {
+  if (!original) return null;
+  const parsed = parseSignedObjectUrl(original);
+  if (!parsed) return original;
+  const key = `${parsed.bucket}|${parsed.path}|${width}|${quality}`;
+  const existing = cache.get(key);
+  if (existing) return existing;
+  const promise = (async () => {
+    try {
+      const { data, error } = await client.storage
+        .from(parsed.bucket)
+        .createSignedUrl(parsed.path, ONE_YEAR, {
+          transform: { width, quality, resize: "cover" as const },
+        });
+      if (error || !data?.signedUrl) return original;
+      return data.signedUrl as string;
+    } catch {
+      return original;
+    }
+  })();
+  cache.set(key, promise);
+  return promise;
+}
+
+
+
 
 
 export type HomeFeaturedFilm = {
