@@ -193,7 +193,7 @@ export function FeaturedFilm() {
                 ) : null}
               </p>
               {synopsis ? (
-                <p className="mt-5 max-w-xl text-[14px] leading-relaxed text-cream/75 line-clamp-3 md:mt-7 md:text-base">
+                <p className="mt-5 hidden max-w-xl text-[14px] leading-relaxed text-cream/75 line-clamp-3 sm:line-clamp-3 sm:block md:mt-7 md:text-base">
                   {synopsis}
                 </p>
               ) : null}
@@ -201,25 +201,18 @@ export function FeaturedFilm() {
                 <Link
                   to="/films/$slug"
                   params={{ slug: data.slug }}
-                  className="group/cta relative inline-flex min-h-11 items-center gap-2.5 overflow-hidden rounded-full bg-cream-bright px-7 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_14px_50px_-10px_rgba(240,215,140,0.55)] active:scale-[0.98] md:px-8 md:py-3.5 md:text-sm"
+                  className="inline-flex min-h-11 items-center gap-2.5 rounded-full bg-cream-bright px-7 py-3 text-[13px] font-semibold text-ink transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] md:px-8 md:py-3.5 md:text-sm"
                 >
-                  {/* Subtle amber sheen on hover */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-amber/30 to-transparent opacity-0 transition-all duration-700 group-hover/cta:translate-x-full group-hover/cta:opacity-100"
-                  />
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden className="relative">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                  <span className="relative">
-                    {locale === "fa" ? "تماشای فیلم" : "Watch Now"}
-                  </span>
+                  <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
                 </Link>
                 {user && (
                   <Link
                     to="/films/$slug"
                     params={{ slug: data.slug }}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-all duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
+                    className="hidden min-h-11 items-center gap-2 rounded-full border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-colors duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:inline-flex md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <line x1="12" y1="5" x2="12" y2="19" />
