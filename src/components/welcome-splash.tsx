@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useLocale, type Region } from "../lib/i18n";
+import { detectVisitorRegion } from "../lib/geo.functions";
 import { Logo } from "./logo";
 
 const STORAGE_SEEN = "iran_splash_seen";
 
 /**
- * Welcome splash — shown once on first visit. The visitor picks a region,
- * which sets the initial locale (global → en, iran → fa) and the saved
- * payment region. Subsequent visits skip the splash; the language toggle
- * in the header can still flip locales independently.
+ * Welcome splash — on first visit we try to auto-detect the visitor's region
+ * from their IP (Cloudflare `cf-ipcountry`). If detection succeeds we save
+ * the choice silently and skip the splash entirely. Only when detection
+ * fails (e.g. local dev, missing headers) do we fall back to the manual
+ * region picker. Users can always change region later from the header /
+ * account page.
  */
 export function WelcomeSplash() {
   const { setRegion } = useLocale();
@@ -19,12 +22,32 @@ export function WelcomeSplash() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const seen = window.localStorage.getItem(STORAGE_SEEN);
-    if (!seen) {
+    if (seen) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { region } = await detectVisitorRegion();
+        if (cancelled) return;
+        if (region) {
+          setRegion(region);
+          try {
+            window.localStorage.setItem(STORAGE_SEEN, "1");
+          } catch {}
+          return;
+        }
+      } catch {
+        // fall through to manual picker
+      }
+      if (cancelled) return;
       setVisible(true);
-      // next frame for enter transition
       requestAnimationFrame(() => setMounted(true));
-    }
-  }, []);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setRegion]);
 
   // Lock background scroll/interaction while splash is visible
   useEffect(() => {
