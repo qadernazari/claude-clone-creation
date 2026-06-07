@@ -59,7 +59,7 @@ function ContactPage() {
     emailTitle: fa ? "ایمیل" : "Email",
     emailValue: "hello@iran.film",
     locationTitle: fa ? "موقعیت" : "Location",
-    locationValue: fa ? "جهانی — آنلاین" : "Global — Online",
+    locationValue: fa ? "جهانی — اینترنتی" : "Global — Online",
     required: fa ? "اجباری" : "Required",
     invalidEmail: fa ? "ایمیل معتبر نیست" : "Invalid email",
     tooLong: fa ? "بیش از حد طولانی" : "Too long",
