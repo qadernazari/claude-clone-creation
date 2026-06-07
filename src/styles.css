@@ -179,8 +179,10 @@
   }
   h1 { letter-spacing: -0.04em; font-weight: 600; }
 
-  /* Smooth, premium scroll */
-  html { scroll-behavior: smooth; }
+  /* Smooth, premium scroll — desktop only; on mobile let native momentum drive scroll for 60fps */
+  @media (hover: hover) and (pointer: fine) {
+    html { scroll-behavior: smooth; }
+  }
 
   /* Custom thin scrollbar */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -607,3 +609,50 @@ body[data-auth-sheet-open]::-webkit-scrollbar {
   display: none;
 }
 body[data-auth-sheet-open] .mobile-tab-bar { display: none !important; }
+
+/* =========================================================
+   Mobile performance pass — touch devices only.
+   Goal: native-streaming feel (smooth scroll, instant taps,
+   stable cards). Strips per-frame composite cost that helps
+   on desktop but hurts mid-range phones.
+   ========================================================= */
+@media (hover: none) and (pointer: coarse) {
+  /* backdrop-filter re-samples underlying pixels every frame —
+     the single biggest mobile scroll-jank source. Swap for a
+     solid, slightly-translucent dark background that reads the
+     same visually but composites once. */
+  .mobile-tab-bar,
+  header.region-sticky,
+  header[class*="backdrop-blur"],
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .mobile-tab-bar { background-color: rgb(10, 8, 7) !important; }
+
+  /* Heavy poster shadows + transition-all force layer promotion
+     and repaint on scroll. Flatten on mobile — the ring/border
+     already separates the card from the background. */
+  .cine-img,
+  [class*="shadow-["] {
+    box-shadow: none !important;
+  }
+
+  /* transition-all animates layout properties (shadow, transform,
+     filter) the user never sees on touch (no hover). Kill it. */
+  [class*="transition-all"] {
+    transition-property: opacity, background-color, border-color, color !important;
+    transition-duration: 150ms !important;
+  }
+
+  /* Disable the cinematic poster zoom on mobile entirely —
+     it cannot fire (no hover) and just forces will-change. */
+  .cine-img { transition: none !important; transform: none !important; filter: none !important; }
+
+  /* Tap responsiveness: remove iOS tap-highlight delay/flash. */
+  a, button, [role="button"] { -webkit-tap-highlight-color: transparent; }
+
+  /* Off-screen rails: let the browser skip layout/paint until
+     they scroll near the viewport. Huge win on long home pages. */
+  section { content-visibility: auto; contain-intrinsic-size: 1px 600px; }
+}
