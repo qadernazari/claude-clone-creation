@@ -415,6 +415,44 @@ export type Database = {
           },
         ]
       }
+      film_reviews: {
+        Row: {
+          body: string | null
+          created_at: string
+          film_id: string
+          id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          film_id: string
+          id?: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          film_id?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "film_reviews_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       films: {
         Row: {
           access_mode: string
@@ -932,7 +970,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      film_rating_aggregates: {
+        Row: {
+          avg_rating: number | null
+          film_id: string | null
+          review_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "film_reviews_film_id_fkey"
+            columns: ["film_id"]
+            isOneToOne: false
+            referencedRelation: "films"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       delete_email: {
