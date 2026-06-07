@@ -394,6 +394,8 @@ function AuthPage() {
                     setMode(mode === "signin" ? "signup" : "signin");
                     setError(null);
                     setPwError(null);
+                    setRevealPassword(false);
+                    setPassword("");
                   }}
                   className="ms-2 text-cream hover:underline font-medium"
                 >
