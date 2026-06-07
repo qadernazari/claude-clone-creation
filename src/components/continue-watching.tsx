@@ -147,7 +147,10 @@ export function ContinueWatching() {
                   </svg>
                 </div>
                 {/* Progress bar — amber fill, the only place gold appears */}
-                <div className="absolute inset-x-0 bottom-0 h-[3px] bg-cream/10">
+                <div
+                  className="absolute inset-x-0 bottom-0 h-[3px]"
+                  style={{ background: "rgba(var(--rgb-cream), 0.10)" }}
+                >
                   <div
                     className="h-full bg-amber"
                     style={{ width: `${pct}%`, boxShadow: "0 0 8px rgba(201,168,76,0.6)" }}
