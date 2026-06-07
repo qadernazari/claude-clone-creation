@@ -91,30 +91,44 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div
       dir={fa ? "rtl" : "ltr"}
-      className="flex min-h-screen items-center justify-center bg-background px-4"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-0 px-6"
     >
-      <div className="max-w-md text-center">
-        <h1 className={`text-xl font-semibold tracking-tight text-foreground ${fa ? "font-vazir" : ""}`}>
-          {fa ? "این صفحه بارگذاری نشد" : "This page didn't load"}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 40%, rgba(201,168,76,0.08), transparent 55%), linear-gradient(180deg, var(--bg-0), oklch(0.12 0 0))",
+        }}
+      />
+      <div className="relative z-10 max-w-lg text-center">
+        <span className="block text-[10px] font-semibold uppercase tracking-[0.40em] text-amber/90">
+          {fa ? "خطا" : "Interruption"}
+        </span>
+        <h1
+          className={`mt-5 font-display text-3xl font-medium tracking-[-0.02em] text-cream-bright md:text-4xl ${fa ? "font-vazir" : ""}`}
+        >
+          {fa ? "نمایش متوقف شد" : "Something interrupted the projection"}
         </h1>
-        <p className={`mt-2 text-sm text-muted-foreground ${fa ? "font-vazir" : ""}`}>
+        <div className="mx-auto mt-5 h-px w-16 bg-amber/60" aria-hidden />
+        <p className={`mt-6 text-sm leading-relaxed text-cream/55 ${fa ? "font-vazir" : ""}`}>
           {fa
             ? "خطایی رخ داد. می‌توانید دوباره تلاش کنید یا به خانه برگردید."
-            : "Something went wrong on our end. You can try refreshing or head back home."}
+            : "Something went wrong on our end. You can try again or head back home."}
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex min-h-11 items-center rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
           >
             {fa ? "تلاش دوباره" : "Try again"}
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex min-h-11 items-center rounded-full border border-cream/25 px-6 py-3 text-[13px] font-medium text-cream/85 transition-all duration-300 hover:border-amber/50 hover:text-amber"
           >
             {fa ? "خانه" : "Go home"}
           </a>
