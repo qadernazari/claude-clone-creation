@@ -179,8 +179,10 @@
   }
   h1 { letter-spacing: -0.04em; font-weight: 600; }
 
-  /* Smooth, premium scroll */
-  html { scroll-behavior: smooth; }
+  /* Smooth, premium scroll — desktop only; on mobile let native momentum drive scroll for 60fps */
+  @media (hover: hover) and (pointer: fine) {
+    html { scroll-behavior: smooth; }
+  }
 
   /* Custom thin scrollbar */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
