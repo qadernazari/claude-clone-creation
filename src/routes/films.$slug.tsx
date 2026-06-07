@@ -990,6 +990,7 @@ function FilmPage() {
           </div>
         </div>
       )}
+      {film.film_type === "series" && <SeriesEpisodes seriesId={film.id} />}
       <FilmReviewsSection filmId={film.id} />
       <SiteFooter />
 
