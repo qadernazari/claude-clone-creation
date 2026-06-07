@@ -152,17 +152,23 @@ function PosterRail({
   fa: boolean;
 }) {
   return (
-    <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
-      <div className="mb-5 flex items-end justify-between gap-6">
-        <h2 className={`font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
-          {heading}
-        </h2>
+    <section className="mx-auto max-w-7xl px-6 pt-10 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
+      <div className="mb-6 flex items-end justify-between gap-6">
+        <div>
+          <span className="block text-[10px] uppercase tracking-[0.3em] text-amber">
+            {fa ? "بیشتر" : "Related Perspectives"}
+          </span>
+          <h2 className={`mt-3 text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px] ${fa ? "font-vazir" : "font-display italic"}`}>
+            {heading}
+          </h2>
+        </div>
         {linkText && (
-          <Link to="/browse" className="text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
+          <Link to="/browse" className="shrink-0 text-[11px] uppercase tracking-[0.22em] text-cream/50 hover:text-cream-bright transition-colors">
             {linkText} →
           </Link>
         )}
       </div>
+
       <div className="-mx-6 overflow-x-auto overflow-y-visible px-6 pt-2 pb-3 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <ul className="flex gap-4 min-w-max md:gap-5">
           {films.map((r) => {
