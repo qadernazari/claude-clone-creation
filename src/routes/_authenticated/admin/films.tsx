@@ -40,6 +40,10 @@ type Film = {
   poster_gradient: string | null;
   video_url?: string | null;
   preview_url: string | null;
+  film_type?: "movie" | "series" | "episode";
+  parent_film_id?: string | null;
+  season_number?: number | null;
+  episode_number?: number | null;
 };
 
 type CreditDraft = {
@@ -70,11 +74,12 @@ const EMPTY: FilmDraft = {
   access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
+  film_type: "movie", parent_film_id: null, season_number: null, episode_number: null,
 };
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, created_at, updated_at")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
@@ -406,6 +411,10 @@ function FilmEditorModal({
         mobile_cover_url: d.mobile_cover_url?.trim() || null,
         poster_gradient: d.poster_gradient || null,
         preview_url: d.preview_url?.trim() || null,
+        film_type: d.film_type ?? "movie",
+        parent_film_id: d.film_type === "episode" ? (d.parent_film_id || null) : null,
+        season_number: d.film_type === "episode" ? (d.season_number ?? null) : null,
+        episode_number: d.film_type === "episode" ? (d.episode_number ?? null) : null,
       };
 
       let filmId = d.id;
