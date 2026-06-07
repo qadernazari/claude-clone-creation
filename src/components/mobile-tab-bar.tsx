@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState } from "@/hooks/use-subscription";
@@ -8,10 +7,17 @@ import { useCurrentUserState } from "@/hooks/use-subscription";
  * Visible only on small screens (<md). Hidden on the immersive
  * watch player and on auth / checkout routes to maximize content.
  *
- * Routes:
- *  - Home    → /
- *  - Browse  → /browse  (search input lives at the top of /browse)
- *  - Account → /account if signed in, /auth otherwise
+ * Layout stability rules:
+ *  - The bar always renders the same 4 tabs (Home, Browse, Library, Account).
+ *    Unauthenticated users get their Library tab linked to /auth so the
+ *    geometry never shifts when the auth state resolves after mount.
+ *  - Visibility is driven purely by CSS (`html[data-tabbar="hidden"]`).
+ *    The inline boot script in `__root.tsx` sets that attribute from the
+ *    URL pathname BEFORE first paint, so hidden routes never reserve space
+ *    and visible routes never give it back.
+ *  - The bar sits at `bottom: 0` + `env(safe-area-inset-bottom)`. We
+ *    deliberately do NOT listen to visualViewport changes — the per-scroll
+ *    style writes that produced caused visible jitter on iOS.
  */
 export function MobileTabBar() {
   const { locale } = useLocale();
@@ -27,51 +33,20 @@ export function MobileTabBar() {
     path.startsWith("/checkout") ||
     path.startsWith("/admin");
 
-  // Tell the body whether to reserve space for the tab bar.
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    if (hidden) document.body.setAttribute("data-no-tabbar", "true");
-    else document.body.removeAttribute("data-no-tabbar");
-    return () => document.body.removeAttribute("data-no-tabbar");
-  }, [hidden]);
-
-  // Pin the bar to the visual viewport bottom on iOS so it doesn't
-  // shift when the URL bar collapses after first paint.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      document.documentElement.style.setProperty(
-        "--tabbar-vv-offset",
-        `${offset}px`,
-      );
-    };
-    update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
-    return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-    };
-  }, []);
-
   if (hidden) return null;
 
   const isHome = path === "/";
   const isBrowse = path === "/browse";
-  const isAccount =
-    path.startsWith("/account") ||
-    path === "/auth";
+  const isLibrary =
+    path.startsWith("/library") || path.startsWith("/my-tickets");
+  const isAccount = path.startsWith("/account") || path === "/auth";
 
   return (
     <nav
       aria-label={fa ? "ناوبری" : "Primary"}
       dir={fa ? "rtl" : "ltr"}
-      className="mobile-tab-bar fixed inset-x-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
+      className="mobile-tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
       style={{
-        bottom: "var(--tabbar-vv-offset, 0px)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
@@ -100,19 +75,17 @@ export function MobileTabBar() {
             </svg>
           }
         />
-        {user && (
-          <TabItem
-            to="/library"
-            label={fa ? "کتابخانه" : "Library"}
-            active={path.startsWith("/library") || path.startsWith("/my-tickets")}
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M5 4h3l1 2h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
-                <path d="M9 12h8" />
-              </svg>
-            }
-          />
-        )}
+        <TabItem
+          to={user ? "/library" : "/auth"}
+          label={fa ? "کتابخانه" : "Library"}
+          active={isLibrary}
+          icon={
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M5 4h3l1 2h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+              <path d="M9 12h8" />
+            </svg>
+          }
+        />
         <TabItem
           to={user ? "/account" : "/auth"}
           label={fa ? "حساب" : "Account"}

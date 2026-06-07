@@ -200,7 +200,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var r=localStorage.getItem('iran_region');var l=localStorage.getItem('iran_lang');if(r!=='global'&&r!=='iran')r=l==='fa'?'iran':'global';l=r==='iran'?'fa':'en';document.documentElement.lang=l;document.documentElement.dir=l==='fa'?'rtl':'ltr';document.documentElement.dataset.region=r;}catch(e){}",
+              "try{var r=localStorage.getItem('iran_region');var l=localStorage.getItem('iran_lang');if(r!=='global'&&r!=='iran')r=l==='fa'?'iran':'global';l=r==='iran'?'fa':'en';document.documentElement.lang=l;document.documentElement.dir=l==='fa'?'rtl':'ltr';document.documentElement.dataset.region=r;var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}",
           }}
         />
         <HeadContent />
