@@ -51,6 +51,42 @@ export type HomePageData = {
   categories: HomeCategory[];
 };
 
+type RawFilm = Record<string, unknown>;
+
+function parseSigned(u: string | null | undefined): { bucket: string; path: string } | null {
+  if (!u) return null;
+  const m = u.match(/\/storage\/v1\/object\/sign\/([^/]+)\/([^?]+)/);
+  return m ? { bucket: m[1], path: decodeURIComponent(m[2]) } : null;
+}
+
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+async function renderUrl(
+  supabaseAdmin: any,
+  cache: Map<string, Promise<string | null>>,
+  original: string | null | undefined,
+  width: number,
+  quality = 68,
+): Promise<string | null> {
+  if (!original) return null;
+  const parsed = parseSigned(original);
+  if (!parsed) return original;
+  const key = `${parsed.bucket}|${parsed.path}|${width}|${quality}`;
+  const existing = cache.get(key);
+  if (existing) return existing;
+  const promise = (async () => {
+    const { data, error } = await supabaseAdmin.storage
+      .from(parsed.bucket)
+      .createSignedUrl(parsed.path, ONE_YEAR, {
+        transform: { width, quality, resize: "cover" },
+      });
+    if (error || !data?.signedUrl) return original;
+    return data.signedUrl as string;
+  })();
+  cache.set(key, promise);
+  return promise;
+}
+
 export const getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageData> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -83,9 +119,34 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
     if (filmsRes.error) throw new Error(filmsRes.error.message);
     if (categoriesRes.error) throw new Error(categoriesRes.error.message);
 
+    const cache = new Map<string, Promise<string | null>>();
+    const featuredRaw = featuredRes.data as RawFilm | null;
+    const filmsRaw = (filmsRes.data as RawFilm[] | null) ?? [];
+
+    const featured = featuredRaw
+      ? await (async () => {
+          const [cover, thumbnail, mobile] = await Promise.all([
+            renderUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 70),
+            renderUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 72),
+            renderUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 1080, 70),
+          ]);
+          return { ...featuredRaw, cover_url: cover, thumbnail_url: thumbnail, mobile_cover_url: mobile } as HomeFeaturedFilm;
+        })()
+      : null;
+
+    const films = await Promise.all(
+      filmsRaw.map(async (f) => {
+        const [cover, thumbnail] = await Promise.all([
+          renderUrl(supabaseAdmin, cache, f.cover_url as string | null, 720, 68),
+          renderUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 800, 68),
+        ]);
+        return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
+      }),
+    );
+
     return {
-      featured: (featuredRes.data as HomeFeaturedFilm | null) ?? null,
-      films: (filmsRes.data as HomeRailFilm[] | null) ?? [],
+      featured,
+      films,
       categories: (categoriesRes.data as HomeCategory[] | null) ?? [],
     };
   },
@@ -94,5 +155,6 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
 export const homePageQueryOptions = queryOptions({
   queryKey: ["home", "page-data"],
   queryFn: () => getHomePageData(),
-  staleTime: 60_000,
+  staleTime: 5 * 60_000,
+  gcTime: 30 * 60_000,
 });
