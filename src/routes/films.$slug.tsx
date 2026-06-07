@@ -963,7 +963,7 @@ function FilmPage() {
               </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
                 {fa
-                  ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
+                  ? "تماشای نامحدودِ همه‌ی آثار. هر زمان لغو کنید."
                   : "Unlimited access to the full catalog. Cancel anytime."}
               </p>
               <button
