@@ -1054,24 +1054,37 @@ function FilmPage() {
       )}
 
       {/* Preview / trailer lightbox */}
+      {/* Cinema trailer modal — true black, fade-in, ESC + body-scroll-lock above */}
       {previewOpen && film.preview_url && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 p-4 trailer-modal-fade backdrop-blur-md"
           onClick={() => setPreviewOpen(false)}
           role="dialog"
           aria-modal="true"
+          aria-label={t.playPreview}
         >
+          {/* Eyebrow label, top-left */}
+          <div
+            className={`pointer-events-none absolute top-6 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90 ${dir === "rtl" ? "right-6" : "left-6"}`}
+          >
+            {fa ? "تیزر" : "Trailer"}
+            <span className={`text-cream/40 ${dir === "rtl" ? "mr-2" : "ml-2"}`}>· {title}</span>
+          </div>
+          {/* Cinematic close button */}
           <button
             type="button"
             onClick={() => setPreviewOpen(false)}
-            className="absolute top-5 right-5 text-cream/70 hover:text-cream-bright text-2xl leading-none"
-            aria-label="Close preview"
+            className={`absolute top-5 flex h-10 w-10 items-center justify-center rounded-full border border-cream/15 bg-black/40 text-cream/75 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-amber/40 hover:text-amber ${dir === "rtl" ? "left-5" : "right-5"}`}
+            aria-label={fa ? "بستن" : "Close"}
           >
-            ×
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
           </button>
           <div
-            className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden border border-cream/15 bg-black"
+            className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-cream/10 bg-black shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9),0_0_0_1px_rgba(201,168,76,0.08)] trailer-modal-rise"
             onClick={(e) => e.stopPropagation()}
+            style={{ aspectRatio: "16 / 9" }}
           >
             <video
               src={film.preview_url}
@@ -1081,6 +1094,9 @@ function FilmPage() {
               className="h-full w-full"
             />
           </div>
+          <p className={`pointer-events-none absolute bottom-5 text-[10px] uppercase tracking-[0.28em] text-cream/35 ${dir === "rtl" ? "right-6" : "left-6"}`}>
+            {fa ? "برای بستن کلیک کنید یا ESC را بزنید" : "Click outside or press ESC to close"}
+          </p>
         </div>
       )}
       {film.film_type === "series" && <SeriesEpisodes seriesId={film.id} />}
