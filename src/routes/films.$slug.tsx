@@ -1,23 +1,23 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FilmReviewsSection } from "@/components/film-reviews-section";
 import { SeriesEpisodes } from "@/components/series-episodes";
-
-// Lazy-loaded — Stripe SDK is ~200KB; only load when user opens checkout.
-const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
-const MembershipCheckout = lazy(() => import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })));
-const ContributeModal = lazy(() => import("@/components/contribute-modal").then((m) => ({ default: m.ContributeModal })));
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { PromoBannerList } from "@/components/promo-banner";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+
+// Lazy-loaded — Stripe SDK is ~200KB; only load when user opens checkout.
+const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
+const MembershipCheckout = lazy(() => import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })));
+const ContributeModal = lazy(() => import("@/components/contribute-modal").then((m) => ({ default: m.ContributeModal })));
 
 
 
