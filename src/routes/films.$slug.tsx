@@ -775,7 +775,28 @@ function FilmPage() {
             <ul className="flex gap-5 min-w-max md:gap-7">
               {credits.map((c, i) => {
                 const name = (fa ? c.value_fa || c.value_en : c.value_en) || "";
-                const role = fa ? c.label_fa || c.label_en : c.label_en;
+                const creditTypeLabels: Record<string, { en: string; fa: string }> = {
+                  director: { en: "Director", fa: "کارگردان" },
+                  writer: { en: "Writer", fa: "نویسنده" },
+                  producer: { en: "Producer", fa: "تهیه‌کننده" },
+                  composer: { en: "Composer", fa: "آهنگساز" },
+                  cinematographer: { en: "Cinematographer", fa: "فیلم‌بردار" },
+                  editor: { en: "Editor", fa: "تدوین‌گر" },
+                  cast: { en: "Cast", fa: "بازیگر" },
+                  actor: { en: "Actor", fa: "بازیگر" },
+                  narrator: { en: "Narrator", fa: "راوی" },
+                  sound: { en: "Sound", fa: "صدا" },
+                  production: { en: "Production", fa: "تولید" },
+                };
+                const fallback = c.credit_type
+                  ? creditTypeLabels[c.credit_type.toLowerCase()] ?? {
+                      en: c.credit_type.charAt(0).toUpperCase() + c.credit_type.slice(1),
+                      fa: c.credit_type,
+                    }
+                  : null;
+                const role = fa
+                  ? c.label_fa || c.label_en || fallback?.fa
+                  : c.label_en || fallback?.en;
                 const parts = name.trim().split(/\s+/).filter(Boolean);
                 const initials = ((parts[0]?.[0] ?? "?") + (parts[1]?.[0] ?? "")).toUpperCase();
                 return (
