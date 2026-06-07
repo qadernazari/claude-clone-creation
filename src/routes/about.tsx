@@ -188,10 +188,10 @@ function AboutPage() {
                   {fa ? "ایمیل عمومی" : "General"}
                 </p>
                 <a
-                  href="mailto:hello@iran.film"
+                  href="mailto:info@ir.show"
                   className="mt-1 block text-lg text-cream-bright hover:text-amber"
                 >
-                  hello@iran.film
+                  info@ir.show
                 </a>
               </div>
               <div>
@@ -199,10 +199,10 @@ function AboutPage() {
                   {fa ? "فیلم‌سازان" : "Filmmakers"}
                 </p>
                 <a
-                  href="mailto:submissions@iran.film"
+                  href="mailto:info@ir.show"
                   className="mt-1 block text-lg text-cream-bright hover:text-amber"
                 >
-                  submissions@iran.film
+                  info@ir.show
                 </a>
               </div>
             </div>
