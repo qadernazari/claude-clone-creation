@@ -719,7 +719,9 @@ function FilmEditorModal({
                     className={inp}
                   >
                     <option value="">— select a series —</option>
-                    {/* parent options injected by parent component via window prop */}
+                    {seriesOptions.map((s) => (
+                      <option key={s.id} value={s.id}>{s.title_en}</option>
+                    ))}
                   </select>
                 </label>
                 <label className="block">
