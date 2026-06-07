@@ -64,12 +64,12 @@ function AboutPage() {
           </p>
           <h1 className="font-display text-5xl leading-[1.05] text-cream-bright md:text-6xl">
             {fa
-              ? "خانه‌ای برای سینمای کوتاهِ ایران."
+              ? "فیلم‌های کوتاه ایرانی، در دسترس همه‌ی جهان."
               : "Iranian short films, streaming worldwide."}
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-cream/70">
             {fa
-              ? "ایران یک پلتفرم پخش بلیتی، دو زبانه و بدون اشتراک است. شما هزینه‌ی همان فیلمی را می‌پردازید که می‌خواهید ببینید — و بخش بزرگی از آن مستقیم به فیلم‌ساز می‌رسد."
+              ? "ایران خانه‌ای آنلاین برای سینمای کوتاه ایران است. عضویت ماهانه با ۷ روز آزمایش رایگان، به‌علاوه‌ی بلیت‌های ویژه برای انتشارهای منتخب. پرداختِ منصفانه و شفاف به سازندگانِ فیلم."
               : "A streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals for select releases. Fair, transparent pay for the people who made the film."}
           </p>
         </div>
@@ -83,12 +83,12 @@ function AboutPage() {
           <div className="space-y-5 text-cream/75">
             <p>
               {fa
-                ? "ما باور داریم سینمای کوتاهِ ایران شایسته‌ی خانه‌ای‌ست که در آن صدای حقیقی‌اش شنیده شود — بدون الگوریتم، بدون اشتراک، و بدون واسطه‌های ناعادلانه."
+                ? "ما باور داریم سینمای کوتاهِ ایران شایسته‌ی خانه‌ای‌ست که در آن صدای حقیقی‌اش شنیده شود — بدون الگوریتم، بدون تبلیغاتِ پیش از پخش، و بدون واسطه‌های ناعادلانه میانِ فیلم‌ساز و تماشاگر."
                 : "Iranian short cinema deserves a home where its authentic voice is heard — without algorithms, without ad pre-rolls, and without unfair middlemen between filmmakers and the audience."}
             </p>
             <p>
               {fa
-                ? "هر فیلم با وسواس انتخاب می‌شود. هر بلیت یک حمایت مستقیم است. هر تماشاگر، بخشی از یک جامعه‌ی کوچک اما واقعی‌ست."
+                ? "هر فیلم با دقت انتخاب می‌شود. هر عضویت و هر بلیت یک حمایت مستقیم از هنرمند است. هر تماشاگر، بخشی از یک جامعه‌ی کوچک اما واقعی‌ست."
                 : "Every film is hand-picked. Every membership and ticket supports the artist directly. Every viewer is part of a small but real community."}
             </p>
           </div>

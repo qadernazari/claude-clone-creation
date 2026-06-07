@@ -151,7 +151,7 @@ function PressPage() {
           </div>
           <p className="mt-10 max-w-3xl text-cream/75">
             {fa
-              ? "ایران یک پلتفرم پخش بلیتی و بدون اشتراک برای فیلم‌های کوتاهِ اختصاصی ایرانی است. هر بلیت یک حمایت مستقیم از فیلم‌ساز است."
+              ? "ایران خانه‌ای دوزبانه برای پخشِ فیلم‌های کوتاهِ ایرانی است. عضویتِ ماهانه با ۷ روز آزمایشِ رایگان، به‌علاوه‌ی بلیت‌های ویژه برای انتشارهای منتخب. پرداخت به فیلم‌سازان روی هر تماشا و هر بلیت به‌صورت شفاف انجام می‌شود."
               : "IRAN is a bilingual streaming home for Iranian short films. Monthly membership with a 7-day free trial, plus Premium rentals for select releases. Filmmakers are paid transparently on every stream and every ticket."}
           </p>
         </div>
