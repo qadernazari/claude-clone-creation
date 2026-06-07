@@ -97,7 +97,7 @@ export function FeaturedFilm() {
               <img
                 src={mobileImage}
                 alt=""
-                className={`hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-14 w-full object-cover object-center transition-opacity duration-500 md:hidden ${
+                className={`hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 w-full object-cover object-top transition-opacity duration-500 md:hidden ${
                   mobileHeroReady ? "opacity-100" : "opacity-0"
                 }`}
                 loading="eager"
