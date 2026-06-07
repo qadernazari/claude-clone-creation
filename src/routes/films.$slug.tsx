@@ -458,6 +458,70 @@ function FilmPage() {
       <PaymentTestModeBanner />
       <SiteHeader />
 
+      {/* Condensed sticky cinematic header — appears after the hero scrolls past.
+          Mirrors the primary CTA so users on long pages can always Watch/Buy. */}
+      <div
+        className={`pointer-events-none fixed inset-x-0 top-0 z-30 transition-all duration-500 ${
+          stickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        }`}
+        aria-hidden={!stickyHeader}
+      >
+        <div className="pointer-events-auto border-b border-cream/8 bg-bg-0/80 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 md:px-10">
+            <Link
+              to="/"
+              className="hidden shrink-0 text-cream/55 transition-colors hover:text-cream-bright md:inline-flex"
+              aria-label={t.back}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={dir === "rtl" ? { transform: "scaleX(-1)" } : undefined}>
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </Link>
+            <div className="min-w-0 flex-1">
+              <div className={`truncate font-display text-[15px] font-medium tracking-[-0.01em] text-cream-bright md:text-[16px] ${fa ? "font-vazir" : ""}`}>
+                {title}
+              </div>
+              {director && (
+                <div className="truncate text-[11px] text-cream/45">
+                  {fa ? "کارگردان " : "Dir. "}{director}
+                </div>
+              )}
+            </div>
+            {!isAuthLoading && (
+              !user ? (
+                <Link
+                  to="/auth"
+                  search={{ redirect: `/watch/${film.slug}` }}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                  <span className="hidden sm:inline">{accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}</span>
+                  <span className="sm:hidden">{fa ? "ورود" : "Sign in"}</span>
+                </Link>
+              ) : showWatchNow ? (
+                <Link
+                  to="/watch/$slug"
+                  params={{ slug: film.slug }}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                  {t.watch}
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => (isMember || accessType === "ppv_only" ? setCheckoutOpen(true) : setMembershipOpen(true))}
+                  disabled={tomanOnly && (isMember || accessType === "ppv_only")}
+                  className="inline-flex shrink-0 items-center rounded-full bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02] disabled:opacity-60"
+                >
+                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : t.startTrial}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Cinematic full-bleed hero */}
       <section className="relative isolate min-h-[78vh] w-full overflow-hidden bg-background md:min-h-[88vh]">
         {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
