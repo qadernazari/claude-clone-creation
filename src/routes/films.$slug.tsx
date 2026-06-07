@@ -466,7 +466,10 @@ function FilmPage() {
         }`}
         aria-hidden={!stickyHeader}
       >
-        <div className="pointer-events-auto border-b border-cream/8 bg-bg-0/80 backdrop-blur-xl">
+        <div
+          className="pointer-events-auto border-b border-cream/8 bg-bg-0/80 backdrop-blur-xl"
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+        >
           <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 md:px-10">
             <Link
               to="/"
