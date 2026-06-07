@@ -31,24 +31,48 @@ function NotFoundComponent() {
   return (
     <div
       dir={fa ? "rtl" : "ltr"}
-      className="flex min-h-screen items-center justify-center bg-background px-4"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-0 px-6"
     >
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className={`mt-4 text-xl font-semibold text-foreground ${fa ? "font-vazir" : ""}`}>
-          {fa ? "صفحه پیدا نشد" : "Page not found"}
+      {/* Ambient amber glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 35%, rgba(201,168,76,0.10), transparent 55%), linear-gradient(180deg, var(--bg-0), oklch(0.12 0 0))",
+        }}
+      />
+      <div className="relative z-10 max-w-lg text-center">
+        <span className="block text-[10px] font-semibold uppercase tracking-[0.40em] text-amber/90">
+          {fa ? "خطای ۴۰۴" : "Error 404"}
+        </span>
+        <h1
+          className="mt-5 font-display text-[110px] font-medium leading-none tracking-[-0.05em] text-cream-bright md:text-[160px]"
+          style={{ textShadow: "0 12px 60px rgba(201,168,76,0.20)" }}
+        >
+          404
+        </h1>
+        <div className="mx-auto mt-5 h-px w-16 bg-amber/60" aria-hidden />
+        <h2 className="mt-6 font-display text-xl font-medium tracking-[-0.01em] text-cream md:text-2xl">
+          {fa ? "این صحنه در آرشیو نیست" : "This reel isn't in the archive"}
         </h2>
-        <p className={`mt-2 text-sm text-muted-foreground ${fa ? "font-vazir" : ""}`}>
+        <p className="mt-3 text-sm leading-relaxed text-cream/55">
           {fa
-            ? "صفحه‌ای که دنبالش هستید وجود ندارد یا جابه‌جا شده است."
+            ? "صفحه‌ای که دنبالش هستید پیدا نشد یا جابه‌جا شده است."
             : "The page you're looking for doesn't exist or has been moved."}
         </p>
-        <div className="mt-6">
+        <div className="mt-9 flex items-center justify-center gap-3">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
           >
-            {fa ? "خانه" : "Go home"}
+            {fa ? "بازگشت به خانه" : "Back to home"}
+          </Link>
+          <Link
+            to="/browse"
+            className="inline-flex min-h-11 items-center rounded-full border border-cream/25 px-6 py-3 text-[13px] font-medium text-cream/85 transition-all duration-300 hover:border-amber/50 hover:text-amber"
+          >
+            {fa ? "جست‌وجو در آثار" : "Browse films"}
           </Link>
         </div>
       </div>
