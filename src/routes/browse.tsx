@@ -70,34 +70,9 @@ function BrowsePage() {
   const [q, setQ] = useState(initialQ);
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
-  const { data: films, isLoading } = useQuery({
-    queryKey: ["films", "browse"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, created_at, sort_order",
-        )
-        .eq("visibility", "published")
-        .limit(200);
-      if (error) throw error;
-      return data as Film[];
-    },
-    staleTime: 60_000,
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name_en, name_fa")
-        .order("sort_order", { ascending: true });
-      if (error) throw error;
-      return data as Category[];
-    },
-    staleTime: 5 * 60_000,
-  });
+  const { data, isLoading } = useQuery(browsePageQueryOptions);
+  const films = data?.films as Film[] | undefined;
+  const categories = data?.categories as Category[] | undefined;
 
   const usedCategoryIds = useMemo(
     () => new Set((films ?? []).map((f) => f.category).filter(Boolean) as string[]),
