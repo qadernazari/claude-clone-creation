@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipPortalSession } from "@/lib/membership.functions";
-import { MembershipCheckout } from "@/components/membership-checkout";
+// Lazy — Stripe SDK is heavy; only load when user opens checkout.
+const MembershipCheckout = lazy(() => import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })));
 import { AcceptTrialButton } from "@/components/accept-trial-button";
 
 function fmtDate(iso: string | null, fa: boolean) {
@@ -110,10 +111,12 @@ export function MembershipPanel() {
           </button>
         </div>
         {checkoutOpen && (
-          <MembershipCheckout
-            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
-            onClose={() => setCheckoutOpen(false)}
-          />
+          <Suspense fallback={null}>
+            <MembershipCheckout
+              returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
+              onClose={() => setCheckoutOpen(false)}
+            />
+          </Suspense>
         )}
       </section>
     );
@@ -157,10 +160,12 @@ export function MembershipPanel() {
           </div>
         </dl>
         {checkoutOpen && (
-          <MembershipCheckout
-            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
-            onClose={() => setCheckoutOpen(false)}
-          />
+          <Suspense fallback={null}>
+            <MembershipCheckout
+              returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
+              onClose={() => setCheckoutOpen(false)}
+            />
+          </Suspense>
         )}
       </section>
     );

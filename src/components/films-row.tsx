@@ -90,7 +90,7 @@ function Rail({
 
   return (
     <section
-      className="relative mx-auto max-w-[1400px] px-5 md:px-12"
+      className="relative mx-auto max-w-[1400px] px-5 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_520px]"
     >
       <div className="mb-6 flex items-end justify-between gap-6">
         <div className="max-w-2xl">

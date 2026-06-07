@@ -6,10 +6,11 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 import { AuthMenu } from "@/components/auth-menu";
 import { useSubscription, memberCanAccess } from "@/hooks/use-subscription";
-import { TrialExpiredModal } from "@/components/trial-expired-modal";
+// Lazy — only loads if the user's trial actually expires mid-watch.
+const TrialExpiredModal = lazy(() => import("@/components/trial-expired-modal").then((m) => ({ default: m.TrialExpiredModal })));
 import { getFilmStreamUrl } from "@/lib/watch.functions";
 import { upsertWatchProgress, getResumePosition } from "@/lib/library.functions";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/watch/$slug")({
   loader: async ({ params }) => {
@@ -360,7 +361,11 @@ function WatchPage() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      {trialModalOpen && <TrialExpiredModal onClose={() => setTrialModalOpen(false)} />}
+      {trialModalOpen && (
+        <Suspense fallback={null}>
+          <TrialExpiredModal onClose={() => setTrialModalOpen(false)} />
+        </Suspense>
+      )}
       <header className="sticky top-0 z-30 border-b border-cream/10 bg-bg-0/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <Link to="/" className="inline-flex items-center" aria-label="IRAN — home">
