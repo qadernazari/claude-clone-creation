@@ -114,6 +114,7 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
           "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
         )
         .eq("visibility", "published")
+        .neq("film_type", "episode")
         .order("sort_order", { ascending: true })
         .limit(1)
         .maybeSingle(),
@@ -123,6 +124,7 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
           "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, access_type, is_premium, sort_order",
         )
         .eq("visibility", "published")
+        .neq("film_type", "episode")
         .order("sort_order", { ascending: true })
         .limit(60),
       supabaseAdmin
