@@ -35,6 +35,28 @@ export function MobileTabBar() {
     return () => document.body.removeAttribute("data-no-tabbar");
   }, [hidden]);
 
+  // Pin the bar to the visual viewport bottom on iOS so it doesn't
+  // shift when the URL bar collapses after first paint.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty(
+        "--tabbar-vv-offset",
+        `${offset}px`,
+      );
+    };
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, []);
+
   if (hidden) return null;
 
   const isHome = path === "/";
@@ -47,8 +69,11 @@ export function MobileTabBar() {
     <nav
       aria-label={fa ? "ناوبری" : "Primary"}
       dir={fa ? "rtl" : "ltr"}
-      className="mobile-tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
-      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      className="mobile-tab-bar fixed inset-x-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
+      style={{
+        bottom: "var(--tabbar-vv-offset, 0px)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+      }}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-1.5">
         <TabItem
