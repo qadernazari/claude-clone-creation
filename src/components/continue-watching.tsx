@@ -109,7 +109,7 @@ export function ContinueWatching() {
               params={{ slug: f.slug }}
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
-              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1 md:group-hover:ring-cream/20">
+              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1 md:group-hover:ring-amber/30 md:group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
                 {f.thumbnail_url || f.cover_url ? (
                   <img
                     src={f.thumbnail_url || f.cover_url || ""}
@@ -127,20 +127,27 @@ export function ContinueWatching() {
                     aria-hidden
                   />
                 )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/70 via-transparent to-transparent" />
-                {/* play affordance */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream-bright/95 text-ink shadow-2xl">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/80 via-bg-0/10 to-transparent" />
+                {/* Hover Resume pill — slides up from bottom on desktop hover */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-4 hidden justify-center md:flex">
+                  <span className="inline-flex translate-y-3 items-center gap-1.5 rounded-full bg-cream-bright px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink opacity-0 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7z" />
                     </svg>
+                    {fa ? "ادامه" : "Resume"}
                   </span>
                 </div>
-                {/* progress bar — only place gold appears as a fill */}
+                {/* Mobile play affordance (always visible, subtle) */}
+                <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-bg-0/60 text-cream-bright backdrop-blur-sm md:hidden">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                {/* Progress bar — amber fill, the only place gold appears */}
                 <div className="absolute inset-x-0 bottom-0 h-[3px] bg-cream/10">
                   <div
                     className="h-full bg-amber"
-                    style={{ width: `${pct}%` }}
+                    style={{ width: `${pct}%`, boxShadow: "0 0 8px rgba(201,168,76,0.6)" }}
                   />
                 </div>
               </div>
