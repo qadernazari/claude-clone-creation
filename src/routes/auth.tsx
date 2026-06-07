@@ -145,6 +145,14 @@ function AuthPage() {
     setPwError(null);
 
     if (!validateEmail(email)) return setEmailError(t.invalidEmail);
+
+    // Phase 1: reveal password after valid email
+    if (!revealPassword) {
+      setRevealPassword(true);
+      window.setTimeout(() => passwordRef.current?.focus(), 220);
+      return;
+    }
+
     if (password.length < 8) return setPwError(t.shortPw);
     setLoading(true);
     try {
