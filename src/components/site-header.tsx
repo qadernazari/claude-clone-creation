@@ -202,7 +202,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-semibold transition-colors md:hidden"
+        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
       >
         <RegionGlobeIcon size={15} className="region-trigger-icon" />
         <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
