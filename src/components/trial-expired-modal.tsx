@@ -30,7 +30,7 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
             : "Activate full membership to keep watching premium content. Your account, watchlist, and viewing history are saved."}
         </p>
         <ul className="mt-5 space-y-2 text-sm text-cream/75">
-          <li>• {fa ? "تماشای نامحدودِ همه‌ی آثار" : "Unlimited access to the catalog"}</li>
+          <li>• {fa ? "تماشای نامحدود کاتالوگ" : "Unlimited access to the catalog"}</li>
           <li>• {fa ? "هر زمان لغو کنید" : "Cancel anytime"}</li>
           <li>• {fa ? "ارتقای سریع" : "Quick, simple upgrade"}</li>
         </ul>

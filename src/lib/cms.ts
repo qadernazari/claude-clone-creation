@@ -145,7 +145,7 @@ export const DEFAULT_WHY_IRAN: { cards: WhyIranCard[] } = {
     {
       icon: "💝",
       heading: { en: "7-day free trial", fa: "۷ روز رایگان" },
-      body: { en: "Membership unlocks the full catalog.", fa: "عضویت به همه‌ی آثار دسترسی می‌دهد." },
+      body: { en: "Membership unlocks the full catalog.", fa: "عضویت به کلِ کاتالوگ دسترسی می‌دهد." },
     },
     {
       icon: "🌍",

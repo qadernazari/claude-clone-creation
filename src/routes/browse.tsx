@@ -134,7 +134,7 @@ function BrowsePage() {
 
         <header className="mb-4 max-w-3xl fade-up md:mb-14">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
-            {locale === "fa" ? "گنجینه‌ی آثار" : "The Catalog"}
+            {locale === "fa" ? "کاتالوگ" : "The Catalog"}
           </span>
           <h1 className="mt-3 font-display font-medium text-cream-bright text-[1.6rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
             {locale === "fa" ? "همه‌ی فیلم‌ها" : "Every film, in one place"}
