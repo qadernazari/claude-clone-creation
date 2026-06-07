@@ -133,6 +133,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.gstatic.com",
         crossOrigin: "anonymous",
       },
+      // Warm up the storage CDN we fetch every cover/avatar from — saves the
+      // TLS+TCP handshake on the first image request on mobile.
+      {
+        rel: "preconnect",
+        href: "https://yasfnvftzwyuxdhpysof.supabase.co",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "stylesheet",
         // Trimmed to the weights actually used in the app (3-2-1-3 instead of
@@ -140,6 +147,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,400&family=Vazirmatn:wght@400;500;600&display=swap",
       },
     ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
