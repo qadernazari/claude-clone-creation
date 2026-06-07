@@ -109,7 +109,10 @@ export function ContinueWatching() {
               params={{ slug: f.slug }}
               className="group block w-[78vw] shrink-0 snap-start sm:w-[360px] md:w-[400px]"
             >
-              <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/8 transition-transform duration-300 md:group-hover:scale-[1.02]">
+              <div
+                className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 transition-transform duration-300 md:group-hover:scale-[1.02]"
+                style={{ boxShadow: "inset 0 0 0 1px rgba(var(--rgb-cream), 0.10)" }}
+              >
                 {f.thumbnail_url || f.cover_url ? (
                   <img
                     src={f.thumbnail_url || f.cover_url || ""}
