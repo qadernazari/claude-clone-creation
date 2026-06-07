@@ -15,7 +15,7 @@ import { PromoBannerList } from "@/components/promo-banner";
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 
 
@@ -928,28 +928,34 @@ function FilmPage() {
       </section>
 
       {checkoutOpen && (
-        <FilmCheckout
-          filmSlug={film.slug}
-          filmId={film.id}
-          returnUrl={returnUrl}
-          onClose={() => setCheckoutOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <FilmCheckout
+            filmSlug={film.slug}
+            filmId={film.id}
+            returnUrl={returnUrl}
+            onClose={() => setCheckoutOpen(false)}
+          />
+        </Suspense>
       )}
 
       {membershipOpen && (
-        <MembershipCheckout
-          returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
-          onClose={() => setMembershipOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <MembershipCheckout
+            returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
+            onClose={() => setMembershipOpen(false)}
+          />
+        </Suspense>
       )}
 
       {contribOpen && (
-        <ContributeModal
-          filmSlug={film.slug}
-          filmTitle={title}
-          returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&kind=contribution&film=${film.slug}` : ""}
-          onClose={() => setContribOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <ContributeModal
+            filmSlug={film.slug}
+            filmTitle={title}
+            returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&kind=contribution&film=${film.slug}` : ""}
+            onClose={() => setContribOpen(false)}
+          />
+        </Suspense>
       )}
 
       {/* Preview / trailer lightbox */}
