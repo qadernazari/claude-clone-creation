@@ -279,6 +279,7 @@ function FilmsAdminPage() {
         <FilmEditorModal
           draft={editing}
           categories={categories}
+          allFilms={films ?? []}
           onCancel={() => setEditing(null)}
           onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin", "films"] }); qc.invalidateQueries({ queryKey: ["admin", "films-with-video"] }); }}
         />
@@ -353,16 +354,18 @@ const CREDIT_TYPES: { value: string; label: string }[] = [
 ];
 
 function FilmEditorModal({
-  draft, categories, onCancel, onSaved,
+  draft, categories, allFilms, onCancel, onSaved,
 }: {
   draft: FilmDraft;
   categories: string[];
+  allFilms: Film[];
   onCancel: () => void;
   onSaved: () => void;
 }) {
   const [d, setD] = useState<FilmDraft>(draft);
   const [credits, setCredits] = useState<CreditDraft[]>([]);
   const [saving, setSaving] = useState(false);
+  const seriesOptions = allFilms.filter((f) => f.film_type === "series" && f.id !== d.id);
   const set = <K extends keyof FilmDraft>(k: K, v: FilmDraft[K]) => setD((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
