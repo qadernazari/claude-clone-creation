@@ -145,8 +145,8 @@ function AuthPage() {
 
     if (!validateEmail(email)) return setEmailError(t.invalidEmail);
 
-    // Phase 1: reveal password after valid email
-    if (!revealPassword) {
+    // Phase 1: reveal password after valid email (signin only)
+    if (mode === "signin" && !revealPassword) {
       setRevealPassword(true);
       window.setTimeout(() => document.getElementById("password")?.focus(), 220);
       return;
@@ -317,11 +317,11 @@ function AuthPage() {
                   />
                   <div
                     className={`grid transition-all duration-300 ease-out ${
-                      revealPassword
+                      mode === "signup" || revealPassword
                         ? "grid-rows-[1fr] opacity-100 translate-y-0"
                         : "grid-rows-[0fr] opacity-0 -translate-y-1 pointer-events-none"
                     }`}
-                    aria-hidden={!revealPassword}
+                    aria-hidden={mode === "signin" && !revealPassword}
                   >
                     <div className="overflow-hidden">
                       <FloatingInput
@@ -377,7 +377,7 @@ function AuthPage() {
                     ? mode === "signin"
                       ? t.working
                       : t.sending
-                    : !revealPassword
+                    : mode === "signin" && !revealPassword
                       ? t.continueBtn
                       : mode === "signin"
                         ? t.signin
