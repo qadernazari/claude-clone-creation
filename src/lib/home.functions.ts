@@ -32,7 +32,7 @@ async function renderResizedUrl(
       const { data, error } = await client.storage
         .from(parsed.bucket)
         .createSignedUrl(parsed.path, ONE_YEAR, {
-          transform: { width, quality, resize: "cover" as const },
+          transform: { width, quality, resize: "contain" as const },
         });
       if (error || !data?.signedUrl) return original;
       return data.signedUrl as string;
