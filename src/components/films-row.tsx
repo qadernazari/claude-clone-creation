@@ -187,10 +187,6 @@ export function FilmsRow() {
       key: "originals",
       eyebrow: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
       title: "",
-      subtitle:
-        locale === "fa"
-          ? "آثار منتخب، با امضای فیلم‌سازان."
-          : "Signature works, in the filmmakers' own voice.",
       films: editors,
     });
 
