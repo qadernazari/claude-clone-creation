@@ -78,7 +78,7 @@ export function FeaturedFilm() {
         {hasAnyImage ? (
           <>
             <div
-              className="hero-mobile-poster absolute inset-x-0 bottom-0 top-14 bg-cover bg-center md:hidden"
+              className="hero-mobile-poster absolute inset-x-0 bottom-0 top-0 bg-cover bg-top md:hidden"
               style={{
                 backgroundImage: safeMobileImage
                   ? `linear-gradient(180deg, rgba(13,13,13,0.08) 0%, rgba(13,13,13,0.36) 72%, var(--bg-0) 100%), url(\"${safeMobileImage}\")`
