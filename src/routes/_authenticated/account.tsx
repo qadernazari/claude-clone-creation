@@ -37,6 +37,8 @@ type Profile = {
   full_name: string | null;
   locale: string;
   created_at: string;
+  parental_pin: string | null;
+  max_age_rating: string | null;
 };
 
 type Ticket = {
@@ -74,7 +76,7 @@ function AccountPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, email, full_name, locale, created_at")
+        .select("id, email, full_name, locale, created_at, parental_pin, max_age_rating")
         .maybeSingle();
       if (error) throw new Error(error.message);
       return data as Profile | null;
@@ -330,6 +332,10 @@ function AccountPage() {
 
         {/* Membership */}
         <MembershipPanel />
+
+        {/* Parental controls */}
+        <ParentalControlsPanel profile={profile ?? null} />
+
 
         {/* Password */}
         <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
