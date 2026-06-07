@@ -82,8 +82,18 @@ function LibraryPage() {
               : "Everything you're watching, saved, or have purchased — in one calm place."}
           </p>
           {isMember && (
-            <div className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-amber-bright">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+            <div
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.18em]"
+              style={{
+                border: "1px solid rgba(var(--rgb-amber), 0.30)",
+                background: "rgba(var(--rgb-amber), 0.10)",
+                color: "rgb(var(--rgb-amber-bright))",
+              }}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ background: "rgb(var(--rgb-amber))" }}
+              />
               {fa ? "عضو فعال" : "Active member"}
             </div>
           )}
