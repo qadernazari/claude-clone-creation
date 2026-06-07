@@ -99,9 +99,11 @@ function Rail({
               {eyebrow}
             </span>
           )}
-          <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[28px]">
-            {title}
-          </h2>
+          {title && (
+            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[28px]">
+              {title}
+            </h2>
+          )}
           {subtitle && (
             <p className="mt-2 text-[13px] text-cream/45">{subtitle}</p>
           )}
@@ -186,7 +188,8 @@ export function FilmsRow() {
 
     out.push({
       key: "originals",
-      title: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
+      eyebrow: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
+      title: "",
       subtitle:
         locale === "fa"
           ? "آثار منتخب، با امضای فیلم‌سازان."
@@ -196,7 +199,8 @@ export function FilmsRow() {
 
     out.push({
       key: "new",
-      title: locale === "fa" ? "آثار تازه" : "New Releases",
+      eyebrow: locale === "fa" ? "آثار تازه" : "New Releases",
+      title: "",
       films: newReleases,
     });
 
