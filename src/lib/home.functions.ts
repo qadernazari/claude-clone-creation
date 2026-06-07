@@ -1,5 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+import { makeRenderCache, renderResizedUrl } from "./storage-render.server";
+
 
 export type HomeFeaturedFilm = {
   id: string;
@@ -51,6 +53,8 @@ export type HomePageData = {
   categories: HomeCategory[];
 };
 
+type RawFilm = Record<string, unknown>;
+
 export const getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageData> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -83,9 +87,34 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
     if (filmsRes.error) throw new Error(filmsRes.error.message);
     if (categoriesRes.error) throw new Error(categoriesRes.error.message);
 
+    const cache = makeRenderCache();
+    const featuredRaw = featuredRes.data as RawFilm | null;
+    const filmsRaw = (filmsRes.data as RawFilm[] | null) ?? [];
+
+    const featured = featuredRaw
+      ? await (async () => {
+          const [cover, thumbnail, mobile] = await Promise.all([
+            renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 70),
+            renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 72),
+            renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 1080, 70),
+          ]);
+          return { ...featuredRaw, cover_url: cover, thumbnail_url: thumbnail, mobile_cover_url: mobile } as HomeFeaturedFilm;
+        })()
+      : null;
+
+    const films = await Promise.all(
+      filmsRaw.map(async (f) => {
+        const [cover, thumbnail] = await Promise.all([
+          renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 720, 68),
+          renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 800, 68),
+        ]);
+        return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
+      }),
+    );
+
     return {
-      featured: (featuredRes.data as HomeFeaturedFilm | null) ?? null,
-      films: (filmsRes.data as HomeRailFilm[] | null) ?? [],
+      featured,
+      films,
       categories: (categoriesRes.data as HomeCategory[] | null) ?? [],
     };
   },
@@ -94,5 +123,6 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
 export const homePageQueryOptions = queryOptions({
   queryKey: ["home", "page-data"],
   queryFn: () => getHomePageData(),
-  staleTime: 60_000,
+  staleTime: 5 * 60_000,
+  gcTime: 30 * 60_000,
 });
