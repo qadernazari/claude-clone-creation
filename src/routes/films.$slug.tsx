@@ -218,6 +218,35 @@ function FilmPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
+  const [stickyHeader, setStickyHeader] = useState(false);
+
+  // Reveal a condensed cinematic header once the hero has scrolled out
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onScroll = () => {
+      // ~88vh hero on desktop, ~78vh on mobile — trigger near the end
+      const trigger = window.innerHeight * 0.72;
+      setStickyHeader(window.scrollY > trigger);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Trap body scroll + ESC-to-close while the trailer modal is open
+  useEffect(() => {
+    if (!previewOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPreviewOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [previewOpen]);
 
 
   // Log a "view" event with geo / device / referrer captured server-side
@@ -428,6 +457,70 @@ function FilmPage() {
     <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
       <PaymentTestModeBanner />
       <SiteHeader />
+
+      {/* Condensed sticky cinematic header — appears after the hero scrolls past.
+          Mirrors the primary CTA so users on long pages can always Watch/Buy. */}
+      <div
+        className={`pointer-events-none fixed inset-x-0 top-0 z-30 transition-all duration-500 ${
+          stickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        }`}
+        aria-hidden={!stickyHeader}
+      >
+        <div className="pointer-events-auto border-b border-cream/8 bg-bg-0/80 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 md:px-10">
+            <Link
+              to="/"
+              className="hidden shrink-0 text-cream/55 transition-colors hover:text-cream-bright md:inline-flex"
+              aria-label={t.back}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={dir === "rtl" ? { transform: "scaleX(-1)" } : undefined}>
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </Link>
+            <div className="min-w-0 flex-1">
+              <div className={`truncate font-display text-[15px] font-medium tracking-[-0.01em] text-cream-bright md:text-[16px] ${fa ? "font-vazir" : ""}`}>
+                {title}
+              </div>
+              {director && (
+                <div className="truncate text-[11px] text-cream/45">
+                  {fa ? "کارگردان " : "Dir. "}{director}
+                </div>
+              )}
+            </div>
+            {!isAuthLoading && (
+              !user ? (
+                <Link
+                  to="/auth"
+                  search={{ redirect: `/watch/${film.slug}` }}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                  <span className="hidden sm:inline">{accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}</span>
+                  <span className="sm:hidden">{fa ? "ورود" : "Sign in"}</span>
+                </Link>
+              ) : showWatchNow ? (
+                <Link
+                  to="/watch/$slug"
+                  params={{ slug: film.slug }}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02]"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                  {t.watch}
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => (isMember || accessType === "ppv_only" ? setCheckoutOpen(true) : setMembershipOpen(true))}
+                  disabled={tomanOnly && (isMember || accessType === "ppv_only")}
+                  className="inline-flex shrink-0 items-center rounded-full bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02] disabled:opacity-60"
+                >
+                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : t.startTrial}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Cinematic full-bleed hero */}
       <section className="relative isolate min-h-[78vh] w-full overflow-hidden bg-background md:min-h-[88vh]">
@@ -961,24 +1054,37 @@ function FilmPage() {
       )}
 
       {/* Preview / trailer lightbox */}
+      {/* Cinema trailer modal — true black, fade-in, ESC + body-scroll-lock above */}
       {previewOpen && film.preview_url && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 p-4 trailer-modal-fade backdrop-blur-md"
           onClick={() => setPreviewOpen(false)}
           role="dialog"
           aria-modal="true"
+          aria-label={t.playPreview}
         >
+          {/* Eyebrow label, top-left */}
+          <div
+            className={`pointer-events-none absolute top-6 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90 ${dir === "rtl" ? "right-6" : "left-6"}`}
+          >
+            {fa ? "تیزر" : "Trailer"}
+            <span className={`text-cream/40 ${dir === "rtl" ? "mr-2" : "ml-2"}`}>· {title}</span>
+          </div>
+          {/* Cinematic close button */}
           <button
             type="button"
             onClick={() => setPreviewOpen(false)}
-            className="absolute top-5 right-5 text-cream/70 hover:text-cream-bright text-2xl leading-none"
-            aria-label="Close preview"
+            className={`absolute top-5 flex h-10 w-10 items-center justify-center rounded-full border border-cream/15 bg-black/40 text-cream/75 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-amber/40 hover:text-amber ${dir === "rtl" ? "left-5" : "right-5"}`}
+            aria-label={fa ? "بستن" : "Close"}
           >
-            ×
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
           </button>
           <div
-            className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden border border-cream/15 bg-black"
+            className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-cream/10 bg-black shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9),0_0_0_1px_rgba(201,168,76,0.08)] trailer-modal-rise"
             onClick={(e) => e.stopPropagation()}
+            style={{ aspectRatio: "16 / 9" }}
           >
             <video
               src={film.preview_url}
@@ -988,6 +1094,9 @@ function FilmPage() {
               className="h-full w-full"
             />
           </div>
+          <p className={`pointer-events-none absolute bottom-5 text-[10px] uppercase tracking-[0.28em] text-cream/35 ${dir === "rtl" ? "right-6" : "left-6"}`}>
+            {fa ? "برای بستن کلیک کنید یا ESC را بزنید" : "Click outside or press ESC to close"}
+          </p>
         </div>
       )}
       {film.film_type === "series" && <SeriesEpisodes seriesId={film.id} />}
