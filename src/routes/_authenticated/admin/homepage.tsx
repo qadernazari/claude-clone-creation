@@ -36,16 +36,19 @@ function useCmsState<T>(key: string, fallback: T) {
 
 function HomepagePage() {
   return (
-    <div className="p-8 max-w-5xl space-y-6">
-      <PageHeader title="Homepage" subtitle="Control what appears on your main page." />
-      <EditLaunchPanel />
-      <AccessModePanel />
-      <SupportPaymentsPanel />
-      <HeroPanel />
-      <WhyIranPanel />
-      <SectionsPanel />
-      <WelcomePanel />
-    </div>
+    <>
+      <SectionTabs section="Site content" tabs={SITE_CONTENT_TABS} />
+      <div className="p-8 max-w-5xl space-y-6">
+        <PageHeader title="Homepage" subtitle="Control what appears on your main page." />
+        <EditLaunchPanel />
+        <AccessModePanel />
+        <SupportPaymentsPanel />
+        <HeroPanel />
+        <WhyIranPanel />
+        <SectionsPanel />
+        <WelcomePanel />
+      </div>
+    </>
   );
 }
 
