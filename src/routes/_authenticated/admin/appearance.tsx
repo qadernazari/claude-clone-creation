@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { loadCmsKey, saveCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, DEFAULT_APPEARANCE, type Appearance } from "@/lib/cms";
 import { PageHeader, Panel } from "@/components/admin/bilingual-field";
+import { SectionTabs, SITE_CONTENT_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/appearance")({
   component: AppearancePage,
@@ -30,6 +31,8 @@ function AppearancePage() {
   ];
 
   return (
+    <>
+      <SectionTabs section="Site content" tabs={SITE_CONTENT_TABS} />
     <div className="p-8 max-w-3xl space-y-4">
       <PageHeader title="Appearance" subtitle="Brand colours. Saved values are read by the public site theme." />
       <Panel title="Brand colours">

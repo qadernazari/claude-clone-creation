@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Trash2, Plus, Tag, History, X } from "lucide-react";
+import { SectionTabs, COMMERCE_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/coupons")({
   component: CouponsPage,
@@ -164,6 +165,8 @@ function CouponsPage() {
   });
 
   return (
+    <>
+      <SectionTabs section="Commerce" tabs={COMMERCE_TABS} />
     <div className="p-8 max-w-6xl">
       <header className="mb-6 flex items-start justify-between gap-4">
         <div>

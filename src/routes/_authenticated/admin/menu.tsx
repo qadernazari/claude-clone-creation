@@ -7,6 +7,7 @@ import { loadCmsKey, saveCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, DEFAULT_MENU, nid, type MenuItem } from "@/lib/cms";
 import { BilingualField, PageHeader, Panel } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
+import { SectionTabs, SITE_CONTENT_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/menu")({
   component: MenuPage,
@@ -39,6 +40,8 @@ function MenuPage() {
   }
 
   return (
+    <>
+      <SectionTabs section="Site content" tabs={SITE_CONTENT_TABS} />
     <div className="p-8 max-w-4xl space-y-4">
       <PageHeader title="Menu / Navigation" subtitle="Order and label the items in the public site's top menu." />
       <Panel>
