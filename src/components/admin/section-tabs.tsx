@@ -6,24 +6,21 @@ export type SectionTab = {
 };
 
 export function SectionTabs({
-  title,
-  description,
+  section,
   tabs,
 }: {
-  title: string;
-  description?: string;
+  section: string;
   tabs: ReadonlyArray<SectionTab>;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <div className="border-b border-border bg-card/20">
-      <div className="px-8 pt-6">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {description && (
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-        )}
-        <nav className="mt-5 -mb-px flex gap-1 overflow-x-auto">
+    <div className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
+      <div className="px-8 pt-4">
+        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          {section}
+        </div>
+        <nav className="mt-2 -mb-px flex gap-1 overflow-x-auto">
           {tabs.map((t) => {
             const active = pathname === t.to;
             return (
