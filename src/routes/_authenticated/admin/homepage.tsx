@@ -12,6 +12,7 @@ import {
   type SupportPayments, type WelcomeScreen, type WhyIranCard,
 } from "@/lib/cms";
 import { BilingualField, PageHeader, Panel } from "@/components/admin/bilingual-field";
+import { SectionTabs, SITE_CONTENT_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/homepage")({
   component: HomepagePage,
