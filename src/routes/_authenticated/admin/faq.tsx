@@ -7,6 +7,7 @@ import { loadCmsKey, saveCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, DEFAULT_FAQ, type FaqContent } from "@/lib/cms";
 import { PageHeader } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
+import { SectionTabs, SITE_CONTENT_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/faq")({
   component: FaqPage,
@@ -64,6 +65,8 @@ function FaqPage() {
   }
 
   return (
+    <>
+      <SectionTabs section="Site content" tabs={SITE_CONTENT_TABS} />
     <div className="p-8 max-w-4xl">
       <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
         <PageHeader title="FAQ" subtitle="Public FAQ — questions and answers, in both languages." />
@@ -177,5 +180,6 @@ function FaqPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

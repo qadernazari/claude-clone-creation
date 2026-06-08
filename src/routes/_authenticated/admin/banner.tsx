@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { loadCmsKey, saveCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, DEFAULT_BANNER, type BannerContent } from "@/lib/cms";
 import { BilingualField, PageHeader, Panel } from "@/components/admin/bilingual-field";
+import { SectionTabs, SITE_CONTENT_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/banner")({
   component: BannerPage,
@@ -27,6 +28,8 @@ function BannerPage() {
     success: "bg-emerald-500/15 text-emerald-400",
   };
   return (
+    <>
+      <SectionTabs section="Site content" tabs={SITE_CONTENT_TABS} />
     <div className="p-8 max-w-4xl space-y-4">
       <PageHeader title="Banner" subtitle="A site-wide announcement bar shown at the top of every page." />
       <Panel>
@@ -59,5 +62,6 @@ function BannerPage() {
         <button type="button" onClick={() => save.mutate()} className="mt-4 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90">Save banner</button>
       </Panel>
     </div>
+    </>
   );
 }

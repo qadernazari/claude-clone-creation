@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Gift, Users, Clock, CheckCircle2, XCircle, Globe2 } from "lucide-react";
+import { SectionTabs, COMMERCE_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/trials")({
   component: TrialAnalyticsPage,
@@ -112,7 +113,9 @@ function TrialAnalyticsPage() {
   }, [enriched, filter, search]);
 
   return (
-    <div className="space-y-6">
+    <>
+      <SectionTabs section="Commerce" tabs={COMMERCE_TABS} />
+    <div className="p-8 space-y-6">
       <div className="flex items-center gap-3">
         <Gift className="h-6 w-6 text-amber-500" />
         <h1 className="text-2xl font-semibold tracking-tight">Trial Analytics</h1>
@@ -204,6 +207,7 @@ function TrialAnalyticsPage() {
         )}
       </section>
     </div>
+    </>
   );
 }
 

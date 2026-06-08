@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, Search, HeartHandshake, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { SectionTabs, COMMERCE_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/contributions")({
   component: ContributionsPage,
@@ -165,6 +166,8 @@ function ContributionsPage() {
   }
 
   return (
+    <>
+      <SectionTabs section="Commerce" tabs={COMMERCE_TABS} />
     <div className="p-8 max-w-6xl">
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -308,5 +311,6 @@ function ContributionsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

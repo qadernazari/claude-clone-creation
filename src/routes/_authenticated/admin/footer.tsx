@@ -7,6 +7,7 @@ import { loadCmsKey, saveCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, DEFAULT_FOOTER, nid, type FooterContent } from "@/lib/cms";
 import { BilingualField, PageHeader, Panel } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
+import { SectionTabs, SITE_CONTENT_TABS } from "@/components/admin/section-tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/footer")({
   component: FooterPage,
@@ -30,6 +31,8 @@ function FooterPage() {
     setValue({ ...value, columns: value.columns.map((c, j) => j === i ? { ...c, ...patch } : c) });
   }
   return (
+    <>
+      <SectionTabs section="Site content" tabs={SITE_CONTENT_TABS} />
     <div className="p-8 max-w-5xl space-y-4">
       <PageHeader title="Footer & Links" subtitle="Edit the site footer columns and links." />
       <Panel title="Columns">
@@ -73,5 +76,6 @@ function FooterPage() {
         <button type="button" onClick={() => save.mutate()} className="ml-auto rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90">Save footer</button>
       </div>
     </div>
+    </>
   );
 }
