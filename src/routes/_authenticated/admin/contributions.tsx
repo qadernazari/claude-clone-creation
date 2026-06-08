@@ -311,5 +311,6 @@ function ContributionsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

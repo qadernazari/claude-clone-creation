@@ -77,5 +77,6 @@ function MenuPage() {
         </div>
       </Panel>
     </div>
+    </>
   );
 }

@@ -207,6 +207,7 @@ function TrialAnalyticsPage() {
         )}
       </section>
     </div>
+    </>
   );
 }
 

@@ -76,5 +76,6 @@ function FooterPage() {
         <button type="button" onClick={() => save.mutate()} className="ml-auto rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90">Save footer</button>
       </div>
     </div>
+    </>
   );
 }

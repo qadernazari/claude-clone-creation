@@ -180,5 +180,6 @@ function FaqPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -309,5 +309,6 @@ function PagesPage() {
         </section>
       </div>
     </div>
+    </>
   );
 }

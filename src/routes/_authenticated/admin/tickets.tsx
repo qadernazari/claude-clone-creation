@@ -364,5 +364,6 @@ function TicketsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
