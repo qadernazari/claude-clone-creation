@@ -520,7 +520,6 @@ function AccountPage() {
 const AGE_RATINGS = ["G", "PG", "PG-13", "R", "NC-17", "TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA"] as const;
 
 type ProfileLite = {
-  parental_pin: string | null;
   max_age_rating: string | null;
 } | null;
 
@@ -528,14 +527,26 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const qc = useQueryClient();
-  const [pin, setPin] = useState<string>(profile?.parental_pin ?? "");
+  // PIN is write-only: we never read the stored PIN to the client.
+  // An empty input means "leave the existing PIN unchanged".
+  const [pin, setPin] = useState<string>("");
   const [maxAge, setMaxAge] = useState<string>(profile?.max_age_rating ?? "");
   const [err, setErr] = useState<string | null>(null);
+  const [clearPin, setClearPin] = useState(false);
 
   useEffect(() => {
-    setPin(profile?.parental_pin ?? "");
     setMaxAge(profile?.max_age_rating ?? "");
-  }, [profile?.parental_pin, profile?.max_age_rating]);
+  }, [profile?.max_age_rating]);
+
+  // Check whether a PIN exists without ever fetching its value to the client.
+  const { data: status } = useQuery({
+    queryKey: ["account", "parental-status"],
+    queryFn: async () => {
+      const { getParentalStatus } = await import("@/lib/parental.functions");
+      return await getParentalStatus();
+    },
+  });
+  const hasPin = !!status?.hasPin;
 
   const save = useMutation({
     mutationFn: async () => {
@@ -544,16 +555,21 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
       if (trimmed && !/^[0-9]{4,6}$/.test(trimmed)) {
         throw new Error(fa ? "پین باید ۴ تا ۶ رقم باشد" : "PIN must be 4–6 digits");
       }
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          parental_pin: trimmed || null,
-          max_age_rating: maxAge || null,
-        })
-        .eq("id", (await supabase.auth.getUser()).data.user!.id);
+      const userId = (await supabase.auth.getUser()).data.user!.id;
+      const patch: { max_age_rating: string | null; parental_pin?: string | null } = {
+        max_age_rating: maxAge || null,
+      };
+      if (clearPin) patch.parental_pin = null;
+      else if (trimmed) patch.parental_pin = trimmed;
+      const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["account", "profile"] }),
+    onSuccess: () => {
+      setPin("");
+      setClearPin(false);
+      qc.invalidateQueries({ queryKey: ["account", "profile"] });
+      qc.invalidateQueries({ queryKey: ["account", "parental-status"] });
+    },
     onError: (e) => setErr((e as Error).message),
   });
 
@@ -595,20 +611,32 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
             {fa ? "پین والدین (۴ تا ۶ رقم)" : "Parental PIN (4–6 digits)"}
           </span>
           <input
-            type="text"
+            type="password"
             inputMode="numeric"
             pattern="[0-9]*"
             maxLength={6}
+            autoComplete="new-password"
             value={pin}
+            disabled={clearPin}
             onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-            placeholder={fa ? "اختیاری" : "Optional"}
-            className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber"
+            placeholder={hasPin ? (fa ? "تغییر پین (خالی = بدون تغییر)" : "Change PIN (blank = unchanged)") : (fa ? "اختیاری" : "Optional")}
+            className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber disabled:opacity-50"
           />
           <span className="mt-2 block text-[11px] text-cream/45">
-            {fa
-              ? "برای دور زدن محدودیت رده سنی پرسیده می‌شود."
-              : "Required to bypass the age rating limit."}
+            {hasPin
+              ? fa ? "پین تنظیم شده است. برای امنیت نمایش داده نمی‌شود." : "A PIN is set. It is not shown for security."
+              : fa ? "هنوز پینی تنظیم نشده است." : "No PIN set yet."}
           </span>
+          {hasPin && (
+            <label className="mt-2 flex items-center gap-2 text-[11px] text-cream/55">
+              <input
+                type="checkbox"
+                checked={clearPin}
+                onChange={(e) => setClearPin(e.target.checked)}
+              />
+              {fa ? "حذف پین فعلی" : "Remove current PIN"}
+            </label>
+          )}
         </label>
       </div>
 
@@ -631,3 +659,4 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
     </section>
   );
 }
+
