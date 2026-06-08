@@ -22,7 +22,7 @@ export const validateCoupon = createServerFn({ method: "POST" })
   .inputValidator((data: { code: string; context: "membership" | "ticket"; filmId?: string }) =>
     z
       .object({
-        code: z.string().min(1).max(64),
+        code: z.string().trim().min(1).max(64).regex(/^[A-Za-z0-9_-]+$/, "Invalid coupon code"),
         context: z.enum(["membership", "ticket"]),
         filmId: z.string().uuid().optional(),
       })

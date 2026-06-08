@@ -49,8 +49,11 @@ export async function lookupCoupon(
   supabaseAdmin: SupabaseAdmin,
   args: { code: string; context: CouponContext; filmId?: string | null },
 ): Promise<CouponLookupResult> {
-  const code = args.code.trim();
-  if (!code) return { ok: false, error: "Enter a coupon code" };
+  // Strip anything that isn't alphanumeric / dash / underscore so users can't
+  // smuggle LIKE wildcards ("%", "_") through .ilike() and enumerate or match
+  // unintended coupon codes. After sanitization the value is safe for ilike.
+  const code = args.code.trim().replace(/[^A-Za-z0-9_-]/g, "");
+  if (!code) return { ok: false, error: "Invalid coupon code" };
 
   const { data, error } = await supabaseAdmin
     .from("coupons")
