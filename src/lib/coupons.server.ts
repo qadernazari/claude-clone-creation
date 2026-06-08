@@ -33,7 +33,7 @@ export type CouponLookupResult =
 type SupabaseAdmin = {
   from: (table: string) => {
     select: (cols: string) => {
-      ilike: (col: string, val: string) => {
+      eq: (col: string, val: string) => {
         maybeSingle: () => Promise<{ data: CouponRow | null; error: { message: string } | null }>;
       };
     };
@@ -49,15 +49,17 @@ export async function lookupCoupon(
   supabaseAdmin: SupabaseAdmin,
   args: { code: string; context: CouponContext; filmId?: string | null },
 ): Promise<CouponLookupResult> {
-  const code = args.code.trim();
-  if (!code) return { ok: false, error: "Enter a coupon code" };
+  // Normalize input and strip anything that isn't alphanumeric/dash/underscore so
+  // LIKE-wildcard injection (e.g. "%") is impossible — we then do an exact match.
+  const code = args.code.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+  if (!code) return { ok: false, error: "Invalid coupon code" };
 
   const { data, error } = await supabaseAdmin
     .from("coupons")
     .select(
       "id, code, discount_type, discount_value, currency, applies_to, film_id, max_redemptions, redemptions_count, expires_at, active",
     )
-    .ilike("code", code)
+    .eq("code", code)
     .maybeSingle();
 
   if (error) return { ok: false, error: error.message };
