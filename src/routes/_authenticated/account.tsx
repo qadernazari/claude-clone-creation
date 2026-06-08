@@ -37,7 +37,6 @@ type Profile = {
   full_name: string | null;
   locale: string;
   created_at: string;
-  parental_pin: string | null;
   max_age_rating: string | null;
 };
 
