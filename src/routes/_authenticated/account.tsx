@@ -75,7 +75,7 @@ function AccountPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, email, full_name, locale, created_at, parental_pin, max_age_rating")
+        .select("id, email, full_name, locale, created_at, max_age_rating")
         .maybeSingle();
       if (error) throw new Error(error.message);
       return data as Profile | null;
