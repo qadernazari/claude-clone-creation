@@ -6,6 +6,7 @@ import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
 import { IrPayPanel } from "@/components/ir-pay-panel";
 import { useIrMode } from "@/hooks/use-ir-mode";
+import { loadCmsKey } from "@/lib/cms-client";
 
 import { useLocale } from "@/lib/i18n";
 import { AcceptTrialButton } from "@/components/accept-trial-button";
@@ -22,8 +23,16 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
   const irMode = useIrMode();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
+  const [membershipPriceToman, setMembershipPriceToman] = useState<number | undefined>(undefined);
   const { hasUsedTrial, isMember } = useSubscription();
   const showTrialCta = !hasUsedTrial && !isMember;
+
+  useEffect(() => {
+    if (!irMode) return;
+    loadCmsKey<{ membershipPriceToman?: number }>("general_settings").then((d) => {
+      if (d?.membershipPriceToman) setMembershipPriceToman(d.membershipPriceToman);
+    });
+  }, [irMode]);
 
   // Lock body scroll while modal is open
   useEffect(() => {
@@ -79,6 +88,7 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
           <IrPayPanel
             kind="membership"
             itemId="monthly"
+            amountToman={membershipPriceToman}
             couponCode={applied?.code}
             onClose={onClose}
           />
