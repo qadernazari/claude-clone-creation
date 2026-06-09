@@ -1,127 +1,86 @@
-# Critical audit: what to cut, what to hide, what to redesign
 
-Reviewed the full route tree (`src/routes/`), the 22-page admin (`src/routes/_authenticated/admin/`), and the public component set (`src/components/`). Scored everything against your four jobs: **discover, watch, support filmmakers, manage content**. If something doesn't serve one of those, it's flagged.
+# Iran Mirror — Plan
 
-I'm being blunt on purpose. Nothing here is destructive yet — pick items and I'll cut them.
+Two parts: (A) infrastructure you set up on Hetzner (I write the doc, you paste), and (B) code changes inside Lovable that make the app behave correctly when loaded through that proxy.
 
----
+## A. Hetzner reverse proxy (you run, I document)
 
-## A. The home page is doing too much
+Goal: one VM in Falkenstein/Helsinki that fronts both the site and the Supabase API on Iran-friendly hostnames.
 
-`src/routes/index.tsx` renders, in order:
-1. Featured hero
-2. Continue Watching
-3. `FilmsRow` (Originals + New Releases + up to 4 category rails = **up to 6 rails**)
-4. `CollectionsGrid` (up to 6 category tiles)
-5. Membership upsell block
-6. FAQ section
-7. Footer
+- **Domains** (configure DNS at your registrar)
+  - `ir.show` → reverse-proxied site for IR visitors (or a sub like `m.ir.show` if you want to keep the main domain Cloudflare-only)
+  - `api.ir.show` → reverse-proxied Supabase REST/Auth/Storage/Realtime
+- **VM**: Hetzner CX22, Ubuntu 24.04 (~€4/mo)
+- **Stack**: Caddy 2 (auto Let's Encrypt) — single config file, two upstreams
+- **Deliverable from me**: `docs/iran-mirror.md` with:
+  - Caddyfile (with WebSocket upgrade for Realtime, header rewrites for Supabase)
+  - DNS record list
+  - One-shot install script
+  - Test checklist (use IPRoyal Iran proxy to verify)
 
-Apple TV+ shows **hero + 4–5 rails**. MUBI shows **hero + 1 rail + editorial**. Netflix shows **hero + rails**. None of them ship an FAQ on the homepage.
+## B. In-app changes (I build)
 
-**Recommended cuts on `/`:**
-- **Remove `CollectionsGrid` from home.** It's redundant with the category rails already shown by `FilmsRow` directly above it. Same data, second presentation. Keep collections only on `/browse` or kill the component entirely.
-- **Remove `FaqSection` from home.** FAQ belongs on `/help` or `/about`. Apple TV+ / MUBI / Netflix home pages do not have FAQs. It's SEO bait at the cost of feeling like a marketing site.
-- **Cap rails at 4 on home.** Originals, New Releases, 2 category rails max. More rails = more scroll fatigue, slower LCP, more thumbnails to download on mobile.
-- **Remove `MembershipMoment` block** for signed-out users in favor of a single bottom CTA in the footer; the hero CTA already converts. Two upsells on one page is pressure, not premium.
+### 1. Region detection + routing
+- Extend `detectVisitorRegion` already in `src/lib/geo.functions.ts` — on first visit from IR, show a one-time toast: *"Detected you're in Iran — switch to the Iran-optimized site? [Switch] [Stay]"* and persist choice in a cookie.
+- When loaded from the mirror hostname, set a `ir_mode = true` flag in a React context.
 
-## B. Pages that don't earn their slot
+### 2. Supabase client URL override
+- Edit `src/integrations/supabase/client.ts` to read `VITE_SUPABASE_URL_OVERRIDE` **and** auto-detect: if `window.location.hostname` matches the mirror, use `https://api.ir.show` instead of `*.supabase.co`. Same publishable key works.
+- Add `https://api.ir.show` to Supabase Auth → Redirect URLs (you click once in Cloud UI; I'll point you to it).
 
-- **`/press`** — a press page for a streaming service with no press coverage yet is aspirational. Either remove until there's real press, or fold into `/about`.
-- **`/contact`** — keep, but the form + submissions admin page is a lot. MUBI uses a single `support@` email. Recommend replacing with a `mailto:` link inside `/about` and deleting `contact-submissions.tsx` admin page.
-- **`/about`** and **`/press`** overlap; merge.
-- **`/unsubscribe`** — required, leave alone.
-- **`checkout.return.tsx`** — required, leave alone.
+### 3. Toman pricing (manual per item)
+Migration adds `price_irr_toman bigint` to:
+- `films` (PPV ticket price in Toman)
+- `plans` / membership tiers → currently membership is in `subscriptions`; I'll check whether prices live on a `plans` table or in code, and add IRR there
+- `coupons` (fixed-amount IRR discounts)
+- `contributions` (suggested IRR amounts)
 
-## C. Components that add weight without value
+Admin UI: every existing price field gets a second IRR input next to it. Admin can leave IRR blank → item is hidden from IR users.
 
-- **`welcome-splash.tsx`** — region/language splash modal. Premium services detect region silently. This is the #1 friction on first visit. Move to a quiet language switch in the header; auto-detect locale from `navigator.language`. Delete the splash.
-- **`promo-banner.tsx` + `trial-banner.tsx` + `payment-test-mode-banner.tsx`** — three stacked top banners. At most one banner should ever show. Consolidate into a single banner slot with priority (test-mode > trial state > marketing promo).
-- **`trial-expired-modal.tsx`** — modals interrupt. Replace with an inline state on the watch/film page ("Your trial ended — continue with membership"). Modals on premium services are rare and always feel cheap.
-- **`contribute-modal.tsx`** — if "support filmmakers" is a real pillar, contribution shouldn't be hidden in a modal. Promote to a real page (`/support-filmmakers`) or remove. As-is, it's a half-feature.
-- **`page-overlay.tsx`** — verify it's actually used; if it's only for the welcome splash, deletes with it.
-- **`coupon-field.tsx`** appearing inside both `film-checkout` and `membership-checkout` — keep, but render collapsed behind a "Have a code?" link. Default-visible coupon fields scream discount site.
+### 4. IR payment gateway (stub now, fill in later)
+- New file `src/lib/ir-payments.functions.ts` with the same shape as the Stripe checkout fns: `createIrCheckout({ kind: 'membership'|'ticket'|'contribution', itemId, couponCode? })` returns `{ redirectUrl }`.
+- New server route `src/routes/api/public/ir-payments/callback.ts` that the gateway calls after payment, marks the ticket/subscription paid, and redirects the user back.
+- Today both functions return `{ error: 'IR gateway not yet configured' }` and the IR checkout button shows "Coming soon" — wired end-to-end, gateway swap is one file.
+- Tables already in place (`tickets`, `subscriptions`, `payment_events`) get a `provider` column with values `stripe | zarinpal | idpay | nextpay | manual` so IR transactions are clearly separated.
 
-## D. Admin: 22 pages is too many
+### 5. IR-only checkout UI
+- When `ir_mode === true`:
+  - Hide Stripe/PayPal buttons everywhere
+  - Show "Pay with Iranian bank card" button → calls `createIrCheckout`
+  - Display prices in **Toman** (formatted with Persian digits if locale is `fa`)
+- When `ir_mode === false`: zero visual change, current flow stays identical.
 
-A premium catalog of this size (dozens of films, not thousands) needs **≈8 admin pages**, not 22. Consolidation recommendations:
+### 6. Sign-in: magic link + SMS OTP (both)
+- Magic link: already supported by Supabase, just expose it on `/auth` for IR users (no Google button in IR mode — Google is blocked anyway).
+- Phone OTP: requires picking an Iranian SMS provider with a Supabase-compatible SMS hook (Kavenegar is the common one). For now I'll:
+  - Enable phone auth in Supabase config
+  - Build the UI (phone field + "Send code" + 6-digit input)
+  - Wire `signInWithOtp({ phone })` and `verifyOtp`
+  - Add a clear note in `docs/iran-mirror.md` listing the 2–3 SMS providers and the one-time Supabase Auth → SMS Provider config step you do in the Cloud UI when you sign up with one
+- Same `auth.users` row for both methods, so an IR user with both a phone and an email lands in one account with one watchlist/library.
 
-**Merge into one "Site content" page:**
-- `appearance.tsx` + `homepage.tsx` + `footer.tsx` + `menu.tsx` + `banner.tsx` + `pages.tsx` + `faq.tsx` → single page with tabs. These are all "edit the marketing surface."
+### 7. Hide blocked third-parties in IR mode
+- Skip Google Fonts (already self-hostable via the existing build; I'll fall back to system stack for IR)
+- Skip reCAPTCHA if present
+- Skip any analytics that hit blocked hosts
 
-**Merge into one "Commerce" page:**
-- `coupons.tsx` + `tickets.tsx` + `trials.tsx` + `contributions.tsx` → tabs under one "Commerce" page. They're all transactional history with the same shape.
+## What's out of scope (intentionally)
+- Auto-converting USD↔Toman prices (you chose manual)
+- Picking the Iran gateway now (stub today, swap later — 1 file)
+- Moving database geography (DB stays on Supabase EU; only the *edge* is proxied)
+- Stripe/PayPal changes — they continue to work unchanged for non-IR visitors
 
-**Merge or remove:**
-- `contact-submissions.tsx` → remove with the contact form (see B).
-- `notify-list.tsx` → if this is a "notify me when X launches" list and you have no scheduled launches, hide it. Otherwise fold into Commerce.
-- `support.tsx` → if it duplicates contact-submissions, pick one.
-- `categories.tsx` → keep but move under `films.tsx` as a tab; categories only exist to organize films.
+## Order of work
+1. DB migration: add `price_irr_toman`, `provider` columns, phone-auth schema bits
+2. Region detection + `ir_mode` context + Supabase URL override
+3. Admin: add IRR fields to films/plans/coupons/contributions editors
+4. IR checkout UI + stubbed `ir-payments` functions + callback route
+5. Magic link + phone OTP on `/auth`, IR-aware sign-in screen
+6. Write `docs/iran-mirror.md` (Caddyfile, DNS, SMS provider setup, gateway swap guide)
+7. You: spin up Hetzner VM, paste Caddyfile, point DNS, verify via IPRoyal
 
-**Per-film analytics + credits as nested tabs (already are):** good, leave them.
-
-**End state — 8 admin pages:**
-1. Films (with Categories tab + per-film Analytics & Credits)
-2. Users
-3. Commerce (Tickets / Trials / Coupons / Contributions)
-4. Site content (Homepage / Pages / FAQ / Menu / Footer / Banner / Appearance)
-5. Analytics (site-wide)
-6. Settings
-7. Support inbox (only if you keep a contact form)
-8. Admin home/index
-
-That's 14 fewer pages.
-
-## E. Settings that should be hidden behind "Advanced"
-
-Without listing every toggle in `admin/settings.tsx`, the rule: anything that isn't changed more than once a quarter goes under an `Advanced` accordion at the bottom. Visible by default should be only: site title, support email, default locale, Stripe mode toggle. Everything else (SMTP overrides, feature flags, debug switches) collapses.
-
-## F. Design elements that feel busy
-
-Observed in the pieces I read:
-- **Tab bar amber glow dot + scale + opacity + shadow** on every active tab — three effects stacked. Pick one (the dot). Removes visual noise on every screen.
-- **Posters with `ring-1` + `shadow-[long]` + `group-hover:-translate-y-1.5` + `group-hover:ring-amber/30` + `group-hover:shadow-[longer]`** — five hover effects on a single card. Apple TV+ uses a single scale. Reduce to scale + ring color change.
-- **Mask-image edge fade on every rail** — premium when used sparingly; with 6 rails on the home page it's repeated 6 times in a single scroll. Cutting rails to 4 fixes this implicitly.
-- **`backdrop-blur-xl` everywhere** (tab bar, header, modals) — heavy on mobile GPUs. Keep on the tab bar (fixed, small); drop from full-width hero overlays if any.
-- **Two CTA styles on hero** (`Watch Now` cream-bright with sheen animation, plus `Add to Watchlist` outlined) — fine, but the sheen animation on the primary CTA is a marketing-site flourish. Apple TV+'s play button has zero animation. Drop the sheen.
-- **`promo-banner` + `trial-banner` + hero CTA + membership block + footer CTA** = five conversion surfaces on one page. Pick two.
-
-## G. Duplicate functionality
-
-- `auth-menu.tsx` (desktop dropdown) and `mobile-tab-bar.tsx` Account tab — same destination, two implementations. Keep both, but make sure they stay in sync via a shared component.
-- `films-row.tsx` Rail and `continue-watching.tsx` horizontal scroller are 90% the same layout duplicated. Extract a single `<Rail>` primitive; both consume it. Reduces bundle and bugs.
-- `membership-checkout.tsx` and `film-checkout.tsx` — two checkout flows. If the underlying Stripe shape is similar (line items + return URL), extract one `<Checkout>` and pass mode. Otherwise leave.
-- Region/language switching exists in 3 places (welcome splash, header, footer). Pick one (header).
-
-## H. Mobile-specific clutter
-
-- Mobile hero has copy + 1 CTA, good. But the **synopsis 3-line clamp + uppercase metadata + amber dot separators** are dense for a 390px screen. Drop the synopsis on mobile under 640px; the film detail page has it.
-- **Tab bar shows 3–4 tabs** — good shape now. Confirmed.
-- **"Add to Watchlist" CTA on the hero for signed-in users** — secondary action on a hero is a Netflix pattern; on Apple TV+ this lives only on the film detail page. Consider removing it from hero to keep the hero single-intent.
-
-## I. Things that are correct as-is, don't touch
-
-- File-based routing structure under `_authenticated/`.
-- `mobile-tab-bar` (just fixed).
-- Featured hero composition (after sheen removal).
-- Server-function data layer.
-- Stripe webhook + email infra.
-- Bilingual setup (en/fa). Keep.
-
----
-
-## Suggested first batch (highest impact, lowest risk)
-
-If you want to start cutting today, the three changes that will most visibly make the platform feel like Apple TV+ / MUBI:
-
-1. **Home page diet** — remove `CollectionsGrid`, remove `FaqSection`, cap `FilmsRow` to 4 rails. (Section A)
-2. **Kill the welcome splash + consolidate the three top banners into one priority slot.** (Section C)
-3. **Admin consolidation** — merge marketing pages (Homepage/Pages/FAQ/Menu/Footer/Banner/Appearance) into one tabbed page. (Section D, biggest one)
-
-Tell me which sections to act on (A, B, C, D, E, F, G, H) — or just say "all of it" — and I'll implement in build mode.
-
-## What I did NOT review
-- Email template inventory under `src/lib/email-templates/` (12 templates — likely some redundancy, but needs its own pass).
-- Database schema for unused columns / tables.
-- Stripe product catalog for obsolete prices.
-- Actual rendered admin screens (only filenames). A second pass after you pick consolidation targets would confirm exact tab groupings.
+## Technical notes (for me, not required reading)
+- Caddy will proxy `api.ir.show` → `yasfnvftzwyuxdhpysof.supabase.co` with `Host` header rewrite so Supabase's edge accepts the request. Realtime needs `header_up Connection {>Connection}` + `header_up Upgrade {>Upgrade}`.
+- The site is on Cloudflare Workers (`*.lovable.app`), which IR blocks. Caddy proxies `ir.show` → the published Lovable URL; Cloudflare sees Hetzner's German IP, not the Iranian visitor, so it serves normally.
+- `VITE_SUPABASE_URL_OVERRIDE` must NOT replace `VITE_SUPABASE_URL` — the override is opt-in per request based on hostname so non-IR visitors keep going direct.
+- `provider` column on `tickets`/`subscriptions` is needed because Stripe webhook IDs and ZarinPal `Authority` strings can collide on simple `external_id` matching.
