@@ -3,19 +3,23 @@ import { useCallback, useMemo, useState } from "react";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createFilmCheckout } from "@/lib/payments.functions";
 import { CouponField } from "@/components/coupon-field";
+import { IrPayPanel } from "@/components/ir-pay-panel";
+import { useIrMode } from "@/hooks/use-ir-mode";
 
 import { useLocale } from "@/lib/i18n";
 
 interface FilmCheckoutProps {
   filmSlug: string;
   filmId?: string;
+  priceToman?: number;
   returnUrl: string;
   onClose: () => void;
 }
 
-export function FilmCheckout({ filmSlug, filmId, returnUrl, onClose }: FilmCheckoutProps) {
+export function FilmCheckout({ filmSlug, filmId, priceToman, returnUrl, onClose }: FilmCheckoutProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
+  const irMode = useIrMode();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
 
