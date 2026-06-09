@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
+import { IranMirrorBanner } from "@/components/iran-mirror-banner";
 
 function useFaSafe(): boolean {
   try {
