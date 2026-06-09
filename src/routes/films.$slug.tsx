@@ -992,6 +992,7 @@ function FilmPage() {
           <FilmCheckout
             filmSlug={film.slug}
             filmId={film.id}
+            priceToman={film.price_toman || undefined}
             returnUrl={returnUrl}
             onClose={() => setCheckoutOpen(false)}
           />
