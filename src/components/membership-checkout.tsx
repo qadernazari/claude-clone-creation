@@ -75,7 +75,14 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
         </button>
 
 
-        {!started ? (
+        {irMode ? (
+          <IrPayPanel
+            kind="membership"
+            itemId="monthly"
+            couponCode={applied?.code}
+            onClose={onClose}
+          />
+        ) : !started ? (
           <div className="p-6 sm:p-8">
             <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
               {fa ? "عضویت ماهانه" : "Monthly membership"}
