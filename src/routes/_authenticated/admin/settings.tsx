@@ -81,6 +81,11 @@ function GeneralPanel() {
           <span className="block text-xs font-medium text-muted-foreground mb-1.5">Default ticket price — Toman</span>
           <input type="number" value={v.defaultPriceToman} onChange={(e) => setV({ ...v, defaultPriceToman: Number(e.target.value) })} className={inp} />
         </label>
+        <label className="block mt-3">
+          <span className="block text-xs font-medium text-muted-foreground mb-1.5">Monthly membership price — Toman</span>
+          <input type="number" step="1000" value={v.membershipPriceToman} onChange={(e) => setV({ ...v, membershipPriceToman: Number(e.target.value) })} className={inp} placeholder="490000" />
+          <span className="block mt-1 text-xs text-muted-foreground">Shown to visitors in Iran. International price is set in Stripe.</span>
+        </label>
         <p className="mt-3 text-xs text-muted-foreground">
           Film purchases grant <strong>lifetime access</strong> — buyers own each film forever in their account.
         </p>
