@@ -21,11 +21,12 @@ type GeneralSettings = {
   defaultPriceCents: number;
   defaultPriceToman: number;
   defaultTicketHours: number;
+  membershipPriceToman: number;
 };
 
 const GENERAL_KEY = "general_settings";
 const DEFAULT_GENERAL: GeneralSettings = {
-  apiUrl: "", siteUrl: "", defaultPriceCents: 499, defaultPriceToman: 120000, defaultTicketHours: 48,
+  apiUrl: "", siteUrl: "", defaultPriceCents: 499, defaultPriceToman: 120000, defaultTicketHours: 48, membershipPriceToman: 490000,
 };
 
 function SettingsPage() {
