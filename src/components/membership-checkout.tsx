@@ -88,6 +88,7 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
           <IrPayPanel
             kind="membership"
             itemId="monthly"
+            amountToman={membershipPriceToman}
             couponCode={applied?.code}
             onClose={onClose}
           />
