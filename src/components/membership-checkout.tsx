@@ -23,8 +23,16 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
   const irMode = useIrMode();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
+  const [membershipPriceToman, setMembershipPriceToman] = useState<number | undefined>(undefined);
   const { hasUsedTrial, isMember } = useSubscription();
   const showTrialCta = !hasUsedTrial && !isMember;
+
+  useEffect(() => {
+    if (!irMode) return;
+    loadCmsKey<{ membershipPriceToman?: number }>("general_settings").then((d) => {
+      if (d?.membershipPriceToman) setMembershipPriceToman(d.membershipPriceToman);
+    });
+  }, [irMode]);
 
   // Lock body scroll while modal is open
   useEffect(() => {
