@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
+import { IrPayPanel } from "@/components/ir-pay-panel";
+import { useIrMode } from "@/hooks/use-ir-mode";
 
 import { useLocale } from "@/lib/i18n";
 import { AcceptTrialButton } from "@/components/accept-trial-button";
@@ -17,6 +19,7 @@ interface MembershipCheckoutProps {
 export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
+  const irMode = useIrMode();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
   const { hasUsedTrial, isMember } = useSubscription();
