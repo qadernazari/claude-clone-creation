@@ -37,23 +37,36 @@ echo "    SUPABASE_HOST = $SUPABASE_HOST"
 echo "    ACME_EMAIL    = $ACME_EMAIL"
 
 # ---------- 1. Base packages ----------
-log "Installing prerequisites"
+log "Installing prerequisites (skipping any already present)"
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -y
-apt-get install -y debian-keyring debian-archive-keyring apt-transport-https curl gnupg ca-certificates
+NEED_PKGS=()
+for p in debian-keyring debian-archive-keyring apt-transport-https curl gnupg ca-certificates; do
+  dpkg -s "$p" >/dev/null 2>&1 || NEED_PKGS+=("$p")
+done
+if [[ ${#NEED_PKGS[@]} -gt 0 ]]; then
+  apt-get update -y
+  apt-get install -y "${NEED_PKGS[@]}"
+else
+  log "Prerequisites already installed"
+fi
 
 # ---------- 2. Caddy repo + install ----------
 if ! command -v caddy >/dev/null 2>&1; then
-  log "Adding Caddy apt repo"
-  curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
-    | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-  curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
-    > /etc/apt/sources.list.d/caddy-stable.list
+  if [[ ! -f /usr/share/keyrings/caddy-stable-archive-keyring.gpg ]]; then
+    log "Adding Caddy apt repo key"
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+      | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  fi
+  if [[ ! -f /etc/apt/sources.list.d/caddy-stable.list ]]; then
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+      > /etc/apt/sources.list.d/caddy-stable.list
+  fi
   apt-get update -y
   apt-get install -y caddy
 else
-  log "Caddy already installed: $(caddy version)"
+  log "Caddy already installed: $(caddy version | head -n1)"
 fi
+
 
 # ---------- 3. Build Caddy with replace-response module ----------
 # The stock caddy package does NOT include replace-response. We use
