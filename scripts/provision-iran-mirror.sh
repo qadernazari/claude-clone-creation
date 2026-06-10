@@ -95,9 +95,13 @@ else
 fi
 
 # ---------- 4. Write Caddyfile ----------
-log "Writing /etc/caddy/Caddyfile"
+# Render the desired Caddyfile to a temp path, then only replace the live
+# file if it actually differs. Preserves a timestamped backup of any
+# existing config. Set FORCE_CADDYFILE=1 to overwrite without diffing
+# (useful if you've hand-edited and want to reset to the template).
 mkdir -p /etc/caddy
-cat > /etc/caddy/Caddyfile <<EOF
+NEW_CADDYFILE="$(mktemp)"
+cat > "$NEW_CADDYFILE" <<EOF
 {
     email ${ACME_EMAIL}
     servers {
@@ -157,22 +161,51 @@ ${API_DOMAIN} {
 }
 EOF
 
+CADDYFILE_CHANGED=0
+if [[ -f /etc/caddy/Caddyfile ]] && cmp -s "$NEW_CADDYFILE" /etc/caddy/Caddyfile && [[ "${FORCE_CADDYFILE:-0}" != "1" ]]; then
+  log "/etc/caddy/Caddyfile already matches template — leaving it alone"
+  rm -f "$NEW_CADDYFILE"
+else
+  if [[ -f /etc/caddy/Caddyfile ]]; then
+    BACKUP="/etc/caddy/Caddyfile.bak.$(date +%Y%m%d-%H%M%S)"
+    cp -p /etc/caddy/Caddyfile "$BACKUP"
+    log "Backed up existing Caddyfile -> $BACKUP"
+  fi
+  mv "$NEW_CADDYFILE" /etc/caddy/Caddyfile
+  chmod 644 /etc/caddy/Caddyfile
+  CADDYFILE_CHANGED=1
+  log "Wrote /etc/caddy/Caddyfile"
+fi
+
 log "Validating Caddyfile"
 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
 # ---------- 5. Open firewall (if ufw active) ----------
 if command -v ufw >/dev/null 2>&1 && ufw status | grep -q "Status: active"; then
-  log "Opening ports 80/443 in ufw"
-  ufw allow 80/tcp || true
-  ufw allow 443/tcp || true
+  for port in 80 443; do
+    if ! ufw status | grep -qE "^${port}/tcp\s+ALLOW"; then
+      log "Opening port ${port}/tcp in ufw"
+      ufw allow ${port}/tcp || true
+    fi
+  done
 fi
 
-# ---------- 6. Restart Caddy ----------
-log "Restarting Caddy"
-systemctl enable caddy
-systemctl restart caddy
-sleep 2
-systemctl --no-pager status caddy | head -n 15 || true
+# ---------- 6. Reload or start Caddy ----------
+systemctl enable caddy >/dev/null 2>&1 || true
+if [[ $CADDYFILE_CHANGED -eq 1 ]] || ! systemctl is-active --quiet caddy; then
+  if systemctl is-active --quiet caddy; then
+    log "Reloading Caddy (config changed)"
+    systemctl reload caddy || systemctl restart caddy
+  else
+    log "Starting Caddy"
+    systemctl start caddy
+  fi
+  sleep 2
+else
+  log "Caddy already running with current config — no reload needed"
+fi
+systemctl --no-pager status caddy | head -n 10 || true
+
 
 # ---------- 7. Wait for cert issuance ----------
 log "Waiting up to 120s for TLS certificates (${MIRROR_DOMAIN}, ${API_DOMAIN})"
