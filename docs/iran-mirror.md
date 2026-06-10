@@ -56,21 +56,46 @@ Both should return `49.12.x.x`.
 
 ---
 
-## 4. Install Caddy on the VM
+## 4. Install + configure Caddy (one command)
 
-SSH in as `root` (or a sudo user), then:
+The repo ships `scripts/provision-iran-mirror.sh` which does everything in
+sections 4 and 5 in one shot: installs Caddy, builds it with the
+`replace-response` module, writes the Caddyfile, opens firewall ports,
+restarts the service, and waits for Let's Encrypt certs.
+
+SSH to the VM as root, then:
 
 ```bash
-# Install Caddy from official repo
+curl -fsSL https://raw.githubusercontent.com/<your-org>/<your-repo>/main/scripts/provision-iran-mirror.sh \
+  | MIRROR_DOMAIN=m.ir.show \
+    API_DOMAIN=api.ir.show \
+    LOVABLE_URL=claude-clone-creation.lovable.app \
+    SUPABASE_HOST=yasfnvftzwyuxdhpysof.supabase.co \
+    ACME_EMAIL=you@ir.show \
+    bash
+```
+
+Or copy the file over and run it locally:
+
+```bash
+scp scripts/provision-iran-mirror.sh root@VM_IP:/root/
+ssh root@VM_IP 'chmod +x provision-iran-mirror.sh && ./provision-iran-mirror.sh'
+```
+
+All env vars have sensible defaults — you can run the script with no overrides.
+It is idempotent, so re-running is safe (e.g. after editing the Caddyfile
+template inside the script). When it finishes, skip to section 6.
+
+<details><summary>Manual install (if you prefer)</summary>
+
+```bash
 apt update && apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 apt update && apt install -y caddy
-
-# Enable + verify
 systemctl enable --now caddy
-systemctl status caddy --no-pager
 ```
+</details>
 
 ---
 
