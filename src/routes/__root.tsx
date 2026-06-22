@@ -18,6 +18,7 @@ import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { IranMirrorBanner } from "@/components/iran-mirror-banner";
+import { resolveVisitorRegion } from "../lib/region.functions";
 
 function useFaSafe(): boolean {
   try {
@@ -152,8 +153,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           w.__IRAN_REGION__ ?? { region: "global" as const, locale: "en" as const },
       };
     }
-    const { resolveAndPersistRegion } = await import("../lib/region.server");
-    const r = resolveAndPersistRegion();
+    const r = await resolveVisitorRegion();
     return {
       initialRegion: {
         region: (r.region ?? "global") as "iran" | "global",
