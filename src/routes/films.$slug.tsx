@@ -218,6 +218,8 @@ function FilmPage() {
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
   const [stickyHeader, setStickyHeader] = useState(false);
+  const heroCtaRef = useRef<HTMLDivElement | null>(null);
+  const [inPageCtaVisible, setInPageCtaVisible] = useState(true);
 
   // Reveal a condensed cinematic header once the hero has scrolled out
   useEffect(() => {
@@ -230,6 +232,20 @@ function FilmPage() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Track whether the in-page hero CTA is on screen so the mobile sticky
+  // bottom bar only appears once the user has scrolled past it (avoids
+  // showing two identical "Sign in to watch" buttons simultaneously).
+  useEffect(() => {
+    const el = heroCtaRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInPageCtaVisible(entry.isIntersecting),
+      { rootMargin: "-20px 0px 0px 0px", threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   // Trap body scroll + ESC-to-close while the trailer modal is open
