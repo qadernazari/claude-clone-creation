@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { setRegionPreference } from "@/lib/region.functions";
 
 export type Locale = "en" | "fa";
 export type Region = "global" | "iran";
@@ -27,116 +28,82 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-const STORAGE_LANG = "iran_lang";
 const STORAGE_REGION = "iran_region";
 
-function readInitialLocale(): Locale {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem(STORAGE_LANG);
-  if (stored === "en" || stored === "fa") return stored;
-  return "en";
+declare global {
+  interface Window {
+    __IRAN_REGION__?: { region: Region; locale: Locale };
+  }
 }
 
+/**
+ * Read the SSR-injected region. The root shell server-renders a tiny
+ * `<script>window.__IRAN_REGION__ = {...}</script>` based on the
+ * Host/cookie/cf-ipcountry, so the first React render is already correct —
+ * no useEffect-driven flip, no flash of English/LTR for Iran visitors.
+ */
 function readInitialRegion(): Region {
   if (typeof window === "undefined") return "global";
+  const injected = window.__IRAN_REGION__?.region;
+  if (injected === "iran" || injected === "global") return injected;
+  // Local dev / no SSR — fall back to localStorage
   const stored = window.localStorage.getItem(STORAGE_REGION);
-  if (stored === "global" || stored === "iran") return stored;
+  if (stored === "iran" || stored === "global") return stored;
   return "global";
 }
 
+function regionToLocale(r: Region): Locale {
+  return r === "iran" ? "fa" : "en";
+}
+
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
-  const [region, setRegionState] = useState<Region>("global");
+  // Initialize synchronously from SSR-injected value — same on server and
+  // first client render → no hydration mismatch, no flash.
+  const initialRegion: Region =
+    typeof window === "undefined" ? "global" : readInitialRegion();
+  const [region, setRegionState] = useState<Region>(initialRegion);
+  const [locale, setLocaleState] = useState<Locale>(regionToLocale(initialRegion));
 
-  // Hydrate from localStorage on the client only
-  useEffect(() => {
-    const storedRegion = window.localStorage.getItem(STORAGE_REGION);
-    const initialRegion = storedRegion === "global" || storedRegion === "iran"
-      ? storedRegion
-      : readInitialLocale() === "fa"
-        ? "iran"
-        : "global";
-    const initialLocale = initialRegion === "iran" ? "fa" : "en";
-    setRegionState(initialRegion);
-    setLocaleState(initialLocale);
-    try {
-      window.localStorage.setItem(STORAGE_REGION, initialRegion);
-      window.localStorage.setItem(STORAGE_LANG, initialLocale);
-    } catch {}
-  }, []);
-
-  // Reflect locale on <html>
+  // Mirror to <html> on changes (initial SSR HTML already has correct attrs).
   useEffect(() => {
     if (typeof document === "undefined") return;
     const html = document.documentElement;
     html.lang = locale;
     html.dir = locale === "fa" ? "rtl" : "ltr";
-    html.dataset.region = locale === "fa" ? "iran" : "global";
-  }, [locale]);
+    html.dataset.region = region;
+  }, [locale, region]);
 
-  const setLocale = useCallback((l: Locale) => {
-    const persist = (next: Locale) => {
-      try {
-        window.localStorage.setItem(STORAGE_LANG, next);
-      } catch {}
-    };
-
-    setLocaleState((prev) => {
-      if (prev === l) return prev;
-      persist(l);
-
-      if (typeof document !== "undefined") {
-        const html = document.documentElement;
-        html.dataset.region = l === "fa" ? "iran" : "global";
-        const doc = document as Document & {
-          startViewTransition?: (cb: () => void) => unknown;
-        };
-        const isMobileSafariPath = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
-
-        // Real iPhone Safari can drop composited hero images during root view
-        // transitions. On mobile, flip language/RTL synchronously so the poster
-        // layer never disappears into a black snapshot.
-        if (isMobileSafariPath) {
-          html.lang = l;
-          html.dir = l === "fa" ? "rtl" : "ltr";
-          return l;
-        }
-
-        // Prefer the View Transitions API: a true cross-fade between LTR/RTL snapshots.
-        if (typeof doc.startViewTransition === "function") {
-          doc.startViewTransition(() => {
-            html.lang = l;
-            html.dir = l === "fa" ? "rtl" : "ltr";
-            queueMicrotask(() => setLocaleState(l));
-          });
-          return prev; // state will flip inside the transition
-        }
-
-        // Fallback: brief opacity fade to mask the direction flip.
-        html.setAttribute("data-locale-switching", "");
-        window.setTimeout(() => {
-          html.removeAttribute("data-locale-switching");
-        }, 420);
-      }
-
-      return l;
-    });
-  }, []);
-
-  const setRegion = useCallback((r: Region) => {
-    const pairedLocale: Locale = r === "iran" ? "fa" : "en";
-    setRegionState(r);
-    setLocaleState(pairedLocale);
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = pairedLocale;
-      document.documentElement.dir = pairedLocale === "fa" ? "rtl" : "ltr";
-      document.documentElement.dataset.region = r;
-    }
+  const persistRegion = useCallback((r: Region) => {
     try {
       window.localStorage.setItem(STORAGE_REGION, r);
-      window.localStorage.setItem(STORAGE_LANG, pairedLocale);
     } catch {}
+    // Fire-and-forget cookie write so future SSR responses match.
+    setRegionPreference({ data: { region: r } }).catch(() => {});
   }, []);
+
+  const setRegion = useCallback(
+    (r: Region) => {
+      const pairedLocale = regionToLocale(r);
+      setRegionState(r);
+      setLocaleState(pairedLocale);
+      persistRegion(r);
+      if (typeof document !== "undefined") {
+        const html = document.documentElement;
+        html.lang = pairedLocale;
+        html.dir = pairedLocale === "fa" ? "rtl" : "ltr";
+        html.dataset.region = r;
+      }
+    },
+    [persistRegion],
+  );
+
+  const setLocale = useCallback(
+    (l: Locale) => {
+      // Locale and region are linked: changing one updates both.
+      setRegion(l === "fa" ? "iran" : "global");
+    },
+    [setRegion],
+  );
 
   const value = useMemo<LocaleContextValue>(() => {
     const numFmt = new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US");
