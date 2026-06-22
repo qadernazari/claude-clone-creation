@@ -1,41 +1,31 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { detectVisitorRegion } from "@/lib/geo.functions";
 import { useLocale } from "@/lib/i18n";
 
 const DISMISS_KEY = "ir_mirror_banner_dismissed";
+const MIRROR_HOST = "ir.show";
 
-// The hostname the Hetzner reverse proxy serves. Visitors detected as
-// being in Iran on the main site are offered a one-click hop here.
-// Keep in sync with docs/iran-mirror.md.
-const MIRROR_HOST = "m.ir.show";
+// Hostnames already inside the Iran mirror — banner should not show on these.
+const IRAN_HOSTS = new Set(["ir.show", "www.ir.show", "m.ir.show"]);
 
 /**
  * Shown only when:
- *   - visitor's IP geolocates to IR (cf-ipcountry header)
+ *   - the resolved region is Iran (cookie / cf-ipcountry IR)
  *   - they are NOT already on the mirror host
  *   - they haven't dismissed the banner before
  */
 export function IranMirrorBanner() {
-  const { locale } = useLocale();
+  const { locale, region } = useLocale();
   const fa = locale === "fa";
   const [dismissed, setDismissed] = useState(true);
-
-  const { data } = useQuery({
-    queryKey: ["visitor-region"],
-    queryFn: () => detectVisitorRegion(),
-    staleTime: 60 * 60_000,
-  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const alreadyDismissed = localStorage.getItem(DISMISS_KEY) === "1";
-    const onMirror = window.location.hostname === MIRROR_HOST;
+    const onMirror = IRAN_HOSTS.has(window.location.hostname);
     setDismissed(alreadyDismissed || onMirror);
   }, []);
 
-  const isIr = data?.region === "iran";
-  if (!isIr || dismissed) return null;
+  if (region !== "iran" || dismissed) return null;
 
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, "1");
