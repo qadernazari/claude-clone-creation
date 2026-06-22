@@ -3,11 +3,28 @@
 The main site (`ir.show` on Cloudflare Workers) and the Supabase backend
 (`*.supabase.co`) are both blocked from inside Iran. This guide stands up a
 single Hetzner VM that reverse-proxies both, so visitors in Iran can reach
-the app without a VPN.
+the app without a VPN — and the very first byte is already in Persian / RTL /
+Toman, no flash of English.
 
 The proxy is **not** an attempt to bypass Stripe/PayPal sanctions — payments
 in IR mode go through an Iranian gateway (ZarinPal / IDPay / NextPay), and
 Stripe/PayPal buttons are hidden for IR visitors.
+
+## How region detection works (end to end)
+
+When a request reaches Lovable's SSR, `src/lib/region.server.ts` resolves the
+region in this priority order, and the result is rendered into
+`<html lang dir data-region>` on the first byte:
+
+1. **`iran_region` cookie** — explicit user choice (region switcher), wins forever.
+2. **`X-Iran-Mirror` header** — set by Caddy on every mirror request → Iran.
+3. **`X-Forwarded-Host` / `Host`** matching `ir.show`, `www.ir.show`, `m.ir.show` → Iran.
+4. **`cf-ipcountry` / `x-vercel-ip-country` / `X-Country-Code`** — for direct
+   hits on `claude-clone-creation.lovable.app` from inside Iran (no mirror).
+5. **Nothing detected** → Global default + region switcher visible.
+
+When the resolver decides on a region (cases 2-4), it also writes the
+`iran_region` cookie so subsequent visits hit case 1 instantly.
 
 ---
 
@@ -15,10 +32,11 @@ Stripe/PayPal buttons are hidden for IR visitors.
 
 | Hostname | Purpose | Points to |
 | --- | --- | --- |
-| `m.ir.show` | The site for IR visitors | Hetzner VM → published Lovable URL |
+| `ir.show` | The site for IR visitors | Hetzner VM → published Lovable URL |
 | `api.ir.show` | Supabase REST / Auth / Storage / Realtime | Hetzner VM → `yasfnvftzwyuxdhpysof.supabase.co` |
 
-You keep `ir.show` and `www.ir.show` on Cloudflare unchanged for the rest of the world.
+You keep the published Lovable URL untouched for the rest of the world; IR
+visitors hitting it directly are still detected via `cf-ipcountry`.
 
 ---
 
@@ -36,12 +54,12 @@ After creation, note the public IPv4 (e.g. `49.12.x.x`).
 
 ## 3. DNS records
 
-At your DNS provider for `ir.show` (NOT proxied through Cloudflare for these
-two — set the orange cloud to grey, or these subdomains will go through
-Cloudflare and inherit the IR block):
+At your DNS provider for `ir.show` (NOT proxied through Cloudflare — set the
+orange cloud to grey, or these will go through Cloudflare and inherit the IR
+block):
 
 ```
-A    m.ir.show     49.12.x.x      TTL 300   (Cloudflare proxy: OFF)
+A    ir.show       49.12.x.x      TTL 300   (Cloudflare proxy: OFF)
 A    api.ir.show   49.12.x.x      TTL 300   (Cloudflare proxy: OFF)
 ```
 
