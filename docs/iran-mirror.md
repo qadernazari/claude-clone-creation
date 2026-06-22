@@ -40,14 +40,26 @@ visitors hitting it directly are still detected via `cf-ipcountry`.
 
 ---
 
+## 2. Provision the VM
+
+- **Provider:** Hetzner Cloud
+- **Type:** CX22 (2 vCPU, 4 GB RAM, 40 GB SSD) — ~€4.51/month
+- **Location:** Falkenstein, Nuremberg, or Helsinki (all reachable from Iran)
+- **Image:** Ubuntu 24.04 LTS
+- **SSH key:** add yours during creation
+
+After creation, note the public IPv4 (e.g. `49.12.x.x`).
+
+---
+
 ## 3. DNS records
 
-At your DNS provider for `ir.show` (NOT proxied through Cloudflare for these
-two — set the orange cloud to grey, or these subdomains will go through
-Cloudflare and inherit the IR block):
+At your DNS provider for `ir.show` (NOT proxied through Cloudflare — set the
+orange cloud to grey, or these will go through Cloudflare and inherit the IR
+block):
 
 ```
-A    m.ir.show     49.12.x.x      TTL 300   (Cloudflare proxy: OFF)
+A    ir.show       49.12.x.x      TTL 300   (Cloudflare proxy: OFF)
 A    api.ir.show   49.12.x.x      TTL 300   (Cloudflare proxy: OFF)
 ```
 
