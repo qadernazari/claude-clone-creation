@@ -279,7 +279,7 @@ function AccountPage() {
               />
             </label>
             <label className="block md:col-span-2">
-              <span className="text-xs uppercase tracking-widest text-cream/55">{tr.regionLabel}</span>
+              <span className="me-4 text-xs uppercase tracking-widest text-cream/55">{tr.regionLabel}</span>
               <div className="mt-2 inline-flex w-full max-w-md items-center gap-1 rounded-full border border-cream/10 bg-bg-0 p-1">
                 {([
                   { key: "iran" as const, label: tr.insideIran },
