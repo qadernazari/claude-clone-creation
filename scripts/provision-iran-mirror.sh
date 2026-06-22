@@ -15,7 +15,7 @@
 set -euo pipefail
 
 # ---------- Config (override via env vars) ----------
-MIRROR_DOMAIN="${MIRROR_DOMAIN:-m.ir.show}"
+MIRROR_DOMAIN="${MIRROR_DOMAIN:-ir.show}"
 API_DOMAIN="${API_DOMAIN:-api.ir.show}"
 LOVABLE_URL="${LOVABLE_URL:-claude-clone-creation.lovable.app}"
 SUPABASE_HOST="${SUPABASE_HOST:-yasfnvftzwyuxdhpysof.supabase.co}"
