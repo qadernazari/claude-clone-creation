@@ -122,6 +122,12 @@ ${MIRROR_DOMAIN} {
         header_up Host ${LOVABLE_URL}
         header_up X-Forwarded-Host {host}
         header_up X-Real-IP {remote_host}
+        # Tell Lovable's SSR that every request through this mirror is
+        # Iran traffic, so the root resolver renders Persian / RTL / Toman
+        # on the first byte. (Lovable can't trust cf-ipcountry here — it
+        # sees this VM's IP, not the real visitor's.)
+        header_up X-Iran-Mirror 1
+        header_up X-Country-Code IR
         header_down -Content-Length
     }
 
