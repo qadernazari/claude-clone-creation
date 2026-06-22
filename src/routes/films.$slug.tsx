@@ -1078,9 +1078,11 @@ function FilmPage() {
           Hidden on desktop; mirrors the primary action from the hero so users
           can always tap Watch / Buy / Sign-in without scrolling back up. */}
       <div
-        className="fixed inset-x-0 z-30 md:hidden pointer-events-none"
+        className={`fixed inset-x-0 z-30 md:hidden pointer-events-none transition-all duration-300 ${
+          inPageCtaVisible ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"
+        }`}
         style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
-        aria-hidden={false}
+        aria-hidden={inPageCtaVisible}
       >
         <div className="pointer-events-auto mx-3 mb-2 rounded-2xl border border-cream/10 bg-bg-0/90 px-3 py-2.5 backdrop-blur-xl shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.6)]">
           {isAuthLoading ? (
