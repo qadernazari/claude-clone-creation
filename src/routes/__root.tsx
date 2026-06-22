@@ -140,6 +140,27 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Resolve region from headers/cookie at SSR so the very first byte is
+  // already in the correct locale/RTL. No flash for Iran visitors.
+  beforeLoad: async () => {
+    if (typeof window !== "undefined") {
+      const w = window as Window & {
+        __IRAN_REGION__?: { region: "iran" | "global"; locale: "en" | "fa" };
+      };
+      return {
+        initialRegion:
+          w.__IRAN_REGION__ ?? { region: "global" as const, locale: "en" as const },
+      };
+    }
+    const { resolveAndPersistRegion } = await import("../lib/region.server");
+    const r = resolveAndPersistRegion();
+    return {
+      initialRegion: {
+        region: (r.region ?? "global") as "iran" | "global",
+        locale: r.locale,
+      },
+    };
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -172,8 +193,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.gstatic.com",
         crossOrigin: "anonymous",
       },
-      // Warm up the storage CDN we fetch every cover/avatar from — saves the
-      // TLS+TCP handshake on the first image request on mobile.
       {
         rel: "preconnect",
         href: "https://yasfnvftzwyuxdhpysof.supabase.co",
@@ -181,12 +200,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        // Trimmed to the weights actually used in the app (3-2-1-3 instead of
-        // 5-5-4-5). Halves the font CSS + font file count on first paint.
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,400&family=Vazirmatn:wght@400;500;600&display=swap",
       },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -195,13 +211,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // beforeLoad resolves the region from request headers during SSR.
+  const ctx = Route.useRouteContext();
+  const initialRegion = ctx.initialRegion ?? { region: "global" as const, locale: "en" as const };
+  const locale = initialRegion.locale;
+  const region = initialRegion.region;
+  const dir = locale === "fa" ? "rtl" : "ltr";
+
   return (
-    <html lang="en" dir="ltr" data-region="global" suppressHydrationWarning>
+    <html lang={locale} dir={dir} data-region={region} suppressHydrationWarning>
       <head>
+        {/*
+          Inject the resolved region as a global so <LocaleProvider> can
+          initialize synchronously on the client — no useEffect flip, no
+          flash of English for Iran visitors. Tab-bar visibility check
+          stays inline so it runs before first paint.
+        */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var r=localStorage.getItem('iran_region');var l=localStorage.getItem('iran_lang');if(r!=='global'&&r!=='iran')r=l==='fa'?'iran':'global';l=r==='iran'?'fa':'en';document.documentElement.lang=l;document.documentElement.dir=l==='fa'?'rtl':'ltr';document.documentElement.dataset.region=r;var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}",
+              `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
+              `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}`,
           }}
         />
         <HeadContent />
