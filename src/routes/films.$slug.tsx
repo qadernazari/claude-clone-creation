@@ -690,7 +690,7 @@ function FilmPage() {
 
 
             {/* CTAs — integrated, not boxed */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div ref={heroCtaRef} className="mt-8 flex flex-wrap items-center gap-3">
               {isAuthLoading ? (
                 <span
                   aria-busy="true"
