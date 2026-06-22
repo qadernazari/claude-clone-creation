@@ -218,6 +218,8 @@ function FilmPage() {
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
   const [stickyHeader, setStickyHeader] = useState(false);
+  const heroCtaRef = useRef<HTMLDivElement | null>(null);
+  const [inPageCtaVisible, setInPageCtaVisible] = useState(true);
 
   // Reveal a condensed cinematic header once the hero has scrolled out
   useEffect(() => {
@@ -230,6 +232,20 @@ function FilmPage() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Track whether the in-page hero CTA is on screen so the mobile sticky
+  // bottom bar only appears once the user has scrolled past it (avoids
+  // showing two identical "Sign in to watch" buttons simultaneously).
+  useEffect(() => {
+    const el = heroCtaRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInPageCtaVisible(entry.isIntersecting),
+      { rootMargin: "-20px 0px 0px 0px", threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   // Trap body scroll + ESC-to-close while the trailer modal is open
@@ -674,7 +690,7 @@ function FilmPage() {
 
 
             {/* CTAs — integrated, not boxed */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div ref={heroCtaRef} className="mt-8 flex flex-wrap items-center gap-3">
               {isAuthLoading ? (
                 <span
                   aria-busy="true"
@@ -1062,9 +1078,11 @@ function FilmPage() {
           Hidden on desktop; mirrors the primary action from the hero so users
           can always tap Watch / Buy / Sign-in without scrolling back up. */}
       <div
-        className="fixed inset-x-0 z-30 md:hidden pointer-events-none"
+        className={`fixed inset-x-0 z-30 md:hidden pointer-events-none transition-all duration-300 ${
+          inPageCtaVisible ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"
+        }`}
         style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
-        aria-hidden={false}
+        aria-hidden={inPageCtaVisible}
       >
         <div className="pointer-events-auto mx-3 mb-2 rounded-2xl border border-cream/10 bg-bg-0/90 px-3 py-2.5 backdrop-blur-xl shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.6)]">
           {isAuthLoading ? (
