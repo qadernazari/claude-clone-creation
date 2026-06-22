@@ -153,8 +153,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           w.__IRAN_REGION__ ?? { region: "global" as const, locale: "en" as const },
       };
     }
-    const { resolveAndPersistRegion } = await import("../lib/region.server");
-    const r = resolveAndPersistRegion();
+    const r = await resolveVisitorRegion();
     return {
       initialRegion: {
         region: (r.region ?? "global") as "iran" | "global",
