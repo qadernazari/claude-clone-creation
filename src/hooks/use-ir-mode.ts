@@ -1,22 +1,13 @@
-import { useEffect, useState } from "react";
-
-// The hostname served by the Hetzner reverse proxy for Iran visitors.
-// Keep in sync with docs/iran-mirror.md and src/components/iran-mirror-banner.tsx.
-const MIRROR_HOST = "m.ir.show";
+import { useLocale } from "@/lib/i18n";
 
 /**
- * Returns true when the current page is being served from the Iran mirror.
- * In IR mode, Stripe/PayPal checkout is hidden and replaced with the
- * Iranian gateway flow (Toman pricing, IR bank cards).
+ * True when the visitor is in the Iran region (mirror, IR IP, or manually
+ * chosen). When true, Stripe/PayPal flows are hidden and replaced with the
+ * Iranian gateway (Toman pricing, IR bank cards).
  *
- * SSR-safe: returns false during server render, then settles on the real
- * value after hydration.
+ * Derived from the locale context so there is a single source of truth that
+ * is SSR-correct from the first byte — no hostname sniffing, no flash.
  */
 export function useIrMode(): boolean {
-  const [ir, setIr] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setIr(window.location.hostname === MIRROR_HOST);
-  }, []);
-  return ir;
+  return useLocale().region === "iran";
 }
