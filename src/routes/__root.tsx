@@ -18,6 +18,7 @@ import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { IranMirrorBanner } from "@/components/iran-mirror-banner";
+import { resolveVisitorRegion } from "../lib/region.functions";
 
 function useFaSafe(): boolean {
   try {
