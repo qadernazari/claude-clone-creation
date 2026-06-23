@@ -470,12 +470,17 @@ function FilmPage() {
 
   return (
     <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
-      <SiteHeader />
+      <div
+        className={`transition-opacity duration-300 ${stickyHeader ? "pointer-events-none opacity-0" : "opacity-100"}`}
+        aria-hidden={stickyHeader}
+      >
+        <SiteHeader />
+      </div>
 
       {/* Condensed sticky cinematic header — appears after the hero scrolls past.
           Mirrors the primary CTA so users on long pages can always Watch/Buy. */}
       <div
-        className={`pointer-events-none fixed inset-x-0 top-0 z-30 transition-all duration-500 ${
+        className={`pointer-events-none fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
           stickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         }`}
         aria-hidden={!stickyHeader}
