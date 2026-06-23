@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/73778054[.]txt")({
+export const Route = createFileRoute("/73778054.txt")({
   server: {
     handlers: {
       GET: () =>
