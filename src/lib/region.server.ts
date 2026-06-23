@@ -2,14 +2,13 @@
  * Server-only Iran region resolver.
  *
  * Resolution priority (highest first):
- *   1. `iran_region` cookie — explicit user choice persists across visits
- *   2. `x-iran-mirror` header — set by the Hetzner Caddy mirror (Iran traffic)
- *   3. `cf-ipcountry` / `x-vercel-ip-country` — IP geolocation
- *   4. Global / English — safe default when geo is unknown
+ *   1. `iran_region=manual:<region>` cookie — explicit user choice only
+ *   2. `cf-ipcountry` / `x-vercel-ip-country` — trusted edge IP geolocation
+ *   3. Global / English — safe default when geo is unknown
  *
- * NOTE: host (ir.show) is NEVER used as an Iran signal — non-Iran visitors
- * hit that domain too. Only the Iran VPS mirror should force Iran, and it
- * sets `x-iran-mirror` explicitly.
+ * NOTE: host (ir.show) and mirror headers are NEVER used as Iran signals —
+ * non-Iran visitors hit those paths too. Persian is selected only from a
+ * trusted Iran country header or a new explicit manual-selection cookie.
  *
  * This file is server-only — never imported from the client bundle.
  * Callers go through `src/lib/region.functions.ts`.
@@ -17,6 +16,7 @@
 import {
   getCookie,
   getRequestHeader,
+  setResponseHeader,
   setCookie,
 } from "@tanstack/react-start/server";
 
@@ -29,63 +29,80 @@ const ONE_YEAR = 60 * 60 * 24 * 365;
 export type ResolvedRegion = {
   region: Region | null;
   locale: Locale;
-  source: "cookie" | "mirror-header" | "geo" | "default";
+  source: "cookie" | "geo" | "default";
 };
+
+function normalizeCountry(country: string | null | undefined): string | null {
+  const value = country?.trim().toUpperCase();
+  if (!value || value === "XX" || value === "T1") return null;
+  return value;
+}
+
+function readTrustedCountry(): string | null {
+  return normalizeCountry(
+    getRequestHeader("cf-ipcountry") ?? getRequestHeader("x-vercel-ip-country"),
+  );
+}
+
+function readManualRegionCookie(): Region | null {
+  const cookie = getCookie(REGION_COOKIE);
+  if (cookie === "manual:iran") return "iran";
+  if (cookie === "manual:global") return "global";
+
+  // Legacy plain values were previously written by automatic detection too,
+  // so they are not reliable proof of a manual user choice. Ignore them to
+  // prevent stale `iran_region=iran` cookies from forcing Persian globally.
+  return null;
+}
+
+function applyRegionResponseHeaders(): void {
+  try {
+    setResponseHeader("Vary", "Cookie, CF-IPCountry, X-Vercel-IP-Country");
+    setResponseHeader("Cache-Control", "no-store");
+  } catch {
+    // Response headers are only available during request handling.
+  }
+}
 
 /** Read the cookie and headers and decide on a region. Pure read — no side effects. */
 export function readRegion(): ResolvedRegion {
-  // 1. cookie wins — explicit user choice
-  const cookie = getCookie(REGION_COOKIE);
-  if (cookie === "iran" || cookie === "global") {
-    return { region: cookie, locale: cookie === "iran" ? "fa" : "en", source: "cookie" };
+  applyRegionResponseHeaders();
+
+  // 1. Manual-selection cookie wins. Only the `manual:*` format is trusted;
+  // old plain cookies may have been created by automatic detection.
+  const manualCookie = readManualRegionCookie();
+  if (manualCookie) {
+    return {
+      region: manualCookie,
+      locale: manualCookie === "iran" ? "fa" : "en",
+      source: "cookie",
+    };
   }
 
-  // 2. explicit mirror signal forwarded by the Iran VPS Caddy
-  const mirrorHeader = getRequestHeader("x-iran-mirror");
-  if (mirrorHeader && mirrorHeader !== "0" && mirrorHeader !== "false") {
-    return { region: "iran", locale: "fa", source: "mirror-header" };
-  }
-
-  // 3. edge geo (Cloudflare / Vercel)
-  const country = (
-    getRequestHeader("cf-ipcountry") ??
-    getRequestHeader("x-vercel-ip-country") ??
-    getRequestHeader("x-country-code") ??
-    ""
-  ).toUpperCase();
-  if (country && country !== "XX" && country !== "T1") {
+  // 2. Trusted edge geo. Do not trust x-country-code or x-iran-mirror here:
+  // the mirror previously hard-coded them to IR, which made non-Iran visitors
+  // see Persian on ir.show.
+  const country = readTrustedCountry();
+  if (country) {
     if (country === "IR") return { region: "iran", locale: "fa", source: "geo" };
     return { region: "global", locale: "en", source: "geo" };
   }
 
-  // 4. unknown — default to global / English
+  // 3. Unknown — default to global / English.
   return { region: "global", locale: "en", source: "default" };
 }
 
 /**
- * Resolve and (if missing) persist the region cookie so subsequent visits
- * are decided instantly without re-running header logic.
+ * Resolve the region for this request. Automatic detection intentionally does
+ * NOT write a cookie: saved preferences must come only from a manual user
+ * selection, otherwise one stale Iran detection can force Persian forever.
  */
 export function resolveAndPersistRegion(): ResolvedRegion {
-  const result = readRegion();
-  if (result.source !== "cookie" && result.region) {
-    try {
-      setCookie(REGION_COOKIE, result.region, {
-        maxAge: ONE_YEAR,
-        path: "/",
-        sameSite: "lax",
-        secure: true,
-        httpOnly: false, // client can read for symmetry; not security-sensitive
-      });
-    } catch {
-      // setCookie outside a request context throws — ignore in non-SSR paths.
-    }
-  }
-  return result;
+  return readRegion();
 }
 
 export function writeRegionCookie(region: Region): void {
-  setCookie(REGION_COOKIE, region, {
+  setCookie(REGION_COOKIE, `manual:${region}`, {
     maxAge: ONE_YEAR,
     path: "/",
     sameSite: "lax",
