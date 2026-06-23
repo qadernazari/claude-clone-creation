@@ -120,7 +120,7 @@ function AuthPage() {
     if (m.includes("invalid login") || m.includes("invalid credentials")) {
       return fa ? "ایمیل یا رمز عبور نادرست است." : "Incorrect email or password.";
     }
-    if (m.includes("user already registered") || m.includes("already exists")) {
+    if (m.includes("user already registered") || m.includes("already exists") || m.includes("already registered")) {
       return fa ? "این ایمیل قبلاً ثبت شده است. وارد شوید." : "This email is already registered. Try signing in.";
     }
     if (m.includes("token has expired") || m.includes("invalid token") || m.includes("otp")) {
@@ -132,6 +132,37 @@ function AuthPage() {
     if (m.includes("email not confirmed")) {
       return fa ? "ابتدا ایمیل خود را تأیید کنید." : "Please verify your email first.";
     }
+    if (
+      m.includes("weak") ||
+      m.includes("pwned") ||
+      m.includes("compromised") ||
+      m.includes("easy to guess") ||
+      m.includes("known to be")
+    ) {
+      return fa
+        ? "این رمز عبور ضعیف است و به‌راحتی قابل حدس زدن است. لطفاً رمز عبور قوی‌تری انتخاب کنید."
+        : "This password is too weak or has been exposed in a data breach. Please choose a stronger one.";
+    }
+    if (m.includes("password should be") || m.includes("password must")) {
+      return fa ? "رمز عبور شرایط لازم را ندارد. رمز قوی‌تری انتخاب کنید." : message;
+    }
+    if (m.includes("invalid email") || (m.includes("email") && m.includes("invalid"))) {
+      return fa ? "ایمیل معتبر وارد کنید." : "Please enter a valid email address.";
+    }
+    if (m.includes("user not found")) {
+      return fa ? "حسابی با این ایمیل پیدا نشد." : "No account found with that email.";
+    }
+    if (m.includes("network") || m.includes("failed to fetch") || m.includes("fetch")) {
+      return fa ? "خطای شبکه. اتصال اینترنت را بررسی کنید." : "Network error. Please check your connection.";
+    }
+    if (m.includes("server") || m.includes("500") || m.includes("internal")) {
+      return fa ? "خطای سرور. لطفاً بعداً دوباره تلاش کنید." : "Server error. Please try again later.";
+    }
+    if (m.includes("required") || m.includes("missing")) {
+      return fa ? "لطفاً همه فیلدهای ضروری را پر کنید." : "Please fill in all required fields.";
+    }
+    // Generic fallback — never leak raw English into the Persian flow.
+    if (fa) return "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
     return message;
   }
 
