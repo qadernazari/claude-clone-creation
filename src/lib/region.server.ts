@@ -4,11 +4,14 @@
  * Resolution priority (highest first):
  *   1. `iran_region` cookie — explicit user choice persists across visits
  *   2. `x-iran-mirror` header — set by the Hetzner Caddy mirror (Iran traffic)
- *   3. `x-forwarded-host` — request originated on ir.show / m.ir.show via proxy
- *   4. `cf-ipcountry` / `x-vercel-ip-country` — direct hit on Lovable URL
- *   5. `null` — unknown; UI should show the region selector
+ *   3. `cf-ipcountry` / `x-vercel-ip-country` — IP geolocation
+ *   4. Global / English — safe default when geo is unknown
  *
- * NOTE: this file is server-only — never imported from the client bundle.
+ * NOTE: host (ir.show) is NEVER used as an Iran signal — non-Iran visitors
+ * hit that domain too. Only the Iran VPS mirror should force Iran, and it
+ * sets `x-iran-mirror` explicitly.
+ *
+ * This file is server-only — never imported from the client bundle.
  * Callers go through `src/lib/region.functions.ts`.
  */
 import {
@@ -23,42 +26,27 @@ export type Locale = "en" | "fa";
 export const REGION_COOKIE = "iran_region";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
-const IRAN_HOST_SUFFIXES = ["ir.show", "m.ir.show", "www.ir.show"];
-
 export type ResolvedRegion = {
   region: Region | null;
   locale: Locale;
-  source: "cookie" | "mirror-header" | "host" | "geo" | "default";
+  source: "cookie" | "mirror-header" | "geo" | "default";
 };
-
-function looksLikeIranHost(host: string | undefined): boolean {
-  if (!host) return false;
-  const h = host.toLowerCase().split(":")[0];
-  return IRAN_HOST_SUFFIXES.includes(h);
-}
 
 /** Read the cookie and headers and decide on a region. Pure read — no side effects. */
 export function readRegion(): ResolvedRegion {
-  // 1. cookie wins
+  // 1. cookie wins — explicit user choice
   const cookie = getCookie(REGION_COOKIE);
   if (cookie === "iran" || cookie === "global") {
     return { region: cookie, locale: cookie === "iran" ? "fa" : "en", source: "cookie" };
   }
 
-  // 2. explicit mirror signal forwarded by Caddy
+  // 2. explicit mirror signal forwarded by the Iran VPS Caddy
   const mirrorHeader = getRequestHeader("x-iran-mirror");
   if (mirrorHeader && mirrorHeader !== "0" && mirrorHeader !== "false") {
     return { region: "iran", locale: "fa", source: "mirror-header" };
   }
 
-  // 3. host (Caddy forwards original host via X-Forwarded-Host)
-  const xfHost = getRequestHeader("x-forwarded-host");
-  const host = getRequestHeader("host");
-  if (looksLikeIranHost(xfHost) || looksLikeIranHost(host)) {
-    return { region: "iran", locale: "fa", source: "host" };
-  }
-
-  // 4. edge geo (Cloudflare / Vercel)
+  // 3. edge geo (Cloudflare / Vercel)
   const country = (
     getRequestHeader("cf-ipcountry") ??
     getRequestHeader("x-vercel-ip-country") ??
@@ -70,8 +58,8 @@ export function readRegion(): ResolvedRegion {
     return { region: "global", locale: "en", source: "geo" };
   }
 
-  // 5. unknown — default to global but let the UI know it was a guess
-  return { region: null, locale: "en", source: "default" };
+  // 4. unknown — default to global / English
+  return { region: "global", locale: "en", source: "default" };
 }
 
 /**
