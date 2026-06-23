@@ -184,6 +184,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "IRAN — Iranian short films, streaming worldwide" },
       { name: "twitter:description", content: "Original Iranian short films, streaming worldwide. 7-day free trial, then membership or Premium rentals." },
       { name: "google-site-verification", content: "zoKuyFN67EFMHi4pIwq3FrqFrbDasxMAE2kVfYSTGks" },
+      { name: "enamad", content: "52799420" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
