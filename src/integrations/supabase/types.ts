@@ -642,6 +642,27 @@ export type Database = {
         }
         Relationships: []
       }
+      parental_credentials: {
+        Row: {
+          created_at: string
+          pin_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pin_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pin_hash?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_events: {
         Row: {
           id: string
@@ -673,7 +694,6 @@ export type Database = {
           last_ip: string | null
           locale: string
           max_age_rating: string | null
-          parental_pin: string | null
           signup_city: string | null
           signup_country: string | null
           signup_ip: string | null
@@ -689,7 +709,6 @@ export type Database = {
           last_ip?: string | null
           locale?: string
           max_age_rating?: string | null
-          parental_pin?: string | null
           signup_city?: string | null
           signup_country?: string | null
           signup_ip?: string | null
@@ -705,7 +724,6 @@ export type Database = {
           last_ip?: string | null
           locale?: string
           max_age_rating?: string | null
-          parental_pin?: string | null
           signup_city?: string | null
           signup_country?: string | null
           signup_ip?: string | null

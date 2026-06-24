@@ -555,14 +555,14 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
       if (trimmed && !/^[0-9]{4,6}$/.test(trimmed)) {
         throw new Error(fa ? "پین باید ۴ تا ۶ رقم باشد" : "PIN must be 4–6 digits");
       }
-      const userId = (await supabase.auth.getUser()).data.user!.id;
-      const patch: { max_age_rating: string | null; parental_pin?: string | null } = {
-        max_age_rating: maxAge || null,
-      };
-      if (clearPin) patch.parental_pin = null;
-      else if (trimmed) patch.parental_pin = trimmed;
-      const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
-      if (error) throw new Error(error.message);
+      const { setParentalSettings } = await import("@/lib/parental.functions");
+      await setParentalSettings({
+        data: {
+          maxAgeRating: maxAge || null,
+          pin: trimmed || null,
+          clearPin,
+        },
+      });
     },
     onSuccess: () => {
       setPin("");
