@@ -387,7 +387,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
             >
               <svg
                 width="17"
