@@ -62,6 +62,20 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
     );
   }
 
+  // Trial is one-per-account. If already used (or already a member), swap the
+  // CTA to a Become a Member link so we never offer a second trial.
+  if (user && (hasUsedTrial || isMember)) {
+    if (isMember) return null;
+    return (
+      <Link
+        to="/account"
+        className={`${baseCls}${fullWidth ? " w-full justify-center" : ""}`}
+      >
+        {fa ? "عضو شوید" : "Become a Member"}
+      </Link>
+    );
+  }
+
   if (!user) {
     return (
       <Link
