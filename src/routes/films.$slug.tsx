@@ -378,6 +378,7 @@ function FilmPage() {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
     startTrial: fa ? "شروع رایگان ۷ روزه" : "Accept Free Trial",
+    becomeMember: fa ? "عضو شوید" : "Become a Member",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
     signinToWatch: fa ? "برای تماشا وارد شوید" : "Sign in to watch",
