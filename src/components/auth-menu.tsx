@@ -248,7 +248,7 @@ export function AuthMenu() {
       <div className="flex w-auto min-w-[78px] justify-end">
         <Link
           to="/auth"
-          className="mobile-signin-trigger inline-flex h-10 items-center justify-center rounded-md border border-cream/20 bg-transparent px-5 text-sm font-medium text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
+          className="mobile-signin-trigger inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md border border-cream/20 bg-transparent px-5 text-sm font-medium text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
         >
           {fa ? "ورود" : "Sign in"}
         </Link>
