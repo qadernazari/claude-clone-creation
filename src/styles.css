@@ -729,15 +729,15 @@ body[data-auth-sheet-open] .mobile-tab-bar { display: none !important; }
   .trailer-modal-rise { animation: none; }
 }
 
-/* Platform button hardening: no interactive pill buttons. */
-button[class*="rounded-full"],
-a[href][class*="rounded-full"],
-[role="button"][class*="rounded-full"] {
-  border-radius: var(--radius-md) !important;
-}
+/* Platform button hardening: all interactive controls use the same compact radius. */
+:root { --button-radius: 0.375rem; }
 
-button[class*="rounded-2xl"],
-a[href][class*="rounded-2xl"],
-[role="button"][class*="rounded-2xl"] {
-  border-radius: var(--radius-md) !important;
+button[class*="rounded-"],
+a[href][class*="rounded-"][class*="inline-flex"],
+a[href][class*="rounded-"][class*="items-center"],
+a[href][class*="rounded-"][class*="text-center"],
+a[href][class*="rounded-"][class*="bg-"],
+a[href][class*="rounded-"][class*="border"],
+[role="button"][class*="rounded-"] {
+  border-radius: var(--button-radius) !important;
 }
