@@ -537,7 +537,7 @@ function FilmPage() {
                   disabled={tomanOnly && (isMember || accessType === "ppv_only")}
                   className="inline-flex shrink-0 items-center rounded-md bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02] disabled:opacity-60"
                 >
-                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : t.startTrial}
+                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : (hasUsedTrial ? t.becomeMember : t.startTrial)}
                 </button>
               )
             )}
