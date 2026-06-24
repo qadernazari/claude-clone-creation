@@ -574,7 +574,7 @@ function VerifyView({
                 key={i}
                 className={[
                   "relative flex items-center justify-center",
-                  "h-12 w-9 sm:h-14 sm:w-11 rounded-xl border text-[18px] sm:text-[20px] font-semibold tabular-nums transition-all duration-150",
+                  "h-12 w-9 sm:h-14 sm:w-11 rounded-md border text-[18px] sm:text-[20px] font-semibold tabular-nums transition-all duration-150",
                   filled
                     ? "border-cream/60 bg-white/5 text-cream"
                     : "border-cream/12 text-cream/40",
