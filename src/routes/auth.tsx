@@ -679,7 +679,7 @@ function FloatingInput({
     <div>
       <label
         htmlFor={id}
-        className={`group relative block rounded-2xl border bg-transparent transition-colors ${
+        className={`group relative block rounded-md border bg-cream/[0.03] transition-colors ${
           error
             ? "border-destructive/50 focus-within:border-destructive"
             : "border-cream/12 focus-within:border-cream/40"
