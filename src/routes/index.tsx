@@ -25,6 +25,10 @@ function HomePendingShell() {
   );
 }
 
+function SplitNotFoundComponent() {
+  return <HomeLoadFallback />;
+}
+
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(homePageQueryOptions),
   head: ({ loaderData }) => ({
@@ -98,8 +102,6 @@ export const Route = createFileRoute("/")({
   },
   notFoundComponent: SplitNotFoundComponent,
 });
-
-const SplitNotFoundComponent = HomeLoadFallback;
 
 function HomeLoadFallback() {
   return (
