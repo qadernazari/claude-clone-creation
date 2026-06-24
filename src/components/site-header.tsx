@@ -169,7 +169,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         role="group"
         aria-label="Region"
         dir="ltr"
-        className={`hidden shrink-0 items-center gap-0.5 rounded-md border border-cream/15 bg-cream/6 p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap md:inline-flex ${
+        className={`hidden shrink-0 items-center gap-1 rounded-md border border-cream/10 bg-black/40 p-1 font-semibold tracking-[0.12em] uppercase whitespace-nowrap md:inline-flex ${
           lg ? "text-[11px]" : "text-[10px]"
         }`}
       >
@@ -177,9 +177,9 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("global")}
           aria-pressed={!isIran}
-          className={`rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-            lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
-          } ${!isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
+          className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+            lg ? "h-8 px-4" : "h-7 px-3"
+          } ${!isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
         >
           Global
         </button>
@@ -187,9 +187,9 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("iran")}
           aria-pressed={isIran}
-          className={`rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-            lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
-          } ${isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
+          className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+            lg ? "h-8 px-4" : "h-7 px-3"
+          } ${isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
         >
           <span lang="fa" className="font-fa tracking-normal text-[12px] leading-none">ایران</span>
         </button>
