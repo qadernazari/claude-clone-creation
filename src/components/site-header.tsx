@@ -419,14 +419,29 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
 
 function MembershipCta() {
   const { locale } = useLocale();
-  const { isMember, isLoading } = useSubscription();
-
-  const label = locale === "fa" ? "شروع رایگان" : "Free Trial";
+  const fa = locale === "fa";
+  const { isMember, isLoading, hasUsedTrial } = useSubscription();
 
   if (isLoading || isMember) {
     return <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />;
   }
 
+  // Trial already used (active or expired) → show Become a Member instead.
+  if (hasUsedTrial) {
+    const label = fa ? "عضو شوید" : "Become a Member";
+    return (
+      <div className="hidden shrink-0 sm:block">
+        <a
+          href="/account"
+          className="inline-flex h-10 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase tracking-[0.08em] leading-none text-ink shadow-sm transition-all duration-200 hover:bg-amber/90 active:scale-95"
+        >
+          {label}
+        </a>
+      </div>
+    );
+  }
+
+  const label = fa ? "شروع رایگان" : "Free Trial";
   return (
     <div className="hidden shrink-0 sm:block">
       <AcceptTrialButton
