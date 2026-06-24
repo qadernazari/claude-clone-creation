@@ -210,7 +210,7 @@ function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, year, dir } = useLocale();
   const fa = locale === "fa";
-  const { isMember, isLoading: isAuthLoading, user } = useSubscription();
+  const { isMember, isLoading: isAuthLoading, user, hasUsedTrial } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [membershipOpen, setMembershipOpen] = useState(false);
   
@@ -378,6 +378,7 @@ function FilmPage() {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
     startTrial: fa ? "شروع رایگان ۷ روزه" : "Accept Free Trial",
+    becomeMember: fa ? "عضو شوید" : "Become a Member",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
     signinToWatch: fa ? "برای تماشا وارد شوید" : "Sign in to watch",
@@ -536,7 +537,7 @@ function FilmPage() {
                   disabled={tomanOnly && (isMember || accessType === "ppv_only")}
                   className="inline-flex shrink-0 items-center rounded-md bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02] disabled:opacity-60"
                 >
-                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : t.startTrial}
+                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : (hasUsedTrial ? t.becomeMember : t.startTrial)}
                 </button>
               )
             )}
@@ -966,19 +967,25 @@ function FilmPage() {
                 {fa ? "عضویت ایران" : "IRAN Membership"}
               </span>
               <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-                {fa ? "۷ روز رایگان امتحان کنید" : "Start with 7 days free"}
+                {hasUsedTrial
+                  ? (fa ? "عضویت خود را فعال کنید" : "Activate your membership")
+                  : (fa ? "۷ روز رایگان امتحان کنید" : "Start with 7 days free")}
               </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
-                {fa
-                  ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
-                  : "Unlimited access to the full catalog. Cancel anytime."}
+                {hasUsedTrial
+                  ? (fa
+                      ? "برای ادامه تماشای نامحدود، عضو شوید."
+                      : "Subscribe to keep unlimited access to the full catalog.")
+                  : (fa
+                      ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
+                      : "Unlimited access to the full catalog. Cancel anytime.")}
               </p>
               <button
                 type="button"
                 onClick={() => user ? setMembershipOpen(true) : (window.location.href = "/auth")}
                 className="mt-4 inline-flex items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink transition-transform hover:scale-[1.02]"
               >
-                {t.startTrial}
+                {hasUsedTrial ? t.becomeMember : t.startTrial}
               </button>
             </div>
 

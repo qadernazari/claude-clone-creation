@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { activateTrial } from "@/lib/trial.functions";
-import { useCurrentUserState } from "@/hooks/use-subscription";
+import { useCurrentUserState, useSubscription } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
 
 interface Props {
@@ -21,6 +21,7 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const { user, isLoading: isUserLoading } = useCurrentUserState();
+  const { hasUsedTrial, isMember } = useSubscription();
   const qc = useQueryClient();
   const activate = useServerFn(activateTrial);
   const [loading, setLoading] = useState(false);
@@ -58,6 +59,20 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
       >
         {text}
       </span>
+    );
+  }
+
+  // Trial is one-per-account. If already used (or already a member), swap the
+  // CTA to a Become a Member link so we never offer a second trial.
+  if (user && (hasUsedTrial || isMember)) {
+    if (isMember) return null;
+    return (
+      <Link
+        to="/account"
+        className={`${baseCls}${fullWidth ? " w-full justify-center" : ""}`}
+      >
+        {fa ? "عضو شوید" : "Become a Member"}
+      </Link>
     );
   }
 
