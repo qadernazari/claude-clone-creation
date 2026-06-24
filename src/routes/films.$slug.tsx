@@ -210,7 +210,7 @@ function FilmPage() {
   const { film } = Route.useLoaderData();
   const { locale, region, num, year, dir } = useLocale();
   const fa = locale === "fa";
-  const { isMember, isLoading: isAuthLoading, user } = useSubscription();
+  const { isMember, isLoading: isAuthLoading, user, hasUsedTrial } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [membershipOpen, setMembershipOpen] = useState(false);
   
