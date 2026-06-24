@@ -746,3 +746,13 @@ a.btn-seg-item,
 .btn-seg-item {
   border-radius: 4px !important;
 }
+
+/* Form controls share the same 6px radius as buttons so inputs/buttons align. */
+input[class*=rounded-]:not([type=checkbox]):not([type=radio]),
+textarea[class*=rounded-],
+select[class*=rounded-],
+[role=combobox][class*=rounded-],
+label[class*=rounded-]:has(> input),
+label[class*=rounded-]:has(> textarea) {
+  border-radius: 6px !important;
+}
