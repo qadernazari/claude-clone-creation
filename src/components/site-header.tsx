@@ -430,7 +430,7 @@ function MembershipCta() {
   return (
     <div className="hidden shrink-0 sm:block">
       <AcceptTrialButton
-        className="inline-flex h-9 items-center whitespace-nowrap rounded-md bg-cream px-4 text-[12px] font-semibold leading-none text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg disabled:opacity-70"
+        className="inline-flex h-10 items-center whitespace-nowrap rounded-md bg-cream px-5 text-[12px] font-bold uppercase tracking-[0.08em] leading-none text-ink shadow-sm transition-all duration-200 hover:bg-cream-bright active:scale-95 disabled:opacity-70"
         label={label}
       />
     </div>
