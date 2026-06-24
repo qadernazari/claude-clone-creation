@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { activateTrial } from "@/lib/trial.functions";
-import { useCurrentUserState } from "@/hooks/use-subscription";
+import { useCurrentUserState, useSubscription } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
 
 interface Props {
