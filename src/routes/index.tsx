@@ -1,12 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useLocale } from "../lib/i18n";
 import { FilmsRow } from "../components/films-row";
 import { FeaturedFilm } from "../components/featured-film";
 import { ContinueWatching } from "../components/continue-watching";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { useSubscription } from "@/hooks/use-subscription";
-import { AcceptTrialButton } from "@/components/accept-trial-button";
 import { homePageQueryOptions } from "@/lib/home.functions";
 
 function HomePendingShell() {
@@ -28,6 +25,9 @@ function HomePendingShell() {
   );
 }
 
+function SplitNotFoundComponent() {
+  return <HomeLoadFallback />;
+}
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(homePageQueryOptions),
@@ -100,7 +100,7 @@ export const Route = createFileRoute("/")({
     console.error("home route error:", error);
     return <HomeLoadFallback />;
   },
-  notFoundComponent: HomeLoadFallback,
+  notFoundComponent: SplitNotFoundComponent,
 });
 
 function HomeLoadFallback() {
