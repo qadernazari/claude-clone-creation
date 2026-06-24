@@ -967,19 +967,25 @@ function FilmPage() {
                 {fa ? "عضویت ایران" : "IRAN Membership"}
               </span>
               <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-                {fa ? "۷ روز رایگان امتحان کنید" : "Start with 7 days free"}
+                {hasUsedTrial
+                  ? (fa ? "عضویت خود را فعال کنید" : "Activate your membership")
+                  : (fa ? "۷ روز رایگان امتحان کنید" : "Start with 7 days free")}
               </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
-                {fa
-                  ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
-                  : "Unlimited access to the full catalog. Cancel anytime."}
+                {hasUsedTrial
+                  ? (fa
+                      ? "برای ادامه تماشای نامحدود، عضو شوید."
+                      : "Subscribe to keep unlimited access to the full catalog.")
+                  : (fa
+                      ? "تماشای نامحدود کل کاتالوگ. هر زمان لغو کنید."
+                      : "Unlimited access to the full catalog. Cancel anytime.")}
               </p>
               <button
                 type="button"
                 onClick={() => user ? setMembershipOpen(true) : (window.location.href = "/auth")}
                 className="mt-4 inline-flex items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink transition-transform hover:scale-[1.02]"
               >
-                {t.startTrial}
+                {hasUsedTrial ? t.becomeMember : t.startTrial}
               </button>
             </div>
 
