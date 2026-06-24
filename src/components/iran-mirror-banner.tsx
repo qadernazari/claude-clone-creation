@@ -56,13 +56,13 @@ export function IranMirrorBanner() {
         <div className="flex shrink-0 gap-2">
           <button
             onClick={dismiss}
-            className="rounded-full px-3 py-1.5 text-xs text-cream/70 hover:text-cream"
+            className="rounded-md px-3 py-1.5 text-xs text-cream/70 hover:text-cream"
           >
             {fa ? "بستن" : "Dismiss"}
           </button>
           <button
             onClick={goToMirror}
-            className="rounded-full bg-amber px-3 py-1.5 text-xs font-semibold text-bg-0 hover:bg-amber/90"
+            className="rounded-md bg-amber px-3 py-1.5 text-xs font-semibold text-bg-0 hover:bg-amber/90"
           >
             {fa ? "رفتن به نسخه ایران" : "Open Iran mirror"}
           </button>

@@ -169,7 +169,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         role="group"
         aria-label="Region"
         dir="ltr"
-        className={`hidden shrink-0 items-center gap-0.5 rounded-full border border-cream/15 bg-cream/6 p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap md:inline-flex ${
+        className={`hidden shrink-0 items-center gap-0.5 rounded-md border border-cream/15 bg-cream/6 p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap md:inline-flex ${
           lg ? "text-[11px]" : "text-[10px]"
         }`}
       >
@@ -202,7 +202,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
+        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
         style={{
           WebkitAppearance: "none",
           appearance: "none",
@@ -430,7 +430,7 @@ function MembershipCta() {
   return (
     <div className="hidden shrink-0 sm:block">
       <AcceptTrialButton
-        className="inline-flex h-9 items-center whitespace-nowrap rounded-full bg-cream px-4 text-[12px] font-semibold leading-none text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg disabled:opacity-70"
+        className="inline-flex h-9 items-center whitespace-nowrap rounded-md bg-cream px-4 text-[12px] font-semibold leading-none text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg disabled:opacity-70"
         label={label}
       />
     </div>

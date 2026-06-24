@@ -84,7 +84,7 @@ export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: I
         type="button"
         onClick={start}
         disabled={loading}
-        className="mt-6 w-full rounded-full bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-60"
+        className="mt-6 w-full rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-60"
       >
         {loading
           ? fa ? "در حال انتقال…" : "Redirecting…"
@@ -94,7 +94,7 @@ export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: I
       <button
         type="button"
         onClick={onClose}
-        className="mt-2 w-full rounded-full px-5 py-2 text-xs text-cream/60 hover:text-cream"
+        className="mt-2 w-full rounded-md px-5 py-2 text-xs text-cream/60 hover:text-cream"
       >
         {fa ? "انصراف" : "Cancel"}
       </button>

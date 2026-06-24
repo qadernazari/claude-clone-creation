@@ -83,7 +83,7 @@ function LibraryPage() {
           </p>
           {isMember && (
             <div
-              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.18em]"
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-md px-3 py-1 text-[11px] uppercase tracking-[0.18em]"
               style={{
                 border: "1px solid rgba(var(--rgb-amber), 0.30)",
                 background: "rgba(var(--rgb-amber), 0.10)",
@@ -114,7 +114,7 @@ function LibraryPage() {
               >
                 <span>{t.label}</span>
                 <span
-                  className="ml-2 rtl:ml-0 rtl:mr-2 rounded-full px-1.5 py-0.5 text-[10px] tabular-nums"
+                  className="ml-2 rtl:ml-0 rtl:mr-2 rounded-md px-1.5 py-0.5 text-[10px] tabular-nums"
                   style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
                 >
                   {num(t.count)}
@@ -210,7 +210,7 @@ function LibraryPage() {
                     <Link
                       to="/watch/$slug"
                       params={{ slug: r.film.slug }}
-                      className="rounded-full border border-cream/20 px-3 py-1.5 text-xs text-cream/80 hover:border-cream/40 hover:text-cream-bright"
+                      className="rounded-md border border-cream/20 px-3 py-1.5 text-xs text-cream/80 hover:border-cream/40 hover:text-cream-bright"
                     >
                       {r.completed ? (fa ? "تماشای دوباره" : "Rewatch") : (fa ? "ادامه" : "Resume")}
                     </Link>
@@ -276,7 +276,7 @@ function FilmCard({ film }: { film: LibraryFilm }) {
       <div className="relative">
         <PosterThumb film={film} />
         {film.is_premium && (
-          <span className="absolute left-2 top-2 inline-flex rounded-full bg-amber/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-bg-0">
+          <span className="absolute left-2 top-2 inline-flex rounded-md bg-amber/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-bg-0">
             {fa ? "ویژه" : "Premium"}
           </span>
         )}
@@ -426,7 +426,7 @@ function TicketRow({
         <Link
           to="/watch/$slug"
           params={{ slug: film.slug }}
-          className="rounded-full bg-amber px-4 py-2 text-xs font-medium text-bg-0 hover:bg-amber/90"
+          className="rounded-md bg-amber px-4 py-2 text-xs font-medium text-bg-0 hover:bg-amber/90"
         >
           {fa ? "تماشا" : "Watch"}
         </Link>
@@ -434,7 +434,7 @@ function TicketRow({
         <Link
           to="/films/$slug"
           params={{ slug: film.slug }}
-          className="rounded-full border border-cream/20 px-4 py-2 text-xs text-cream/80 hover:border-cream/40 hover:text-cream-bright"
+          className="rounded-md border border-cream/20 px-4 py-2 text-xs text-cream/80 hover:border-cream/40 hover:text-cream-bright"
         >
           {fa ? "خرید دوباره" : "Buy again"}
         </Link>
@@ -479,7 +479,7 @@ function Empty({ title, cta }: { title: string; cta?: string }) {
       {cta ? (
         <Link
           to="/browse"
-          className="mt-7 inline-flex min-h-11 items-center rounded-full bg-amber px-6 py-3 text-[13px] font-semibold text-bg-0 transition-all duration-300 hover:bg-amber/90 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(201,168,76,0.4)] active:scale-[0.98]"
+          className="mt-7 inline-flex min-h-11 items-center rounded-md bg-amber px-6 py-3 text-[13px] font-semibold text-bg-0 transition-all duration-300 hover:bg-amber/90 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(201,168,76,0.4)] active:scale-[0.98]"
         >
           {cta}
         </Link>

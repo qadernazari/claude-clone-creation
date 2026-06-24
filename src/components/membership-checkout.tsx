@@ -111,7 +111,7 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
               <div className="mt-6">
                 <AcceptTrialButton
                   fullWidth
-                  className="inline-flex items-center justify-center rounded-full bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
+                  className="inline-flex items-center justify-center rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
                   label={fa ? "پذیرش دوره آزمایشی رایگان" : "Accept Free Trial"}
                 />
                 <p className="mt-3 text-center text-xs text-cream/50">
@@ -136,7 +136,7 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
             <button
               type="button"
               onClick={() => setStarted(true)}
-              className={`mt-6 w-full rounded-full ${showTrialCta ? "border border-cream/25 px-5 py-3 text-sm text-cream hover:bg-cream/5" : "bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"}`}
+              className={`mt-6 w-full rounded-md ${showTrialCta ? "border border-cream/25 px-5 py-3 text-sm text-cream hover:bg-cream/5" : "bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"}`}
             >
               {showTrialCta
                 ? fa

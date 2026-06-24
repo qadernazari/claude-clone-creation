@@ -231,7 +231,7 @@ function StatusPill({ status }: { status: "active" | "expired" | "converted" }) 
         ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30"
         : "bg-muted text-muted-foreground border-border";
   return (
-    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize ${cls}`}>
+    <span className={`inline-flex rounded-md border px-2 py-0.5 text-[11px] font-medium capitalize ${cls}`}>
       {status}
     </span>
   );

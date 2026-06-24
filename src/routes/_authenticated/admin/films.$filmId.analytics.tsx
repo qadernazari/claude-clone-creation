@@ -351,7 +351,7 @@ function FilmAnalyticsPage() {
                   <tr key={`${t.kind}-${t.id}`}>
                     <td className="px-4 py-3">{t.who}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs rounded-full px-2 py-0.5 ${t.kind === "ticket" ? "bg-primary/15 text-primary" : "bg-rose-500/15 text-rose-400"}`}>
+                      <span className={`text-xs rounded-md px-2 py-0.5 ${t.kind === "ticket" ? "bg-primary/15 text-primary" : "bg-rose-500/15 text-rose-400"}`}>
                         {capitalize(t.kind)}
                       </span>
                     </td>
@@ -391,9 +391,9 @@ function FilmHero({ film }: { film: { title_en: string; title_fa: string | null;
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">{film.title_en}</h1>
           {film.title_fa && <p className="mt-1 text-sm text-muted-foreground" dir="rtl">{film.title_fa}</p>}
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-            <span className="rounded-full bg-muted px-2 py-0.5">{capitalize(film.access_type.replaceAll("_", " "))}</span>
-            {film.is_premium && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-primary">Premium</span>}
-            <span className="rounded-full bg-muted px-2 py-0.5">{film.duration_min ? `${film.duration_min} min` : "Duration not set"}</span>
+            <span className="rounded-md bg-muted px-2 py-0.5">{capitalize(film.access_type.replaceAll("_", " "))}</span>
+            {film.is_premium && <span className="rounded-md bg-primary/15 px-2 py-0.5 text-primary">Premium</span>}
+            <span className="rounded-md bg-muted px-2 py-0.5">{film.duration_min ? `${film.duration_min} min` : "Duration not set"}</span>
           </div>
         </div>
       </div>

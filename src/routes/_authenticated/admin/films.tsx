@@ -220,7 +220,7 @@ function FilmsAdminPage() {
                     <PricingCell film={f} />
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${
+                    <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${
                       f.visibility === "published" ? "bg-emerald-500/15 text-emerald-400" :
                       f.visibility === "unlisted" ? "bg-amber-500/15 text-amber-400" :
                       "bg-muted text-muted-foreground"
@@ -257,19 +257,19 @@ function FilmsAdminPage() {
       </div>
 
       {selected.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-2xl">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-md border border-border bg-background/95 backdrop-blur px-3 py-2 shadow-2xl">
           <span className="px-2 text-sm text-muted-foreground">{selected.size} selected</span>
           <div className="h-5 w-px bg-border" />
           <button type="button" onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "published" })}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent">
+            className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm hover:bg-accent">
             <Eye className="h-4 w-4" /> Publish
           </button>
           <button type="button" onClick={() => bulkVisibility.mutate({ ids: selectedIds, visibility: "draft" })}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm hover:bg-accent">
+            className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm hover:bg-accent">
             <EyeOff className="h-4 w-4" /> Unpublish
           </button>
           <TwoClickDelete onConfirm={() => bulkDelete.mutate(selectedIds)} label={`Delete ${selected.size}`} />
-          <button type="button" onClick={() => setSelected(new Set())} className="inline-flex items-center gap-1.5 rounded-full p-1.5 text-sm text-muted-foreground hover:bg-accent" aria-label="Clear">
+          <button type="button" onClick={() => setSelected(new Set())} className="inline-flex items-center gap-1.5 rounded-md p-1.5 text-sm text-muted-foreground hover:bg-accent" aria-label="Clear">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -319,14 +319,14 @@ function AssetBadge({ label, present, url, kind, icon }: {
 function PricingCell({ film }: { film: Film }) {
   const muted = "text-muted-foreground";
   if (film.access_type === "free") {
-    return <span className="inline-flex rounded-full px-2 py-0.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30">Free</span>;
+    return <span className="inline-flex rounded-md px-2 py-0.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30">Free</span>;
   }
   if (film.access_type === "membership") {
-    return <span className="inline-flex rounded-full px-2 py-0.5 bg-primary/10 text-primary ring-1 ring-primary/30">Included in Membership</span>;
+    return <span className="inline-flex rounded-md px-2 py-0.5 bg-primary/10 text-primary ring-1 ring-primary/30">Included in Membership</span>;
   }
   const hasPrice = (film.price_cents ?? 0) > 0 || (film.price_toman ?? 0) > 0;
   if (!hasPrice) {
-    return <span className={`inline-flex rounded-full px-2 py-0.5 bg-muted/40 ${muted} ring-1 ring-border`}>No Price Set</span>;
+    return <span className={`inline-flex rounded-md px-2 py-0.5 bg-muted/40 ${muted} ring-1 ring-border`}>No Price Set</span>;
   }
   const label = film.access_type === "membership_or_ppv" ? "Members or " : "";
   return (

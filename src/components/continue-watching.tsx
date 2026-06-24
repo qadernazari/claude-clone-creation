@@ -133,7 +133,7 @@ export function ContinueWatching() {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-0/80 via-bg-0/10 to-transparent" />
                 {/* Hover Resume pill — slides up from bottom on desktop hover */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-4 hidden justify-center md:flex">
-                  <span className="inline-flex translate-y-3 items-center gap-1.5 rounded-full bg-cream-bright px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink opacity-0 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  <span className="inline-flex translate-y-3 items-center gap-1.5 rounded-md bg-cream-bright px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink opacity-0 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7z" />
                     </svg>

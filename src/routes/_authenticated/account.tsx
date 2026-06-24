@@ -280,7 +280,7 @@ function AccountPage() {
             </label>
             <label className="block md:col-span-2">
               <span className="me-4 text-xs uppercase tracking-widest text-cream/55">{tr.regionLabel}</span>
-              <div className="mt-2 inline-flex w-full max-w-md items-center gap-1 rounded-full border border-cream/10 bg-bg-0 p-1">
+              <div className="mt-2 inline-flex w-full max-w-md items-center gap-1 rounded-md border border-cream/10 bg-bg-0 p-1">
                 {([
                   { key: "iran" as const, label: tr.insideIran },
                   { key: "global" as const, label: tr.outsideIran },
@@ -292,7 +292,7 @@ function AccountPage() {
                       type="button"
                       onClick={() => setRegion(opt.key)}
                       aria-pressed={active}
-                      className={`flex-1 rounded-full px-4 py-2 text-sm transition-all duration-300 ${
+                      className={`flex-1 rounded-md px-4 py-2 text-sm transition-all duration-300 ${
                         active ? "bg-cream text-ink" : "text-cream/65 hover:text-cream"
                       }`}
                     >
@@ -319,7 +319,7 @@ function AccountPage() {
               type="button"
               disabled={saveProfile.isPending}
               onClick={() => saveProfile.mutate({ full_name: name, locale })}
-              className="rounded-full bg-cream px-5 py-2 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
+              className="rounded-md bg-cream px-5 py-2 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
             >
               {saveProfile.isPending ? "…" : tr.save}
             </button>
@@ -377,7 +377,7 @@ function AccountPage() {
               <button
                 type="submit"
                 disabled={changePassword.isPending || !newPassword}
-                className="rounded-full bg-cream px-5 py-2 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
+                className="rounded-md bg-cream px-5 py-2 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
               >
                 {changePassword.isPending ? "…" : tr.update}
               </button>
@@ -412,7 +412,7 @@ function AccountPage() {
               <p className="text-cream/70 text-sm">{tr.none}</p>
               <Link
                 to="/"
-                className="mt-4 inline-block rounded-full bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+                className="mt-4 inline-block rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
               >
                 {tr.browse}
               </Link>
@@ -506,7 +506,7 @@ function AccountPage() {
           <button
             type="button"
             onClick={() => supabase.auth.signOut()}
-            className="rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/90 hover:bg-cream/10"
+            className="rounded-md border border-cream/20 px-4 py-2 text-sm text-cream/90 hover:bg-cream/10"
           >
             {tr.signOut}
           </button>
@@ -645,7 +645,7 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
           type="button"
           disabled={save.isPending}
           onClick={() => save.mutate()}
-          className="rounded-full bg-amber px-5 py-2 text-sm font-medium text-ink disabled:opacity-50"
+          className="rounded-md bg-amber px-5 py-2 text-sm font-medium text-ink disabled:opacity-50"
         >
           {save.isPending ? "…" : fa ? "ذخیره" : "Save"}
         </button>

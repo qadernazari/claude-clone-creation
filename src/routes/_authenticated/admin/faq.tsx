@@ -106,13 +106,13 @@ function FaqPage() {
         </div>
       </div>
 
-      <div className="inline-flex rounded-full bg-card/60 border border-border p-1 mb-4">
+      <div className="inline-flex rounded-md bg-card/60 border border-border p-1 mb-4">
         {(["en", "fa"] as const).map((l) => (
           <button
             key={l}
             type="button"
             onClick={() => setLang(l)}
-            className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+            className={`px-4 py-1.5 text-sm rounded-md transition-colors ${
               lang === l ? "bg-primary/90 text-primary-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >

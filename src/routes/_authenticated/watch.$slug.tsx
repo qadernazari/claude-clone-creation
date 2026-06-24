@@ -503,7 +503,7 @@ function WatchPage() {
           </Link>
           <div className="flex items-center gap-4">
             {countdown && (
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-cream/15 bg-cream/5 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-cream/15 bg-cream/5 px-3 py-1 text-[11px] uppercase tracking-widest text-cream/70">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse" />
                 {t.accessRemaining}: {num(countdown.h)}h {num(countdown.m)}m
               </span>
@@ -786,7 +786,7 @@ function WatchPage() {
                 </div>
               )}
               {hud && (
-                <div className="pointer-events-none absolute top-4 left-1/2 z-[7] -translate-x-1/2 rounded-full border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
+                <div className="pointer-events-none absolute top-4 left-1/2 z-[7] -translate-x-1/2 rounded-md border border-cream/15 bg-bg-0/85 backdrop-blur px-4 py-1.5 text-xs text-cream/90 shadow-lg animate-fade-in">
                   {hud}
                 </div>
               )}

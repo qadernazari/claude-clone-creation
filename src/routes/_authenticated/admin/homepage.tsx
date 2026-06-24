@@ -170,7 +170,7 @@ function SupportPaymentsPanel() {
         <div className="text-xs text-muted-foreground mb-3">Shown to visitors who chose “Global”.</div>
         <div className="flex flex-wrap gap-2">
           {value.intl.amounts.map((a, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm">
+            <span key={i} className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1 text-sm">
               ${a}
               <button type="button" onClick={() => setValue({ ...value, intl: { ...value.intl, amounts: value.intl.amounts.filter((_, j) => j !== i) } })}>
                 <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
@@ -193,7 +193,7 @@ function SupportPaymentsPanel() {
         <div className="text-xs text-muted-foreground mb-3">Shown to visitors who chose “Iran” — uses an Iranian gateway.</div>
         <div className="flex flex-wrap gap-2">
           {value.iran.amounts.map((a, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm">
+            <span key={i} className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1 text-sm">
               {a.toLocaleString()}
               <button type="button" onClick={() => setValue({ ...value, iran: { ...value.iran, amounts: value.iran.amounts.filter((_, j) => j !== i) } })}>
                 <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />

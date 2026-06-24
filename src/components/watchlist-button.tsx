@@ -81,7 +81,7 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
         disabled={pending}
         aria-label={label}
         title={label}
-        className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/20 bg-bg-0/60 text-cream/85 backdrop-blur hover:border-cream/40 hover:text-cream-bright transition-colors disabled:opacity-50 ${className}`}
+        className={`inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/20 bg-bg-0/60 text-cream/85 backdrop-blur hover:border-cream/40 hover:text-cream-bright transition-colors disabled:opacity-50 ${className}`}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill={added ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" aria-hidden>
           <path d="M5 3h14a1 1 0 0 1 1 1v17l-8-4.5L4 21V4a1 1 0 0 1 1-1z" />
@@ -96,7 +96,7 @@ export function WatchlistButton({ filmId, variant = "pill", className = "" }: Pr
       onClick={onClick}
       disabled={pending}
       style={{ backgroundColor: "rgba(255, 255, 255, 0.04)" }}
-      className={`inline-flex items-center gap-2 rounded-full border border-cream/20 px-4 py-2 text-sm text-cream/85 hover:border-cream/40 hover:text-cream-bright transition-colors disabled:opacity-50 ${className}`}
+      className={`inline-flex items-center gap-2 rounded-md border border-cream/20 px-4 py-2 text-sm text-cream/85 hover:border-cream/40 hover:text-cream-bright transition-colors disabled:opacity-50 ${className}`}
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill={added ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" aria-hidden>
         <path d="M5 3h14a1 1 0 0 1 1 1v17l-8-4.5L4 21V4a1 1 0 0 1 1-1z" />

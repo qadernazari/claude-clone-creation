@@ -36,7 +36,7 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
         </ul>
         <a
           href="/account"
-          className="mt-7 block w-full rounded-full bg-amber px-5 py-3 text-center text-sm font-medium text-bg-0 hover:bg-amber/90"
+          className="mt-7 block w-full rounded-md bg-amber px-5 py-3 text-center text-sm font-medium text-bg-0 hover:bg-amber/90"
         >
           {fa ? "ارتقا به عضویت" : "Upgrade to membership"}
         </a>

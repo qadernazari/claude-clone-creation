@@ -64,24 +64,24 @@ async function loadProfiles(): Promise<ProfileMap> {
 function StatusBadge({ status }: { status: string }) {
   if (status === "paid")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
+      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
         <CheckCircle2 className="h-3 w-3" /> Paid
       </span>
     );
   if (status === "pending")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-400">
+      <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-xs text-amber-400">
         <Clock className="h-3 w-3" /> Pending
       </span>
     );
   if (status === "refunded" || status === "failed")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-400">
+      <span className="inline-flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-xs text-red-400">
         <XCircle className="h-3 w-3" /> {status}
       </span>
     );
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+    <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
       <HeartHandshake className="h-3 w-3" /> {status}
     </span>
   );

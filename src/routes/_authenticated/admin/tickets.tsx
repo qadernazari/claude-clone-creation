@@ -150,24 +150,24 @@ function TicketsPage() {
   function StatusBadge({ status }: { status: string }) {
     if (status === "paid")
       return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
+        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
           <TicketCheck className="h-3 w-3" /> Paid
         </span>
       );
     if (status === "pending")
       return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-400">
+        <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-xs text-amber-400">
           <Clock className="h-3 w-3" /> Pending
         </span>
       );
     if (status === "refunded")
       return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-400">
+        <span className="inline-flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-xs text-red-400">
           <TicketX className="h-3 w-3" /> Refunded
         </span>
       );
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+      <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
         <Ticket className="h-3 w-3" /> {status}
       </span>
     );
