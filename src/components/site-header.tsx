@@ -169,7 +169,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         role="group"
         aria-label="Region"
         dir="ltr"
-        className={`hidden shrink-0 items-center gap-0.5 rounded-md border border-cream/15 bg-cream/6 p-0.5 font-medium tracking-[0.14em] uppercase whitespace-nowrap md:inline-flex ${
+        className={`hidden shrink-0 items-center gap-1 rounded-md border border-cream/10 bg-black/40 p-1 font-semibold tracking-[0.12em] uppercase whitespace-nowrap md:inline-flex ${
           lg ? "text-[11px]" : "text-[10px]"
         }`}
       >
@@ -177,9 +177,9 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("global")}
           aria-pressed={!isIran}
-          className={`rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-            lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
-          } ${!isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
+          className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+            lg ? "h-8 px-4" : "h-7 px-3"
+          } ${!isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
         >
           Global
         </button>
@@ -187,9 +187,9 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("iran")}
           aria-pressed={isIran}
-          className={`rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
-            lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
-          } ${isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
+          className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+            lg ? "h-8 px-4" : "h-7 px-3"
+          } ${isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
         >
           <span lang="fa" className="font-fa tracking-normal text-[12px] leading-none">ایران</span>
         </button>
@@ -387,7 +387,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
             >
               <svg
                 width="17"
@@ -424,13 +424,13 @@ function MembershipCta() {
   const label = locale === "fa" ? "شروع رایگان" : "Free Trial";
 
   if (isLoading || isMember) {
-    return <div className="hidden h-9 w-[110px] shrink-0 sm:block" aria-hidden />;
+    return <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />;
   }
 
   return (
     <div className="hidden shrink-0 sm:block">
       <AcceptTrialButton
-        className="inline-flex h-9 items-center whitespace-nowrap rounded-md bg-cream px-4 text-[12px] font-semibold leading-none text-ink transition-all duration-300 hover:bg-cream-bright hover:shadow-lg disabled:opacity-70"
+        className="inline-flex h-10 items-center whitespace-nowrap rounded-md bg-cream px-5 text-[12px] font-bold uppercase tracking-[0.08em] leading-none text-ink shadow-sm transition-all duration-200 hover:bg-cream-bright active:scale-95 disabled:opacity-70"
         label={label}
       />
     </div>

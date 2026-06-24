@@ -237,7 +237,7 @@ export function AuthMenu() {
 
   if (isUserLoading) {
     return (
-      <div className="flex w-[78px] justify-end" aria-hidden>
+      <div className="flex w-auto min-w-[78px] justify-end" aria-hidden>
         <span className="h-10 w-10 rounded-md bg-cream/10 opacity-0" />
       </div>
     );
@@ -245,18 +245,10 @@ export function AuthMenu() {
 
   if (!user) {
     return (
-      <div className="flex w-[78px] justify-end">
+      <div className="flex w-auto min-w-[78px] justify-end">
         <Link
           to="/auth"
-          className="mobile-signin-trigger inline-flex min-h-10 items-center justify-center rounded-md border border-cream/35 bg-cream/8 px-4 py-2 text-sm font-medium text-cream hover:bg-cream/15 hover:border-cream/50 transition-colors"
-          style={{
-            WebkitAppearance: "none",
-            appearance: "none",
-            background: "rgba(var(--rgb-bg-0), 0.76)",
-            borderColor: "rgba(var(--rgb-cream), 0.30)",
-            color: "rgb(var(--rgb-cream))",
-            boxShadow: "inset 0 1px 0 rgba(var(--rgb-cream), 0.08), 0 8px 22px -18px rgba(0, 0, 0, 0.85)",
-          }}
+          className="mobile-signin-trigger inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md border border-cream/20 bg-transparent px-5 text-sm font-medium text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
         >
           {fa ? "ورود" : "Sign in"}
         </Link>
@@ -276,11 +268,11 @@ export function AuthMenu() {
   };
 
   return (
-    <div className="relative flex w-[78px] justify-end" ref={containerRef}>
+    <div className="relative flex w-auto min-w-[78px] justify-end" ref={containerRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="group relative h-10 w-10 overflow-hidden rounded-md bg-gradient-to-br from-cream/20 to-cream/5 text-cream text-sm font-medium ring-1 ring-cream/10 transition-all hover:ring-cream/25 hover:from-cream/25"
+        className="group relative h-10 w-10 overflow-hidden rounded-md border border-cream/20 bg-transparent text-cream text-sm font-medium transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
         aria-label={fa ? "حساب کاربری" : "Account menu"}
         aria-haspopup="dialog"
         aria-expanded={open}
