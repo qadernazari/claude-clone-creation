@@ -84,7 +84,7 @@ export const verifyParentalPin = createServerFn({ method: "POST" })
     if (ok && /^[0-9]{4,6}$/.test(stored)) {
       await supabaseAdmin
         .from("parental_credentials" as never)
-        .update({ pin_hash: hashPin(data.pin) })
+        .update({ pin_hash: hashPin(data.pin) } as never)
         .eq("user_id", context.userId);
     }
     return { ok };
