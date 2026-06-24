@@ -237,7 +237,7 @@ export function AuthMenu() {
 
   if (isUserLoading) {
     return (
-      <div className="flex w-[78px] justify-end" aria-hidden>
+      <div className="flex w-auto min-w-[78px] justify-end" aria-hidden>
         <span className="h-10 w-10 rounded-md bg-cream/10 opacity-0" />
       </div>
     );
@@ -245,7 +245,7 @@ export function AuthMenu() {
 
   if (!user) {
     return (
-      <div className="flex w-[78px] justify-end">
+      <div className="flex w-auto min-w-[78px] justify-end">
         <Link
           to="/auth"
           className="mobile-signin-trigger inline-flex h-10 items-center justify-center rounded-md border border-cream/20 bg-transparent px-5 text-sm font-medium text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
@@ -268,7 +268,7 @@ export function AuthMenu() {
   };
 
   return (
-    <div className="relative flex w-[78px] justify-end" ref={containerRef}>
+    <div className="relative flex w-auto min-w-[78px] justify-end" ref={containerRef}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
