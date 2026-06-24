@@ -739,3 +739,10 @@ a[href][class*=rounded-][class*=border],
 [role=button][class*=rounded-] {
   border-radius: 6px !important;
 }
+
+/* Segmented toggle items nest inside a 6px container and use a tighter 4px radius. */
+button.btn-seg-item,
+a.btn-seg-item,
+.btn-seg-item {
+  border-radius: 4px !important;
+}
