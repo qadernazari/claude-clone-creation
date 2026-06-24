@@ -129,7 +129,7 @@ function HomeLoadFallback() {
             </p>
             <Link
               to="/browse"
-              className="mt-10 inline-flex items-center rounded-full bg-cream-bright px-8 py-3.5 text-sm font-semibold text-ink transition-all duration-300 hover:bg-cream"
+              className="mt-10 inline-flex items-center rounded-md bg-cream-bright px-8 py-3.5 text-sm font-semibold text-ink transition-all duration-300 hover:bg-cream"
             >
               Browse films
             </Link>

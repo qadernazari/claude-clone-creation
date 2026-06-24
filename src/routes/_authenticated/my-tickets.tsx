@@ -121,7 +121,7 @@ function MyTicketsPage() {
             <div className="mx-auto mt-5 h-px w-12 bg-amber/40" aria-hidden />
             <Link
               to="/"
-              className="mt-7 inline-flex min-h-11 items-center rounded-full bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
+              className="mt-7 inline-flex min-h-11 items-center rounded-md bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
             >
               {t.browse}
             </Link>
@@ -160,7 +160,7 @@ function MyTicketsPage() {
                       {title}
                     </div>
                     <div className="mt-1 text-xs text-cream/55 space-x-2 rtl:space-x-reverse">
-                      <span className="inline-block rounded-full bg-cream/10 px-2 py-0.5 uppercase tracking-wider">
+                      <span className="inline-block rounded-md bg-cream/10 px-2 py-0.5 uppercase tracking-wider">
                         {statusLabel(tk.status, tk.expires_at)}
                       </span>
                       <span className="tabular-nums">

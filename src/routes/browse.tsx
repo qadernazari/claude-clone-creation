@@ -175,7 +175,7 @@ function BrowsePage() {
                 placeholder={
                   locale === "fa" ? "جست‌وجو…" : "Search films…"
                 }
-                className="w-full rounded-full border border-cream/10 bg-bg-1/70 ps-10 pe-4 py-2 text-[13px] text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:ps-11 md:pe-5 md:py-2.5 md:text-sm"
+                className="w-full rounded-md border border-cream/10 bg-bg-1/70 ps-10 pe-4 py-2 text-[13px] text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:ps-11 md:pe-5 md:py-2.5 md:text-sm"
               />
             </div>
             {/* Compact filter button (mobile only) */}
@@ -204,7 +204,7 @@ function BrowsePage() {
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
               aria-label={locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
-              className="rounded-full border border-cream/10 bg-bg-1/70 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none"
+              className="rounded-md border border-cream/10 bg-bg-1/70 px-4 py-2 text-cream transition-colors hover:border-cream/25 focus:border-cream/30 focus:outline-none"
             >
               {sortOptions.map((o) => (
                 <option key={o.key} value={o.key}>
@@ -220,7 +220,7 @@ function BrowsePage() {
             <button
               type="button"
               onClick={() => setActive(null)}
-              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`shrink-0 rounded-md border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
                 active === null
                   ? "border-cream bg-cream text-ink"
                   : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
@@ -233,7 +233,7 @@ function BrowsePage() {
                 key={c.id}
                 type="button"
                 onClick={() => setActive(c.id)}
-                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
+                className={`shrink-0 rounded-md border px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] transition-all duration-300 ${
                   active === c.id
                     ? "border-cream bg-cream text-ink"
                     : "border-cream/15 text-cream/55 hover:border-cream/40 hover:text-cream"
@@ -345,7 +345,7 @@ function BrowsePage() {
                   setActive(null);
                   setQ("");
                 }}
-                className="mt-7 inline-flex min-h-11 items-center rounded-full border border-cream/25 px-6 py-3 text-[13px] font-medium text-cream/85 transition-all duration-300 hover:border-amber/50 hover:text-amber"
+                className="mt-7 inline-flex min-h-11 items-center rounded-md border border-cream/25 px-6 py-3 text-[13px] font-medium text-cream/85 transition-all duration-300 hover:border-amber/50 hover:text-amber"
               >
                 {locale === "fa" ? "پاک‌سازی فیلترها" : "Clear filters"}
               </button>

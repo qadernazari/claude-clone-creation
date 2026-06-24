@@ -248,7 +248,7 @@ export function AuthMenu() {
       <div className="flex w-[78px] justify-end">
         <Link
           to="/auth"
-          className="mobile-signin-trigger inline-flex min-h-10 items-center justify-center rounded-full border border-cream/35 bg-cream/8 px-4 py-2 text-sm font-medium text-cream hover:bg-cream/15 hover:border-cream/50 transition-colors"
+          className="mobile-signin-trigger inline-flex min-h-10 items-center justify-center rounded-md border border-cream/35 bg-cream/8 px-4 py-2 text-sm font-medium text-cream hover:bg-cream/15 hover:border-cream/50 transition-colors"
           style={{
             WebkitAppearance: "none",
             appearance: "none",

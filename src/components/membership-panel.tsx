@@ -98,14 +98,14 @@ export function MembershipPanel() {
         <div className="mt-5 flex flex-wrap gap-3">
           {!hasUsedTrial && (
             <AcceptTrialButton
-              className="inline-flex items-center rounded-full bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
+              className="inline-flex items-center rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
               label={t.start}
             />
           )}
           <button
             type="button"
             onClick={() => setCheckoutOpen(true)}
-            className="inline-flex items-center rounded-full border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
+            className="inline-flex items-center rounded-md border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
           >
             {fa ? "ارتقا به عضویت" : "Become a member"}
           </button>
@@ -132,7 +132,7 @@ export function MembershipPanel() {
             <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
               {t.title}
             </h2>
-            <span className="mt-2 inline-flex items-center rounded-full border border-amber/30 bg-amber/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-amber">
+            <span className="mt-2 inline-flex items-center rounded-md border border-amber/30 bg-amber/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-amber">
               {fa ? "دوره آزمایشی فعال" : "Free Trial Active"}
               {days !== null && days > 0 ? ` · ${t.daysLeft(days)}` : ""}
             </span>
@@ -140,7 +140,7 @@ export function MembershipPanel() {
           <button
             type="button"
             onClick={() => setCheckoutOpen(true)}
-            className="rounded-full bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+            className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
           >
             {fa ? "ارتقا به عضویت" : "Become a member"}
           </button>
@@ -206,7 +206,7 @@ export function MembershipPanel() {
             {t.title}
           </h2>
           <span
-            className={`mt-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] uppercase tracking-widest ${statusTone}`}
+            className={`mt-2 inline-flex items-center rounded-md border px-2.5 py-0.5 text-[11px] uppercase tracking-widest ${statusTone}`}
           >
             {statusLabel}
             {isTrial && trialDays !== null && trialDays > 0 ? ` · ${t.daysLeft(trialDays)}` : ""}
@@ -216,7 +216,7 @@ export function MembershipPanel() {
           type="button"
           onClick={handlePortal}
           disabled={loadingPortal}
-          className="rounded-full border border-cream/25 px-4 py-2 text-sm text-cream hover:bg-cream/5 disabled:opacity-60"
+          className="rounded-md border border-cream/25 px-4 py-2 text-sm text-cream hover:bg-cream/5 disabled:opacity-60"
         >
           {loadingPortal ? "…" : t.manage}
         </button>

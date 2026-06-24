@@ -171,7 +171,7 @@ function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-full bg-cream px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
+                className="w-full rounded-md bg-cream px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
               >
                 {loading ? "…" : tr.sendBtn}
               </button>
@@ -187,7 +187,7 @@ function ResetPasswordPage() {
               <button
                 type="button"
                 onClick={() => { setStage("request"); setError(null); }}
-                className="w-full rounded-full border border-cream/20 px-5 py-2.5 text-sm font-medium text-cream hover:bg-cream/5"
+                className="w-full rounded-md border border-cream/20 px-5 py-2.5 text-sm font-medium text-cream hover:bg-cream/5"
               >
                 {tr.resend}
               </button>
@@ -226,7 +226,7 @@ function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-full bg-cream px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
+                className="w-full rounded-md bg-cream px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream-bright disabled:opacity-60"
               >
                 {loading ? "…" : tr.submit}
               </button>
@@ -240,7 +240,7 @@ function ResetPasswordPage() {
               <button
                 type="button"
                 onClick={() => navigate({ to: "/account", replace: true })}
-                className="w-full rounded-full bg-cream px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream-bright"
+                className="w-full rounded-md bg-cream px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream-bright"
               >
                 {tr.continue}
               </button>

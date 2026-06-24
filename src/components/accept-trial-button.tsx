@@ -29,7 +29,7 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
   const text = label ?? (fa ? "پذیرش دوره آزمایشی رایگان" : "Accept Free Trial");
   const baseCls =
     className ??
-    "inline-flex items-center rounded-full bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-60";
+    "inline-flex items-center rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-60";
 
   const handleClick = async () => {
     setErr(null);

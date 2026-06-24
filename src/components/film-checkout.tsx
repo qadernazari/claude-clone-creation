@@ -95,7 +95,7 @@ export function FilmCheckout({ filmSlug, filmId, priceToman, returnUrl, onClose 
             <button
               type="button"
               onClick={() => setStarted(true)}
-              className="mt-6 w-full rounded-full bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"
+              className="mt-6 w-full rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"
             >
               {fa ? "ادامه به پرداخت" : "Continue to payment"}
             </button>

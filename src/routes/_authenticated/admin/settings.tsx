@@ -179,7 +179,7 @@ function ProviderBlock({
           <span className="font-medium">{name}</span>
           <span className="ml-2 text-xs text-muted-foreground">{region}</span>
         </div>
-        <span className={`text-xs rounded-full px-2 py-0.5 ${connected ? "bg-emerald-500/15 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+        <span className={`text-xs rounded-md px-2 py-0.5 ${connected ? "bg-emerald-500/15 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
           {connected ? "Identifier saved" : "Not connected"}
         </span>
       </div>

@@ -224,7 +224,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="rounded-full border border-cream/20 px-4 py-1.5 text-xs font-medium text-cream/80 hover:border-cream/40 hover:text-cream"
+                  className="rounded-md border border-cream/20 px-4 py-1.5 text-xs font-medium text-cream/80 hover:border-cream/40 hover:text-cream"
                 >
                   {fa ? "ویرایش" : "Edit"}
                 </button>
@@ -236,7 +236,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                     }
                   }}
                   disabled={remove.isPending}
-                  className="rounded-full border border-cream/10 px-4 py-1.5 text-xs font-medium text-cream/55 hover:border-rose-400/40 hover:text-rose-300 disabled:opacity-50"
+                  className="rounded-md border border-cream/10 px-4 py-1.5 text-xs font-medium text-cream/55 hover:border-rose-400/40 hover:text-rose-300 disabled:opacity-50"
                 >
                   {fa ? "حذف" : "Delete"}
                 </button>
@@ -279,7 +279,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                     <button
                       type="button"
                       onClick={() => setEditing(false)}
-                      className="rounded-full border border-cream/10 px-4 py-2 text-xs font-medium text-cream/55 hover:text-cream"
+                      className="rounded-md border border-cream/10 px-4 py-2 text-xs font-medium text-cream/55 hover:text-cream"
                     >
                       {fa ? "انصراف" : "Cancel"}
                     </button>
@@ -288,7 +288,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                     type="button"
                     disabled={rating === 0 || submit.isPending}
                     onClick={() => submit.mutate()}
-                    className="rounded-full bg-cream px-5 py-2 text-xs font-semibold text-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-md bg-cream px-5 py-2 text-xs font-semibold text-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {submit.isPending
                       ? fa

@@ -65,7 +65,7 @@ export function SeriesEpisodes({ seriesId }: { seriesId: string }) {
           <div
             role="tablist"
             aria-label={fa ? "انتخاب فصل" : "Select season"}
-            className="inline-flex items-center gap-1 rounded-full border border-cream/10 bg-bg-1/60 p-1 backdrop-blur"
+            className="inline-flex items-center gap-1 rounded-md border border-cream/10 bg-bg-1/60 p-1 backdrop-blur"
           >
             {seasons.map(([s]) => {
               const isActive = s === currentSeason;
@@ -75,7 +75,7 @@ export function SeriesEpisodes({ seriesId }: { seriesId: string }) {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveSeason(s)}
-                  className={`relative min-w-[68px] rounded-full px-4 py-1.5 text-[12px] font-medium uppercase tracking-[0.16em] transition-all duration-300 ${
+                  className={`relative min-w-[68px] rounded-md px-4 py-1.5 text-[12px] font-medium uppercase tracking-[0.16em] transition-all duration-300 ${
                     isActive
                       ? "bg-amber text-ink shadow-[0_4px_18px_-6px_rgba(201,168,76,0.55)]"
                       : "text-cream/55 hover:text-cream"
@@ -138,7 +138,7 @@ export function SeriesEpisodes({ seriesId }: { seriesId: string }) {
                       {t({ en: ep.title_en, fa: ep.title_fa || ep.title_en })}
                     </h4>
                     {isNextUp && (
-                      <span className="hidden shrink-0 rounded-full border border-amber/35 bg-amber/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-bright md:inline-block">
+                      <span className="hidden shrink-0 rounded-md border border-amber/35 bg-amber/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-bright md:inline-block">
                         {fa ? "بعدی" : "Next up"}
                       </span>
                     )}
