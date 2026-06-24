@@ -177,7 +177,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("global")}
           aria-pressed={!isIran}
-          className={`rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          className={`rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
             lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
           } ${!isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
         >
@@ -187,7 +187,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("iran")}
           aria-pressed={isIran}
-          className={`rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
+          className={`rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
             lg ? "min-h-9 px-3.5 py-1.5" : "px-2.5 py-1"
           } ${isIran ? "bg-cream text-ink" : "text-cream/75 hover:text-cream"}`}
         >
@@ -261,7 +261,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="region-sheet-close absolute end-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full"
+              className="region-sheet-close absolute end-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-md"
               aria-label={fa ? "بستن" : "Close"}
             >
               <RegionCloseIcon />
@@ -289,7 +289,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
                     dir={option.dir}
                     onClick={() => choose(option.key)}
                     aria-pressed={active}
-                    className={`region-card flex min-h-[92px] w-full items-center gap-4 rounded-2xl px-4 py-4 text-start transition-all duration-300 active:scale-[0.99] ${
+                    className={`region-card flex min-h-[92px] w-full items-center gap-4 rounded-md px-4 py-4 text-start transition-all duration-300 active:scale-[0.99] ${
                       active ? "region-card-active" : ""
                     }`}
                   >
@@ -387,7 +387,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-cream/65 transition-colors hover:bg-cream/5 hover:text-cream"
             >
               <svg
                 width="17"

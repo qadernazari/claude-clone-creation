@@ -78,7 +78,7 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
           type="button"
           onClick={onClose}
           aria-label="Close checkout"
-          className="absolute top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-bg-0/80 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 ltr:right-3 rtl:left-3"
+          className="absolute top-3 z-10 grid h-9 w-9 place-items-center rounded-md bg-bg-0/80 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 ltr:right-3 rtl:left-3"
         >
           ✕
         </button>

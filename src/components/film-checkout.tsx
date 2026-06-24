@@ -54,7 +54,7 @@ export function FilmCheckout({ filmSlug, filmId, priceToman, returnUrl, onClose 
           type="button"
           onClick={onClose}
           aria-label="Close checkout"
-          className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-bg-0 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 sm:-top-3 sm:-right-3 sm:h-9 sm:w-9"
+          className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-md bg-bg-0 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 sm:-top-3 sm:-right-3 sm:h-9 sm:w-9"
         >
           ✕
         </button>

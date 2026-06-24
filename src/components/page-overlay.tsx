@@ -138,7 +138,7 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
           type="button"
           onClick={onClose}
           aria-label={fa ? "بستن" : "Close"}
-          className="absolute top-4 end-4 z-10 h-9 w-9 inline-flex items-center justify-center rounded-full bg-bg-1/80 text-cream/70 hover:text-cream hover:bg-bg-1 transition-colors border border-line"
+          className="absolute top-4 end-4 z-10 h-9 w-9 inline-flex items-center justify-center rounded-md bg-bg-1/80 text-cream/70 hover:text-cream hover:bg-bg-1 transition-colors border border-line"
         >
           <X className="h-4 w-4" />
         </button>

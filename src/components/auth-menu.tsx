@@ -238,7 +238,7 @@ export function AuthMenu() {
   if (isUserLoading) {
     return (
       <div className="flex w-[78px] justify-end" aria-hidden>
-        <span className="h-10 w-10 rounded-full bg-cream/10 opacity-0" />
+        <span className="h-10 w-10 rounded-md bg-cream/10 opacity-0" />
       </div>
     );
   }
@@ -280,7 +280,7 @@ export function AuthMenu() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="group relative h-10 w-10 overflow-hidden rounded-full bg-gradient-to-br from-cream/20 to-cream/5 text-cream text-sm font-medium ring-1 ring-cream/10 transition-all hover:ring-cream/25 hover:from-cream/25"
+        className="group relative h-10 w-10 overflow-hidden rounded-md bg-gradient-to-br from-cream/20 to-cream/5 text-cream text-sm font-medium ring-1 ring-cream/10 transition-all hover:ring-cream/25 hover:from-cream/25"
         aria-label={fa ? "حساب کاربری" : "Account menu"}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -336,7 +336,7 @@ export function AuthMenu() {
               type="button"
               onPointerDown={(event) => event.stopPropagation()}
               onClick={closeSheet}
-              className="auth-menu-close absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-full md:hidden"
+              className="auth-menu-close absolute end-4 top-4 z-[3] inline-flex h-10 w-10 items-center justify-center rounded-md md:hidden"
               aria-label={fa ? "بستن" : "Close"}
             >
               <span aria-hidden>×</span>

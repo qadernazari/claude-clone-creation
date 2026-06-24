@@ -605,7 +605,7 @@ function WatchPage() {
                     to="/films/$slug"
                     params={{ slug: film.slug }}
                     aria-label={t.back}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/15 bg-black/30 text-cream/85 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-amber/50 hover:text-amber"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/15 bg-black/30 text-cream/85 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-amber/50 hover:text-amber"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={dir === "rtl" ? { transform: "scaleX(-1)" } : undefined}>
                       <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -629,7 +629,7 @@ function WatchPage() {
                     type="button"
                     onClick={togglePlay}
                     aria-label={fa ? "پخش" : "Play"}
-                    className="pointer-events-auto absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cream/20 bg-black/45 text-cream-bright backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-amber/60 hover:text-amber"
+                    className="pointer-events-auto absolute left-1/2 top-1/2 flex h-18 w-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md border border-cream/20 bg-black/45 text-cream-bright backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-amber/60 hover:text-amber"
                   >
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M8 5v14l11-7z" />
@@ -677,7 +677,7 @@ function WatchPage() {
                       type="button"
                       onClick={togglePlay}
                       aria-label={playing ? (fa ? "مکث" : "Pause") : (fa ? "پخش" : "Play")}
-                      className="flex h-9 w-9 items-center justify-center rounded-full text-cream-bright transition-all hover:scale-110 hover:text-amber"
+                      className="flex h-9 w-9 items-center justify-center rounded-md text-cream-bright transition-all hover:scale-110 hover:text-amber"
                     >
                       {playing ? (
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -694,7 +694,7 @@ function WatchPage() {
                       type="button"
                       onClick={toggleMute}
                       aria-label={muted ? (fa ? "صدادار" : "Unmute") : (fa ? "بی‌صدا" : "Mute")}
-                      className="hidden h-9 w-9 items-center justify-center rounded-full text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
+                      className="hidden h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
                     >
                       {muted ? (
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -721,7 +721,7 @@ function WatchPage() {
                       type="button"
                       onClick={toggleFullscreen}
                       aria-label={isFullscreen ? (fa ? "خروج از تمام‌صفحه" : "Exit fullscreen") : (fa ? "تمام‌صفحه" : "Fullscreen")}
-                      className="flex h-9 w-9 items-center justify-center rounded-full text-cream/85 transition-all hover:scale-110 hover:text-amber"
+                      className="flex h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber"
                     >
                       {isFullscreen ? (
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

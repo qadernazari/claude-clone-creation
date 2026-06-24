@@ -728,3 +728,14 @@ body[data-auth-sheet-open] .mobile-tab-bar { display: none !important; }
   .trailer-modal-fade,
   .trailer-modal-rise { animation: none; }
 }
+
+/* Platform button hardening: all interactive controls use the same compact radius. */
+button[class*=rounded-],
+a[href][class*=rounded-][class*=inline-flex],
+a[href][class*=rounded-][class*=items-center],
+a[href][class*=rounded-][class*=text-center],
+a[href][class*=rounded-][class*=bg-],
+a[href][class*=rounded-][class*=border],
+[role=button][class*=rounded-] {
+  border-radius: 6px !important;
+}
