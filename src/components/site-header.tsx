@@ -424,7 +424,7 @@ function MembershipCta() {
   const label = locale === "fa" ? "شروع رایگان" : "Free Trial";
 
   if (isLoading || isMember) {
-    return <div className="hidden h-9 w-[110px] shrink-0 sm:block" aria-hidden />;
+    return <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />;
   }
 
   return (
