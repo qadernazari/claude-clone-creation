@@ -17,7 +17,7 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full text-cream/70 hover:text-cream-bright"
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-md text-cream/70 hover:text-cream-bright"
         >
           ✕
         </button>

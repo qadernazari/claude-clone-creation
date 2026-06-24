@@ -289,7 +289,7 @@ function AuthPage() {
             type="button"
             onClick={backFromVerify}
             aria-label={t.back}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/10 text-cream/70 transition-colors hover:bg-cream/5 active:scale-95"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/10 text-cream/70 transition-colors hover:bg-cream/5 active:scale-95"
           >
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
@@ -297,7 +297,7 @@ function AuthPage() {
           <Link
             to="/"
             aria-label={t.back}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream/10 text-cream/70 transition-colors hover:bg-cream/5 active:scale-95"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/10 text-cream/70 transition-colors hover:bg-cream/5 active:scale-95"
           >
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </Link>
@@ -373,7 +373,7 @@ function AuthPage() {
                             type="button"
                             onClick={() => setShowPw((v) => !v)}
                             aria-label={showPw ? "Hide password" : "Show password"}
-                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/40 hover:text-cream/80 transition-colors"
+                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 hover:text-cream/80 transition-colors"
                           >
                             {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -400,7 +400,7 @@ function AuthPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 w-full h-12 inline-flex items-center justify-center gap-2 rounded-full bg-cream text-ink text-[14px] font-semibold tracking-wide transition-all hover:bg-cream-bright active:scale-[0.98] disabled:opacity-70"
+                  className="mt-2 w-full h-11 inline-flex items-center justify-center gap-2 rounded-md bg-cream text-ink text-[14px] font-semibold tracking-wide transition-all hover:bg-cream-bright active:scale-[0.98] disabled:opacity-70"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                   <span>
@@ -615,7 +615,7 @@ function VerifyView({
           type="button"
           onClick={onResend}
           disabled={resendCooldown > 0 || resending}
-          className="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full border border-cream/12 text-cream/85 text-[13px] font-medium transition-all hover:bg-cream/5 active:scale-[0.98] disabled:opacity-50"
+          className="w-full h-11 inline-flex items-center justify-center gap-2 rounded-md border border-cream/12 text-cream/85 text-[13px] font-medium transition-all hover:bg-cream/5 active:scale-[0.98] disabled:opacity-50"
         >
           {resending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -636,7 +636,7 @@ function VerifyView({
         <button
           type="button"
           onClick={onChangeEmail}
-          className="w-full h-10 inline-flex items-center justify-center rounded-full text-[12.5px] text-cream/55 hover:text-cream transition-colors"
+          className="w-full h-10 inline-flex items-center justify-center rounded-md text-[12.5px] text-cream/55 hover:text-cream transition-colors"
         >
           {t.changeEmail}
         </button>

@@ -711,7 +711,7 @@ function FilmPage() {
                 <Link
                   to="/auth"
                   search={{ redirect: `/watch/${film.slug}` }}
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -722,7 +722,7 @@ function FilmPage() {
                 <Link
                   to="/watch/$slug"
                   params={{ slug: film.slug }}
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -736,7 +736,7 @@ function FilmPage() {
                   type="button"
                   onClick={() => setCheckoutOpen(true)}
                   disabled={tomanOnly}
-                  className="inline-flex items-center justify-center rounded-md bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
                 >
                   {t.buy} — {priceLabel}
                 </button>
@@ -745,7 +745,7 @@ function FilmPage() {
                   type="button"
                   onClick={() => setCheckoutOpen(true)}
                   disabled={tomanOnly}
-                  className="inline-flex items-center justify-center rounded-md bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
                 >
                   {t.buy} — {priceLabel}
                 </button>
@@ -753,7 +753,7 @@ function FilmPage() {
                 <button
                   type="button"
                   onClick={() => setMembershipOpen(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-cream-bright px-6 py-3 text-sm font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -768,7 +768,7 @@ function FilmPage() {
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-md border border-cream/20 bg-black/30 px-5 py-3 text-sm font-medium text-cream backdrop-blur-sm transition-colors hover:bg-cream/10"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-md border border-cream/20 bg-black/30 px-5 py-2.5 text-[13px] font-medium text-cream backdrop-blur-sm transition-colors hover:bg-cream/10"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -780,7 +780,7 @@ function FilmPage() {
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center justify-center rounded-md border border-cream/15 bg-black/30 p-3 text-cream/80 backdrop-blur-sm transition-colors hover:bg-cream/10 hover:text-cream-bright"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-cream/15 bg-black/30 text-cream/80 backdrop-blur-sm transition-colors hover:bg-cream/10 hover:text-cream-bright"
                 aria-label={t.share}
                 title={copied ? t.copied : t.share}
               >
@@ -1050,7 +1050,7 @@ function FilmPage() {
           <button
             type="button"
             onClick={() => setPreviewOpen(false)}
-            className={`absolute top-5 flex h-10 w-10 items-center justify-center rounded-full border border-cream/15 bg-black/40 text-cream/75 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-amber/40 hover:text-amber ${dir === "rtl" ? "left-5" : "right-5"}`}
+            className={`absolute top-5 flex h-10 w-10 items-center justify-center rounded-md border border-cream/15 bg-black/40 text-cream/75 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-amber/40 hover:text-amber ${dir === "rtl" ? "left-5" : "right-5"}`}
             aria-label={fa ? "بستن" : "Close"}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -1089,14 +1089,14 @@ function FilmPage() {
         style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
         aria-hidden={inPageCtaVisible}
       >
-        <div className="pointer-events-auto mx-3 mb-2 rounded-2xl border border-cream/10 bg-bg-0/90 px-3 py-2.5 backdrop-blur-xl shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.6)]">
+        <div className="pointer-events-auto mx-3 mb-2 rounded-md border border-cream/10 bg-bg-0/90 px-3 py-2.5 backdrop-blur-xl shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.6)]">
           {isAuthLoading ? (
-            <div className="h-11 w-full rounded-full bg-cream/10" aria-busy="true" />
+            <div className="h-11 w-full rounded-md bg-cream/10" aria-busy="true" />
           ) : !user ? (
             <Link
               to="/auth"
               search={{ redirect: `/watch/${film.slug}` }}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
               {accessType === "ppv_only" ? t.signinToBuy : t.signinToWatch}
@@ -1105,7 +1105,7 @@ function FilmPage() {
             <Link
               to="/watch/$slug"
               params={{ slug: film.slug }}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
               {resumeSec > 0 ? `${fa ? "ادامه از " : "Continue · "}${fmtResume(resumeSec)}` : t.watch}
@@ -1115,7 +1115,7 @@ function FilmPage() {
               type="button"
               onClick={() => setCheckoutOpen(true)}
               disabled={tomanOnly}
-              className="flex h-11 w-full items-center justify-center rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
+              className="flex h-11 w-full items-center justify-center rounded-md bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform disabled:opacity-60"
             >
               {t.buy} — {priceLabel}
             </button>
@@ -1123,7 +1123,7 @@ function FilmPage() {
             <button
               type="button"
               onClick={() => setMembershipOpen(true)}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-cream-bright text-sm font-semibold text-ink active:scale-[0.98] transition-transform"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg>
               {t.startTrial}

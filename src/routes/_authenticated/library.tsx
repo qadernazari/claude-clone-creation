@@ -330,7 +330,7 @@ function WatchlistCard({ film }: { film: LibraryFilm }) {
         disabled={pending}
         aria-label={fa ? "حذف از فهرست" : "Remove from watchlist"}
         title={fa ? "حذف از فهرست" : "Remove from watchlist"}
-        className="absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full bg-bg-0/80 text-cream/70 border border-cream/15 backdrop-blur opacity-0 group-hover:opacity-100 hover:text-cream-bright hover:border-cream/40 transition-all disabled:opacity-50"
+        className="absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-md bg-bg-0/80 text-cream/70 border border-cream/15 backdrop-blur opacity-0 group-hover:opacity-100 hover:text-cream-bright hover:border-cream/40 transition-all disabled:opacity-50"
       >
         <X className="h-3.5 w-3.5" />
       </button>

@@ -728,3 +728,16 @@ body[data-auth-sheet-open] .mobile-tab-bar { display: none !important; }
   .trailer-modal-fade,
   .trailer-modal-rise { animation: none; }
 }
+
+/* Platform button hardening: no interactive pill buttons. */
+button[class*="rounded-full"],
+a[href][class*="rounded-full"],
+[role="button"][class*="rounded-full"] {
+  border-radius: var(--radius-md) !important;
+}
+
+button[class*="rounded-2xl"],
+a[href][class*="rounded-2xl"],
+[role="button"][class*="rounded-2xl"] {
+  border-radius: var(--radius-md) !important;
+}

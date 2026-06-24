@@ -183,7 +183,7 @@ function BrowsePage() {
               type="button"
               onClick={() => setSortSheetOpen(true)}
               aria-label={locale === "fa" ? "مرتب‌سازی" : "Sort"}
-              className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cream/15 bg-bg-1/70 text-cream/70 transition-colors active:scale-95 active:bg-bg-1 md:hidden"
+              className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cream/15 bg-bg-1/70 text-cream/70 transition-colors active:scale-95 active:bg-bg-1 md:hidden"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M3 6h18" />
@@ -283,7 +283,7 @@ function BrowsePage() {
                           setSort(o.key);
                           setSortSheetOpen(false);
                         }}
-                        className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[15px] transition-colors active:bg-cream/6 ${
+                        className={`flex w-full items-center justify-between rounded-md px-4 py-3.5 text-left text-[15px] transition-colors active:bg-cream/6 ${
                           selected ? "text-cream-bright" : "text-cream/80"
                         }`}
                       >
@@ -302,7 +302,7 @@ function BrowsePage() {
                 <button
                   type="button"
                   onClick={() => setSortSheetOpen(false)}
-                  className="h-11 w-full rounded-full border border-cream/15 text-[13px] font-medium text-cream/80 transition-colors active:bg-cream/6"
+                  className="h-11 w-full rounded-md border border-cream/15 text-[13px] font-medium text-cream/80 transition-colors active:bg-cream/6"
                 >
                   {locale === "fa" ? "بستن" : "Close"}
                 </button>
