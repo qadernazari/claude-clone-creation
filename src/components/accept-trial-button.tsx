@@ -21,6 +21,7 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const { user, isLoading: isUserLoading } = useCurrentUserState();
+  const { hasUsedTrial, isMember } = useSubscription();
   const qc = useQueryClient();
   const activate = useServerFn(activateTrial);
   const [loading, setLoading] = useState(false);
