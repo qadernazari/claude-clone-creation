@@ -40,7 +40,6 @@ export function MobileTabBar() {
   const isLibrary =
     path.startsWith("/library") || path.startsWith("/my-tickets");
   const isAccount = path.startsWith("/account") || path === "/auth";
-  const isMembership = path.startsWith("/membership");
   const showLibrary = !!user;
 
   return (
