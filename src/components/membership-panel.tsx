@@ -148,14 +148,6 @@ export function MembershipPanel() {
             <dd className="mt-1 text-cream-bright">{fmtDate(trial.ends_at, fa)}</dd>
           </div>
         </dl>
-        {checkoutOpen && (
-          <Suspense fallback={null}>
-            <MembershipCheckout
-              returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
-              onClose={() => setCheckoutOpen(false)}
-            />
-          </Suspense>
-        )}
       </section>
     );
   }
