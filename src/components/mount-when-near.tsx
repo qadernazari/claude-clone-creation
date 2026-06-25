@@ -35,14 +35,11 @@ export function MountWhenNear({
     window.addEventListener("pointerdown", arm, opts);
     window.addEventListener("touchstart", arm, opts);
     window.addEventListener("keydown", arm, opts);
-    // Safety fallback: arm after 4s so SEO crawlers / no-scroll users still see content.
-    const t = window.setTimeout(arm, 4000);
     return () => {
       window.removeEventListener("scroll", arm);
       window.removeEventListener("pointerdown", arm);
       window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
-      window.clearTimeout(t);
     };
   }, [armed]);
 
