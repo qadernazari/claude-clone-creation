@@ -39,26 +39,9 @@ function isActiveTrial(t: TrialRow | null | undefined): boolean {
 }
 
 export function useCurrentUserState() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setUser(data.session?.user ?? null);
-      setIsLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
-      setUser(s?.user ?? null);
-      setIsLoading(false);
-    });
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-  return { user, isLoading };
+  return useAuthState();
 }
+
 
 export function useCurrentUser() {
   const { user } = useCurrentUserState();
