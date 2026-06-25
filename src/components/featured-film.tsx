@@ -1,52 +1,20 @@
-import { useEffect, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
 type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
   const { locale, num, year, t } = useLocale();
-  const user = useCurrentUser();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
-  const mobileImageForState = data?.mobile_cover_url || data?.cover_url || data?.thumbnail_url || "";
-  const [mobileHeroReady, setMobileHeroReady] = useState(!mobileImageForState);
-
-  useEffect(() => {
-    if (!mobileImageForState) {
-      setMobileHeroReady(true);
-      return;
-    }
-
-    let cancelled = false;
-    const img = new Image();
-    const markReady = () => {
-      if (!cancelled) setMobileHeroReady(true);
-    };
-
-    setMobileHeroReady(false);
-    img.decoding = "async";
-    img.src = mobileImageForState;
-
-    if (img.complete && img.naturalWidth > 0) {
-      markReady();
-    } else {
-      img.onload = markReady;
-      img.onerror = markReady;
-      img.decode?.().then(markReady).catch(() => undefined);
-    }
-
-    return () => {
-      cancelled = true;
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [mobileImageForState]);
 
   if (!data) return <FeaturedFilmFallback />;
+
+
 
   const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
   const director = t({
