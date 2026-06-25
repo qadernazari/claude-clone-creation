@@ -138,9 +138,10 @@ function MembershipPage() {
         </section>
 
         <section className="mx-auto mt-12 max-w-2xl">
-          <h3 className={`text-sm uppercase tracking-[0.18em] text-cream/55 ${fa ? "font-vazir" : ""}`}>
+          <h2 className={`text-sm uppercase tracking-[0.18em] text-cream/55 ${fa ? "font-vazir" : ""}`}>
             {fa ? "شامل همه پلن‌ها" : "Included with every plan"}
-          </h3>
+          </h2>
+
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {benefits.map((b) => (
               <li key={b} className="flex items-start gap-2 text-sm text-cream/80">
