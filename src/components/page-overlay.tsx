@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { X, User, Ticket, CreditCard, LifeBuoy, Newspaper } from "lucide-react";
 import { loadCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, type PagesContent, type FaqContent, type PageCard } from "@/lib/cms";
@@ -27,9 +27,19 @@ function ICON({ name, className }: { name: string; className?: string }) {
 
 export function PageOverlayProvider({ children }: { children: ReactNode }) {
   const [slug, setSlug] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const openPage = useCallback((s: string) => setSlug(s), []);
+  const openPage = useCallback((s: string) => {
+    // Warm the CMS cache the moment the user intends to open a page,
+    // so the sheet never flashes a "not found" fallback while loading.
+    queryClient.prefetchQuery({
+      queryKey: ["site_content", CMS_KEYS.PAGES],
+      queryFn: () => loadCmsKey<PagesContent>(CMS_KEYS.PAGES),
+    });
+    setSlug(s);
+  }, [queryClient]);
   const closePage = useCallback(() => setSlug(null), []);
+
 
   // Allow opening via URL hash (#page=about) for shareability
   useEffect(() => {
@@ -107,15 +117,16 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
   const fa = locale === "fa";
   const dir = fa ? "rtl" : "ltr";
 
-  const { data: pages } = useQuery({
+  const { data: pages, isFetched: pagesFetched } = useQuery({
     queryKey: ["site_content", CMS_KEYS.PAGES],
     queryFn: () => loadCmsKey<PagesContent>(CMS_KEYS.PAGES),
   });
-  const { data: faq } = useQuery({
+  const { data: faq, isFetched: faqFetched } = useQuery({
     queryKey: ["site_content", CMS_KEYS.FAQ],
     queryFn: () => loadCmsKey<FaqContent>(CMS_KEYS.FAQ),
     enabled: slug === "faq",
   });
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -163,12 +174,25 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
         </button>
 
         <div className="overflow-y-auto" onClick={onBodyClick}>
-          {!entry && slug !== "faq" && (
+          {(!pagesFetched || (slug === "faq" && !faqFetched)) && (
+            <div className="px-6 py-14 md:px-12 md:py-20 animate-pulse" aria-hidden>
+              <div className="h-3 w-24 rounded bg-cream/10" />
+              <div className="mt-6 h-8 w-2/3 rounded bg-cream/10" />
+              <div className="mt-10 space-y-3">
+                <div className="h-3 w-full rounded bg-cream/5" />
+                <div className="h-3 w-11/12 rounded bg-cream/5" />
+                <div className="h-3 w-10/12 rounded bg-cream/5" />
+                <div className="h-3 w-9/12 rounded bg-cream/5" />
+              </div>
+            </div>
+          )}
+          {pagesFetched && !entry && slug !== "faq" && (
             <div className="p-16 text-center text-cream/50">
               {fa ? "صفحه پیدا نشد" : "Page not found"}
             </div>
           )}
-          {(entry || slug === "faq") && (
+
+          {((entry && pagesFetched) || (slug === "faq" && faqFetched)) && (
             <article className={`px-6 py-14 md:px-12 md:py-20 ${fa ? "font-fa" : ""}`}>
               {entry?.[fa ? "fa" : "en"].kicker && (
                 <p className="mb-4 text-[11px] uppercase tracking-[0.32em] text-amber">
