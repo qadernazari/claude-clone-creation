@@ -232,8 +232,13 @@ export function FeaturedFilm() {
  */
 function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
   const ready = useDeferredMount();
+  if (!ready) return null;
+  return <WatchlistCtaReady slug={slug} locale={locale} />;
+}
+
+function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
   const user = useCurrentUser();
-  if (!ready || !user) return null;
+  if (!user) return null;
   return (
     <Link
       to="/films/$slug"
