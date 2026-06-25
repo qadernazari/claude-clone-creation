@@ -237,9 +237,8 @@
     background-color: var(--bg-1);
   }
 
-  /* Soft fade-in for chrome that mounts after idle (tab bar, mirror banner)
-     so they don't pop into existence after first paint. */
-  .mobile-tab-bar,
+  /* Soft fade-in only for chrome that truly mounts after idle. The mobile tab
+     bar is SSR-visible critical chrome, so it must not animate in late. */
   .iran-mirror-banner {
     animation: chromeFadeIn 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
