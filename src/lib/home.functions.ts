@@ -9,6 +9,13 @@ function parseSignedObjectUrl(u: string | null | undefined) {
   return m ? { bucket: m[1], path: decodeURIComponent(m[2]) } : null;
 }
 
+// Cross-request in-memory cache for resized signed URLs. A signed URL with a
+// 1-year expiry is safe to memoize for the lifetime of the worker instance —
+// repeat SSR calls then skip the expensive `storage.createSignedUrl` round
+// trip entirely. Cap to keep memory bounded.
+const GLOBAL_URL_CACHE = new Map<string, string>();
+const GLOBAL_URL_CACHE_MAX = 2000;
+
 function makeRenderCache() {
   return new Map<string, Promise<string | null>>();
 }
@@ -25,6 +32,8 @@ async function renderResizedUrl(
   const parsed = parseSignedObjectUrl(original);
   if (!parsed) return original;
   const key = `${parsed.bucket}|${parsed.path}|${width}|${quality}`;
+  const cached = GLOBAL_URL_CACHE.get(key);
+  if (cached) return cached;
   const existing = cache.get(key);
   if (existing) return existing;
   const promise = (async () => {
@@ -35,7 +44,13 @@ async function renderResizedUrl(
           transform: { width, quality, resize: "contain" as const },
         });
       if (error || !data?.signedUrl) return original;
-      return data.signedUrl as string;
+      const url = data.signedUrl as string;
+      if (GLOBAL_URL_CACHE.size >= GLOBAL_URL_CACHE_MAX) {
+        const firstKey = GLOBAL_URL_CACHE.keys().next().value;
+        if (firstKey) GLOBAL_URL_CACHE.delete(firstKey);
+      }
+      GLOBAL_URL_CACHE.set(key, url);
+      return url;
     } catch {
       return original;
     }
@@ -43,10 +58,6 @@ async function renderResizedUrl(
   cache.set(key, promise);
   return promise;
 }
-
-
-
-
 
 export type HomeFeaturedFilm = {
   id: string;
@@ -92,6 +103,13 @@ export type HomeCategory = {
   sort_order: number | null;
 };
 
+export type HomeRailsData = {
+  films: HomeRailFilm[];
+  categories: HomeCategory[];
+};
+
+// Legacy combined type — kept so existing imports keep typechecking. Callers
+// should migrate to the split queries below.
 export type HomePageData = {
   featured: HomeFeaturedFilm | null;
   films: HomeRailFilm[];
@@ -100,24 +118,50 @@ export type HomePageData = {
 
 type RawFilm = Record<string, unknown>;
 
-export const getHomePageData = createServerFn({ method: "GET" }).handler(
-  async (): Promise<HomePageData> => {
+/**
+ * SSR-critical: just the featured (hero) film. Tiny query, single row.
+ * Loader awaits this so first byte already contains the LCP image URL.
+ */
+export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
+  async (): Promise<HomeFeaturedFilm | null> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const res = await supabaseAdmin
+      .from("films")
+      .select(
+        "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
+      )
+      .eq("visibility", "published")
+      .neq("film_type", "episode")
+      .order("sort_order", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (res.error) throw new Error(res.error.message);
+    const featuredRaw = res.data as RawFilm | null;
+    if (!featuredRaw) return null;
+    const cache = makeRenderCache();
+    const [cover, thumbnail, mobile] = await Promise.all([
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 68),
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1600, 70),
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 62),
+    ]);
+    return {
+      ...featuredRaw,
+      cover_url: cover,
+      thumbnail_url: thumbnail,
+      mobile_cover_url: mobile,
+    } as HomeFeaturedFilm;
+  },
+);
 
-
-
-
-    const [featuredRes, filmsRes, categoriesRes] = await Promise.all([
-      supabaseAdmin
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
-        )
-        .eq("visibility", "published")
-        .neq("film_type", "episode")
-        .order("sort_order", { ascending: true })
-        .limit(1)
-        .maybeSingle(),
+/**
+ * Below-the-fold: rails (films + categories). Fetched client-side only
+ * when the user scrolls (DeferredHomeRails mounts the consumer). Kept
+ * off the SSR critical path so TTFB stays minimal.
+ */
+export const getHomeRails = createServerFn({ method: "GET" }).handler(
+  async (): Promise<HomeRailsData> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [filmsRes, categoriesRes] = await Promise.all([
       supabaseAdmin
         .from("films")
         .select(
@@ -132,47 +176,49 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
         .select("id, name_en, name_fa, sort_order")
         .order("sort_order", { ascending: true }),
     ]);
-
-    if (featuredRes.error) throw new Error(featuredRes.error.message);
     if (filmsRes.error) throw new Error(filmsRes.error.message);
     if (categoriesRes.error) throw new Error(categoriesRes.error.message);
 
     const cache = makeRenderCache();
-    const featuredRaw = featuredRes.data as RawFilm | null;
     const filmsRaw = (filmsRes.data as RawFilm[] | null) ?? [];
-
-    const featured = featuredRaw
-      ? await (async () => {
-          const [cover, thumbnail, mobile] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 68),
-            renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1600, 70),
-            renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 62),
-          ]);
-          return { ...featuredRaw, cover_url: cover, thumbnail_url: thumbnail, mobile_cover_url: mobile } as HomeFeaturedFilm;
-        })()
-      : null;
-
     const films = await Promise.all(
       filmsRaw.map(async (f) => {
         const [cover, thumbnail] = await Promise.all([
-          renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 720, 68),
-          renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 800, 68),
+          renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 520, 62),
+          renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 520, 62),
         ]);
         return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
       }),
     );
-
     return {
-      featured,
       films,
       categories: (categoriesRes.data as HomeCategory[] | null) ?? [],
     };
   },
 );
 
+export const homeFeaturedQueryOptions = queryOptions({
+  queryKey: ["home", "featured"],
+  queryFn: () => getHomeFeatured(),
+  staleTime: 5 * 60_000,
+  gcTime: 30 * 60_000,
+});
+
+export const homeRailsQueryOptions = queryOptions({
+  queryKey: ["home", "rails"],
+  queryFn: () => getHomeRails(),
+  staleTime: 5 * 60_000,
+  gcTime: 30 * 60_000,
+});
+
+// Back-compat: combined query used by callers that still expect the old
+// shape. Internally just composes the two split queries.
 export const homePageQueryOptions = queryOptions({
   queryKey: ["home", "page-data"],
-  queryFn: () => getHomePageData(),
+  queryFn: async (): Promise<HomePageData> => {
+    const [featured, rails] = await Promise.all([getHomeFeatured(), getHomeRails()]);
+    return { featured, films: rails.films, categories: rails.categories };
+  },
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,
 });
