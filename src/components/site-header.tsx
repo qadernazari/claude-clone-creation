@@ -432,7 +432,7 @@ function MembershipCta() {
     return (
       <div className="hidden shrink-0 sm:block">
         <a
-          href="/account"
+          href="/membership"
           className="inline-flex h-10 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase tracking-[0.08em] leading-none text-ink shadow-sm transition-all duration-200 hover:bg-amber/90 active:scale-95"
         >
           {label}
