@@ -45,25 +45,21 @@ export function FeaturedFilm() {
       <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
         {hasAnyImage ? (
           <>
-            <div
-              className="hero-mobile-poster absolute inset-x-0 bottom-0 top-0 bg-cover bg-top md:hidden"
-              style={{
-                backgroundImage: safeMobileImage
-                  ? `linear-gradient(180deg, rgba(13,13,13,0.08) 0%, rgba(13,13,13,0.36) 72%, var(--bg-0) 100%), url(\"${safeMobileImage}\")`
-                  : fallbackBg,
-              }}
-              aria-hidden
-            />
-            {/* Mobile: dedicated 9:16 vertical poster. Image is preloaded
-                via <link rel="preload"> on the route head; no JS-driven
-                fade/skeleton — avoids a post-paint re-render. */}
+            {/*
+              Hero images. IMPORTANT: do NOT set fetchPriority="high" on
+              these <img> tags. React 19 hoists every high-priority img
+              src into an unconditional ReactDOM.preload() in <head>,
+              ignoring media queries / Tailwind responsive classes — which
+              caused mobile to also download the 1920w desktop thumbnail.
+              The correct preload (with `media`) is emitted by the route
+              `head()` in src/routes/index.tsx.
+            */}
             {mobileImage ? (
               <img
                 src={mobileImage}
                 alt=""
                 className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 w-full object-cover object-top md:hidden"
                 loading="eager"
-                fetchPriority="high"
                 decoding="async"
                 sizes="100vw"
                 aria-hidden
@@ -79,7 +75,6 @@ export function FeaturedFilm() {
                   alt=""
                   className="cine-img absolute inset-0 hidden h-full w-full scale-[1.03] object-cover object-center md:block"
                   loading="eager"
-                  fetchPriority="high"
                   decoding="async"
                   aria-hidden
                 />
@@ -99,7 +94,6 @@ export function FeaturedFilm() {
                     alt={title}
                     className="absolute inset-0 h-full w-full object-contain object-center"
                     loading="eager"
-                    fetchPriority="high"
                     decoding="async"
                   />
                 </div>
