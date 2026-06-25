@@ -78,6 +78,8 @@ export function MobileTabBar() {
     path.startsWith("/checkout") ||
     path.startsWith("/admin");
 
+  useVisualViewportChromeOffset();
+
   if (hidden) return null;
 
   const isHome = path === "/";
@@ -86,6 +88,18 @@ export function MobileTabBar() {
     path.startsWith("/library") || path.startsWith("/my-tickets");
   const isAccount = path.startsWith("/account") || path === "/auth";
   const showLibrary = !!user;
+
+  return (
+    <nav
+      aria-label={fa ? "ناوبری" : "Primary"}
+      dir={fa ? "rtl" : "ltr"}
+      className="mobile-tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        transform: "translateY(calc(-1 * var(--vv-chrome-bottom, 0px)))",
+        willChange: "transform",
+      }}
+    >
 
   return (
     <nav
