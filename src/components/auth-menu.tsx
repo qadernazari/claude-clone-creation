@@ -4,15 +4,13 @@ import { Link } from "@tanstack/react-router";
 import {
   User as UserIcon,
   Library,
-  Bookmark,
-  PlayCircle,
-  CreditCard,
   Ticket,
   Globe2,
   Shield,
   LogOut,
   ChevronRight,
 } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState, useSubscription } from "@/hooks/use-subscription";
