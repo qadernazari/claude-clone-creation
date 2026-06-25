@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
+import { useAuthState } from "@/lib/auth-context";
 
 /**
  * Native-app-style bottom tab bar for mobile.
@@ -22,6 +23,7 @@ export function MobileTabBar() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const location = useLocation();
+  const { user } = useAuthState();
 
   const path = location.pathname;
   const hidden =
@@ -38,6 +40,8 @@ export function MobileTabBar() {
   const isLibrary =
     path.startsWith("/library") || path.startsWith("/my-tickets");
   const isAccount = path.startsWith("/account") || path === "/auth";
+  const isMembership = path.startsWith("/membership");
+  const showLibrary = !!user;
 
   return (
     <nav
@@ -73,17 +77,30 @@ export function MobileTabBar() {
             </svg>
           }
         />
-        <TabItem
-          to="/library"
-          label={fa ? "کتابخانه" : "Library"}
-          active={isLibrary}
-          icon={
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M5 4h3l1 2h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
-              <path d="M9 12h8" />
-            </svg>
-          }
-        />
+        {showLibrary ? (
+          <TabItem
+            to="/library"
+            label={fa ? "کتابخانه" : "Library"}
+            active={isLibrary}
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M5 4h3l1 2h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+                <path d="M9 12h8" />
+              </svg>
+            }
+          />
+        ) : (
+          <TabItem
+            to="/membership"
+            label={fa ? "عضویت" : "Membership"}
+            active={isMembership}
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8L3.5 9.2l5.9-.9L12 3z" />
+              </svg>
+            }
+          />
+        )}
         <TabItem
           to="/account"
           label={fa ? "حساب" : "Account"}
