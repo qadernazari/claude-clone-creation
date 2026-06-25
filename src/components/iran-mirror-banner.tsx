@@ -42,7 +42,7 @@ export function IranMirrorBanner() {
       dir={fa ? "rtl" : "ltr"}
       role="region"
       aria-label={fa ? "نسخه ایران" : "Iran version"}
-      className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-2xl rounded-2xl border border-amber/30 bg-bg-1/95 px-4 py-3 shadow-2xl backdrop-blur-md md:bottom-4 md:px-5 md:py-4"
+      className="iran-mirror-banner fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-2xl rounded-2xl border border-amber/30 bg-bg-1/95 px-4 py-3 shadow-2xl backdrop-blur-md md:bottom-4 md:px-5 md:py-4"
     >
       <div className="flex items-start gap-3 md:items-center">
         <div className="flex-1 text-sm leading-relaxed text-cream/90">
