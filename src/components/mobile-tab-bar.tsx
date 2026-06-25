@@ -1,6 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
-import { useCurrentUserState } from "@/hooks/use-subscription";
 
 /**
  * Native-app-style bottom tab bar for mobile.
@@ -23,7 +22,6 @@ export function MobileTabBar() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const location = useLocation();
-  const { user } = useCurrentUserState();
 
   const path = location.pathname;
   const hidden =
@@ -76,7 +74,7 @@ export function MobileTabBar() {
           }
         />
         <TabItem
-          to={user ? "/library" : "/auth"}
+          to="/library"
           label={fa ? "کتابخانه" : "Library"}
           active={isLibrary}
           icon={
@@ -87,7 +85,7 @@ export function MobileTabBar() {
           }
         />
         <TabItem
-          to={user ? "/account" : "/auth"}
+          to="/account"
           label={fa ? "حساب" : "Account"}
           active={isAccount}
           icon={
