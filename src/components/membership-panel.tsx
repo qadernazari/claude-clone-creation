@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
 import { createMembershipPortalSession } from "@/lib/membership.functions";
-import { getStripeEnvironment } from "@/lib/stripe";
+import { getStripeEnvironment } from "@/lib/stripe-env";
 import { AcceptTrialButton } from "@/components/accept-trial-button";
 
 function fmtDate(iso: string | null, fa: boolean) {
