@@ -176,7 +176,7 @@ function Home() {
         <FeaturedFilm />
 
         {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-        <MountWhenNear rootMargin="300px" minHeight={240} armOnInteraction={false} scrollArmThreshold={240}>
+        <MountWhenNear rootMargin="300px" minHeight={240} armOnViewportScroll={false}>
           <Suspense fallback={null}>
             <div className="pt-10 md:pt-14">
               <ContinueWatching />
@@ -185,7 +185,7 @@ function Home() {
         </MountWhenNear>
 
         {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
-        <MountWhenNear rootMargin="300px" minHeight={400} armOnInteraction={false} scrollArmThreshold={420}>
+        <MountWhenNear rootMargin="300px" minHeight={400} armOnViewportScroll={false}>
           <Suspense fallback={null}>
             <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
               <FilmsRow />
