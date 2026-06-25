@@ -1,6 +1,51 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import { useAuthState } from "@/lib/auth-context";
+
+/**
+ * Keep the tab bar pinned to the *visual* viewport bottom on iOS Safari.
+ *
+ * With `viewport-fit=cover`, `position: fixed; bottom: 0` anchors to the
+ * LAYOUT viewport — the area behind Safari's bottom toolbar on first paint.
+ * That makes the bar (and the body's bottom padding) visibly "slide down"
+ * the moment the user scrolls and Safari's chrome collapses.
+ *
+ * We compute the chrome offset = `window.innerHeight - visualViewport.height
+ * - visualViewport.offsetTop` and expose it as `--vv-chrome-bottom` on
+ * <html>. The tab bar and body padding read that variable and lift the bar
+ * above the chrome from the first frame.
+ *
+ * Crucially we only listen to `visualViewport.resize` — NOT `scroll` —
+ * because resize fires once when Safari shows/hides chrome, while scroll
+ * fires every frame and caused the jitter the previous attempt hit.
+ */
+function useVisualViewportChromeOffset() {
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const root = document.documentElement;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const gap = Math.max(
+        0,
+        window.innerHeight - vv.height - vv.offsetTop,
+      );
+      root.style.setProperty("--vv-chrome-bottom", `${Math.round(gap)}px`);
+    };
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(update);
+    };
+    update();
+    vv.addEventListener("resize", schedule);
+    return () => {
+      vv.removeEventListener("resize", schedule);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
+}
 
 /**
  * Native-app-style bottom tab bar for mobile.
@@ -33,6 +78,8 @@ export function MobileTabBar() {
     path.startsWith("/checkout") ||
     path.startsWith("/admin");
 
+  useVisualViewportChromeOffset();
+
   if (hidden) return null;
 
   const isHome = path === "/";
@@ -49,6 +96,8 @@ export function MobileTabBar() {
       className="mobile-tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
       style={{
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        transform: "translateY(calc(-1 * var(--vv-chrome-bottom, 0px)))",
+        willChange: "transform",
       }}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-1.5">

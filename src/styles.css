@@ -513,8 +513,13 @@ body {
   /* Reserve space for the mobile bottom tab bar so content never sits behind it.
      Hidden routes (watch/auth/checkout/admin) get html[data-tabbar="hidden"]
      set by the inline boot script in __root.tsx BEFORE first paint, so the
-     reservation never flips after hydration. */
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+     reservation never flips after hydration.
+
+     `--vv-chrome-bottom` is set by MobileTabBar from visualViewport.resize
+     and reflects iOS Safari's bottom chrome height. Adding it here keeps
+     the page bottom clear of the chrome so footer + tab bar never appear
+     "attached" or shift up/down when Safari shows/hides its toolbar. */
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + var(--vv-chrome-bottom, 0px));
 }
 html[data-tabbar="hidden"] body {
   padding-bottom: 0;
