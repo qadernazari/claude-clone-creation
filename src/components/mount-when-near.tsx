@@ -13,10 +13,16 @@ export function MountWhenNear({
   children,
   rootMargin = "200px",
   minHeight,
+  armOnInteraction = true,
+  armOnViewportScroll = true,
+  scrollArmThreshold = 20,
 }: {
   children: ReactNode;
   rootMargin?: string;
   minHeight?: number | string;
+  armOnInteraction?: boolean;
+  armOnViewportScroll?: boolean;
+  scrollArmThreshold?: number;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [show, setShow] = useState(false);
@@ -26,25 +32,27 @@ export function MountWhenNear({
   useEffect(() => {
     if (armed) return;
     const arm = () => setArmed(true);
-    if (window.scrollY > 20) {
+    const armFromScroll = () => {
+      if (window.scrollY > scrollArmThreshold) setArmed(true);
+    };
+    if (armOnViewportScroll && window.scrollY > scrollArmThreshold) {
       setArmed(true);
       return;
     }
     const opts = { passive: true, once: true } as AddEventListenerOptions;
-    window.addEventListener("scroll", arm, opts);
-    window.addEventListener("pointerdown", arm, opts);
-    window.addEventListener("touchstart", arm, opts);
-    window.addEventListener("keydown", arm, opts);
-    // Safety fallback: arm after 4s so SEO crawlers / no-scroll users still see content.
-    const t = window.setTimeout(arm, 4000);
+    if (armOnViewportScroll) window.addEventListener("scroll", armFromScroll, opts);
+    if (armOnInteraction) {
+      window.addEventListener("pointerdown", arm, opts);
+      window.addEventListener("touchstart", arm, opts);
+      window.addEventListener("keydown", arm, opts);
+    }
     return () => {
-      window.removeEventListener("scroll", arm);
+      window.removeEventListener("scroll", armFromScroll);
       window.removeEventListener("pointerdown", arm);
       window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
-      window.clearTimeout(t);
     };
-  }, [armed]);
+  }, [armed, armOnInteraction, armOnViewportScroll, scrollArmThreshold]);
 
   useEffect(() => {
     if (show || !armed) return;

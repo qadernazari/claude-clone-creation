@@ -240,6 +240,11 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
+              // iPhone Safari exposes a smaller visual viewport while the
+              // bottom URL bar is visible. Set the offset in the head script
+              // before first paint so the tab bar never spends a frame glued
+              // to the layout viewport and then jumps after React hydrates.
+              `try{var vv=window.visualViewport;var r=document.documentElement;var u=function(){if(!vv)return;var g=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);r.style.setProperty('--vv-chrome-bottom',Math.round(g)+'px');};u();if(vv){vv.addEventListener('resize',function(){requestAnimationFrame(u);},{passive:true});}}catch(e){}` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
               // Inject the webfont stylesheet asynchronously so it never
               // blocks first paint. display=optional means the browser
