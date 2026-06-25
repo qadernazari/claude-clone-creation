@@ -27,9 +27,19 @@ function ICON({ name, className }: { name: string; className?: string }) {
 
 export function PageOverlayProvider({ children }: { children: ReactNode }) {
   const [slug, setSlug] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const openPage = useCallback((s: string) => setSlug(s), []);
+  const openPage = useCallback((s: string) => {
+    // Warm the CMS cache the moment the user intends to open a page,
+    // so the sheet never flashes a "not found" fallback while loading.
+    queryClient.prefetchQuery({
+      queryKey: ["site_content", CMS_KEYS.PAGES],
+      queryFn: () => loadCmsKey<PagesContent>(CMS_KEYS.PAGES),
+    });
+    setSlug(s);
+  }, [queryClient]);
   const closePage = useCallback(() => setSlug(null), []);
+
 
   // Allow opening via URL hash (#page=about) for shareability
   useEffect(() => {
