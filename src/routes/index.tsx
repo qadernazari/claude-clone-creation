@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { homePageQueryOptions } from "@/lib/home.functions";
+import { homeFeaturedQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
 // approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
@@ -93,7 +93,7 @@ function SplitNotFoundComponent() {
 }
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(homePageQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(homeFeaturedQueryOptions),
   head: ({ loaderData }) => ({
     meta: [
       { title: "ir.show — Home of Iranian cinema" },
