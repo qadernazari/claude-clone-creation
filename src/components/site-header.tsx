@@ -415,7 +415,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             </Link>
             <RegionToggle />
             <MembershipCta />
-            <AuthMenu />
+            <Suspense fallback={<AuthMenuFallback />}>
+              <AuthMenu />
+            </Suspense>
+
           </div>
 
         </div>
