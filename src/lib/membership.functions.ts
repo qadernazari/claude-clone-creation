@@ -10,8 +10,9 @@ import {
 type CheckoutResult = { clientSecret: string } | { error: string };
 type PortalResult = { url: string } | { error: string };
 
-const MEMBERSHIP_PRICE_LOOKUP_KEY = "membership_monthly";
-const TRIAL_DAYS = 7;
+import { MEMBERSHIP_PLANS, getPlan, type MembershipPlanId } from "@/lib/membership-plans";
+
+const PLAN_IDS = MEMBERSHIP_PLANS.map((p) => p.id) as [MembershipPlanId, ...MembershipPlanId[]];
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
@@ -47,10 +48,11 @@ async function resolveOrCreateCustomer(
 
 export const createMembershipCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl: string; environment: StripeEnv; couponCode?: string }) =>
+  .inputValidator((data: { returnUrl: string; environment: StripeEnv; plan: MembershipPlanId; couponCode?: string }) =>
     z.object({
       returnUrl: z.string().url(),
       environment: z.enum(["sandbox", "live"]),
+      plan: z.enum(PLAN_IDS),
       couponCode: z.string().min(1).max(64).optional(),
     }).parse(data),
   )
@@ -60,10 +62,11 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
       const email = (claims as { email?: string })?.email;
 
       const stripe = createStripeClient(data.environment);
+      const plan = getPlan(data.plan);
 
       // Resolve the membership price by lookup_key (stable across envs).
       const prices = await stripe.prices.list({
-        lookup_keys: [MEMBERSHIP_PRICE_LOOKUP_KEY],
+        lookup_keys: [plan.stripeLookupKey],
         active: true,
         limit: 1,
       });
@@ -95,20 +98,22 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
 
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: price.id, quantity: 1 }],
-        mode: "subscription",
+        mode: "payment",
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         customer: customerId,
         ...(resolvedCoupon && {
           discounts: [{ coupon: resolvedCoupon.stripeCouponId }],
         }),
-        subscription_data: {
-          trial_period_days: TRIAL_DAYS,
-          metadata: { userId },
+        payment_intent_data: {
+          description: `IRAN Membership · ${plan.months} ${plan.months === 1 ? "Month" : "Months"}`,
+          metadata: { userId, kind: "membership_bundle", bundle_months: String(plan.months), plan_id: plan.id },
         },
         metadata: {
           userId,
-          kind: "membership",
+          kind: "membership_bundle",
+          bundle_months: String(plan.months),
+          plan_id: plan.id,
           ...(resolvedCoupon && { coupon_id: resolvedCoupon.couponId }),
         },
       });
