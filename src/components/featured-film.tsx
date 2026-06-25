@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
@@ -11,6 +12,32 @@ export function FeaturedFilm() {
   const { locale, num, year, t } = useLocale();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
+  // Desktop hero = 16:9 cinematic art (thumbnail_url) with cover_url as fallback.
+  // Mobile hero = dedicated 9:16 portrait art (mobile_cover_url). When no mobile
+  // art exists, fall back to the portrait cover_url; only as a last resort use the
+  // landscape thumbnail (which will look cropped on a phone).
+  const desktopImage = data ? data.thumbnail_url || data.cover_url : null;
+  const mobileImage = data ? data.mobile_cover_url || data.cover_url || data.thumbnail_url : null;
+  const mobileImageRef = useRef<HTMLImageElement | null>(null);
+  const desktopImageRef = useRef<HTMLImageElement | null>(null);
+  const [mobileImageReady, setMobileImageReady] = useState(false);
+  const [desktopImageReady, setDesktopImageReady] = useState(false);
+
+  useEffect(() => {
+    setMobileImageReady(false);
+    const img = mobileImageRef.current;
+    if (img?.complete && img.naturalWidth > 0) {
+      requestAnimationFrame(() => setMobileImageReady(true));
+    }
+  }, [mobileImage]);
+
+  useEffect(() => {
+    setDesktopImageReady(false);
+    const img = desktopImageRef.current;
+    if (img?.complete && img.naturalWidth > 0) {
+      requestAnimationFrame(() => setDesktopImageReady(true));
+    }
+  }, [desktopImage]);
 
   if (!data) return <FeaturedFilmFallback />;
 
@@ -25,12 +52,6 @@ export function FeaturedFilm() {
     en: data.synopsis_en || "",
     fa: data.synopsis_fa || data.synopsis_en || "",
   });
-  // Desktop hero = 16:9 cinematic art (thumbnail_url) with cover_url as fallback.
-  // Mobile hero = dedicated 9:16 portrait art (mobile_cover_url). When no mobile
-  // art exists, fall back to the portrait cover_url; only as a last resort use the
-  // landscape thumbnail (which will look cropped on a phone).
-  const desktopImage = data.thumbnail_url || data.cover_url;
-  const mobileImage = data.mobile_cover_url || data.cover_url || data.thumbnail_url;
   const hasAnyImage = !!(desktopImage || mobileImage);
   const isDesktopLandscape = !!data.thumbnail_url;
   const fallbackBg =
@@ -64,15 +85,18 @@ export function FeaturedFilm() {
             */}
             {mobileImage ? (
               <img
+                ref={mobileImageRef}
                 src={mobileImage}
                 alt=""
                 width={720}
                 height={1280}
-                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 h-full w-full object-cover object-top md:hidden"
+                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 h-full w-full object-cover object-top opacity-0 transition-opacity duration-700 ease-out md:hidden"
+                style={{ opacity: mobileImageReady ? 1 : 0 }}
                 loading="eager"
                 decoding="async"
                 sizes="100vw"
                 aria-hidden
+                onLoad={() => setMobileImageReady(true)}
               />
             ) : null}
 
@@ -87,14 +111,17 @@ export function FeaturedFilm() {
             {desktopImage ? (
               isDesktopLandscape ? (
                 <img
+                  ref={desktopImageRef}
                   src={desktopImage}
                   alt=""
                   width={1600}
                   height={900}
-                  className="cine-img absolute inset-0 hidden h-full w-full scale-[1.03] object-cover object-center md:block"
+                  className="cine-img absolute inset-0 hidden h-full w-full scale-[1.03] object-cover object-center opacity-0 transition-opacity duration-700 ease-out md:block"
+                  style={{ opacity: desktopImageReady ? 1 : 0 }}
                   loading="lazy"
                   decoding="async"
                   aria-hidden
+                  onLoad={() => setDesktopImageReady(true)}
                 />
               ) : (
                 <div className="absolute inset-0 hidden md:block">
@@ -108,13 +135,16 @@ export function FeaturedFilm() {
                     aria-hidden
                   />
                   <img
+                    ref={desktopImageRef}
                     src={desktopImage}
                     alt={title}
                     width={1200}
                     height={1600}
-                    className="absolute inset-0 h-full w-full object-contain object-center"
+                    className="absolute inset-0 h-full w-full object-contain object-center opacity-0 transition-opacity duration-700 ease-out"
+                    style={{ opacity: desktopImageReady ? 1 : 0 }}
                     loading="lazy"
                     decoding="async"
+                    onLoad={() => setDesktopImageReady(true)}
                   />
                 </div>
               )
@@ -202,8 +232,13 @@ export function FeaturedFilm() {
  */
 function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
   const ready = useDeferredMount();
+  if (!ready) return null;
+  return <WatchlistCtaReady slug={slug} locale={locale} />;
+}
+
+function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
   const user = useCurrentUser();
-  if (!ready || !user) return null;
+  if (!user) return null;
   return (
     <Link
       to="/films/$slug"

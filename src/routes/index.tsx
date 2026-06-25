@@ -62,10 +62,24 @@ function HomePendingShell() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(13,13,13,0.12) 0%, rgba(13,13,13,0.48) 70%, var(--bg-0) 100%)",
+              "linear-gradient(180deg, rgba(13,13,13,0.18) 0%, rgba(13,13,13,0.38) 58%, var(--bg-0) 100%)",
           }}
           aria-hidden
         />
+        <div className="relative z-10 flex h-full items-end">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-6 md:px-12 md:pb-20">
+            <div className="hero-pending-copy max-w-2xl" aria-hidden>
+              <div className="h-3 w-28 rounded-full bg-amber/35" />
+              <div className="mt-5 h-12 w-[min(78vw,24rem)] rounded-md bg-cream/12 md:h-20 md:w-[32rem]" />
+              <div className="mt-4 flex items-center gap-2.5">
+                <div className="h-2 w-20 rounded-full bg-cream/12" />
+                <div className="h-2 w-10 rounded-full bg-cream/10" />
+                <div className="h-2 w-12 rounded-full bg-cream/10" />
+              </div>
+              <div className="mt-7 h-11 w-36 rounded-md bg-cream-bright/90" />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
