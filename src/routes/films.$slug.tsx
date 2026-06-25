@@ -470,7 +470,8 @@ function FilmPage() {
 
 
   return (
-    <div dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
+    <main dir={dir} className="min-h-screen overflow-x-hidden bg-background text-foreground pb-20 md:pb-0">
+
       <div
         className={`transition-opacity duration-300 ${stickyHeader ? "pointer-events-none opacity-0" : "opacity-100"}`}
         aria-hidden={stickyHeader}
@@ -1133,6 +1134,7 @@ function FilmPage() {
           )}
         </div>
       </div>
-    </div>
+    </main>
+
   );
 }
