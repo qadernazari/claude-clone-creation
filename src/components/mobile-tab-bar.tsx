@@ -23,7 +23,7 @@ export function MobileTabBar() {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const location = useLocation();
-  const { user, isLoading } = useAuthState();
+  const { user } = useAuthState();
 
   const path = location.pathname;
   const hidden =
