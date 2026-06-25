@@ -182,7 +182,7 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
             </div>
           )}
 
-          {(entry || slug === "faq") && (
+          {((entry && pagesFetched) || (slug === "faq" && faqFetched)) && (
             <article className={`px-6 py-14 md:px-12 md:py-20 ${fa ? "font-fa" : ""}`}>
               {entry?.[fa ? "fa" : "en"].kicker && (
                 <p className="mb-4 text-[11px] uppercase tracking-[0.32em] text-amber">
