@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense } from "react";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
+import { MountWhenNear } from "../components/mount-when-near";
 import { homePageQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
