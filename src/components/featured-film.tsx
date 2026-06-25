@@ -54,13 +54,9 @@ export function FeaturedFilm() {
               }}
               aria-hidden
             />
-            <div
-              className={`hero-mobile-skeleton absolute inset-x-0 bottom-0 top-0 md:hidden ${
-                mobileHeroReady ? "opacity-0" : "opacity-100"
-              }`}
-              aria-hidden
-            />
-            {/* Mobile: dedicated 9:16 vertical poster */}
+            {/* Mobile: dedicated 9:16 vertical poster. Image is preloaded
+                via <link rel="preload"> on the route head; no JS-driven
+                fade/skeleton — avoids a post-paint re-render. */}
             {mobileImage ? (
               <img
                 src={mobileImage}
@@ -70,11 +66,10 @@ export function FeaturedFilm() {
                 fetchPriority="high"
                 decoding="async"
                 sizes="100vw"
-                onLoad={() => setMobileHeroReady(true)}
-                onError={() => setMobileHeroReady(true)}
                 aria-hidden
               />
             ) : null}
+
 
             {/* Desktop / tablet: 16:9 cinematic art */}
             {desktopImage ? (
