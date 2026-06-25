@@ -170,19 +170,8 @@ export function FeaturedFilm() {
                   </svg>
                   <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
                 </Link>
-                {user && (
-                  <Link
-                    to="/films/$slug"
-                    params={{ slug: data.slug }}
-                    className="hidden min-h-11 items-center gap-2 rounded-md border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-colors duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:inline-flex md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                    {locale === "fa" ? "افزودن به فهرست" : "Add to Watchlist"}
-                  </Link>
-                )}
+                <WatchlistCta slug={data.slug} locale={locale} />
+
               </div>
             </div>
           </div>
