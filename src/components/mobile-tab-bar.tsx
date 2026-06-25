@@ -100,16 +100,6 @@ export function MobileTabBar() {
         willChange: "transform",
       }}
     >
-
-  return (
-    <nav
-      aria-label={fa ? "ناوبری" : "Primary"}
-      dir={fa ? "rtl" : "ltr"}
-      className="mobile-tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
-      style={{
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      }}
-    >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-1.5">
         <TabItem
           to="/"
