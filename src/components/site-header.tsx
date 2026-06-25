@@ -1,12 +1,21 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
-import { AuthMenu } from "./auth-menu";
 import { useSubscription } from "@/hooks/use-subscription";
 import { AcceptTrialButton } from "./accept-trial-button";
 import { TrialBanner } from "./trial-banner";
+
+// AuthMenu is a 535-line panel only opened on click. Keep it out of the
+// initial bundle — render a same-sized placeholder until React is idle.
+const AuthMenu = lazy(() =>
+  import("./auth-menu").then((m) => ({ default: m.AuthMenu })),
+);
+const AuthMenuFallback = () => (
+  <div className="h-10 w-10 shrink-0" aria-hidden />
+);
+
 
 function RegionGlobeIcon({ className = "", size = 18 }: { className?: string; size?: number }) {
   return (
@@ -406,7 +415,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             </Link>
             <RegionToggle />
             <MembershipCta />
-            <AuthMenu />
+            <Suspense fallback={<AuthMenuFallback />}>
+              <AuthMenu />
+            </Suspense>
+
           </div>
 
         </div>

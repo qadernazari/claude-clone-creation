@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getStripeEnvironment } from "@/lib/stripe";
-import type { User } from "@supabase/supabase-js";
+import { getStripeEnvironment } from "@/lib/stripe-env";
+import { useAuthState } from "@/lib/auth-context";
 import type { Database } from "@/integrations/supabase/types";
+
 
 export type FilmAccessType = Database["public"]["Enums"]["film_access_type"];
 
@@ -39,26 +39,9 @@ function isActiveTrial(t: TrialRow | null | undefined): boolean {
 }
 
 export function useCurrentUserState() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setUser(data.session?.user ?? null);
-      setIsLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
-      setUser(s?.user ?? null);
-      setIsLoading(false);
-    });
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-  return { user, isLoading };
+  return useAuthState();
 }
+
 
 export function useCurrentUser() {
   const { user } = useCurrentUserState();

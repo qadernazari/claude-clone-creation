@@ -1,10 +1,46 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FilmsRow } from "../components/films-row";
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { FeaturedFilm } from "../components/featured-film";
-import { ContinueWatching } from "../components/continue-watching";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { homePageQueryOptions } from "@/lib/home.functions";
+
+// Below-the-fold rails are lazy-loaded and only mounted when the user
+// approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
+// and removes their queries / image lists from the hydration critical path.
+const FilmsRow = lazy(() =>
+  import("../components/films-row").then((m) => ({ default: m.FilmsRow })),
+);
+const ContinueWatching = lazy(() =>
+  import("../components/continue-watching").then((m) => ({ default: m.ContinueWatching })),
+);
+
+function MountWhenNear({ children, rootMargin = "600px" }: { children: ReactNode; rootMargin?: string }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (show) return;
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setShow(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShow(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [show, rootMargin]);
+  return <div ref={ref}>{show ? <Suspense fallback={null}>{children}</Suspense> : null}</div>;
+}
+
 
 function HomePendingShell() {
   return (
@@ -149,14 +185,19 @@ function Home() {
         <FeaturedFilm />
 
         {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-        <div className="pt-10 md:pt-14">
-          <ContinueWatching />
-        </div>
+        <MountWhenNear>
+          <div className="pt-10 md:pt-14">
+            <ContinueWatching />
+          </div>
+        </MountWhenNear>
 
         {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
-        <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
-          <FilmsRow />
-        </div>
+        <MountWhenNear>
+          <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
+            <FilmsRow />
+          </div>
+        </MountWhenNear>
+
       </main>
 
       <SiteFooter />

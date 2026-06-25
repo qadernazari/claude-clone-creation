@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -16,9 +16,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
-import { MobileTabBar } from "@/components/mobile-tab-bar";
-import { IranMirrorBanner } from "@/components/iran-mirror-banner";
+import { AuthProvider } from "../lib/auth-context";
 import { resolveVisitorRegion } from "../lib/region.functions";
+
+// Defer non-critical chrome out of the initial bundle. Neither is needed
+// for FCP/LCP — both render after hydration via DeferredChrome below.
+const MobileTabBar = lazy(() =>
+  import("@/components/mobile-tab-bar").then((m) => ({ default: m.MobileTabBar })),
+);
+const IranMirrorBanner = lazy(() =>
+  import("@/components/iran-mirror-banner").then((m) => ({ default: m.IranMirrorBanner })),
+);
+
 
 function useFaSafe(): boolean {
   try {
@@ -256,17 +265,49 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <LocaleProvider>
-        <PageOverlayProvider>
-          <AuthInvalidator />
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <MobileTabBar />
-          <IranMirrorBanner />
-          <Toaster richColors position="top-center" />
-        </PageOverlayProvider>
-      </LocaleProvider>
+      <AuthProvider>
+        <LocaleProvider>
+          <PageOverlayProvider>
+            <AuthInvalidator />
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <DeferredChrome />
+            <Toaster richColors position="top-center" />
+          </PageOverlayProvider>
+        </LocaleProvider>
+      </AuthProvider>
     </QueryClientProvider>
+  );
+}
+
+/**
+ * Mounts the mobile tab bar and the Iran mirror banner only after the page
+ * has had a chance to paint and become interactive. Keeps both out of the
+ * critical-path bundle on mobile (saves ~30 KB and several long tasks).
+ */
+function DeferredChrome() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(() => setReady(true), { timeout: 2000 });
+      return () => {
+        const cancel = (window as Window & { cancelIdleCallback?: (id: number) => void })
+          .cancelIdleCallback;
+        if (cancel) cancel(id);
+      };
+    }
+    const t = window.setTimeout(() => setReady(true), 800);
+    return () => window.clearTimeout(t);
+  }, []);
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <MobileTabBar />
+      <IranMirrorBanner />
+    </Suspense>
   );
 }
 
@@ -274,10 +315,24 @@ function AuthInvalidator() {
   const router = useRouter();
   const queryClient = useQueryClient();
   useEffect(() => {
-    // Best-effort: record current IP/geo on first mount when signed in.
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) captureMemberGeo().catch(() => {});
-    });
+    // Defer the geo capture until the browser is idle so it never competes
+    // with hydration / hero paint on mobile.
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    const runGeo = () => {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session?.user) captureMemberGeo().catch(() => {});
+      });
+    };
+    let idleId: number | null = null;
+    let timeoutId: number | null = null;
+    if (typeof w.requestIdleCallback === "function") {
+      idleId = w.requestIdleCallback(runGeo, { timeout: 4000 });
+    } else {
+      timeoutId = window.setTimeout(runGeo, 2000);
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       // Only react to real identity transitions. Without this filter we also
       // run on TOKEN_REFRESHED (~hourly + every tab focus) and INITIAL_SESSION
@@ -289,7 +344,16 @@ function AuthInvalidator() {
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
       if (session?.user) captureMemberGeo().catch(() => {});
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (idleId !== null) {
+        const cancel = (window as Window & { cancelIdleCallback?: (id: number) => void })
+          .cancelIdleCallback;
+        if (cancel) cancel(idleId);
+      }
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
   }, [router, queryClient]);
   return null;
 }
+
