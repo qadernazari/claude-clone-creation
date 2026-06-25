@@ -1,52 +1,20 @@
-import { useEffect, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
 type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
   const { locale, num, year, t } = useLocale();
-  const user = useCurrentUser();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
-  const mobileImageForState = data?.mobile_cover_url || data?.cover_url || data?.thumbnail_url || "";
-  const [mobileHeroReady, setMobileHeroReady] = useState(!mobileImageForState);
-
-  useEffect(() => {
-    if (!mobileImageForState) {
-      setMobileHeroReady(true);
-      return;
-    }
-
-    let cancelled = false;
-    const img = new Image();
-    const markReady = () => {
-      if (!cancelled) setMobileHeroReady(true);
-    };
-
-    setMobileHeroReady(false);
-    img.decoding = "async";
-    img.src = mobileImageForState;
-
-    if (img.complete && img.naturalWidth > 0) {
-      markReady();
-    } else {
-      img.onload = markReady;
-      img.onerror = markReady;
-      img.decode?.().then(markReady).catch(() => undefined);
-    }
-
-    return () => {
-      cancelled = true;
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [mobileImageForState]);
 
   if (!data) return <FeaturedFilmFallback />;
+
+
 
   const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
   const director = t({
@@ -86,13 +54,9 @@ export function FeaturedFilm() {
               }}
               aria-hidden
             />
-            <div
-              className={`hero-mobile-skeleton absolute inset-x-0 bottom-0 top-0 md:hidden ${
-                mobileHeroReady ? "opacity-0" : "opacity-100"
-              }`}
-              aria-hidden
-            />
-            {/* Mobile: dedicated 9:16 vertical poster */}
+            {/* Mobile: dedicated 9:16 vertical poster. Image is preloaded
+                via <link rel="preload"> on the route head; no JS-driven
+                fade/skeleton — avoids a post-paint re-render. */}
             {mobileImage ? (
               <img
                 src={mobileImage}
@@ -102,11 +66,10 @@ export function FeaturedFilm() {
                 fetchPriority="high"
                 decoding="async"
                 sizes="100vw"
-                onLoad={() => setMobileHeroReady(true)}
-                onError={() => setMobileHeroReady(true)}
                 aria-hidden
               />
             ) : null}
+
 
             {/* Desktop / tablet: 16:9 cinematic art */}
             {desktopImage ? (
@@ -207,25 +170,38 @@ export function FeaturedFilm() {
                   </svg>
                   <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
                 </Link>
-                {user && (
-                  <Link
-                    to="/films/$slug"
-                    params={{ slug: data.slug }}
-                    className="hidden min-h-11 items-center gap-2 rounded-md border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-colors duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:inline-flex md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                    {locale === "fa" ? "افزودن به فهرست" : "Add to Watchlist"}
-                  </Link>
-                )}
+                <WatchlistCta slug={data.slug} locale={locale} />
+
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Desktop-only secondary CTA. Hidden on mobile (md:inline-flex), and even
+ * on desktop the auth check is deferred until idle so useCurrentUser
+ * doesn't run during hero hydration.
+ */
+function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
+  const ready = useDeferredMount();
+  const user = useCurrentUser();
+  if (!ready || !user) return null;
+  return (
+    <Link
+      to="/films/$slug"
+      params={{ slug }}
+      className="hidden min-h-11 items-center gap-2 rounded-md border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-colors duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:inline-flex md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      {locale === "fa" ? "افزودن به فهرست" : "Add to Watchlist"}
+    </Link>
   );
 }
 

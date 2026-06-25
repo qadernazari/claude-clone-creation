@@ -3,17 +3,27 @@ import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
-import { useSubscription } from "@/hooks/use-subscription";
-import { AcceptTrialButton } from "./accept-trial-button";
-import { TrialBanner } from "./trial-banner";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
-// AuthMenu is a 535-line panel only opened on click. Keep it out of the
-// initial bundle — render a same-sized placeholder until React is idle.
+// AuthMenu, TrialBanner, and the subscription-aware membership CTA are
+// all kept out of the hydration critical path. They each trigger Supabase
+// queries on mount and pull large dependency trees (lucide icons, the
+// trial server-fn client, etc.). Loading them after first paint removes
+// several long main-thread tasks on mobile.
 const AuthMenu = lazy(() =>
   import("./auth-menu").then((m) => ({ default: m.AuthMenu })),
 );
+const TrialBanner = lazy(() =>
+  import("./trial-banner").then((m) => ({ default: m.TrialBanner })),
+);
+const MembershipCtaLazy = lazy(() =>
+  import("./membership-cta").then((m) => ({ default: m.MembershipCta })),
+);
 const AuthMenuFallback = () => (
   <div className="h-10 w-10 shrink-0" aria-hidden />
+);
+const MembershipCtaFallback = () => (
+  <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />
 );
 
 
@@ -414,53 +424,52 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </svg>
             </Link>
             <RegionToggle />
-            <MembershipCta />
-            <Suspense fallback={<AuthMenuFallback />}>
-              <AuthMenu />
-            </Suspense>
-
+            <HeaderDeferredChrome />
           </div>
 
         </div>
-        <TrialBanner />
+        <HeaderDeferredBanner />
       </header>
     </>
   );
 }
 
-
-function MembershipCta() {
-  const { locale } = useLocale();
-  const fa = locale === "fa";
-  const { isMember, isLoading, hasUsedTrial } = useSubscription();
-
-  if (isLoading || isMember) {
-    return <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />;
-  }
-
-  // Trial already used (active or expired) → show Become a Member instead.
-  if (hasUsedTrial) {
-    const label = fa ? "عضو شوید" : "Become a Member";
+/**
+ * Single idle gate for all subscription-aware header pieces. Mounts the
+ * membership CTA + auth menu only after the browser is idle, so the
+ * initial header paint never waits on Supabase queries or the auth-menu
+ * chunk.
+ */
+function HeaderDeferredChrome() {
+  const ready = useDeferredMount();
+  if (!ready) {
     return (
-      <div className="hidden shrink-0 sm:block">
-        <a
-          href="/membership"
-          className="inline-flex h-10 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase tracking-[0.08em] leading-none text-ink shadow-sm transition-all duration-200 hover:bg-amber/90 active:scale-95"
-        >
-          {label}
-        </a>
-      </div>
+      <>
+        <MembershipCtaFallback />
+        <AuthMenuFallback />
+      </>
     );
   }
-
-  const label = fa ? "شروع رایگان" : "Free Trial";
   return (
-    <div className="hidden shrink-0 sm:block">
-      <AcceptTrialButton
-        className="inline-flex h-10 items-center whitespace-nowrap rounded-md bg-cream px-5 text-[12px] font-bold uppercase tracking-[0.08em] leading-none text-ink shadow-sm transition-all duration-200 hover:bg-cream-bright active:scale-95 disabled:opacity-70"
-        label={label}
-      />
-    </div>
+    <>
+      <Suspense fallback={<MembershipCtaFallback />}>
+        <MembershipCtaLazy />
+      </Suspense>
+      <Suspense fallback={<AuthMenuFallback />}>
+        <AuthMenu />
+      </Suspense>
+    </>
   );
 }
+
+function HeaderDeferredBanner() {
+  const ready = useDeferredMount(2000);
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <TrialBanner />
+    </Suspense>
+  );
+}
+
 
