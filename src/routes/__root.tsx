@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -16,9 +16,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
-import { MobileTabBar } from "@/components/mobile-tab-bar";
-import { IranMirrorBanner } from "@/components/iran-mirror-banner";
+import { AuthProvider } from "../lib/auth-context";
 import { resolveVisitorRegion } from "../lib/region.functions";
+
+// Defer non-critical chrome out of the initial bundle. Neither is needed
+// for FCP/LCP — both render after hydration via DeferredChrome below.
+const MobileTabBar = lazy(() =>
+  import("@/components/mobile-tab-bar").then((m) => ({ default: m.MobileTabBar })),
+);
+const IranMirrorBanner = lazy(() =>
+  import("@/components/iran-mirror-banner").then((m) => ({ default: m.IranMirrorBanner })),
+);
+
 
 function useFaSafe(): boolean {
   try {
