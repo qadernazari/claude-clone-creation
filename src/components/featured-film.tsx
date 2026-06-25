@@ -12,35 +12,16 @@ export function FeaturedFilm() {
   const { locale, num, year, t } = useLocale();
   const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
   const data = homeData.featured;
-
-  if (!data) return <FeaturedFilmFallback />;
-
-
-
-  const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
-  const director = t({
-    en: data.director_en || "",
-    fa: data.director_fa || data.director_en || "",
-  });
-  const synopsis = t({
-    en: data.synopsis_en || "",
-    fa: data.synopsis_fa || data.synopsis_en || "",
-  });
   // Desktop hero = 16:9 cinematic art (thumbnail_url) with cover_url as fallback.
   // Mobile hero = dedicated 9:16 portrait art (mobile_cover_url). When no mobile
   // art exists, fall back to the portrait cover_url; only as a last resort use the
   // landscape thumbnail (which will look cropped on a phone).
-  const desktopImage = data.thumbnail_url || data.cover_url;
-  const mobileImage = data.mobile_cover_url || data.cover_url || data.thumbnail_url;
-  const hasAnyImage = !!(desktopImage || mobileImage);
-  const isDesktopLandscape = !!data.thumbnail_url;
+  const desktopImage = data ? data.thumbnail_url || data.cover_url : null;
+  const mobileImage = data ? data.mobile_cover_url || data.cover_url || data.thumbnail_url : null;
   const mobileImageRef = useRef<HTMLImageElement | null>(null);
   const desktopImageRef = useRef<HTMLImageElement | null>(null);
   const [mobileImageReady, setMobileImageReady] = useState(false);
   const [desktopImageReady, setDesktopImageReady] = useState(false);
-  const fallbackBg =
-    data.poster_gradient ||
-    "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
 
   useEffect(() => {
     setMobileImageReady(false);
@@ -57,6 +38,25 @@ export function FeaturedFilm() {
       requestAnimationFrame(() => setDesktopImageReady(true));
     }
   }, [desktopImage]);
+
+  if (!data) return <FeaturedFilmFallback />;
+
+
+
+  const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
+  const director = t({
+    en: data.director_en || "",
+    fa: data.director_fa || data.director_en || "",
+  });
+  const synopsis = t({
+    en: data.synopsis_en || "",
+    fa: data.synopsis_fa || data.synopsis_en || "",
+  });
+  const hasAnyImage = !!(desktopImage || mobileImage);
+  const isDesktopLandscape = !!data.thumbnail_url;
+  const fallbackBg =
+    data.poster_gradient ||
+    "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
   
 
 
