@@ -42,34 +42,53 @@ export function PageOverlayProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
 
-  // Lock body scroll while open — use position:fixed to fully prevent
-  // background scroll on iOS Safari and preserve scroll position on close.
+  // Lock page scroll while open and restore the exact scroll position on close.
   useEffect(() => {
     if (!slug) return;
-    const scrollY = window.scrollY;
+    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    const html = document.documentElement;
     const body = document.body;
-    const prev = {
+    const prevHtml = {
+      overflow: html.style.overflow,
+      overscrollBehavior: html.style.overscrollBehavior,
+      scrollBehavior: html.style.scrollBehavior,
+    };
+    const prevBody = {
+      overflow: body.style.overflow,
+      scrollBehavior: body.style.scrollBehavior,
       position: body.style.position,
       top: body.style.top,
       left: body.style.left,
       right: body.style.right,
       width: body.style.width,
-      overflow: body.style.overflow,
     };
+
+    html.style.setProperty("scroll-behavior", "auto", "important");
+    body.style.setProperty("scroll-behavior", "auto", "important");
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+    body.style.overflow = "hidden";
     body.style.position = "fixed";
     body.style.top = `-${scrollY}px`;
     body.style.left = "0";
     body.style.right = "0";
     body.style.width = "100%";
-    body.style.overflow = "hidden";
+
     return () => {
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.left = prev.left;
-      body.style.right = prev.right;
-      body.style.width = prev.width;
-      body.style.overflow = prev.overflow;
+      html.style.overflow = prevHtml.overflow;
+      html.style.overscrollBehavior = prevHtml.overscrollBehavior;
+      body.style.overflow = prevBody.overflow;
+      body.style.position = prevBody.position;
+      body.style.top = prevBody.top;
+      body.style.left = prevBody.left;
+      body.style.right = prevBody.right;
+      body.style.width = prevBody.width;
       window.scrollTo(0, scrollY);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
+        html.style.scrollBehavior = prevHtml.scrollBehavior;
+        body.style.scrollBehavior = prevBody.scrollBehavior;
+      });
     };
   }, [slug]);
 
