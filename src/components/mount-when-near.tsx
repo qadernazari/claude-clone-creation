@@ -14,11 +14,13 @@ export function MountWhenNear({
   rootMargin = "200px",
   minHeight,
   armOnInteraction = true,
+  scrollArmThreshold = 20,
 }: {
   children: ReactNode;
   rootMargin?: string;
   minHeight?: number | string;
   armOnInteraction?: boolean;
+  scrollArmThreshold?: number;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [show, setShow] = useState(false);
@@ -29,9 +31,9 @@ export function MountWhenNear({
     if (armed) return;
     const arm = () => setArmed(true);
     const armFromScroll = () => {
-      if (window.scrollY > 20) setArmed(true);
+      if (window.scrollY > scrollArmThreshold) setArmed(true);
     };
-    if (window.scrollY > 20) {
+    if (window.scrollY > scrollArmThreshold) {
       setArmed(true);
       return;
     }
@@ -48,7 +50,7 @@ export function MountWhenNear({
       window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
     };
-  }, [armed, armOnInteraction]);
+  }, [armed, armOnInteraction, scrollArmThreshold]);
 
   useEffect(() => {
     if (show || !armed) return;
