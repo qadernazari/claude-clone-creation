@@ -42,7 +42,7 @@ export function FeaturedFilm() {
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
+      <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
         {/* Warm poster placeholder painted immediately by SSR — keeps the
             hero looking intentional (not an empty black box) until the
             actual image decodes. Hidden once the image is loaded. */}
@@ -73,9 +73,6 @@ export function FeaturedFilm() {
                 decoding="async"
                 sizes="100vw"
                 aria-hidden
-                onLoad={(e) => {
-                  (e.currentTarget as HTMLImageElement).dataset.loaded = "true";
-                }}
               />
             ) : null}
 
@@ -225,7 +222,7 @@ function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="relative h-[100dvh] min-h-[640px] w-full overflow-hidden bg-bg-0">
+      <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
         <div
           className="absolute inset-0"
           style={{
