@@ -18,8 +18,18 @@ const ContinueWatching = lazy(() =>
 function MountWhenNear({ children, rootMargin = "0px" }: { children: ReactNode; rootMargin?: string }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [show, setShow] = useState(false);
+  const [armed, setArmed] = useState(false);
   useEffect(() => {
-    if (show) return;
+    if (armed) return;
+    const arm = () => {
+      if (window.scrollY > 40) setArmed(true);
+    };
+    arm();
+    window.addEventListener("scroll", arm, { passive: true });
+    return () => window.removeEventListener("scroll", arm);
+  }, [armed]);
+  useEffect(() => {
+    if (show || !armed) return;
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
@@ -37,7 +47,7 @@ function MountWhenNear({ children, rootMargin = "0px" }: { children: ReactNode; 
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [show, rootMargin]);
+  }, [show, armed, rootMargin]);
   return <div ref={ref}>{show ? <Suspense fallback={null}>{children}</Suspense> : null}</div>;
 }
 
