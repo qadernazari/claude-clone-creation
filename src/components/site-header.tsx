@@ -3,17 +3,27 @@ import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
-import { useSubscription } from "@/hooks/use-subscription";
-import { AcceptTrialButton } from "./accept-trial-button";
-import { TrialBanner } from "./trial-banner";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
-// AuthMenu is a 535-line panel only opened on click. Keep it out of the
-// initial bundle — render a same-sized placeholder until React is idle.
+// AuthMenu, TrialBanner, and the subscription-aware membership CTA are
+// all kept out of the hydration critical path. They each trigger Supabase
+// queries on mount and pull large dependency trees (lucide icons, the
+// trial server-fn client, etc.). Loading them after first paint removes
+// several long main-thread tasks on mobile.
 const AuthMenu = lazy(() =>
   import("./auth-menu").then((m) => ({ default: m.AuthMenu })),
 );
+const TrialBanner = lazy(() =>
+  import("./trial-banner").then((m) => ({ default: m.TrialBanner })),
+);
+const MembershipCtaLazy = lazy(() =>
+  import("./membership-cta").then((m) => ({ default: m.MembershipCta })),
+);
 const AuthMenuFallback = () => (
   <div className="h-10 w-10 shrink-0" aria-hidden />
+);
+const MembershipCtaFallback = () => (
+  <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />
 );
 
 
