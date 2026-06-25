@@ -175,10 +175,91 @@ async function handleContribution(session: any, origin: string) {
   await grantSupporterRole(admin, userId);
 }
 
+async function handleMembershipBundle(session: any, env: StripeEnv, origin: string) {
+  const meta = session.metadata ?? {};
+  const userId: string | undefined = meta.userId;
+  const months = Number(meta.bundle_months);
+  const planId: string = meta.plan_id ?? `${months}mo`;
+  if (!userId || !months || !Number.isFinite(months)) {
+    console.error("membership_bundle missing userId/bundle_months", session.id);
+    return;
+  }
+  if (session.payment_status !== "paid") {
+    console.log("Ignoring unpaid membership bundle", session.id, session.payment_status);
+    return;
+  }
+
+  const admin = await getAdmin();
+
+  // Extend (or create) the user's active membership window.
+  const { data: latest } = await admin
+    .from("subscriptions")
+    .select("current_period_end")
+    .eq("user_id", userId)
+    .eq("environment", env)
+    .order("current_period_end", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
+
+  const now = new Date();
+  const base = latest?.current_period_end
+    ? new Date(Math.max(now.getTime(), new Date(latest.current_period_end as string).getTime()))
+    : now;
+  const end = new Date(base);
+  end.setMonth(end.getMonth() + months);
+
+  const providerRef = (session.payment_intent as string | null) ?? session.id;
+  const customerId = (session.customer as string | null) ?? null;
+
+  const { error } = await admin.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      stripe_subscription_id: `bundle_${providerRef}`,
+      stripe_customer_id: customerId ?? `bundle_${userId}`,
+      product_id: "iran_membership_bundle",
+      price_id: `membership_${planId}`,
+      status: "active",
+      current_period_start: now.toISOString(),
+      current_period_end: end.toISOString(),
+      cancel_at_period_end: true,
+      environment: env,
+      updated_at: now.toISOString(),
+    },
+    { onConflict: "stripe_subscription_id" },
+  );
+  if (error) {
+    console.error("membership bundle upsert failed:", error.message);
+    throw new Error(error.message);
+  }
+
+  await admin.from("payment_events").upsert(
+    { id: session.id, provider: "stripe", type: "checkout.session.completed:membership_bundle" },
+    { onConflict: "id" },
+  );
+
+  const recipient = session.customer_details?.email as string | undefined;
+  if (recipient) {
+    const amount = session.amount_total ?? 0;
+    const currency = (session.currency ?? "usd").toLowerCase();
+    await sendReceipt(origin, "membership-receipt", recipient, `membership-${providerRef}`, {
+      planMonths: months,
+      amountFormatted: formatUsd(amount, currency),
+      accessUntilFormatted: formatExpiry(end),
+      manageUrl: `${origin}/account`,
+    });
+    await addToNotifyList(admin, recipient);
+  }
+  await grantSupporterRole(admin, userId);
+}
+
 async function handleCheckoutCompleted(session: any, env: StripeEnv, origin: string) {
   const meta = session.metadata ?? {};
 
-  // Branch by intent: contributions vs ticket purchases.
+  // Branch by intent: membership bundle, contribution, or ticket.
+  if (meta.kind === "membership_bundle") {
+    await handleMembershipBundle(session, env, origin);
+    return;
+  }
   if (meta.type === "contribution") {
     await handleContribution(session, origin);
     const admin = await getAdmin();
@@ -450,11 +531,11 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           switch (event.type) {
             case "checkout.session.completed": {
               const session: any = event.data.object;
-              // Subscription checkouts: skip the ticket path; the subscription.*
-              // events below handle persistence. PPV (no kind=membership) keeps
-              // running through handleCheckoutCompleted.
-              if (session.mode === "subscription" || session.metadata?.kind === "membership") {
-                console.log("Membership checkout completed", session.id);
+              // Subscription checkouts (legacy): skip the ticket path;
+              // subscription.* events handle persistence. Membership bundles,
+              // contributions, and PPV all flow through handleCheckoutCompleted.
+              if (session.mode === "subscription" && session.metadata?.kind !== "membership_bundle") {
+                console.log("Legacy subscription checkout completed", session.id);
                 break;
               }
               await handleCheckoutCompleted(session, env, origin);
