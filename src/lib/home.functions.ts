@@ -144,9 +144,9 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
     const featured = featuredRaw
       ? await (async () => {
           const [cover, thumbnail, mobile] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 70),
-            renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 72),
-            renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 1080, 70),
+            renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 68),
+            renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1600, 70),
+            renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 62),
           ]);
           return { ...featuredRaw, cover_url: cover, thumbnail_url: thumbnail, mobile_cover_url: mobile } as HomeFeaturedFilm;
         })()
