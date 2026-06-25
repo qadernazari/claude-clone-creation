@@ -144,22 +144,24 @@ function Home() {
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader current="home" />
+      <main>
+        {/* 1. Cinematic hero = featured film */}
+        <FeaturedFilm />
 
-      {/* 1. Cinematic hero = featured film */}
-      <FeaturedFilm />
+        {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
+        <div className="pt-10 md:pt-14">
+          <ContinueWatching />
+        </div>
 
-      {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-      <div className="pt-10 md:pt-14">
-        <ContinueWatching />
-      </div>
-
-      {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
-      <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
-        <FilmsRow />
-      </div>
+        {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
+        <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
+          <FilmsRow />
+        </div>
+      </main>
 
       <SiteFooter />
     </div>
   );
 }
+
 
