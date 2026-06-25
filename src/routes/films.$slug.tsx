@@ -533,11 +533,14 @@ function FilmPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => (isMember || accessType === "ppv_only" ? setCheckoutOpen(true) : setMembershipOpen(true))}
+                  onClick={() => {
+                    if (isMember || accessType === "ppv_only") setCheckoutOpen(true);
+                    else window.location.href = "/membership";
+                  }}
                   disabled={tomanOnly && (isMember || accessType === "ppv_only")}
                   className="inline-flex shrink-0 items-center rounded-md bg-cream-bright px-4 py-2 text-[12px] font-semibold text-ink transition-transform hover:scale-[1.02] disabled:opacity-60"
                 >
-                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : (hasUsedTrial ? t.becomeMember : t.startTrial)}
+                  {isMember || accessType === "ppv_only" ? `${t.buy} — ${priceLabel}` : t.becomeMember}
                 </button>
               )
             )}
@@ -982,10 +985,10 @@ function FilmPage() {
               </p>
               <button
                 type="button"
-                onClick={() => user ? setMembershipOpen(true) : (window.location.href = "/auth")}
+                onClick={() => user ? (window.location.href = "/membership") : (window.location.href = "/auth")}
                 className="mt-4 inline-flex items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink transition-transform hover:scale-[1.02]"
               >
-                {hasUsedTrial ? t.becomeMember : t.startTrial}
+                {t.becomeMember}
               </button>
             </div>
 
@@ -1027,14 +1030,6 @@ function FilmPage() {
         </Suspense>
       )}
 
-      {membershipOpen && (
-        <Suspense fallback={null}>
-          <MembershipCheckout
-            returnUrl={typeof window !== "undefined" ? `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1&film=${film.slug}` : ""}
-            onClose={() => setMembershipOpen(false)}
-          />
-        </Suspense>
-      )}
 
       {/* Preview / trailer lightbox */}
       {/* Cinema trailer modal — true black, fade-in, ESC + body-scroll-lock above */}
