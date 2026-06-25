@@ -36,7 +36,7 @@ export function FeaturedFilm() {
   const fallbackBg =
     data.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
-  const safeMobileImage = mobileImage?.replace(/"/g, "%22");
+  
 
 
   return (
