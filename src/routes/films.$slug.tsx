@@ -1134,6 +1134,7 @@ function FilmPage() {
           )}
         </div>
       </div>
-    </div>
+    </main>
+
   );
 }
