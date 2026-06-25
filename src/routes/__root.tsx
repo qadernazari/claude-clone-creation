@@ -244,9 +244,17 @@ function RootShell({ children }: { children: ReactNode }) {
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
               // Inject the webfont stylesheet asynchronously so it never
-              // blocks first paint. Dropped Fraunces (used in 2 small spots
-              // only) to shave bytes; system serif fallback covers it.
-              `try{var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Vazirmatn:wght@400;500;600&display=swap';l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`,
+              // blocks first paint. display=optional means the browser
+              // uses the system fallback if the font isn't ready in ~100ms
+              // and never swaps later — eliminates the layout shift the
+              // large Persian/Latin headline caused on slow networks.
+              // Locale-aware: Iran visitors only fetch Vazirmatn; global
+              // visitors only fetch the Latin families.
+              `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
+                locale === "fa"
+                  ? "https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600&display=optional"
+                  : "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=optional",
+              )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`,
           }}
         />
 

@@ -58,7 +58,9 @@ export function FeaturedFilm() {
               <img
                 src={mobileImage}
                 alt=""
-                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 w-full object-cover object-top md:hidden"
+                width={720}
+                height={1280}
+                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 h-full w-full object-cover object-top md:hidden"
                 loading="eager"
                 decoding="async"
                 sizes="100vw"
@@ -67,14 +69,22 @@ export function FeaturedFilm() {
             ) : null}
 
 
-            {/* Desktop / tablet: 16:9 cinematic art */}
+            {/* Desktop / tablet: 16:9 cinematic art.
+                loading="lazy" here is critical: React 19 auto-hoists every
+                eager <img> into an unconditional <link rel=preload> in <head>,
+                which on mobile caused the 1600w desktop thumbnail to be
+                downloaded alongside the real mobile cover. Lazy disables
+                that auto-preload; the correct media-gated preload still
+                fires from the route head() on real desktops. */}
             {desktopImage ? (
               isDesktopLandscape ? (
                 <img
                   src={desktopImage}
                   alt=""
+                  width={1600}
+                  height={900}
                   className="cine-img absolute inset-0 hidden h-full w-full scale-[1.03] object-cover object-center md:block"
-                  loading="eager"
+                  loading="lazy"
                   decoding="async"
                   aria-hidden
                 />
@@ -92,8 +102,10 @@ export function FeaturedFilm() {
                   <img
                     src={desktopImage}
                     alt={title}
+                    width={1200}
+                    height={1600}
                     className="absolute inset-0 h-full w-full object-contain object-center"
-                    loading="eager"
+                    loading="lazy"
                     decoding="async"
                   />
                 </div>

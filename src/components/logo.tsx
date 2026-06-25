@@ -24,6 +24,9 @@ export function Logo({ className = "", size = 40, withTagline = false }: Props) 
         className="block select-none"
         style={{ height: size, width: "auto" }}
         draggable={false}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
       />
       {withTagline ? (
         <span className="text-[10px] uppercase tracking-[0.4em] text-cream/60">
