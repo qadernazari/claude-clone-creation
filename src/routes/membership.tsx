@@ -16,7 +16,7 @@ import {
   type MembershipPlanId,
   type MembershipPlan,
 } from "@/lib/membership-plans";
-import { useAuth } from "@/integrations/supabase/auth";
+
 
 const MembershipCheckout = lazy(() =>
   import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })),
@@ -40,8 +40,7 @@ function MembershipPage() {
   const { locale, num } = useLocale();
   const fa = locale === "fa";
   const navigate = useNavigate();
-  const { user, isLoading: isAuthLoading } = useAuth();
-  const { hasUsedTrial, isMember } = useSubscription();
+  const { user, isLoading: isAuthLoading, hasUsedTrial, isMember } = useSubscription();
   const irMode = useIrMode();
   const [baseToman, setBaseToman] = useState<number>(MEMBERSHIP_BASE_TOMAN);
   const [checkoutPlan, setCheckoutPlan] = useState<MembershipPlanId | null>(null);
