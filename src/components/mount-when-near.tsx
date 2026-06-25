@@ -35,19 +35,27 @@ export function MountWhenNear({
     const armFromScroll = () => {
       if (window.scrollY > scrollArmThreshold) setArmed(true);
     };
+    const armFromWheel = () => requestAnimationFrame(armFromScroll);
     if (armOnViewportScroll && window.scrollY > scrollArmThreshold) {
       setArmed(true);
       return;
     }
-    const opts = { passive: true, once: true } as AddEventListenerOptions;
-    if (armOnViewportScroll) window.addEventListener("scroll", armFromScroll, opts);
+    const scrollOpts = { passive: true } as AddEventListenerOptions;
+    const interactionOpts = { passive: true, once: true } as AddEventListenerOptions;
+    if (armOnViewportScroll) {
+      window.addEventListener("scroll", armFromScroll, scrollOpts);
+      window.addEventListener("wheel", armFromWheel, scrollOpts);
+      window.addEventListener("touchmove", armFromWheel, scrollOpts);
+    }
     if (armOnInteraction) {
-      window.addEventListener("pointerdown", arm, opts);
-      window.addEventListener("touchstart", arm, opts);
-      window.addEventListener("keydown", arm, opts);
+      window.addEventListener("pointerdown", arm, interactionOpts);
+      window.addEventListener("touchstart", arm, interactionOpts);
+      window.addEventListener("keydown", arm, interactionOpts);
     }
     return () => {
       window.removeEventListener("scroll", armFromScroll);
+      window.removeEventListener("wheel", armFromWheel);
+      window.removeEventListener("touchmove", armFromWheel);
       window.removeEventListener("pointerdown", arm);
       window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
@@ -58,6 +66,12 @@ export function MountWhenNear({
     if (show || !armed) return;
     const el = ref.current;
     if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const margin = Number.parseInt(rootMargin, 10) || 0;
+    if (rect.top <= window.innerHeight + margin && rect.bottom >= -margin) {
+      setShow(true);
+      return;
+    }
     if (typeof IntersectionObserver === "undefined") {
       setShow(true);
       return;

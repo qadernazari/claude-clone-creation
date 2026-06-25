@@ -1,9 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { MountWhenNear } from "../components/mount-when-near";
 import { homePageQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
@@ -15,6 +14,44 @@ const FilmsRow = lazy(() =>
 const ContinueWatching = lazy(() =>
   import("../components/continue-watching").then((m) => ({ default: m.ContinueWatching })),
 );
+
+function DeferredHomeRails() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const reveal = () => {
+      if (window.scrollY > 140) setShow(true);
+    };
+    reveal();
+    window.addEventListener("scroll", reveal, { passive: true });
+    window.addEventListener("wheel", reveal, { passive: true });
+    window.addEventListener("touchmove", reveal, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", reveal);
+      window.removeEventListener("wheel", reveal);
+      window.removeEventListener("touchmove", reveal);
+    };
+  }, []);
+
+  if (!show) {
+    return <div className="min-h-[640px]" aria-hidden />;
+  }
+
+  return (
+    <>
+      <Suspense fallback={<div className="min-h-[240px]" aria-hidden />}>
+        <div className="pt-10 md:pt-14">
+          <ContinueWatching />
+        </div>
+      </Suspense>
+      <Suspense fallback={<div className="min-h-[400px]" aria-hidden />}>
+        <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
+          <FilmsRow />
+        </div>
+      </Suspense>
+    </>
+  );
+}
 
 
 
@@ -176,23 +213,7 @@ function Home() {
         <FeaturedFilm />
         <div className="h-[72px] bg-bg-0 md:hidden" aria-hidden />
 
-        {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-        <MountWhenNear rootMargin="300px" minHeight={240} armOnInteraction={false} armOnViewportScroll={false}>
-          <Suspense fallback={null}>
-            <div className="pt-10 md:pt-14">
-              <ContinueWatching />
-            </div>
-          </Suspense>
-        </MountWhenNear>
-
-        {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
-        <MountWhenNear rootMargin="300px" minHeight={400} armOnInteraction={false} armOnViewportScroll={false}>
-          <Suspense fallback={null}>
-            <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
-              <FilmsRow />
-            </div>
-          </Suspense>
-        </MountWhenNear>
+        <DeferredHomeRails />
 
       </main>
 
