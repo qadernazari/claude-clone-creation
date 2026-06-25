@@ -185,14 +185,19 @@ function Home() {
         <FeaturedFilm />
 
         {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-        <div className="pt-10 md:pt-14">
-          <ContinueWatching />
-        </div>
+        <MountWhenNear>
+          <div className="pt-10 md:pt-14">
+            <ContinueWatching />
+          </div>
+        </MountWhenNear>
 
         {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
-        <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
-          <FilmsRow />
-        </div>
+        <MountWhenNear>
+          <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
+            <FilmsRow />
+          </div>
+        </MountWhenNear>
+
       </main>
 
       <SiteFooter />
