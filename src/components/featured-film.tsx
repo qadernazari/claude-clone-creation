@@ -61,7 +61,7 @@ export function FeaturedFilm() {
 
 
   return (
-    <section className="relative isolate overflow-hidden after:block after:h-[72px] after:bg-bg-0 md:after:hidden">
+    <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
       <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
         {/* Warm poster placeholder painted immediately by SSR — keeps the
@@ -256,7 +256,7 @@ function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa"
 
 function FeaturedFilmFallback() {
   return (
-    <section className="relative isolate overflow-hidden after:block after:h-[72px] after:bg-bg-0 md:after:hidden">
+    <section className="relative isolate overflow-hidden">
       <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
         <div
           className="absolute inset-0"
