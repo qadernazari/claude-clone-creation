@@ -559,18 +559,20 @@ function FilmPage() {
               <img
                 src={heroArtMobile}
                 alt=""
-                fetchPriority="high"
                 decoding="async"
                 className="film-hero-kenburns absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
                 aria-hidden
               />
             ) : null}
-            {/* Desktop / tablet: 16:9 cinematic art with slow Ken Burns drift */}
+            {/* Desktop / tablet: 16:9 cinematic art with slow Ken Burns drift.
+                Note: NOT fetchPriority="high" — that would make React 19 emit
+                an unconditional <link rel="preload"> for this 1920w landscape
+                image, which mobile would then download too. The route head()
+                already preloads the right image. */}
             {heroArtDesktop ? (
               <img
                 src={heroArtDesktop}
                 alt=""
-                fetchPriority="high"
                 decoding="async"
                 className="film-hero-kenburns absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"
                 aria-hidden

@@ -1,62 +1,49 @@
-## Goal
-Cut mobile Total Blocking Time (1,070ms → <300ms) and JS execution (~3s → <1.5s) by removing JavaScript that the homepage doesn't actually need on first paint. No visual changes.
+## Why the score is still 57
 
-## Root causes identified
+TBT is now green (you fixed that last round). The two red metrics are **LCP** and **FCP**, and they have a single root cause that the last round didn't address.
 
-1. **Stripe SDK leaks into the homepage bundle (~150 KB+).**
-   `src/lib/stripe.ts` imports `@stripe/stripe-js` at module top. `src/hooks/use-subscription.tsx` imports from `@/lib/stripe`, so every component using `useSubscription` / `useCurrentUser` (site-header, featured-film, continue-watching, mobile-tab-bar, trial-banner, accept-trial-button, watchlist-button) pulls Stripe into the initial chunk. Stripe is only needed on `/membership` and the film checkout sheet.
+I fetched the live HTML of `https://www.ir.show/` and counted **5 image preloads** in `<head>`, not 2:
 
-2. **PageOverlayProvider eagerly imports CMS + overlay content for the whole site** in `__root.tsx`, even on first paint of `/`.
+```
+1. iran-logo.webp                                        (small, fine)
+2. mobile cover (1200w q70)  — NO media query           ← duplicate
+3. desktop thumbnail (1920w q72) — NO media query       ← duplicate, mobile downloads it too!
+4. mobile cover     — media="(max-width: 767px)"        (the one we want on mobile)
+5. desktop thumbnail — media="(min-width: 768px)"       (the one we want on desktop)
+```
 
-3. **AuthMenu (535 lines) loads eagerly in the header** — it's only opened on click. Same for `MobileTabBar` and `IranMirrorBanner` rendered in root.
+Preloads #2 and #3 are auto-emitted by **React 19** because `featured-film.tsx` renders BOTH a mobile `<img>` and a desktop `<img>` with `fetchPriority="high"`. React 19 hoists every `<img fetchPriority="high">` into an unconditional `ReactDOM.preload(...)` in `<head>` — it doesn't know about `md:hidden` / `hidden md:block`, so on a phone the browser **also downloads the 1920w landscape thumbnail** (~150–250 KB) at high priority, in parallel with the real LCP image. That competes for the same connection, pushes LCP from ~2s → 6.6s, and inflates FCP because the render-blocking CSS waits behind the same connection slot.
 
-4. **Below-the-fold rails (`FilmsRow`, `ContinueWatching`) execute on first render** instead of after the hero. They run queries, image lists and watchlist logic synchronously during hydration.
+This is also why scores got worse the more "preload the LCP" work we did — every `fetchPriority="high"` we added doubled the problem instead of fixing it.
 
-5. **`AuthInvalidator` runs `supabase.auth.getSession()` + `captureMemberGeo()` at mount**, before the hero is interactive, contributing to long tasks.
+### Other smaller contributors to LCP
 
-6. **Duplicate auth subscriptions:** `__root.tsx` subscribes to `onAuthStateChange`, and every `useCurrentUserState()` mount subscribes again (header, featured-film, continue-watching, mobile-tab-bar). On mobile the homepage instantiates 4–5 of these — each triggers its own `getSession()` round-trip.
+- The hero is served from `api.ir.show/storage/v1/render/image/...` (Supabase storage transform). First request is uncached → slow TTFB on PSI's cold lab run. Long-tail fix is to put a Caddy / CDN cache in front; not in scope for this round.
+- The hero `<div>` also paints the same image as a CSS `background-image` (the `.hero-mobile-poster` layer) on top of the same `<img>`. The browser fetches once (same URL), but it does two paints and an extra composite. Removing the CSS background layer makes paint cheaper.
 
-## Plan (code-only, no visual changes)
+## Plan (frontend only, no behavior change)
 
-### 1. Split Stripe out of the initial bundle
-- Move `getStripeEnvironment` to a tiny `src/lib/stripe-env.ts` that does NOT import `@stripe/stripe-js`. Re-export from `stripe.ts` for back-compat.
-- Update `use-subscription.tsx`, `membership-panel.tsx` to import from `stripe-env.ts`.
-- Keep `getStripe()` (which calls `loadStripe`) in `stripe.ts` — only `film-checkout.tsx` and `membership-checkout.tsx` import it, and both are already lazy-loaded.
-- Expected saving: ~150 KB of unused JS on home/browse/about/contact/auth.
+1. **`src/components/featured-film.tsx` — stop React 19 from auto-preloading**
+   - Remove `fetchPriority="high"` from every hero `<img>` (mobile portrait, desktop landscape, desktop portrait fallback). Keep `loading="eager"` and `decoding="async"`.
+   - Drop the `.hero-mobile-poster` CSS background-image layer; the `<img>` underneath already shows the same picture. Saves a paint and one wasted style recalc.
 
-### 2. Centralise auth/session in a single context
-- Create `src/lib/auth-context.tsx` exposing one `AuthProvider` that runs `getSession()` + `onAuthStateChange` ONCE.
-- Rewrite `useCurrentUserState`, `useCurrentUser` to read from the context (no new subscription per consumer).
-- Mount `AuthProvider` inside `RootComponent` in `__root.tsx` and remove the duplicated `supabase.auth.getSession()` from `AuthInvalidator` (keep only router/query invalidation).
-- Expected: removes 4–5 redundant `getSession()` calls + listener subscriptions on home mount → less TBT, fewer long tasks.
+2. **`src/routes/index.tsx` — keep the one correct preload per breakpoint**
+   - Already correct (uses `media="(max-width: 767px)"` and `media="(min-width: 768px)"`). No change.
+   - Add `imageSizes="100vw"` to the mobile preload so the browser knows it can use the same resource for the `<img sizes="100vw">` later (avoids a second fetch if browsers ever revalidate).
 
-### 3. Lazy-load below-the-fold homepage sections
-- In `src/routes/index.tsx`, convert `FilmsRow` and `ContinueWatching` to `lazy()` + `Suspense` with a lightweight skeleton fallback identical to current spacing (no visual change).
-- Wrap them in an `IntersectionObserver`-based mount gate (`MountWhenNear`, 600px rootMargin) so their chunk is fetched only when the user starts scrolling.
-- Keep `FeaturedFilm` eager (it's the LCP).
+3. **`src/routes/films.$slug.tsx` — same fix on the film detail route**
+   - That route's `<head>` preloads with `fetchpriority: "high"` (lowercase — TanStack accepts both), and the film page's hero `<img>` is also `fetchPriority="high"`. Same React-19 double-preload pattern. Remove `fetchPriority="high"` from the `<img>` on that page; keep the route-head preload.
 
-### 4. Lazy-load non-critical root chrome
-- In `__root.tsx`, convert `MobileTabBar` and `IranMirrorBanner` to `lazy()` rendered inside a `<ClientOnly>` after first paint (mount on `requestIdleCallback`, or after a `useHydrated()` + 0-ms timeout). They're not needed for FCP/LCP.
-- Defer `PageOverlayProvider`'s CMS preload: keep the provider eager (it provides context), but lazy-import the overlay panel component only when an overlay is requested. Audit `page-overlay.tsx` to ensure nothing runs at mount that touches CMS.
+4. **Verify after deploy**
+   - Re-fetch the rendered HTML and confirm there are exactly **2 image preloads** for the hero (one per breakpoint), not 4.
+   - Re-run mobile PageSpeed. Expected: LCP drops from 6.6s → ~2.5–3.5s, FCP from 3.9s → ~2s, Performance back into the 80s. TBT stays green.
 
-### 5. Lazy-load AuthMenu
-- In `site-header.tsx`, replace the eager `import { AuthMenu }` with `lazy()`; render a tiny placeholder (same dimensions as the trigger button) until idle, then hydrate. The 535-line panel + its icons stay out of the initial chunk.
+### What this does NOT change
 
-### 6. Defer `captureMemberGeo`
-- Wrap the call in `requestIdleCallback` (fallback `setTimeout(…, 2000)`) inside `AuthInvalidator` so the network + work happens after the page is interactive.
+- No business logic, no auth, no API calls.
+- No visual change — the hero looks identical; we're only stopping the browser from fetching the wrong image on the wrong device.
+- Server-side caching of the Supabase storage transform (Caddy `Cache-Control`) is a separate, follow-up task — say the word after this lands and I'll write the Caddy snippet to put on the Hetzner mirror.
 
-### 7. Tighten image work on first paint
-- Confirm `films-row.tsx` and `continue-watching.tsx` images already use `loading="lazy"` + `fetchpriority="low"` (verified previously) — no change unless audit finds regression.
+### Technical detail (for reference)
 
-## Out of scope
-- Visual / layout changes.
-- Touching the Caddy mirror config (separate task — cache-lifetimes audit).
-- Server-side membership / payments logic.
-
-## Verification
-After implementation, re-run mobile PageSpeed Insights against `https://www.ir.show` and confirm:
-- TBT under ~300 ms
-- JS execution under ~1.5 s
-- "Reduce unused JavaScript" savings drops well below 290 KiB
-- No regression in FCP / LCP / CLS
-- Homepage still renders the same hero, rails, header, tab bar, and overlays
+React 19's `react-dom/server` runs an internal `prepareHostDispatcher` that calls `ReactDOM.preload(src, { as: "image", fetchPriority })` whenever it serializes an `<img fetchPriority="high">`. Those preloads land in `<head>` regardless of CSS visibility, media queries, or `hidden` class, because the renderer can't evaluate CSS. The supported workaround is exactly what the plan does: don't mark both `<img>` tags as high-priority — let the route-level `<link rel="preload" media="...">` decide.
