@@ -104,6 +104,7 @@ export const Route = createFileRoute("/")({
               as: "image" as const,
               href: loaderData.featured.mobile_cover_url || loaderData.featured.cover_url || loaderData.featured.thumbnail_url || "",
               media: "(max-width: 767px)" as const,
+              imageSizes: "100vw" as const,
               fetchPriority: "high" as const,
             },
             {
