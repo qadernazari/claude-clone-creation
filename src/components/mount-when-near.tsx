@@ -39,12 +39,13 @@ export function MountWhenNear({
       setArmed(true);
       return;
     }
-    const opts = { passive: true, once: true } as AddEventListenerOptions;
-    if (armOnViewportScroll) window.addEventListener("scroll", armFromScroll, opts);
+    const scrollOpts = { passive: true } as AddEventListenerOptions;
+    const interactionOpts = { passive: true, once: true } as AddEventListenerOptions;
+    if (armOnViewportScroll) window.addEventListener("scroll", armFromScroll, scrollOpts);
     if (armOnInteraction) {
-      window.addEventListener("pointerdown", arm, opts);
-      window.addEventListener("touchstart", arm, opts);
-      window.addEventListener("keydown", arm, opts);
+      window.addEventListener("pointerdown", arm, interactionOpts);
+      window.addEventListener("touchstart", arm, interactionOpts);
+      window.addEventListener("keydown", arm, interactionOpts);
     }
     return () => {
       window.removeEventListener("scroll", armFromScroll);
