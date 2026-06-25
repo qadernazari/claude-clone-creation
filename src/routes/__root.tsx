@@ -234,11 +234,13 @@ function RootShell({ children }: { children: ReactNode }) {
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
-              // Promote the print-stylesheet webfont link to render once it loads,
-              // so fonts are non-blocking but still applied (no FOIT for long).
-              `try{var ls=document.querySelectorAll('link[rel="stylesheet"][media="print"]');for(var i=0;i<ls.length;i++){(function(l){if(l.sheet){l.media='all';}else{l.addEventListener('load',function(){l.media='all';});}})(ls[i]);}}catch(e){}`,
+              // Inject the webfont stylesheet asynchronously so it never
+              // blocks first paint. Dropped Fraunces (used in 2 small spots
+              // only) to shave bytes; system serif fallback covers it.
+              `try{var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Vazirmatn:wght@400;500;600&display=swap';l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`,
           }}
         />
+
         <HeadContent />
       </head>
       <body>
