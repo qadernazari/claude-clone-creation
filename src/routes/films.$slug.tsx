@@ -14,7 +14,7 @@ import { getResumePosition } from "@/lib/library.functions";
 
 // Lazy-loaded — Stripe SDK is ~200KB; only load when user opens checkout.
 const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
-const MembershipCheckout = lazy(() => import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })));
+// Membership purchases happen on the dedicated /membership page.
 
 
 
@@ -212,7 +212,7 @@ function FilmPage() {
   const fa = locale === "fa";
   const { isMember, isLoading: isAuthLoading, user, hasUsedTrial } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [membershipOpen, setMembershipOpen] = useState(false);
+  
   
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
