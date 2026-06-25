@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
-import { homePageQueryOptions, type HomeCategory, type HomeRailFilm } from "../lib/home.functions";
+import { homeRailsQueryOptions, type HomeCategory, type HomeRailFilm } from "../lib/home.functions";
 
 type Film = HomeRailFilm;
 type Category = HomeCategory;
@@ -149,9 +149,9 @@ function Rail({
 /* ---------- Multi-rail container ---------- */
 export function FilmsRow() {
   const { locale, num, year, t } = useLocale();
-  const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
-  const films = homeData.films;
-  const categories = homeData.categories;
+  const { data: railsData } = useSuspenseQuery(homeRailsQueryOptions);
+  const films = railsData.films;
+  const categories = railsData.categories;
 
   const rails = useMemo(() => {
     const all = films ?? [];

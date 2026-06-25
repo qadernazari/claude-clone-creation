@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
-import { homePageQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
+import { homeFeaturedQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
@@ -10,8 +10,7 @@ type Film = HomeFeaturedFilm;
 
 export function FeaturedFilm() {
   const { locale, num, year, t } = useLocale();
-  const { data: homeData } = useSuspenseQuery(homePageQueryOptions);
-  const data = homeData.featured;
+  const { data } = useSuspenseQuery(homeFeaturedQueryOptions);
   // Desktop hero = 16:9 cinematic art (thumbnail_url) with cover_url as fallback.
   // Mobile hero = dedicated 9:16 portrait art (mobile_cover_url). When no mobile
   // art exists, fall back to the portrait cover_url; only as a last resort use the

@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { homePageQueryOptions } from "@/lib/home.functions";
+import { homeFeaturedQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
 // approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
@@ -93,7 +93,7 @@ function SplitNotFoundComponent() {
 }
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(homePageQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(homeFeaturedQueryOptions),
   head: ({ loaderData }) => ({
     meta: [
       { title: "ir.show — Home of Iranian cinema" },
@@ -109,27 +109,27 @@ export const Route = createFileRoute("/")({
           "A premium streaming destination for Iranian cinema. Originals, award-winners, documentaries, and curated collections.",
       },
       { property: "og:url", content: "https://ir.show/" },
-      ...(loaderData?.featured?.thumbnail_url || loaderData?.featured?.cover_url || loaderData?.featured?.mobile_cover_url
+      ...(loaderData?.thumbnail_url || loaderData?.cover_url || loaderData?.mobile_cover_url
         ? [
             {
               property: "og:image" as const,
-              content: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
+              content: loaderData.thumbnail_url || loaderData.cover_url || loaderData.mobile_cover_url || "",
             },
             {
               name: "twitter:image" as const,
-              content: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
+              content: loaderData.thumbnail_url || loaderData.cover_url || loaderData.mobile_cover_url || "",
             },
           ]
         : []),
     ],
     links: [
       { rel: "canonical", href: "https://ir.show/" },
-      ...(loaderData?.featured?.thumbnail_url || loaderData?.featured?.cover_url || loaderData?.featured?.mobile_cover_url
+      ...(loaderData?.thumbnail_url || loaderData?.cover_url || loaderData?.mobile_cover_url
         ? [
             {
               rel: "preload" as const,
               as: "image" as const,
-              href: loaderData.featured.mobile_cover_url || loaderData.featured.cover_url || loaderData.featured.thumbnail_url || "",
+              href: loaderData.mobile_cover_url || loaderData.cover_url || loaderData.thumbnail_url || "",
               media: "(max-width: 767px)" as const,
               imageSizes: "100vw" as const,
               fetchPriority: "high" as const,
@@ -137,7 +137,7 @@ export const Route = createFileRoute("/")({
             {
               rel: "preload" as const,
               as: "image" as const,
-              href: loaderData.featured.thumbnail_url || loaderData.featured.cover_url || loaderData.featured.mobile_cover_url || "",
+              href: loaderData.thumbnail_url || loaderData.cover_url || loaderData.mobile_cover_url || "",
               media: "(min-width: 768px)" as const,
               fetchPriority: "high" as const,
             },
