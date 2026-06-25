@@ -164,11 +164,24 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
         </button>
 
         <div className="overflow-y-auto" onClick={onBodyClick}>
-          {!entry && slug !== "faq" && (
+          {(!pagesFetched || (slug === "faq" && !faqFetched)) && (
+            <div className="px-6 py-14 md:px-12 md:py-20 animate-pulse" aria-hidden>
+              <div className="h-3 w-24 rounded bg-cream/10" />
+              <div className="mt-6 h-8 w-2/3 rounded bg-cream/10" />
+              <div className="mt-10 space-y-3">
+                <div className="h-3 w-full rounded bg-cream/5" />
+                <div className="h-3 w-11/12 rounded bg-cream/5" />
+                <div className="h-3 w-10/12 rounded bg-cream/5" />
+                <div className="h-3 w-9/12 rounded bg-cream/5" />
+              </div>
+            </div>
+          )}
+          {pagesFetched && !entry && slug !== "faq" && (
             <div className="p-16 text-center text-cream/50">
               {fa ? "صفحه پیدا نشد" : "Page not found"}
             </div>
           )}
+
           {(entry || slug === "faq") && (
             <article className={`px-6 py-14 md:px-12 md:py-20 ${fa ? "font-fa" : ""}`}>
               {entry?.[fa ? "fa" : "en"].kicker && (
