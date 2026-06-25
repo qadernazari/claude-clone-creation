@@ -16,41 +16,6 @@ const ContinueWatching = lazy(() =>
   import("../components/continue-watching").then((m) => ({ default: m.ContinueWatching })),
 );
 
-function MountWhenNear({ children, rootMargin = "0px" }: { children: ReactNode; rootMargin?: string }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [show, setShow] = useState(false);
-  const [armed, setArmed] = useState(false);
-  useEffect(() => {
-    if (armed) return;
-    const arm = () => {
-      if (window.scrollY > 40) setArmed(true);
-    };
-    arm();
-    window.addEventListener("scroll", arm, { passive: true });
-    return () => window.removeEventListener("scroll", arm);
-  }, [armed]);
-  useEffect(() => {
-    if (show || !armed) return;
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setShow(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setShow(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [show, armed, rootMargin]);
-  return <div ref={ref}>{show ? <Suspense fallback={null}>{children}</Suspense> : null}</div>;
-}
 
 
 function HomePendingShell() {
