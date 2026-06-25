@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
+import { useAuthState } from "@/lib/auth-context";
 
 /**
  * Native-app-style bottom tab bar for mobile.
