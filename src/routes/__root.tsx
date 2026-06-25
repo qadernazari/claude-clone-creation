@@ -199,23 +199,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://yasfnvftzwyuxdhpysof.supabase.co",
         crossOrigin: "anonymous",
       },
-      // Non-render-blocking webfont load (preload + async swap).
-      // Saves ~1.4s of render-blocking time on slow mobile networks.
-      {
-        rel: "preload",
-        as: "style",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,400&family=Vazirmatn:wght@400;500;600&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Fraunces:opsz,wght@9..144,400&family=Vazirmatn:wght@400;500;600&display=swap",
-        media: "print",
-        // Flip to `all` once loaded so styles apply without blocking render.
-        onLoad: "this.media='all'",
-      } as unknown as { rel: string; href: string },
+      // Webfont CSS is injected asynchronously by the inline script in
+      // RootShell <head> (media=print swap pattern). Keeping it out of the
+      // SSR <link> list ensures it never blocks first paint.
     ],
 
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
