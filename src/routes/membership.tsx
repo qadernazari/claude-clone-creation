@@ -4,6 +4,7 @@ import { Check, Sparkles } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { usePageOverlay } from "@/components/page-overlay";
 import { useLocale } from "@/lib/i18n";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useIrMode } from "@/hooks/use-ir-mode";
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/membership")({
 function MembershipPage() {
   const { locale, num } = useLocale();
   const fa = locale === "fa";
+  const { openPage } = usePageOverlay();
   const navigate = useNavigate();
   const { user, isLoading: isAuthLoading, hasUsedTrial, isMember } = useSubscription();
   const irMode = useIrMode();
@@ -153,17 +155,17 @@ function MembershipPage() {
           {fa ? (
             <>
               با خرید عضویت، شما{" "}
-              <Link to="/terms" className="underline hover:text-cream/80">
+              <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
                 شرایط استفاده
-              </Link>{" "}
+              </button>{" "}
               را می‌پذیرید.
             </>
           ) : (
             <>
               By purchasing a plan, you agree to our{" "}
-              <Link to="/terms" className="underline hover:text-cream/80">
+              <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
                 Terms of Service
-              </Link>
+              </button>
               .
             </>
           )}
