@@ -1,25 +1,14 @@
-## Goal
-Remove redundant rows in the account dropdown / mobile sheet (`src/components/auth-menu.tsx`) so every entry leads to a distinct destination.
+## Problem
 
-## Current duplication
-- **Library section** — 3 rows all link to `/library`: My Library, Watchlist, Continue Watching.
-- **Account section** — 2 rows both link to `/account`: Account Settings, Subscription & Billing.
+On `/my-tickets`, the page title "My tickets" and subtitle "All your purchases" render underneath the fixed `SiteHeader`, so they visually mix with HOME / ORIGINALS / region switcher / BECOME A MEMBER.
 
-## Changes (UI only, `src/components/auth-menu.tsx`)
-1. **Library section** → keep a single row:
-   - "My Library" → `/library` (icon: Library)
-   - Remove Watchlist and Continue Watching rows.
-2. **Account section** → collapse billing into settings:
-   - "Account Settings" → `/account` (icon: UserIcon)
-   - "My Tickets" → `/my-tickets` (kept, distinct page)
-   - "Region" toggle (kept, distinct action)
-   - Remove "Subscription & Billing" row (the Membership badge at the top already deep-links to `/account` for billing context).
-3. Keep both Persian and English labels in sync (remove the corresponding `fa` strings too).
-4. Admin and Session sections unchanged.
+Cause: the `<main>` uses `px-6 py-12` with no top offset to clear the fixed header. Other pages (e.g. `account.tsx`) use `pt-20 md:pt-32`.
 
-## Result
-Menu shrinks from 8 navigation rows to 4 (My Library, Account Settings, My Tickets, Region) + Admin + Sign out, with no two rows pointing to the same page.
+## Change
 
-## Out of scope
-- No route changes, no new pages, no tab/anchor deep-linking.
-- No styling changes beyond removing the deleted rows.
+In `src/routes/_authenticated/my-tickets.tsx`, update the `<main>` wrapper:
+
+- From: `mx-auto max-w-5xl px-6 py-12`
+- To:   `mx-auto max-w-5xl px-5 pt-20 pb-12 md:px-6 md:pt-32`
+
+This matches the Account page spacing so the heading clears the sticky header on both mobile and desktop. No other logic, styling, or copy changes.

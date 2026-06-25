@@ -96,7 +96,7 @@ function MyTicketsPage() {
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      <main className="mx-auto max-w-5xl px-6 py-12">
+      <main className="mx-auto max-w-5xl px-5 pt-20 pb-12 md:px-6 md:pt-32">
         <h1 className={`text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
           {t.title}
         </h1>
