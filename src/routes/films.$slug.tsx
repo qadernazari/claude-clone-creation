@@ -5,9 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { FilmReviewsSection } from "@/components/film-reviews-section";
-import { SeriesEpisodes } from "@/components/series-episodes";
 import { WatchlistButton } from "@/components/watchlist-button";
+import { MountWhenNear } from "@/components/mount-when-near";
+
+// Deferred — reviews + episodes only load after the user scrolls or interacts.
+const FilmReviewsSection = lazy(() =>
+  import("@/components/film-reviews-section").then((m) => ({ default: m.FilmReviewsSection })),
+);
+const SeriesEpisodes = lazy(() =>
+  import("@/components/series-episodes").then((m) => ({ default: m.SeriesEpisodes })),
+);
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
@@ -1080,8 +1087,18 @@ function FilmPage() {
           </p>
         </div>
       )}
-      {film.film_type === "series" && <SeriesEpisodes seriesId={film.id} />}
-      <FilmReviewsSection filmId={film.id} />
+      {film.film_type === "series" && (
+        <MountWhenNear rootMargin="400px" minHeight={320}>
+          <Suspense fallback={null}>
+            <SeriesEpisodes seriesId={film.id} />
+          </Suspense>
+        </MountWhenNear>
+      )}
+      <MountWhenNear rootMargin="400px" minHeight={280}>
+        <Suspense fallback={null}>
+          <FilmReviewsSection filmId={film.id} />
+        </Suspense>
+      </MountWhenNear>
       <SiteFooter />
 
       {/* Mobile-only sticky bottom CTA — sits above the bottom tab bar.
