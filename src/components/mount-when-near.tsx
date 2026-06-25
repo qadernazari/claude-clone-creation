@@ -26,17 +26,20 @@ export function MountWhenNear({
   useEffect(() => {
     if (armed) return;
     const arm = () => setArmed(true);
+    const armFromScroll = () => {
+      if (window.scrollY > 20) setArmed(true);
+    };
     if (window.scrollY > 20) {
       setArmed(true);
       return;
     }
     const opts = { passive: true, once: true } as AddEventListenerOptions;
-    window.addEventListener("scroll", arm, opts);
+    window.addEventListener("scroll", armFromScroll, opts);
     window.addEventListener("pointerdown", arm, opts);
     window.addEventListener("touchstart", arm, opts);
     window.addEventListener("keydown", arm, opts);
     return () => {
-      window.removeEventListener("scroll", arm);
+      window.removeEventListener("scroll", armFromScroll);
       window.removeEventListener("pointerdown", arm);
       window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
