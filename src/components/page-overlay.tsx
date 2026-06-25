@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { X, User, Ticket, CreditCard, LifeBuoy, Newspaper } from "lucide-react";
 import { loadCmsKey } from "@/lib/cms-client";
 import { CMS_KEYS, type PagesContent, type FaqContent, type PageCard } from "@/lib/cms";
