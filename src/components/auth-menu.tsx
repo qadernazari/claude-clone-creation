@@ -4,15 +4,13 @@ import { Link } from "@tanstack/react-router";
 import {
   User as UserIcon,
   Library,
-  Bookmark,
-  PlayCircle,
-  CreditCard,
   Ticket,
   Globe2,
   Shield,
   LogOut,
   ChevronRight,
 } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUserState, useSubscription } from "@/hooks/use-subscription";
@@ -403,18 +401,6 @@ export function AuthMenu() {
                 label={fa ? "کتابخانه من" : "My Library"}
                 onClick={() => setOpen(false)}
               />
-              <Row
-                to="/library"
-                icon={<Bookmark size={17} strokeWidth={1.6} />}
-                label={fa ? "فهرست تماشا" : "Watchlist"}
-                onClick={() => setOpen(false)}
-              />
-              <Row
-                to="/library"
-                icon={<PlayCircle size={17} strokeWidth={1.6} />}
-                label={fa ? "ادامه تماشا" : "Continue Watching"}
-                onClick={() => setOpen(false)}
-              />
             </Section>
 
             {/* Account section */}
@@ -426,17 +412,12 @@ export function AuthMenu() {
                 onClick={() => setOpen(false)}
               />
               <Row
-                to="/account"
-                icon={<CreditCard size={17} strokeWidth={1.6} />}
-                label={fa ? "اشتراک و صورتحساب" : "Subscription & Billing"}
-                onClick={() => setOpen(false)}
-              />
-              <Row
                 to="/my-tickets"
                 icon={<Ticket size={17} strokeWidth={1.6} />}
                 label={fa ? "بلیط‌های من" : "My Tickets"}
                 onClick={() => setOpen(false)}
               />
+
               <button
                 type="button"
                 onClick={switchRegion}
