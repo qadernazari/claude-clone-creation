@@ -43,6 +43,14 @@ export function FeaturedFilm() {
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
       <div className="relative h-[82svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
+        {/* Warm poster placeholder painted immediately by SSR — keeps the
+            hero looking intentional (not an empty black box) until the
+            actual image decodes. Hidden once the image is loaded. */}
+        <div
+          className="hero-mobile-poster pointer-events-none absolute inset-0 md:hidden"
+          style={{ background: fallbackBg }}
+          aria-hidden
+        />
         {hasAnyImage ? (
           <>
             {/*
@@ -65,6 +73,9 @@ export function FeaturedFilm() {
                 decoding="async"
                 sizes="100vw"
                 aria-hidden
+                onLoad={(e) => {
+                  (e.currentTarget as HTMLImageElement).dataset.loaded = "true";
+                }}
               />
             ) : null}
 
