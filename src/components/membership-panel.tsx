@@ -1,11 +1,10 @@
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
-import { getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipPortalSession } from "@/lib/membership.functions";
-// Lazy — Stripe SDK is heavy; only load when user opens checkout.
-const MembershipCheckout = lazy(() => import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })));
+import { getStripeEnvironment } from "@/lib/stripe";
 import { AcceptTrialButton } from "@/components/accept-trial-button";
 
 function fmtDate(iso: string | null, fa: boolean) {
@@ -29,7 +28,7 @@ export function MembershipPanel() {
   const openPortal = useServerFn(createMembershipPortalSession);
   const [loadingPortal, setLoadingPortal] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  void useState; // keep import shape stable; no checkout modal here anymore
 
   const t = {
     title: fa ? "عضویت" : "Membership",
@@ -102,22 +101,13 @@ export function MembershipPanel() {
               label={t.start}
             />
           )}
-          <button
-            type="button"
-            onClick={() => setCheckoutOpen(true)}
+          <Link
+            to="/membership"
             className="inline-flex items-center rounded-md border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
           >
-            {fa ? "ارتقا به عضویت" : "Become a member"}
-          </button>
+            {fa ? "مشاهده پلن‌ها" : "View plans"}
+          </Link>
         </div>
-        {checkoutOpen && (
-          <Suspense fallback={null}>
-            <MembershipCheckout
-              returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
-              onClose={() => setCheckoutOpen(false)}
-            />
-          </Suspense>
-        )}
       </section>
     );
   }
@@ -137,13 +127,12 @@ export function MembershipPanel() {
               {days !== null && days > 0 ? ` · ${t.daysLeft(days)}` : ""}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setCheckoutOpen(true)}
+          <Link
+            to="/membership"
             className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
           >
             {fa ? "ارتقا به عضویت" : "Become a member"}
-          </button>
+          </Link>
         </div>
         <dl className="mt-6 grid gap-4 sm:grid-cols-2 text-sm">
           <div>
@@ -159,14 +148,6 @@ export function MembershipPanel() {
             <dd className="mt-1 text-cream-bright">{fmtDate(trial.ends_at, fa)}</dd>
           </div>
         </dl>
-        {checkoutOpen && (
-          <Suspense fallback={null}>
-            <MembershipCheckout
-              returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&membership=1`}
-              onClose={() => setCheckoutOpen(false)}
-            />
-          </Suspense>
-        )}
       </section>
     );
   }

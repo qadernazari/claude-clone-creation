@@ -35,10 +35,10 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
           <li>• {fa ? "ارتقای سریع" : "Quick, simple upgrade"}</li>
         </ul>
         <a
-          href="/account"
+          href="/membership"
           className="mt-7 block w-full rounded-md bg-amber px-5 py-3 text-center text-sm font-medium text-bg-0 hover:bg-amber/90"
         >
-          {fa ? "ارتقا به عضویت" : "Upgrade to membership"}
+          {fa ? "مشاهده پلن‌های عضویت" : "View membership plans"}
         </a>
       </div>
     </div>

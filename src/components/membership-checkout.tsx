@@ -9,55 +9,56 @@ import { useIrMode } from "@/hooks/use-ir-mode";
 import { loadCmsKey } from "@/lib/cms-client";
 
 import { useLocale } from "@/lib/i18n";
-import { AcceptTrialButton } from "@/components/accept-trial-button";
-import { useSubscription } from "@/hooks/use-subscription";
+import { getPlan, tomanPriceForPlan, type MembershipPlanId } from "@/lib/membership-plans";
 
 interface MembershipCheckoutProps {
   returnUrl: string;
   onClose: () => void;
+  plan: MembershipPlanId;
 }
 
-export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutProps) {
+export function MembershipCheckout({ returnUrl, onClose, plan: planId }: MembershipCheckoutProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const irMode = useIrMode();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
-  const [membershipPriceToman, setMembershipPriceToman] = useState<number | undefined>(undefined);
-  const { hasUsedTrial, isMember } = useSubscription();
-  const showTrialCta = !hasUsedTrial && !isMember;
+  const [baseToman, setBaseToman] = useState<number | undefined>(undefined);
+  const plan = getPlan(planId);
 
   useEffect(() => {
     if (!irMode) return;
     loadCmsKey<{ membershipPriceToman?: number }>("general_settings").then((d) => {
-      if (d?.membershipPriceToman) setMembershipPriceToman(d.membershipPriceToman);
+      if (d?.membershipPriceToman) setBaseToman(d.membershipPriceToman);
     });
   }, [irMode]);
 
-  // Lock body scroll while modal is open
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => { document.body.style.overflow = prev; };
   }, []);
-
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const result = await createMembershipCheckout({
       data: {
         returnUrl,
         environment: getStripeEnvironment(),
+        plan: planId,
         ...(applied && { couponCode: applied.code }),
       },
     });
     if ("error" in result) throw new Error(result.error);
     if (!result.clientSecret) throw new Error("No client secret returned");
     return result.clientSecret;
-  }, [returnUrl, applied]);
+  }, [returnUrl, applied, planId]);
 
   const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
+
+  const planAmountToman = baseToman ? tomanPriceForPlan(plan, baseToman) : undefined;
+  const monthsLabel = fa
+    ? `${plan.months} ${plan.months === 1 ? "ماه" : "ماه"}`
+    : `${plan.months} ${plan.months === 1 ? "Month" : "Months"}`;
 
   return (
     <div
@@ -83,48 +84,32 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
           ✕
         </button>
 
-
         {irMode ? (
           <IrPayPanel
             kind="membership"
-            itemId="monthly"
-            amountToman={membershipPriceToman}
+            itemId={planId}
+            amountToman={planAmountToman}
             couponCode={applied?.code}
             onClose={onClose}
           />
         ) : !started ? (
           <div className="p-6 sm:p-8">
-            <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-              {fa ? "عضویت ماهانه" : "Monthly membership"}
+            <div className="text-[11px] uppercase tracking-[0.18em] text-amber/90">
+              {fa ? "عضویت ایران" : "IRAN Membership"}
+            </div>
+            <h2 className={`mt-1 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+              {monthsLabel}
             </h2>
             <p className="mt-2 text-sm text-cream/65">
-              {showTrialCta
-                ? fa
-                  ? "هفت روز رایگان — بدون نیاز به اطلاعات پرداخت."
-                  : "7 days free — no payment information required."
-                : fa
-                  ? "پرداخت ماهانه. هر زمان لغو کنید."
-                  : "Billed monthly. Cancel anytime."}
+              {fa
+                ? "پرداخت یکبار. بدون تمدید خودکار. هر زمان می‌توانید پلن جدید بخرید."
+                : "One-time payment. No auto-renewal. Buy another bundle anytime."}
             </p>
-
-            {showTrialCta && (
-              <div className="mt-6">
-                <AcceptTrialButton
-                  fullWidth
-                  className="inline-flex items-center justify-center rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
-                  label={fa ? "پذیرش دوره آزمایشی رایگان" : "Accept Free Trial"}
-                />
-                <p className="mt-3 text-center text-xs text-cream/50">
-                  {fa ? "یا" : "or"}
-                </p>
-              </div>
-            )}
 
             <div className="mt-6">
               <p className="mb-2 text-[11px] uppercase tracking-widest text-cream/55">
                 {fa ? "کد تخفیف (اختیاری)" : "Promo code (optional)"}
               </p>
-              {/* coupon field below — promo banner list removed */}
               <CouponField
                 context="membership"
                 fa={fa}
@@ -136,15 +121,9 @@ export function MembershipCheckout({ returnUrl, onClose }: MembershipCheckoutPro
             <button
               type="button"
               onClick={() => setStarted(true)}
-              className={`mt-6 w-full rounded-md ${showTrialCta ? "border border-cream/25 px-5 py-3 text-sm text-cream hover:bg-cream/5" : "bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"}`}
+              className="mt-6 w-full rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"
             >
-              {showTrialCta
-                ? fa
-                  ? "خرید مستقیم عضویت"
-                  : "Skip trial, become a member"
-                : fa
-                  ? "ادامه به پرداخت"
-                  : "Continue to payment"}
+              {fa ? "ادامه به پرداخت" : "Continue to payment"}
             </button>
           </div>
         ) : (
