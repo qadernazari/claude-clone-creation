@@ -243,7 +243,10 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
-              `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}`,
+              `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
+              // Promote the print-stylesheet webfont link to render once it loads,
+              // so fonts are non-blocking but still applied (no FOIT for long).
+              `try{var ls=document.querySelectorAll('link[rel="stylesheet"][media="print"]');for(var i=0;i<ls.length;i++){(function(l){if(l.sheet){l.media='all';}else{l.addEventListener('load',function(){l.media='all';});}})(ls[i]);}}catch(e){}`,
           }}
         />
         <HeadContent />
@@ -255,6 +258,7 @@ function RootShell({ children }: { children: ReactNode }) {
     </html>
   );
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
