@@ -15,11 +15,21 @@ const ContinueWatching = lazy(() =>
   import("../components/continue-watching").then((m) => ({ default: m.ContinueWatching })),
 );
 
-function MountWhenNear({ children, rootMargin = "600px" }: { children: ReactNode; rootMargin?: string }) {
+function MountWhenNear({ children, rootMargin = "0px" }: { children: ReactNode; rootMargin?: string }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [show, setShow] = useState(false);
+  const [armed, setArmed] = useState(false);
   useEffect(() => {
-    if (show) return;
+    if (armed) return;
+    const arm = () => {
+      if (window.scrollY > 40) setArmed(true);
+    };
+    arm();
+    window.addEventListener("scroll", arm, { passive: true });
+    return () => window.removeEventListener("scroll", arm);
+  }, [armed]);
+  useEffect(() => {
+    if (show || !armed) return;
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
@@ -37,7 +47,7 @@ function MountWhenNear({ children, rootMargin = "600px" }: { children: ReactNode
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [show, rootMargin]);
+  }, [show, armed, rootMargin]);
   return <div ref={ref}>{show ? <Suspense fallback={null}>{children}</Suspense> : null}</div>;
 }
 
@@ -46,7 +56,7 @@ function HomePendingShell() {
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader current="home" />
-      <main className="relative h-[82svh] min-h-[520px] overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]">
+      <main className="relative h-[100svh] min-h-[620px] overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]">
         <div className="hero-mobile-skeleton absolute inset-0" aria-hidden />
         <div
           className="absolute inset-0"
@@ -186,14 +196,14 @@ function Home() {
         <FeaturedFilm />
 
         {/* 2. Continue Watching (logged-in only, hides itself otherwise) */}
-        <MountWhenNear>
+        <MountWhenNear rootMargin="0px">
           <div className="pt-10 md:pt-14">
             <ContinueWatching />
           </div>
         </MountWhenNear>
 
         {/* 3. Editorial rails — capped at 4 total (Originals, New Releases, 2 categories) */}
-        <MountWhenNear>
+        <MountWhenNear rootMargin="0px">
           <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
             <FilmsRow />
           </div>

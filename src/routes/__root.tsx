@@ -18,12 +18,10 @@ import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { AuthProvider } from "../lib/auth-context";
 import { resolveVisitorRegion } from "../lib/region.functions";
+import { MobileTabBar } from "@/components/mobile-tab-bar";
 
-// Defer non-critical chrome out of the initial bundle. Neither is needed
-// for FCP/LCP — both render after hydration via DeferredChrome below.
-const MobileTabBar = lazy(() =>
-  import("@/components/mobile-tab-bar").then((m) => ({ default: m.MobileTabBar })),
-);
+// Defer only the mirror notice. The mobile tab bar is visible chrome, so it
+// renders with SSR to avoid the bottom bar popping in after first paint.
 const IranMirrorBanner = lazy(() =>
   import("@/components/iran-mirror-banner").then((m) => ({ default: m.IranMirrorBanner })),
 );
@@ -279,6 +277,7 @@ function RootComponent() {
             <AuthInvalidator />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
+            <MobileTabBar />
             <DeferredChrome />
             <Toaster richColors position="top-center" />
           </PageOverlayProvider>
@@ -289,9 +288,7 @@ function RootComponent() {
 }
 
 /**
- * Mounts the mobile tab bar and the Iran mirror banner only after the page
- * has had a chance to paint and become interactive. Keeps both out of the
- * critical-path bundle on mobile (saves ~30 KB and several long tasks).
+ * Mounts the Iran mirror banner well after the first screen is stable.
  */
 function DeferredChrome() {
   const [ready, setReady] = useState(false);
@@ -300,20 +297,19 @@ function DeferredChrome() {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
     };
     if (typeof w.requestIdleCallback === "function") {
-      const id = w.requestIdleCallback(() => setReady(true), { timeout: 2000 });
+      const id = w.requestIdleCallback(() => setReady(true), { timeout: 6000 });
       return () => {
         const cancel = (window as Window & { cancelIdleCallback?: (id: number) => void })
           .cancelIdleCallback;
         if (cancel) cancel(id);
       };
     }
-    const t = window.setTimeout(() => setReady(true), 800);
+    const t = window.setTimeout(() => setReady(true), 5000);
     return () => window.clearTimeout(t);
   }, []);
   if (!ready) return null;
   return (
     <Suspense fallback={null}>
-      <MobileTabBar />
       <IranMirrorBanner />
     </Suspense>
   );

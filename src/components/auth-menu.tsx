@@ -246,9 +246,14 @@ export function AuthMenu() {
       <div className="flex w-auto min-w-[78px] justify-end">
         <Link
           to="/auth"
-          className="mobile-signin-trigger inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md border border-cream/20 bg-transparent px-5 text-sm font-medium text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
+          aria-label={fa ? "ورود" : "Sign in"}
+          className="mobile-signin-trigger inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95 sm:w-auto sm:px-5 sm:text-sm sm:font-medium"
         >
-          {fa ? "ورود" : "Sign in"}
+          <svg className="sm:hidden" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5 20c1.5-3.5 4.2-5 7-5s5.5 1.5 7 5" />
+          </svg>
+          <span className="hidden sm:inline">{fa ? "ورود" : "Sign in"}</span>
         </Link>
       </div>
     );
