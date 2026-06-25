@@ -107,15 +107,16 @@ function PageSheet({ slug, onClose, onNavigate }: { slug: string; onClose: () =>
   const fa = locale === "fa";
   const dir = fa ? "rtl" : "ltr";
 
-  const { data: pages } = useQuery({
+  const { data: pages, isFetched: pagesFetched } = useQuery({
     queryKey: ["site_content", CMS_KEYS.PAGES],
     queryFn: () => loadCmsKey<PagesContent>(CMS_KEYS.PAGES),
   });
-  const { data: faq } = useQuery({
+  const { data: faq, isFetched: faqFetched } = useQuery({
     queryKey: ["site_content", CMS_KEYS.FAQ],
     queryFn: () => loadCmsKey<FaqContent>(CMS_KEYS.FAQ),
     enabled: slug === "faq",
   });
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
