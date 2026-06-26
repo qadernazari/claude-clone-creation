@@ -116,10 +116,8 @@ function SplitNotFoundComponent() {
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
-    if (typeof window === "undefined") {
-      const { setHomepageCacheHeaders } = await import("@/lib/cache-headers.server");
-      setHomepageCacheHeaders();
-    }
+    const { setHomepageCacheHeaders } = await import("@/lib/cache-headers");
+    setHomepageCacheHeaders();
     return context.queryClient.ensureQueryData(homeFeaturedQueryOptions);
   },
   head: ({ loaderData }) => ({
