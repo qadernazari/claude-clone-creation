@@ -342,6 +342,7 @@ function DeferredChrome() {
   return (
     <Suspense fallback={null}>
       <IranMirrorBanner />
+      <Toaster richColors position="top-center" />
     </Suspense>
   );
 }
