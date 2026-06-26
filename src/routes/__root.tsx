@@ -202,12 +202,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "enamad", content: "52799420" },
     ],
     links: [
-      // Preload the stylesheet so the network fetch starts immediately;
-      // the actual <link rel="stylesheet"> is injected non-blocking
-      // (media="print" → swap to "all" onload) by the inline script in
-      // RootShell <head>. Combined with the inline critical CSS this
-      // eliminates the ~830ms render-blocking CSS hit on mobile.
+      // Stylesheet is render-blocking by spec — preload it so the browser
+      // starts fetching it the moment the HTML streams in, in parallel
+      // with HTML parsing, instead of waiting until the parser reaches
+      // the <link> tag.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
+      { rel: "stylesheet", href: appCss },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
