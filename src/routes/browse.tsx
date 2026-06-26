@@ -287,13 +287,9 @@ function BrowsePage() {
         ) : null}
 
         <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-cream/40 md:mb-8">
-          {isLoading
-            ? locale === "fa"
-              ? "در حال بارگذاری…"
-              : "Loading…"
-            : `${num(filtered.length)} ${
-                locale === "fa" ? "اثر" : filtered.length === 1 ? "film" : "films"
-              }`}
+          {`${num(filtered.length)} ${
+            locale === "fa" ? "اثر" : filtered.length === 1 ? "film" : "films"
+          }`}
         </p>
 
         {/* Mobile sort bottom sheet */}
