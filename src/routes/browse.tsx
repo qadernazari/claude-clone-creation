@@ -114,7 +114,6 @@ function BrowsePage() {
   });
   const films = data.films as Film[];
   const categories = data.categories as Category[];
-  const isLoading = false;
 
   const usedCategoryIds = useMemo(
     () => new Set((films ?? []).map((f) => f.category).filter(Boolean) as string[]),
