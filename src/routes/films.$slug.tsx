@@ -36,7 +36,15 @@ export const Route = createFileRoute("/films/$slug")({
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) throw notFound();
-    return { film: data };
+    // Resize the hero image for the og:image / twitter:image tag —
+    // matches the homepage pattern (width 1200, quality 75). Crawlers
+    // get a fast, uniformly sized share preview instead of the raw
+    // full-resolution signed URL.
+    const { getResizedOgImage } = await import("@/lib/og-image.functions");
+    const ogImage = await getResizedOgImage({
+      data: { url: data.thumbnail_url || data.cover_url || null },
+    });
+    return { film: data, ogImage };
   },
   head: ({ params, loaderData }) => {
     const f = loaderData?.film;
@@ -45,6 +53,7 @@ export const Route = createFileRoute("/films/$slug")({
     const desc = f.synopsis_en?.slice(0, 160) ?? "Original Iranian short film on IRAN.";
     const url = `https://ir.show/films/${params.slug}`;
     const isoDuration = f.duration_min ? `PT${f.duration_min}M` : undefined;
+    const ogImage = loaderData?.ogImage || f.thumbnail_url || f.cover_url;
     return {
       meta: [
         { title },
@@ -54,8 +63,8 @@ export const Route = createFileRoute("/films/$slug")({
         { property: "og:type", content: "video.movie" },
         { property: "og:url", content: url },
         { property: "og:site_name", content: "IRAN" },
-        ...(f.cover_url ? [{ property: "og:image" as const, content: f.cover_url }] : []),
-        ...(f.cover_url ? [{ name: "twitter:image" as const, content: f.cover_url }] : []),
+        ...(ogImage ? [{ property: "og:image" as const, content: ogImage }] : []),
+        ...(ogImage ? [{ name: "twitter:image" as const, content: ogImage }] : []),
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [

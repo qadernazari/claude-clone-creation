@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { browsePageQueryOptions } from "../lib/browse.functions";
+import { homeFeaturedQueryOptions } from "../lib/home.functions";
 import type { BrowseFilm, BrowseCategory } from "../lib/browse.types";
 import { useLocale } from "../lib/i18n";
 import { SiteHeader } from "../components/site-header";
@@ -16,7 +17,18 @@ const browseSearchSchema = z.object({
 
 export const Route = createFileRoute("/browse")({
   validateSearch: zodValidator(browseSearchSchema),
-  head: () => ({
+  loader: async ({ context }) => {
+    // SSR-critical: hydrate the catalog server-side so the initial HTML
+    // contains actual film cards (not a "Loading…" placeholder). Crawlers
+    // can index the catalog and users on slow connections see content
+    // before JS boots.
+    const [, featured] = await Promise.all([
+      context.queryClient.ensureQueryData(browsePageQueryOptions),
+      context.queryClient.ensureQueryData(homeFeaturedQueryOptions),
+    ]);
+    return { ogImage: featured?.thumbnail_url || featured?.cover_url || null };
+  },
+  head: ({ loaderData }) => ({
     meta: [
       { title: "Browse films — All originals" },
       {
@@ -30,6 +42,13 @@ export const Route = createFileRoute("/browse")({
         content: "Every film in the catalog, filterable by category and sort.",
       },
       { property: "og:url", content: "https://ir.show/browse" },
+      ...(loaderData?.ogImage
+        ? [
+            { property: "og:image" as const, content: loaderData.ogImage },
+            { name: "twitter:image" as const, content: loaderData.ogImage },
+            { name: "twitter:card" as const, content: "summary_large_image" },
+          ]
+        : []),
     ],
     links: [{ rel: "canonical", href: "https://ir.show/browse" }],
   }),
@@ -48,6 +67,7 @@ export const Route = createFileRoute("/browse")({
     </div>
   ),
 });
+
 
 type Film = BrowseFilm;
 
@@ -71,9 +91,10 @@ function BrowsePage() {
   const [q, setQ] = useState(initialQ);
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
-  const { data, isLoading } = useQuery(browsePageQueryOptions);
-  const films = data?.films as Film[] | undefined;
-  const categories = data?.categories as Category[] | undefined;
+  const { data } = useSuspenseQuery(browsePageQueryOptions);
+  const films = data.films as Film[];
+  const categories = data.categories as Category[];
+  const isLoading = false;
 
   const usedCategoryIds = useMemo(
     () => new Set((films ?? []).map((f) => f.category).filter(Boolean) as string[]),
