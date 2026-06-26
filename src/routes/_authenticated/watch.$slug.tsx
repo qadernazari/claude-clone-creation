@@ -866,6 +866,49 @@ function WatchPage() {
                       {fmtTime(duration)}
                     </span>
                     <div className="flex-1" />
+                    {subtitles.length > 0 && (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setCcOpen((x) => !x)}
+                          aria-label={fa ? "زیرنویس" : "Subtitles"}
+                          aria-expanded={ccOpen}
+                          className={`flex h-9 min-w-9 items-center justify-center rounded-md px-1.5 text-[11px] font-semibold transition-all hover:scale-110 ${activeCc ? "text-amber" : "text-cream/85 hover:text-amber"}`}
+                        >
+                          CC
+                        </button>
+                        {ccOpen && (
+                          <div
+                            role="menu"
+                            className="absolute bottom-12 end-0 min-w-[160px] rounded-md border border-cream/15 bg-bg-0/95 p-1 text-[12px] shadow-2xl backdrop-blur"
+                          >
+                            <button
+                              type="button"
+                              role="menuitemradio"
+                              aria-checked={activeCc === null}
+                              onClick={() => selectCc(null)}
+                              className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-start hover:bg-cream/10 ${activeCc === null ? "text-amber" : "text-cream/85"}`}
+                            >
+                              <span>{fa ? "خاموش" : "Off"}</span>
+                              {activeCc === null && <span aria-hidden>✓</span>}
+                            </button>
+                            {subtitles.map((s) => (
+                              <button
+                                key={s.lang}
+                                type="button"
+                                role="menuitemradio"
+                                aria-checked={activeCc === s.lang}
+                                onClick={() => selectCc(s.lang)}
+                                className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-start hover:bg-cream/10 ${activeCc === s.lang ? "text-amber" : "text-cream/85"}`}
+                              >
+                                <span>{s.label}</span>
+                                {activeCc === s.lang && <span aria-hidden>✓</span>}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={toggleFullscreen}
