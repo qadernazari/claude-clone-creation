@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { homeFeaturedQueryOptions } from "@/lib/home.functions";
+import { homeFeaturedQueryOptions, homeRailsQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
 // approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
@@ -15,8 +16,28 @@ const ContinueWatching = lazy(() =>
   import("../components/continue-watching").then((m) => ({ default: m.ContinueWatching })),
 );
 
+// Warm the lazy chunks + rails data on idle so the moment the user scrolls
+// the rails render instantly — no chunk fetch, no query wait.
+function prefetchRails(queryClient: ReturnType<typeof useQueryClient>) {
+  void import("../components/films-row");
+  void import("../components/continue-watching");
+  void queryClient.prefetchQuery(homeRailsQueryOptions);
+}
+
 function DeferredHomeRails() {
   const [show, setShow] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Idle prefetch — runs ~after hero paints, before user even scrolls.
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number };
+    const run = () => prefetchRails(queryClient);
+    if (w.requestIdleCallback) {
+      w.requestIdleCallback(run, { timeout: 1500 });
+    } else {
+      setTimeout(run, 600);
+    }
+  }, [queryClient]);
 
   useEffect(() => {
     const reveal = () => {
@@ -52,6 +73,7 @@ function DeferredHomeRails() {
     </>
   );
 }
+
 
 
 
