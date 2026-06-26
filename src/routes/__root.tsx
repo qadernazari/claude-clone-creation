@@ -198,13 +198,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "enamad", content: "52799420" },
     ],
     links: [
-      // Stylesheet is render-blocking by spec — preload it so the browser
-      // starts fetching it the moment the HTML streams in, in parallel
-      // with HTML parsing, instead of waiting until the parser reaches
-      // the <link> tag. Combined with the inline critical CSS below, this
-      // is the biggest FCP win available without splitting the stylesheet.
+      // Preload the stylesheet so the network fetch starts immediately;
+      // the actual <link rel="stylesheet"> is injected non-blocking
+      // (media="print" → swap to "all" onload) by the inline script in
+      // RootShell <head>. Combined with the inline critical CSS this
+      // eliminates the ~830ms render-blocking CSS hit on mobile.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
-      { rel: "stylesheet", href: appCss },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
@@ -212,11 +211,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         crossOrigin: "anonymous",
       },
       { rel: "dns-prefetch", href: "https://yasfnvftzwyuxdhpysof.supabase.co" },
-      // Google Fonts preconnects intentionally removed — PageSpeed flagged
-      // them as unused because the webfont CSS is injected async via the
-      // inline script in RootShell <head> with display=optional, so the
-      // connection sat idle through FCP. The async load now opens its own
-      // connection only if/when the font is actually requested.
     ],
 
   }),
