@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { MountWhenNear } from "@/components/mount-when-near";
+import { Share2, Check } from "lucide-react";
+import { toast } from "sonner";
 
 // Deferred — reviews + episodes only load after the user scrolls or interacts.
 const FilmReviewsSection = lazy(() =>
@@ -406,8 +408,8 @@ function FilmPage() {
     contribSoon: fa ? "حمایت به‌زودی فعال می‌شود." : "Contributions coming soon.",
     tomanSoon: fa ? "پرداخت با تومان (زرین‌پال) به‌زودی." : "Toman checkout (ZarinPal) coming soon.",
     playPreview: fa ? "پخش تیزر" : "Watch trailer",
-    share: fa ? "هم‌رسانی" : "Share",
-    copied: fa ? "لینک کپی شد" : "Link copied",
+    share: fa ? "اشتراک‌گذاری" : "Share",
+    copied: fa ? "لینک کپی شد!" : "Link copied!",
     moreFromCat: fa ? "بیشتر از این دسته" : "More to explore",
     orBuy: fa ? "یا فقط این فیلم را بخرید" : "Or buy this film",
     creditGroups: {
@@ -435,17 +437,26 @@ function FilmPage() {
 
 
   const handleShare = async () => {
-    const url = typeof window !== "undefined" ? window.location.href : "";
+    const url = `https://ir.show/films/${film.slug}`;
+    const firstSentence = synopsis
+      ? (synopsis.replace(/\s+/g, " ").trim().match(/^[^.!?。！？]+[.!?。！？]?/)?.[0] ?? "").trim()
+      : "";
+    const shareData = { title, text: firstSentence, url };
     try {
-      if (navigator.share) {
-        await navigator.share({ title: `${title} — IRAN`, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1800);
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share(shareData);
+        return;
       }
     } catch {
-      /* user cancelled */
+      /* user cancelled or share failed — fall through to clipboard */
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success(t.copied);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked */
     }
   };
 
@@ -798,17 +809,15 @@ function FilmPage() {
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-cream/15 bg-black/30 text-cream/80 backdrop-blur-sm transition-colors hover:bg-cream/10 hover:text-cream-bright"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/20 bg-black/20 text-cream/85 backdrop-blur-sm transition-colors hover:border-cream/45 hover:bg-cream/8 hover:text-cream-bright"
                 aria-label={t.share}
                 title={copied ? t.copied : t.share}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <circle cx="18" cy="5" r="3" />
-                  <circle cx="6" cy="12" r="3" />
-                  <circle cx="18" cy="19" r="3" />
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                </svg>
+                {copied ? (
+                  <Check size={16} className="text-amber" aria-hidden />
+                ) : (
+                  <Share2 size={16} aria-hidden />
+                )}
               </button>
             </div>
 
