@@ -45,12 +45,18 @@ export function SiteFooter() {
           </div>
 
           <nav className="flex flex-wrap items-center gap-x-7 gap-y-3 text-[12px]">
-            {pageBtn("about", fa ? "درباره" : "About")}
+            <Link to="/about" className="text-cream/50 transition-colors hover:text-cream">
+              {fa ? "درباره" : "About"}
+            </Link>
             <Link to="/browse" className="text-cream/50 transition-colors hover:text-cream">
               {fa ? "آثار" : "Browse"}
             </Link>
-            {pageBtn("help", fa ? "راهنما" : "Help")}
-            {pageBtn("contact", fa ? "تماس" : "Contact")}
+            <Link to="/help" className="text-cream/50 transition-colors hover:text-cream">
+              {fa ? "راهنما" : "Help"}
+            </Link>
+            <Link to="/contact" className="text-cream/50 transition-colors hover:text-cream">
+              {fa ? "تماس" : "Contact"}
+            </Link>
             {pageBtn("privacy", fa ? "حریم خصوصی" : "Privacy")}
             {pageBtn("terms", fa ? "قوانین" : "Terms")}
           </nav>
