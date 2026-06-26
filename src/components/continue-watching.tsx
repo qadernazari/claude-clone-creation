@@ -81,7 +81,7 @@ export function ContinueWatching() {
       <div className="mx-auto max-w-[1400px] px-5 md:px-12">
         <div className="mb-5 md:mb-7">
           <h2 className="font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[26px]">
-            {fa ? "ادامه‌ی تماشا" : "Continue Watching"}
+            {fa ? "ادامه تماشا" : "Continue Watching"}
           </h2>
         </div>
       </div>
@@ -164,7 +164,7 @@ export function ContinueWatching() {
                 {remaining !== null && (
                   <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-cream/40">
                     {fa
-                      ? `${num(remaining)} دقیقه باقی‌مانده`
+                      ? `${num(remaining)} دقیقه مانده`
                       : `${num(remaining)} min left`}
                   </p>
                 )}

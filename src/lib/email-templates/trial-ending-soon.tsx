@@ -39,7 +39,7 @@ const Email = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      Your {SITE_NAME} trial ends soon · پایان دوره آزمایشی نزدیک است
+      Your {SITE_NAME} trial ends soon · پایان آزمایش رایگان نزدیک است
     </Preview>
     <Body style={main}>
       <Container style={container}>
@@ -72,11 +72,11 @@ const Email = ({
         <Hr style={hr} />
 
         <Section dir="rtl" style={{ textAlign: 'right' }}>
-          <Heading style={h1}>پایان دوره آزمایشی نزدیک است</Heading>
+          <Heading style={h1}>پایان آزمایش رایگان نزدیک است</Heading>
           <Text style={text}>
-            دوره آزمایشی شما در تاریخ{' '}
+            آزمایش رایگان شما در تاریخ{' '}
             <strong>{trialEndFormatted || 'به‌زودی'}</strong> به پایان می‌رسد.
-            پس از آن اشتراک{' '}
+            پس از آن عضویت{' '}
             {priceFormatted ? (
               <>به مبلغ <strong>{priceFormatted}</strong></>
             ) : null}{' '}
@@ -84,7 +84,7 @@ const Email = ({
           </Text>
           <Section style={{ textAlign: 'center', margin: '28px 0' }}>
             <Button href={manageUrl} style={button}>
-              مدیریت اشتراک
+              مدیریت عضویت
             </Button>
           </Section>
         </Section>

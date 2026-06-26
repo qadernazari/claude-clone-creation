@@ -37,7 +37,7 @@ const Email = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      Your {SITE_NAME} membership has been canceled · اشتراک شما لغو شد
+      Your {SITE_NAME} membership has been canceled · عضویت شما پایان یافت
     </Preview>
     <Body style={main}>
       <Container style={container}>
@@ -69,9 +69,9 @@ const Email = ({
         <Hr style={hr} />
 
         <Section dir="rtl" style={{ textAlign: 'right' }}>
-          <Heading style={h1}>اشتراک شما لغو شد</Heading>
+          <Heading style={h1}>عضویت شما پایان یافت</Heading>
           <Text style={text}>
-            اشتراک {SITE_NAME} شما لغو شد و دیگر تمدید نمی‌شود.
+            عضویت {SITE_NAME} شما پایان یافت و دیگر تمدید نمی‌شود.
           </Text>
           {accessUntilFormatted ? (
             <Text style={meta}>

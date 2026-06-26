@@ -17,10 +17,10 @@ export function CouponField({ context, filmId, fa, applied, onApply }: CouponFie
   const [loading, setLoading] = useState(false);
 
   const labels = {
-    placeholder: fa ? "کد تخفیف" : "Promo code",
-    apply: fa ? "اعمال" : "Apply",
-    applied: fa ? "اعمال شد" : "Applied",
-    remove: fa ? "حذف" : "Remove",
+    placeholder: fa ? "کد تخفیف را وارد کنید" : "Promo code",
+    apply: fa ? "اعمال کد" : "Apply",
+    applied: fa ? "کد اعمال شد" : "Applied",
+    remove: fa ? "حذف کد" : "Remove",
   };
 
   async function handleApply() {
@@ -31,13 +31,16 @@ export function CouponField({ context, filmId, fa, applied, onApply }: CouponFie
     try {
       const res = await check({ data: { code: trimmed, context, filmId } });
       if (!res.ok) {
-        setError(res.error);
+        const hasPersian = /[\u0600-\u06FF]/.test(res.error || "");
+        setError(fa && !hasPersian ? "کد تخفیف معتبر نیست." : res.error);
         return;
       }
       onApply({ code: res.code, label: res.discountLabel });
       setCode("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not validate code");
+      const raw = e instanceof Error ? e.message : "Could not validate code";
+      const hasPersian = /[\u0600-\u06FF]/.test(raw);
+      setError(fa && !hasPersian ? "کد تخفیف معتبر نیست." : raw);
     } finally {
       setLoading(false);
     }

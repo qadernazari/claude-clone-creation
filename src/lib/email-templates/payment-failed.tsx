@@ -39,7 +39,7 @@ const Email = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      Payment failed for your {SITE_NAME} membership · پرداخت ناموفق
+      Payment failed for your {SITE_NAME} membership · مشکل در پرداخت
     </Preview>
     <Body style={main}>
       <Container style={container}>
@@ -75,7 +75,7 @@ const Email = ({
         <Section dir="rtl" style={{ textAlign: 'right' }}>
           <Heading style={h1}>پرداخت شما انجام نشد</Heading>
           <Text style={text}>
-            آخرین پرداخت اشتراک شما{' '}
+            آخرین پرداخت عضویت شما{' '}
             {amountFormatted ? <>به مبلغ <strong>{amountFormatted}</strong> </> : null}
             موفق نبود. معمولاً به این دلیل است که کارت منقضی شده یا توسط بانک
             رد شده است.

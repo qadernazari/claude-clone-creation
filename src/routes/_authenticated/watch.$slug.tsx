@@ -596,7 +596,7 @@ function WatchPage() {
     buyOne: fa ? "خرید بلیط" : "Buy a ticket",
     missing: fa ? "ویدئو هنوز در دسترس نیست." : "Video is not available yet.",
     checking: fa ? "در حال بررسی بلیط…" : "Checking your ticket…",
-    accessRemaining: fa ? "زمان باقی‌مانده" : "Access remaining",
+    accessRemaining: fa ? "زمان مانده" : "Access remaining",
     theaterOn: fa ? "حالت سینما" : "Theater mode",
     theaterOff: fa ? "حالت عادی" : "Standard view",
     shortcuts: fa ? "میانبرها" : "Shortcuts",
