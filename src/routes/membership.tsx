@@ -24,7 +24,12 @@ const MembershipCheckout = lazy(() =>
 );
 
 export const Route = createFileRoute("/membership")({
-  head: () => ({
+  loader: async ({ context }) => {
+    const { homeFeaturedQueryOptions } = await import("@/lib/home.functions");
+    const featured = await context.queryClient.ensureQueryData(homeFeaturedQueryOptions);
+    return { ogImage: featured?.thumbnail_url || featured?.cover_url || null };
+  },
+  head: ({ loaderData }) => ({
     meta: [
       { title: "Membership — IRAN" },
       {
@@ -32,7 +37,22 @@ export const Route = createFileRoute("/membership")({
         content:
           "Choose your IRAN membership. 1, 3, 6, or 12 months — unlimited streaming, save up to 20%.",
       },
+      { property: "og:title", content: "Membership — IRAN" },
+      {
+        property: "og:description",
+        content:
+          "Unlimited Iranian cinema. 1, 3, 6, or 12 month plans — no auto-renewal, cancel anytime.",
+      },
+      { property: "og:url", content: "https://ir.show/membership" },
+      ...(loaderData?.ogImage
+        ? [
+            { property: "og:image" as const, content: loaderData.ogImage },
+            { name: "twitter:image" as const, content: loaderData.ogImage },
+            { name: "twitter:card" as const, content: "summary_large_image" },
+          ]
+        : []),
     ],
+    links: [{ rel: "canonical", href: "https://ir.show/membership" }],
   }),
   component: MembershipPage,
 });
