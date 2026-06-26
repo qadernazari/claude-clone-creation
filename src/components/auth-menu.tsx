@@ -373,7 +373,7 @@ export function AuthMenu() {
               >
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
-                    {fa ? "اشتراک" : "Membership"}
+                    {fa ? "عضویت" : "Membership"}
                   </p>
                   <p
                     className={[

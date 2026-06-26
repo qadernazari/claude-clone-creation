@@ -83,7 +83,7 @@ export function MembershipPanel() {
         <p className="mt-2 text-sm text-cream/70">
           {isTrialExpired
             ? fa
-              ? "دوره آزمایشی شما به پایان رسید. برای ادامه، عضو شوید."
+              ? "آزمایش رایگان شما به پایان رسید. برای ادامه، عضو شوید."
               : "Your free trial has ended. Become a member to keep watching."
             : t.none}
         </p>
