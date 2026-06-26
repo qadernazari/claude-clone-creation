@@ -38,14 +38,14 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
     try {
       const res = await activate();
       if ("error" in res) {
-        setErr(res.error);
+        setErr(fa ? "فعال‌سازی آزمایش رایگان ممکن نشد. دوباره تلاش کنید." : res.error);
       } else {
         // Refresh subscription/trial state across the app.
         await qc.invalidateQueries({ queryKey: ["subscription"] });
         await qc.invalidateQueries({ queryKey: ["my-trial"] });
       }
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Could not start trial");
+      setErr(fa ? "خطایی رخ داد. دوباره تلاش کنید." : (e instanceof Error ? e.message : "Could not start trial"));
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export function AcceptTrialButton({ className, label, fullWidth }: Props) {
         to="/account"
         className={`${baseCls}${fullWidth ? " w-full justify-center" : ""}`}
       >
-        {fa ? "عضو شوید" : "Become a Member"}
+        {fa ? "تبدیل به عضو" : "Become a Member"}
       </Link>
     );
   }

@@ -16,16 +16,16 @@ export function NewsletterSection() {
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   const t = {
-    label: fa ? "در جریان باش" : "Stay in the loop",
+    label: fa ? "در جریان بمانید" : "Stay in the loop",
     heading: fa ? "فیلم‌های جدید، هر ماه." : "New films, added monthly.",
     subtitle: fa
       ? "وقتی فیلم‌های ایرانی جدید به پلتفرم اضافه می‌شوند، به شما خبر می‌دهیم."
       : "Get notified when new Iranian films arrive on the platform.",
     placeholder: fa ? "آدرس ایمیل شما" : "Your email address",
-    button: fa ? "اطلاع بده" : "Notify Me",
+    button: fa ? "خبرم کنید" : "Notify Me",
     submitting: fa ? "در حال ارسال…" : "Submitting…",
     success: fa
-      ? "در لیست هستید. به زودی با شما در تماس خواهیم بود."
+      ? "ثبت شدید. وقتی فیلم جدید اضافه شود خبرتان می‌کنیم."
       : "You're on the list. We'll be in touch.",
     duplicate: fa ? "ایمیل شما قبلاً ثبت شده است." : "You're already on the list.",
     invalid: fa ? "لطفاً یک ایمیل معتبر وارد کنید." : "Please enter a valid email.",
