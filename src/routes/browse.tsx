@@ -15,6 +15,8 @@ const browseSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
 });
 
+const FALLBACK_OG = "https://yasfnvftzwyuxdhpysof.supabase.co/storage/v1/render/image/sign/film-thumbnails/new-film/a2e2704d-324f-4ef7-b294-c552fcb803d4.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zODlhNWU3Yi0zYzdmLTQ5YWMtYjQ3YS04ODQ2NGM5YjhiMGIiLCJhbGciOiJIUzI1NiJ9.eyJ0cmFuc2Zvcm1hdGlvbnMiOiJ3aWR0aDoxNDAwLHJlc2l6ZTpjb250YWluLHF1YWxpdHk6NzAiLCJ1cmwiOiJmaWxtLXRodW1ibmFpbHMvbmV3LWZpbG0vYTJlMjcwNGQtMzI0Zi00ZWY3LWIyOTQtYzU1MmZjYjgwM2Q0LmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODI1MDE4OTAsImV4cCI6MTgxNDAzNzg5MH0.UEBH4vlm8e04xbsMidizKO34WhNkmFMs5Om0yphoSB0";
+
 export const Route = createFileRoute("/browse")({
   validateSearch: zodValidator(browseSearchSchema),
   loader: async () => {
@@ -41,7 +43,9 @@ export const Route = createFileRoute("/browse")({
     }
   },
   pendingComponent: () => null,
-  head: ({ loaderData }) => ({
+  head: ({ loaderData }) => {
+    const ogImage = loaderData?.ogImage || FALLBACK_OG;
+    return {
     meta: [
       { title: "Browse films — All originals" },
       {
@@ -56,16 +60,14 @@ export const Route = createFileRoute("/browse")({
           "Explore every film in the catalog. Sort by newest, duration, or our curated order. Iranian cinema, streaming worldwide.",
       },
       { property: "og:url", content: "https://ir.show/browse" },
-      ...(loaderData?.ogImage
-        ? [
-            { property: "og:image" as const, content: loaderData.ogImage },
-            { name: "twitter:image" as const, content: loaderData.ogImage },
-            { name: "twitter:card" as const, content: "summary_large_image" },
-          ]
-        : []),
+      { property: "og:site_name", content: "IRAN" },
+      { property: "og:image" as const, content: ogImage },
+      { name: "twitter:image" as const, content: ogImage },
+      { name: "twitter:card" as const, content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://ir.show/browse" }],
-  }),
+    };
+  },
   component: BrowsePage,
   errorComponent: ({ error }) => {
     console.error("browse error:", error);
@@ -112,7 +114,6 @@ function BrowsePage() {
   });
   const films = data.films as Film[];
   const categories = data.categories as Category[];
-  const isLoading = false;
 
   const usedCategoryIds = useMemo(
     () => new Set((films ?? []).map((f) => f.category).filter(Boolean) as string[]),
@@ -285,13 +286,9 @@ function BrowsePage() {
         ) : null}
 
         <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-cream/40 md:mb-8">
-          {isLoading
-            ? locale === "fa"
-              ? "در حال بارگذاری…"
-              : "Loading…"
-            : `${num(filtered.length)} ${
-                locale === "fa" ? "اثر" : filtered.length === 1 ? "film" : "films"
-              }`}
+          {`${num(filtered.length)} ${
+            locale === "fa" ? "اثر" : filtered.length === 1 ? "film" : "films"
+          }`}
         </p>
 
         {/* Mobile sort bottom sheet */}
@@ -351,13 +348,7 @@ function BrowsePage() {
         )}
 
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-[2/3] animate-pulse rounded-lg bg-bg-1" aria-hidden />
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-amber/30 bg-amber/5 text-amber" aria-hidden>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

@@ -23,13 +23,17 @@ const MembershipCheckout = lazy(() =>
   import("@/components/membership-checkout").then((m) => ({ default: m.MembershipCheckout })),
 );
 
+const FALLBACK_OG = "https://yasfnvftzwyuxdhpysof.supabase.co/storage/v1/render/image/sign/film-thumbnails/new-film/a2e2704d-324f-4ef7-b294-c552fcb803d4.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zODlhNWU3Yi0zYzdmLTQ5YWMtYjQ3YS04ODQ2NGM5YjhiMGIiLCJhbGciOiJIUzI1NiJ9.eyJ0cmFuc2Zvcm1hdGlvbnMiOiJ3aWR0aDoxNDAwLHJlc2l6ZTpjb250YWluLHF1YWxpdHk6NzAiLCJ1cmwiOiJmaWxtLXRodW1ibmFpbHMvbmV3LWZpbG0vYTJlMjcwNGQtMzI0Zi00ZWY3LWIyOTQtYzU1MmZjYjgwM2Q0LmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODI1MDE4OTAsImV4cCI6MTgxNDAzNzg5MH0.UEBH4vlm8e04xbsMidizKO34WhNkmFMs5Om0yphoSB0";
+
 export const Route = createFileRoute("/membership")({
   loader: async ({ context }) => {
     const { homeFeaturedQueryOptions } = await import("@/lib/home.functions");
     const featured = await context.queryClient.ensureQueryData(homeFeaturedQueryOptions);
     return { ogImage: featured?.thumbnail_url || featured?.cover_url || null };
   },
-  head: ({ loaderData }) => ({
+  head: ({ loaderData }) => {
+    const ogImage = loaderData?.ogImage || FALLBACK_OG;
+    return {
     meta: [
       { title: "Membership — IRAN" },
       {
@@ -45,16 +49,13 @@ export const Route = createFileRoute("/membership")({
       },
       { property: "og:url", content: "https://ir.show/membership" },
       { property: "og:site_name", content: "IRAN" },
-      ...(loaderData?.ogImage
-        ? [
-            { property: "og:image" as const, content: loaderData.ogImage },
-            { name: "twitter:image" as const, content: loaderData.ogImage },
-            { name: "twitter:card" as const, content: "summary_large_image" },
-          ]
-        : []),
+      { property: "og:image" as const, content: ogImage },
+      { name: "twitter:image" as const, content: ogImage },
+      { name: "twitter:card" as const, content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://ir.show/membership" }],
-  }),
+    };
+  },
   component: MembershipPage,
 });
 
