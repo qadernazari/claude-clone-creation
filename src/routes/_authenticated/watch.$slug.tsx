@@ -683,18 +683,62 @@ function WatchPage() {
                 poster={film.cover_url || undefined}
                 autoPlay={resumePrompt === null}
                 playsInline
+                crossOrigin="anonymous"
                 controlsList="nodownload"
                 onLoadedMetadata={onLoadedMetadata}
-                onTimeUpdate={() => { onTimeUpdate(); onTimeTick(); }}
+                onTimeUpdate={() => {
+                  const v = videoRef.current;
+                  if (v) lastKnownPosRef.current = v.currentTime;
+                  onTimeUpdate(); onTimeTick();
+                }}
                 onEnded={() => { onEnded(); setPlaying(false); setOverlayVisible(true); }}
                 onVolumeChange={onVolumeChange}
                 onPlay={onPlayEvt}
                 onPause={onPauseEvt}
                 onDurationChange={onDurationChangeEvt}
                 onProgress={onProgressEvt}
+                onWaiting={onWaitingEvt}
+                onPlaying={onPlayingEvt}
+                onCanPlay={onCanPlayEvt}
+                onStalled={onWaitingEvt}
+                onError={onErrorEvt}
                 onClick={togglePlay}
                 className="absolute inset-0 h-full w-full bg-black cursor-pointer"
-              />
+              >
+                {subtitles.map((s) => (
+                  <track
+                    key={s.lang}
+                    kind="subtitles"
+                    src={s.url}
+                    srcLang={s.lang}
+                    label={s.label}
+                    default={activeCc ? s.lang === activeCc : !!s.default}
+                  />
+                ))}
+              </video>
+
+              {/* Buffering spinner */}
+              {buffering && !streamError && (
+                <div className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full border-2 border-cream/20 border-t-amber animate-spin" />
+                </div>
+              )}
+
+              {/* Stream error overlay */}
+              {streamError && (
+                <div className="absolute inset-0 z-[7] flex flex-col items-center justify-center gap-3 bg-black/70 px-6 text-center backdrop-blur-sm">
+                  <p className="font-display text-lg text-cream-bright">
+                    {fa ? "اتصال پخش قطع شد." : "Playback connection was lost."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={retryStream}
+                    className="rounded-md bg-amber px-5 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+                  >
+                    {fa ? "تلاش دوباره" : "Try again"}
+                  </button>
+                </div>
+              )}
 
               {/* ---- Cinematic overlay ---- */}
               <div
