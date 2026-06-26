@@ -1,8 +1,79 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+
+const FAQ_EN: { q: string; a: string }[] = [
+  {
+    q: "How does the free trial work?",
+    a: "New accounts get 7 days of full access to the entire catalog — no payment required upfront. After 7 days you can choose a membership plan. If you don't subscribe, your access simply ends.",
+  },
+  {
+    q: "What happens after my membership expires?",
+    a: "Your access ends on the expiry date. There is no automatic charge. You can renew anytime by purchasing a new plan.",
+  },
+  {
+    q: "Can I cancel my membership?",
+    a: "There's nothing to cancel — IRAN memberships are one-time payments with no auto-renewal. You're never locked in.",
+  },
+  {
+    q: "What devices can I watch on?",
+    a: "IRAN works on any device with a modern web browser — iPhone, Android, iPad, Mac, PC, and smart TVs with a browser. No app download needed.",
+  },
+  {
+    q: "Are there Persian subtitles?",
+    a: "Yes. All films include Persian (Farsi) subtitles. You can toggle them on or off in the video player.",
+  },
+  {
+    q: "Can I watch from Iran?",
+    a: "Yes. ir.show is accessible from Iran and worldwide. Some network conditions may affect streaming quality.",
+  },
+  {
+    q: "What payment methods do you accept?",
+    a: "We accept all major credit and debit cards (Visa, Mastercard, Amex) via Stripe. Payments are secure and encrypted.",
+  },
+  {
+    q: "I have a question not answered here.",
+    a: "Email us at hello@ir.show — we typically respond within 24 hours.",
+  },
+];
+
+const FAQ_FA: { q: string; a: string }[] = [
+  {
+    q: "دوره‌ی آزمایش رایگان چگونه کار می‌کند؟",
+    a: "حساب‌های جدید ۷ روز دسترسی کامل به همه‌ی کاتالوگ دارند — بدون نیاز به پرداخت اولیه. پس از ۷ روز می‌توانید پلن عضویت انتخاب کنید. اگر مشترک نشوید، دسترسی شما به‌سادگی پایان می‌یابد.",
+  },
+  {
+    q: "پس از پایان عضویتم چه می‌شود؟",
+    a: "دسترسی شما در تاریخ انقضا پایان می‌یابد. هیچ مبلغی به‌طور خودکار کسر نمی‌شود. هر زمان بخواهید می‌توانید با خرید پلن جدید تمدید کنید.",
+  },
+  {
+    q: "آیا می‌توانم عضویتم را لغو کنم؟",
+    a: "چیزی برای لغو وجود ندارد — عضویت‌های ایران پرداخت یک‌باره هستند و تمدید خودکار ندارند. هرگز گرفتار نمی‌شوید.",
+  },
+  {
+    q: "روی چه دستگاه‌هایی می‌توانم تماشا کنم؟",
+    a: "ایران روی هر دستگاهی با مرورگر مدرن کار می‌کند — آیفون، اندروید، آیپد، مک، پی‌سی و تلویزیون‌های هوشمند با مرورگر. نیازی به نصب اپلیکیشن نیست.",
+  },
+  {
+    q: "آیا زیرنویس فارسی دارد؟",
+    a: "بله. تمام فیلم‌ها شامل زیرنویس فارسی هستند. می‌توانید آن را در پخش‌کننده‌ی ویدیو روشن یا خاموش کنید.",
+  },
+  {
+    q: "آیا از داخل ایران می‌توانم تماشا کنم؟",
+    a: "بله. ir.show از داخل ایران و سراسر جهان قابل دسترسی است. شرایط شبکه ممکن است بر کیفیت پخش تأثیر بگذارد.",
+  },
+  {
+    q: "چه روش‌های پرداختی پذیرفته می‌شود؟",
+    a: "همه‌ی کارت‌های اعتباری و دبیت اصلی (ویزا، مسترکارت، امکس) از طریق Stripe پذیرفته می‌شود. پرداخت‌ها امن و رمزنگاری شده هستند.",
+  },
+  {
+    q: "سؤالم اینجا پاسخ داده نشده است.",
+    a: "به hello@ir.show ایمیل بزنید — معمولاً ظرف ۲۴ ساعت پاسخ می‌دهیم.",
+  },
+];
 
 export const Route = createFileRoute("/help")({
   head: () => ({
@@ -11,12 +82,12 @@ export const Route = createFileRoute("/help")({
       {
         name: "description",
         content:
-          "Answers to common questions about IRAN: free trial, devices, cancellation, payment methods, and watching from Iran.",
+          "Answers to common questions about IRAN: free trial, devices, cancellation, payment methods, subtitles, and watching from Iran.",
       },
       { property: "og:title", content: "Help & FAQ — IRAN" },
       {
         property: "og:description",
-        content: "Free trial, devices, cancellation, payments, and watching from Iran.",
+        content: "Free trial, devices, cancellation, payments, subtitles, and watching from Iran.",
       },
       { property: "og:url", content: "https://ir.show/help" },
     ],
@@ -38,60 +109,6 @@ export const Route = createFileRoute("/help")({
   }),
   component: HelpPage,
 });
-
-const FAQ_EN: { q: string; a: string }[] = [
-  {
-    q: "How does the free trial work?",
-    a: "New members get 7 days of full access to the entire IRAN catalog at no cost and with no payment details required. At the end of the trial you can choose a membership plan if you'd like to keep watching — nothing is charged automatically.",
-  },
-  {
-    q: "What devices can I watch on?",
-    a: "IRAN streams in any modern browser on phone, tablet, laptop, and desktop. We support iOS Safari, Android Chrome, plus desktop Chrome, Safari, Firefox, and Edge. There's nothing to install.",
-  },
-  {
-    q: "How do I cancel?",
-    a: "There is nothing to cancel. Every membership is a one-time payment for the period you chose (1, 3, 6, or 12 months). When it ends, access stops unless you renew.",
-  },
-  {
-    q: "Is there auto-renewal?",
-    a: "No. We don't auto-renew. You always decide when to extend your membership.",
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "International credit and debit cards via Stripe (Visa, Mastercard, American Express), plus Iranian Rial payments via local gateways for members inside Iran.",
-  },
-  {
-    q: "Can I watch in Iran?",
-    a: "Yes. IRAN is fully accessible from inside Iran. Local Rial payment is supported and the service runs without a VPN.",
-  },
-];
-
-const FAQ_FA: { q: string; a: string }[] = [
-  {
-    q: "دوره‌ی آزمایش رایگان چگونه کار می‌کند؟",
-    a: "اعضای جدید ۷ روز به‌صورت کامل و رایگان به همه‌ی کاتالوگ ایران دسترسی دارند، بدون نیاز به اطلاعات پرداخت. در پایان دوره می‌توانید پلن دلخواه‌تان را انتخاب کنید — هیچ مبلغی به‌طور خودکار کسر نمی‌شود.",
-  },
-  {
-    q: "روی چه دستگاه‌هایی می‌توانم تماشا کنم؟",
-    a: "ایران در هر مرورگر مدرنی پخش می‌شود: موبایل، تبلت، لپ‌تاپ و دسکتاپ. سافاری iOS، کروم اندروید و همچنین کروم، سافاری، فایرفاکس و اج روی دسکتاپ پشتیبانی می‌شود. نیازی به نصب اپلیکیشن نیست.",
-  },
-  {
-    q: "چگونه عضویتم را لغو کنم؟",
-    a: "چیزی برای لغو وجود ندارد. هر عضویت یک پرداخت یک‌باره برای دوره‌ی انتخابی شماست (۱، ۳، ۶ یا ۱۲ ماه). پس از پایان دوره، دسترسی متوقف می‌شود مگر آن‌که خودتان تمدید کنید.",
-  },
-  {
-    q: "آیا تمدید خودکار وجود دارد؟",
-    a: "خیر. ما تمدید خودکار نداریم. زمان تمدید همیشه با خودِ شماست.",
-  },
-  {
-    q: "چه روش‌های پرداختی پذیرفته می‌شود؟",
-    a: "کارت‌های اعتباری و دبیت بین‌المللی از طریق Stripe (ویزا، مسترکارت، امریکن اکسپرس) و همچنین پرداخت ریالی از طریق درگاه‌های داخلی برای اعضای داخل ایران.",
-  },
-  {
-    q: "آیا می‌توانم از داخل ایران تماشا کنم؟",
-    a: "بله. ایران به‌طور کامل از داخل کشور قابل دسترسی است. پرداخت ریالی پشتیبانی می‌شود و سرویس بدون نیاز به VPN کار می‌کند.",
-  },
-];
 
 function HelpPage() {
   const { locale, dir } = useLocale();
@@ -118,48 +135,42 @@ function HelpPage() {
           <h1
             className={`text-4xl leading-[1.05] text-cream-bright md:text-6xl ${fa ? "font-vazir" : "font-display"}`}
           >
-            {fa ? "پرسش‌های پرتکرار" : "Frequently asked questions"}
+            {fa ? "پرسش‌های پرتکرار." : "Frequently asked questions."}
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-cream/70">
-            {fa
-              ? "پاسخ سؤال خود را اینجا پیدا نکردید؟ به hello@ir.show ایمیل بزنید — معمولاً ظرف ۲۴ ساعت پاسخ می‌دهیم."
-              : "Can't find what you're looking for? Email hello@ir.show — we usually reply within 24 hours."}
-          </p>
         </div>
       </section>
 
-      <section className="hairline border-t">
-        <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
-          <ul className="divide-y divide-line">
+      <section>
+        <div className="mx-auto max-w-3xl px-6 pb-24">
+          <ul className="border-t border-amber/15">
             {items.map((item, i) => {
               const isOpen = open === i;
               return (
-                <li key={i}>
+                <li key={i} className="border-b border-amber/15">
                   <button
                     type="button"
                     onClick={() => setOpen(isOpen ? null : i)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between gap-6 py-6 text-start"
+                    className="flex w-full items-center justify-between gap-6 py-5 text-start"
                   >
-                    <span
-                      className={`text-lg text-cream-bright md:text-xl ${fa ? "font-vazir" : "font-display"}`}
-                    >
+                    <span className="text-[15px] font-medium text-cream-bright">
                       {item.q}
                     </span>
-                    <span
-                      className={`shrink-0 text-amber transition-transform duration-300 ${isOpen ? "rotate-45" : ""}`}
+                    <ChevronDown
+                      size={18}
                       aria-hidden
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 5v14M5 12h14" />
-                      </svg>
-                    </span>
+                      className={`shrink-0 text-amber transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
-                  {isOpen && (
-                    <p className="pb-6 pe-10 text-[15px] leading-relaxed text-cream/70">
-                      {item.a}
-                    </p>
-                  )}
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="pb-6 pe-8 text-[14px] leading-relaxed text-cream/65">
+                        {item.a}
+                      </p>
+                    </div>
+                  </div>
                 </li>
               );
             })}
