@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { browsePageQueryOptions } from "../lib/browse.functions";
-import { homeFeaturedQueryOptions } from "../lib/home.functions";
+import { browsePageQueryOptions, getBrowsePageData } from "../lib/browse.functions";
+import { getHomeFeatured } from "../lib/home.functions";
 import type { BrowseFilm, BrowseCategory } from "../lib/browse.types";
 import { useLocale } from "../lib/i18n";
 import { SiteHeader } from "../components/site-header";
@@ -17,17 +17,21 @@ const browseSearchSchema = z.object({
 
 export const Route = createFileRoute("/browse")({
   validateSearch: zodValidator(browseSearchSchema),
-  loader: async ({ context }) => {
-    // SSR-critical: hydrate the catalog server-side so the initial HTML
-    // contains actual film cards (not a "Loading…" placeholder). Crawlers
-    // can index the catalog and users on slow connections see content
-    // before JS boots.
-    const [, featured] = await Promise.all([
-      context.queryClient.ensureQueryData(browsePageQueryOptions),
-      context.queryClient.ensureQueryData(homeFeaturedQueryOptions),
+  loader: async () => {
+    // SSR-critical: fetch directly through the route loader and pass the
+    // result as loaderData/initialData. This avoids relying on QueryClient
+    // hydration for the first HTML render, so crawlers receive real film cards.
+    const [browseData, featured] = await Promise.all([
+      getBrowsePageData(),
+      getHomeFeatured(),
     ]);
-    return { ogImage: featured?.thumbnail_url || featured?.cover_url || null };
+
+    return {
+      ...browseData,
+      ogImage: featured?.thumbnail_url || featured?.cover_url || null,
+    };
   },
+  pendingComponent: () => null,
   head: ({ loaderData }) => ({
     meta: [
       { title: "Browse films — All originals" },
@@ -91,7 +95,11 @@ function BrowsePage() {
   const [q, setQ] = useState(initialQ);
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
-  const { data } = useSuspenseQuery(browsePageQueryOptions);
+  const loaderData = Route.useLoaderData();
+  const { data } = useQuery({
+    ...browsePageQueryOptions,
+    initialData: loaderData,
+  });
   const films = data.films as Film[];
   const categories = data.categories as Category[];
   const isLoading = false;
