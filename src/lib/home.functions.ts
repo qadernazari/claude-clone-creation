@@ -74,6 +74,10 @@ export type HomeFeaturedFilm = {
   poster_gradient: string | null;
   cover_url: string | null;
   thumbnail_url: string | null;
+  /** Mobile-sized version of thumbnail_url (760w q55), used when no
+   *  dedicated mobile_cover_url exists. Prevents serving the full 1400w
+   *  desktop hero to a 375px viewport. */
+  thumbnail_url_mobile: string | null;
   mobile_cover_url: string | null;
   is_premium: boolean | null;
 };
