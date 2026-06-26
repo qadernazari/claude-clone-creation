@@ -211,7 +211,7 @@ function Home() {
       <main>
         {/* 1. Cinematic hero = featured film */}
         <FeaturedFilm />
-        <div className="h-[72px] bg-bg-0 md:hidden" aria-hidden />
+        <div className="h-3 bg-bg-0 md:hidden" aria-hidden />
 
         <DeferredHomeRails />
 
