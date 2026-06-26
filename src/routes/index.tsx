@@ -244,6 +244,7 @@ function Home() {
 
       </main>
 
+      <NewsletterSection />
       <SiteFooter />
     </div>
   );
