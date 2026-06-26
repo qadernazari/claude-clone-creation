@@ -685,25 +685,29 @@ function FilmPage() {
               )}
             </div>
 
-            {/* Short synopsis with expandable "More" */}
-            {heroSynopsis && (
-              <div className="mt-5 max-w-xl">
-                <p
-                  className={`text-[15px] leading-relaxed text-cream/85 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] md:text-base ${synopsisOpen ? "" : "line-clamp-3"} ${fa ? "font-vazir" : ""}`}
-                >
-                  {heroSynopsis}
-                </p>
-                {heroSynopsis.length > 180 && (
-                  <button
-                    type="button"
-                    onClick={() => setSynopsisOpen((v) => !v)}
-                    className="mt-2 text-[12px] uppercase tracking-[0.2em] text-cream/65 transition-colors hover:text-cream-bright"
+            {/* Synopsis — only truncate when genuinely long */}
+            {heroSynopsis && (() => {
+              const isLong = heroSynopsis.length > 200;
+              const clamp = isLong && !synopsisOpen;
+              return (
+                <div className="mt-5 max-w-xl">
+                  <p
+                    className={`text-[15px] leading-relaxed text-cream/85 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] md:text-base ${clamp ? "line-clamp-3" : ""} ${fa ? "font-vazir" : ""}`}
                   >
-                    {synopsisOpen ? (fa ? "کمتر" : "Less") : (fa ? "بیشتر" : "More")}
-                  </button>
-                )}
-              </div>
-            )}
+                    {heroSynopsis}
+                  </p>
+                  {isLong && (
+                    <button
+                      type="button"
+                      onClick={() => setSynopsisOpen((v) => !v)}
+                      className="mt-2 text-[12px] uppercase tracking-[0.2em] text-cream/65 transition-colors hover:text-cream-bright"
+                    >
+                      {synopsisOpen ? (fa ? "کمتر" : "Less") : (fa ? "بیشتر" : "More")}
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
 
 
             {/* CTAs — integrated, not boxed */}
