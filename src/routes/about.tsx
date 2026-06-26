@@ -36,28 +36,28 @@ const SECTIONS: Section[] = [
     heading: { en: "What we are", fa: "ما چه هستیم" },
     body: {
       en: "IRAN is a streaming platform dedicated entirely to Iranian cinema. We commission original documentaries, curate short films, and bring the voices of Iranian filmmakers to audiences everywhere — in English and Persian.",
-      fa: "ایران یک پلتفرم پخش است که به‌طور کامل به سینمای ایران اختصاص دارد. ما مستندهای اصلی سفارش می‌دهیم، فیلم‌های کوتاه را گزینش می‌کنیم، و صدای فیلم‌سازان ایرانی را به مخاطبان سراسر جهان می‌رسانیم — به انگلیسی و فارسی.",
+      fa: "ایران تنها پلتفرم پخش اختصاصی سینمای ایران است. ما مستند اصیل می‌سازیم، فیلم کوتاه گزینش می‌کنیم و صدای فیلم‌سازان ایرانی را به مخاطبان جهانی می‌رسانیم — به فارسی و انگلیسی.",
     },
   },
   {
     heading: { en: "Why we built this", fa: "چرا این را ساختیم" },
     body: {
       en: "We built IRAN because we believe Iranian cinema deserves its own home. Not a subfolder on a general platform. Not a piracy site. A place built with care, where every film is chosen with intention and every filmmaker is treated with respect.",
-      fa: "ما ایران را ساختیم چون باور داریم سینمای ایران سزاوار خانه‌ای از آن خود است. نه یک زیرشاخه در یک پلتفرم عمومی. نه یک سایت غیرقانونی. مکانی که با دقت ساخته شده، جایی که هر فیلم با قصد انتخاب می‌شود و با هر فیلم‌ساز با احترام رفتار می‌شود.",
+      fa: "ایران را ساختیم چون باور داریم سینمای ایران خانه‌ای از آنِ خود می‌خواهد. نه یک زیرشاخه در یک پلتفرم عمومی. نه سایتی غیرقانونی. جایی که با دقت ساخته شده، هر فیلم با هدف انتخاب شده و هر فیلم‌ساز با احترام دیده می‌شود.",
     },
   },
   {
     heading: { en: "How it works", fa: "چطور کار می‌کند" },
     body: {
       en: "Every film on IRAN is available with a membership — one flat price, no auto-renewal, no algorithm pushing you toward something louder. Just films, carefully chosen, waiting to be watched.",
-      fa: "هر فیلم در ایران با عضویت در دسترس است — یک قیمت ثابت، بدون تمدید خودکار، بدون الگوریتمی که شما را به سمت چیزی پرسروصداتر هل دهد. فقط فیلم‌ها، با دقت انتخاب‌شده، در انتظار دیده شدن.",
+      fa: "همه فیلم‌ها با یک عضویت ساده در دسترس‌اند — قیمت ثابت، بدون تمدید خودکار، بدون الگوریتمی که شما را به سمت چیز دیگری هل دهد. فقط فیلم، با دقت انتخاب‌شده، منتظر دیده شدن.",
     },
   },
   {
     heading: { en: "The name", fa: "این نام" },
     body: {
       en: "We called it IRAN not as a political statement, but as a declaration of origin. These films come from Iran. They carry its light, its weight, and its humanity.",
-      fa: "ما آن را ایران نامیدیم، نه به عنوان یک بیانیه سیاسی، بلکه به عنوان اعلام خاستگاه. این فیلم‌ها از ایران می‌آیند. آن‌ها نور، وزن و انسانیت آن را با خود حمل می‌کنند.",
+      fa: "نام ایران را انتخاب کردیم، نه برای بیانیه‌ای سیاسی، بلکه برای اعلام یک خاستگاه. این فیلم‌ها از ایران می‌آیند. روشنایی، سنگینی و انسانیت آن را با خود دارند.",
     },
   },
 ];
