@@ -1,4 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
+import { Instagram, Youtube } from "lucide-react";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { usePageOverlay } from "./page-overlay";
@@ -66,8 +67,30 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        <div className="mt-12 border-t border-line pt-8 text-[10px] font-medium uppercase tracking-[0.28em] text-cream/70">
-          © {new Date().getFullYear()} IRAN · {fa ? "تمامی حقوق محفوظ است" : "All rights reserved"}
+        <div className="mt-12 flex flex-col-reverse items-start gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-[10px] font-medium uppercase tracking-[0.28em] text-cream/70">
+            © {new Date().getFullYear()} IRAN · {fa ? "تمامی حقوق محفوظ است" : "All rights reserved"}
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://www.instagram.com/iran.show"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={fa ? "ایران در اینستاگرام" : "IRAN on Instagram"}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 transition-colors hover:text-cream"
+            >
+              <Instagram size={16} aria-hidden />
+            </a>
+            <a
+              href="https://www.youtube.com/@iranshow"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={fa ? "ایران در یوتیوب" : "IRAN on YouTube"}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 transition-colors hover:text-cream"
+            >
+              <Youtube size={16} aria-hidden />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

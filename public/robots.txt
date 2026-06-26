@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /account
+Disallow: /auth
 
 Sitemap: https://ir.show/sitemap.xml
