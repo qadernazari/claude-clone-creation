@@ -22,7 +22,11 @@ import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { AuthProvider } from "../lib/auth-context";
 import { resolveVisitorRegion } from "../lib/region.functions";
-import { MobileTabBar } from "@/components/mobile-tab-bar";
+// MobileTabBar is visible chrome but not LCP — defer to shrink the
+// main bundle's homepage critical path.
+const MobileTabBar = lazy(() =>
+  import("@/components/mobile-tab-bar").then((m) => ({ default: m.MobileTabBar })),
+);
 
 // Defer only the mirror notice. The mobile tab bar is visible chrome, so it
 // renders with SSR to avoid the bottom bar popping in after first paint.
