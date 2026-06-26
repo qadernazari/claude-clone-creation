@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { WatchlistButton } from "@/components/watchlist-button";
 import { MountWhenNear } from "@/components/mount-when-near";
+import { Share2, Check } from "lucide-react";
+import { toast } from "sonner";
 
 // Deferred — reviews + episodes only load after the user scrolls or interacts.
 const FilmReviewsSection = lazy(() =>
