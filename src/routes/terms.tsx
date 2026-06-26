@@ -219,12 +219,178 @@ const SECTION_TITLES_FA = [
   "۱۳. تماس",
 ];
 
+const SECTIONS_FA: { body: React.ReactNode }[] = [
+  {
+    body: (
+      <p>
+        ir.show یک پلتفرم پخش ویدیو با محوریت سینمای ایران است — مستندهای اصلی، فیلم‌های کوتاه و
+        مجموعه‌های گزینش‌شده. محتوا به دو زبان فارسی و انگلیسی در دسترس است.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>
+          برای ایجاد حساب باید حداقل ۱۸ سال داشته باشید (یا سن قانونی کشور خود). مسئولیت امنیت رمز
+          عبورتان با خودتان است. بدون اجازه کتبی، حق اشتراک‌گذاری حساب با دیگران یا استفاده تجاری
+          از آن را ندارید.
+        </p>
+        <p>
+          هر فرد فقط یک حساب می‌تواند داشته باشد. حق داریم حساب‌هایی را که نشانه‌هایی از سوءاستفاده
+          یا اشتراک‌گذاری غیرمجاز دارند، مسدود کنیم.
+        </p>
+      </>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>
+          عضویت در دوره‌های ۱، ۳، ۶ و ۱۲ ماهه در دسترس است. همه پرداخت‌ها یک‌بار انجام می‌شوند —
+          هیچ تمدید خودکاری وجود ندارد. عضویت در پایان دوره‌ای که برای آن پرداخت کرده‌اید منقضی
+          می‌شود. قبل از انقضا، ایمیل یادآوری دریافت خواهید کرد.
+        </p>
+        <p>
+          قیمت‌ها به دلار آمریکا نمایش داده می‌شوند. ممکن است بانک شما کارمزد تبدیل ارز اعمال کند
+          — ما مسئول آن نیستیم.
+        </p>
+        <p>پرداخت‌ها به‌صورت امن توسط Stripe پردازش می‌شوند. اطلاعات کارت شما ذخیره نمی‌شود.</p>
+      </>
+    ),
+  },
+  {
+    body: (
+      <p>
+        حساب‌های جدید ۷ روز آزمایش رایگان با دسترسی کامل به کاتالوگ دریافت می‌کنند. هر شخص فقط یک
+        آزمایش رایگان می‌تواند داشته باشد. حق داریم صلاحیت را بررسی کنیم و آزمایش‌های استفاده‌شده
+        به روش غیرمنصفانه را لغو کنیم.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>
+          از آنجا که محتوای ما به‌صورت دیجیتال و فوری در دسترس قرار می‌گیرد، تمام فروش‌ها قطعی
+          هستند. پس از اعطای دسترسی، بازپرداخت ارائه نمی‌دهیم، مگر در مواردی که قانون حاکم آن را
+          الزامی کند.
+        </p>
+        <p>
+          اگر فکر می‌کنید اشتباهاً از شما کسر شده، ظرف ۷ روز با{" "}
+          <a href="mailto:hello@ir.show" className="text-amber hover:underline">
+            hello@ir.show
+          </a>{" "}
+          تماس بگیرید تا بررسی کنیم.
+        </p>
+      </>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>
+          تمام فیلم‌ها، تصاویر و متن‌های ir.show تحت حمایت حق مؤلف هستند و متعلق به سازندگان و
+          دارندگان مجوز مربوطه‌اند. عضویت شما یک مجوز شخصی، غیرقابل انتقال و غیرانحصاری برای پخش
+          محتوا صرفاً برای تماشای خصوصی اعطا می‌کند.
+        </p>
+        <p>حق ندارید:</p>
+        <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
+          <li>دانلود، کپی یا توزیع مجدد هیچ محتوایی</li>
+          <li>استفاده از نرم‌افزار ضبط صفحه برای ضبط جریان</li>
+          <li>استفاده از محتوا برای نمایش عمومی یا تجاری</li>
+          <li>حذف یا تغییر هرگونه اطلاعیه حق مؤلف</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>موافقت می‌کنید:</p>
+        <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
+          <li>از پلتفرم برای هیچ هدف غیرقانونی استفاده نکنید</li>
+          <li>تلاشی برای مهندسی معکوس، هک یا اختلال در سرویس نکنید</li>
+          <li>حساب جعلی نسازید یا محدودیت‌های آزمایش را دور نزنید</li>
+          <li>هیچ محتوای مضر یا غیرقانونی بارگذاری، ارسال یا منتقل نکنید</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    body: (
+      <p>
+        هدف ما ۹۹.۹٪ آپتایم است اما دسترسی بدون وقفه را تضمین نمی‌کنیم. تعمیر و نگهداری
+        برنامه‌ریزی‌شده تا حد امکان از قبل اطلاع‌رسانی می‌شود. در قبال خسارات ناشی از قطعی
+        مسئولیتی نداریم.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        در صورت نقض این شرایط، ممکن است حساب شما تعلیق یا خاتمه یابد. می‌توانید در هر زمان با تماس
+        با{" "}
+        <a href="mailto:hello@ir.show" className="text-amber hover:underline">
+          hello@ir.show
+        </a>{" "}
+        حساب خود را حذف کنید. خاتمه حساب حقی برای بازپرداخت زمان عضویت استفاده‌نشده ایجاد نمی‌کند.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        تا حداکثر میزان مجاز قانون، ایران مسئول خسارات غیرمستقیم، تصادفی یا تبعی ناشی از استفاده
+        شما از سرویس نیست. مسئولیت کل ما در برابر شما برای هر ادعایی از مبلغی که در ۳ ماه قبل از
+        ادعا پرداخت کرده‌اید تجاوز نخواهد کرد.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        این شرایط تحت قوانین امارات متحده عربی حاکم است. اختلافات در دادگاه‌های دبی، امارات حل و
+        فصل خواهند شد.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        ممکن است این شرایط را به‌روز کنیم. ادامه استفاده از سرویس پس از تغییرات به معنای پذیرش
+        آن‌هاست. برای تغییرات اساسی، کاربران ثبت‌نام‌شده را با حداقل ۱۴ روز اطلاع قبلی از طریق
+        ایمیل مطلع می‌کنیم.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <div className="space-y-1">
+        <p className="text-cream">پلتفرم پخش ایران</p>
+        <p>
+          ایمیل:{" "}
+          <a href="mailto:hello@ir.show" className="text-amber hover:underline">
+            hello@ir.show
+          </a>
+        </p>
+        <p>
+          وب‌سایت:{" "}
+          <a href="https://ir.show" className="text-amber hover:underline">
+            https://ir.show
+          </a>
+        </p>
+      </div>
+    ),
+  },
+];
+
 function TermsPage() {
   const { locale, dir } = useLocale();
   const fa = locale === "fa";
 
   return (
-    <div dir={dir} className="min-h-screen bg-bg-0 text-cream">
+    <div dir={dir} className={`min-h-screen bg-bg-0 text-cream ${fa ? "font-vazir" : ""}`}>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-28 md:py-36">
         <p className="mb-6 text-xs uppercase tracking-[0.35em] text-amber">
@@ -239,21 +405,31 @@ function TermsPage() {
           {fa ? "آخرین به‌روزرسانی: ۲۷ ژوئن ۲۰۲۶" : "Last updated: June 27, 2026"}
         </p>
 
-        <p className="text-[15px] leading-relaxed text-cream/75">
-          These Terms of Service ("Terms") govern your use of the IRAN streaming platform at{" "}
-          <a href="https://ir.show" className="text-amber hover:underline">
-            ir.show
-          </a>
-          , operated by IRAN ("we", "us"). By creating an account or purchasing a membership, you
-          agree to these Terms.
-        </p>
+        {fa ? (
+          <p className="text-[15px] leading-relaxed text-cream/75">
+            این شرایط استفاده («شرایط») نحوه استفاده شما از پلتفرم پخش ایران در ir.show را که توسط
+            ایران («ما») اداره می‌شود، تنظیم می‌کند. با ایجاد حساب یا خرید عضویت، با این شرایط
+            موافقت می‌کنید.
+          </p>
+        ) : (
+          <p className="text-[15px] leading-relaxed text-cream/75">
+            These Terms of Service ("Terms") govern your use of the IRAN streaming platform at{" "}
+            <a href="https://ir.show" className="text-amber hover:underline">
+              ir.show
+            </a>
+            , operated by IRAN ("we", "us"). By creating an account or purchasing a membership, you
+            agree to these Terms.
+          </p>
+        )}
 
         {SECTIONS_EN.map((s, i) => (
           <section key={s.title}>
             <h2 className="mt-10 mb-3 text-sm font-semibold uppercase tracking-widest text-amber">
               {fa ? SECTION_TITLES_FA[i] : s.title}
             </h2>
-            <div className="space-y-4 text-[15px] leading-relaxed text-cream/75">{s.body}</div>
+            <div className="space-y-4 text-[15px] leading-relaxed text-cream/75">
+              {fa ? SECTIONS_FA[i].body : s.body}
+            </div>
           </section>
         ))}
       </main>

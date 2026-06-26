@@ -208,12 +208,180 @@ const SECTION_TITLES_FA = [
   "۱۰. تماس",
 ];
 
+const SECTIONS_FA: { body: React.ReactNode }[] = [
+  {
+    body: (
+      <>
+        <p>
+          <strong className="text-cream font-semibold">اطلاعات حساب</strong> — هنگام ثبت‌نام، ایمیل
+          و رمز عبور شما را دریافت می‌کنیم (رمز عبور رمزنگاری‌شده ذخیره می‌شود و هرگز به‌صورت متن
+          ساده نگه داشته نمی‌شود).
+        </p>
+        <p>
+          <strong className="text-cream font-semibold">اطلاعات پرداخت</strong> — پرداخت‌ها توسط
+          Stripe پردازش می‌شوند. شماره کارت شما هرگز ذخیره نمی‌شود. تنها شناسه تراکنش و کشور
+          صورت‌حساب را دریافت می‌کنیم.
+        </p>
+        <p>
+          <strong className="text-cream font-semibold">اطلاعات استفاده</strong> — ثبت می‌کنیم کدام
+          فیلم‌ها را تماشا کرده‌اید، چه مدت، فهرست تماشای شما و نوع دستگاه/مرورگر. این اطلاعات
+          «ادامه تماشا» را فعال می‌کند و به بهبود کاتالوگ کمک می‌کند.
+        </p>
+        <p>
+          <strong className="text-cream font-semibold">اطلاعات فنی</strong> — آدرس IP، نوع مرورگر،
+          سیستم عامل و آدرس ارجاع‌دهنده به‌صورت خودکار در هر بازدید ثبت می‌شوند.
+        </p>
+        <p>
+          <strong className="text-cream font-semibold">ارتباطات</strong> — اگر با hello@ir.show
+          تماس بگیرید، آن مکاتبات را نگه می‌داریم.
+        </p>
+        <p className="text-cream">
+          ما اطلاعات شخصی شما را به هیچ شخص ثالثی نمی‌فروشیم. هرگز.
+        </p>
+      </>
+    ),
+  },
+  {
+    body: (
+      <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
+        <li>ارائه و اجرای سرویس پخش</li>
+        <li>پردازش پرداخت‌ها و ارسال رسید</li>
+        <li>ذخیره پیشرفت تماشا و تنظیمات شما</li>
+        <li>ارسال ایمیل‌های خدماتی (رسیدها، اطلاع‌رسانی‌های حساب)</li>
+        <li>بهبود پلتفرم از طریق آمار مجموعه و ناشناس</li>
+        <li>رعایت تعهدات قانونی</li>
+        <li className="text-cream/85">
+          از اطلاعات شما برای تبلیغات استفاده نمی‌کنیم و آن‌ها را به کارگزاران داده نمی‌فروشیم.
+        </li>
+      </ul>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>اطلاعات را تنها با موارد زیر به اشتراک می‌گذاریم:</p>
+        <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
+          <li>
+            <strong className="text-cream font-semibold">Stripe</strong> — پردازش پرداخت
+            (stripe.com/privacy)
+          </li>
+          <li>
+            <strong className="text-cream font-semibold">Supabase</strong> — پایگاه داده و
+            ذخیره‌سازی فایل، میزبانی‌شده روی AWS (supabase.com/privacy)
+          </li>
+          <li>
+            <strong className="text-cream font-semibold">Vercel / زیرساخت میزبانی</strong> —
+            سرویس‌دهی صفحات
+          </li>
+        </ul>
+        <p>
+          تمام پردازشگرها قراردادی ملزم به حفاظت از داده‌های شما هستند و نمی‌توانند از آن‌ها برای
+          اهداف خود استفاده کنند.
+        </p>
+      </>
+    ),
+  },
+  {
+    body: (
+      <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
+        <li>
+          <strong className="text-cream font-semibold">اطلاعات حساب</strong> — تا زمانی که حساب شما
+          فعال است نگه داشته می‌شود؛ ظرف ۳۰ روز از درخواست حذف، پاک می‌شود.
+        </li>
+        <li>
+          <strong className="text-cream font-semibold">تاریخچه تماشا</strong> — ۱۲ ماه پس از آخرین
+          ورود نگه داشته می‌شود.
+        </li>
+        <li>
+          <strong className="text-cream font-semibold">سوابق پرداخت</strong> — ۷ سال طبق مقررات
+          مالی نگه داشته می‌شود.
+        </li>
+      </ul>
+    ),
+  },
+  {
+    body: (
+      <>
+        <p>بسته به محل سکونت شما، ممکن است این حقوق را داشته باشید:</p>
+        <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
+          <li>دسترسی به اطلاعات شخصی که نگه می‌داریم</li>
+          <li>اصلاح اطلاعات نادرست</li>
+          <li>حذف حساب و اطلاعات مرتبط</li>
+          <li>دریافت اطلاعات در قالبی قابل انتقال</li>
+          <li>پس گرفتن رضایت در هر زمان</li>
+        </ul>
+        <p>
+          برای استفاده از هر یک از این حقوق، با موضوع «درخواست حریم خصوصی» به{" "}
+          <a href="mailto:hello@ir.show" className="text-amber hover:underline">
+            hello@ir.show
+          </a>{" "}
+          ایمیل بزنید. ظرف ۱۴ روز پاسخ می‌دهیم.
+        </p>
+      </>
+    ),
+  },
+  {
+    body: (
+      <p>
+        ما فقط از کوکی‌های ضروری استفاده می‌کنیم — برای مدیریت نشست و نگه داشتن شما در حالت ورود.
+        از کوکی‌های تبلیغاتی یا ردیابی استفاده نمی‌کنیم. از Google Analytics یا Facebook Pixel
+        استفاده نمی‌کنیم.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        ir.show برای کودکان زیر ۱۳ سال طراحی نشده است. ما آگاهانه اطلاعاتی از کودکان جمع‌آوری
+        نمی‌کنیم. اگر فکر می‌کنید کودکی حساب ایجاد کرده، با hello@ir.show تماس بگیرید تا فوراً آن
+        را حذف کنیم.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        از امنیت استاندارد صنعت استفاده می‌کنیم: HTTPS در همه جا، رمزنگاری رمز عبور (bcrypt)، و
+        امنیت سطح سطری در تمام جداول پایگاه داده. هیچ سیستمی ۱۰۰٪ امن نیست — اگر مشکلی مشاهده
+        کردید، فوراً به hello@ir.show ایمیل بزنید.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <p>
+        ممکن است این سیاست را به‌روز کنیم. در این صورت تاریخ «آخرین به‌روزرسانی» را تغییر می‌دهیم
+        و برای تغییرات اساسی، کاربران ثبت‌نام‌شده را از طریق ایمیل مطلع می‌کنیم.
+      </p>
+    ),
+  },
+  {
+    body: (
+      <div className="space-y-1">
+        <p className="text-cream">پلتفرم پخش ایران</p>
+        <p>
+          ایمیل:{" "}
+          <a href="mailto:hello@ir.show" className="text-amber hover:underline">
+            hello@ir.show
+          </a>
+        </p>
+        <p>
+          وب‌سایت:{" "}
+          <a href="https://ir.show" className="text-amber hover:underline">
+            https://ir.show
+          </a>
+        </p>
+      </div>
+    ),
+  },
+];
+
 function PrivacyPage() {
   const { locale, dir } = useLocale();
   const fa = locale === "fa";
 
   return (
-    <div dir={dir} className="min-h-screen bg-bg-0 text-cream">
+    <div dir={dir} className={`min-h-screen bg-bg-0 text-cream ${fa ? "font-vazir" : ""}`}>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 py-28 md:py-36">
         <p className="mb-6 text-xs uppercase tracking-[0.35em] text-amber">
@@ -228,20 +396,29 @@ function PrivacyPage() {
           {fa ? "آخرین به‌روزرسانی: ۲۷ ژوئن ۲۰۲۶" : "Last updated: June 27, 2026"}
         </p>
 
-        <p className="text-[15px] leading-relaxed text-cream/75">
-          IRAN ("we", "us", "our") operates the streaming platform at{" "}
-          <a href="https://ir.show" className="text-amber hover:underline">
-            ir.show
-          </a>
-          . This Privacy Policy explains what data we collect, how we use it, and your rights.
-        </p>
+        {fa ? (
+          <p className="text-[15px] leading-relaxed text-cream/75">
+            ایران («ما») پلتفرم پخش آنلاین ir.show را اداره می‌کند. این سیاست حریم خصوصی توضیح
+            می‌دهد چه اطلاعاتی جمع‌آوری می‌کنیم، چگونه از آن‌ها استفاده می‌کنیم و چه حقوقی دارید.
+          </p>
+        ) : (
+          <p className="text-[15px] leading-relaxed text-cream/75">
+            IRAN ("we", "us", "our") operates the streaming platform at{" "}
+            <a href="https://ir.show" className="text-amber hover:underline">
+              ir.show
+            </a>
+            . This Privacy Policy explains what data we collect, how we use it, and your rights.
+          </p>
+        )}
 
         {SECTIONS_EN.map((s, i) => (
           <section key={s.title}>
             <h2 className="mt-10 mb-3 text-sm font-semibold uppercase tracking-widest text-amber">
               {fa ? SECTION_TITLES_FA[i] : s.title}
             </h2>
-            <div className="space-y-4 text-[15px] leading-relaxed text-cream/75">{s.body}</div>
+            <div className="space-y-4 text-[15px] leading-relaxed text-cream/75">
+              {fa ? SECTIONS_FA[i].body : s.body}
+            </div>
           </section>
         ))}
       </main>
