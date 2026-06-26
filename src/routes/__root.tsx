@@ -13,7 +13,11 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { LocaleProvider, useLocale } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { Toaster } from "@/components/ui/sonner";
+// Toaster (sonner) is lazy-loaded — it pulls a non-trivial chunk and is
+// never needed for first paint. Mounted via DeferredChrome after idle.
+const Toaster = lazy(() =>
+  import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })),
+);
 import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { AuthProvider } from "../lib/auth-context";
