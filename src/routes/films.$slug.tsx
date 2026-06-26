@@ -727,7 +727,7 @@ function FilmPage() {
                 <Link
                   to="/auth"
                   search={{ redirect: `/watch/${film.slug}` }}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-amber px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-ink shadow-[0_10px_30px_-8px_rgba(201,168,76,0.55)] transition-all hover:bg-amber/90 hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -738,7 +738,7 @@ function FilmPage() {
                 <Link
                   to="/watch/$slug"
                   params={{ slug: film.slug }}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-amber px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-ink shadow-[0_10px_30px_-8px_rgba(201,168,76,0.55)] transition-all hover:bg-amber/90 hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -752,7 +752,7 @@ function FilmPage() {
                   type="button"
                   onClick={() => setCheckoutOpen(true)}
                   disabled={tomanOnly}
-                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-amber px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-ink shadow-[0_10px_30px_-8px_rgba(201,168,76,0.55)] transition-all hover:bg-amber/90 hover:scale-[1.02] disabled:opacity-60"
                 >
                   {t.buy} — {priceLabel}
                 </button>
@@ -761,7 +761,7 @@ function FilmPage() {
                   type="button"
                   onClick={() => setCheckoutOpen(true)}
                   disabled={tomanOnly}
-                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02] disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-amber px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-ink shadow-[0_10px_30px_-8px_rgba(201,168,76,0.55)] transition-all hover:bg-amber/90 hover:scale-[1.02] disabled:opacity-60"
                 >
                   {t.buy} — {priceLabel}
                 </button>
@@ -769,7 +769,7 @@ function FilmPage() {
                 <button
                   type="button"
                   onClick={() => (window.location.href = "/membership")}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[13px] font-semibold text-ink shadow-lg shadow-black/30 transition-transform hover:scale-[1.02]"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-amber px-7 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-ink shadow-[0_10px_30px_-8px_rgba(201,168,76,0.55)] transition-all hover:bg-amber/90 hover:scale-[1.02]"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
@@ -784,7 +784,7 @@ function FilmPage() {
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-md border border-cream/20 bg-black/30 px-5 py-2.5 text-[13px] font-medium text-cream backdrop-blur-sm transition-colors hover:bg-cream/10"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-md border border-cream/25 bg-black/20 px-3.5 text-[12px] font-medium text-cream/85 backdrop-blur-sm transition-colors hover:border-cream/45 hover:bg-cream/8 hover:text-cream"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M8 5v14l11-7z" />
