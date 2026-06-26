@@ -50,7 +50,7 @@ export function SiteFooter() {
               {fa ? "درباره" : "About"}
             </Link>
             <Link to="/browse" className="text-cream/50 transition-colors hover:text-cream">
-              {fa ? "آثار" : "Browse"}
+              {fa ? "فیلم‌ها" : "Browse"}
             </Link>
             <Link to="/help" className="text-cream/50 transition-colors hover:text-cream">
               {fa ? "راهنما" : "Help"}
