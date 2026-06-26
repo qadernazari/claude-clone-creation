@@ -116,26 +116,8 @@ function SplitNotFoundComponent() {
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
-    // CDN + browser caching: SSR HTML for the homepage is identical for
-    // every visitor in the same region (auth-specific UI mounts client-
-    // side via DeferredChrome / WatchlistCta). A short s-maxage with a
-    // longer stale-while-revalidate gives repeat visitors an instant
-    // cached response while still revalidating in the background.
-    // Vary on the geo headers we use to pick locale so Iran visitors
-    // don't get a cached English response.
-    if (typeof window === "undefined") {
-      try {
-        const { setResponseHeader } = await import("@tanstack/react-start/server");
-        setResponseHeader(
-          "Cache-Control",
-          "public, s-maxage=60, stale-while-revalidate=300",
-        );
-        setResponseHeader("Vary", "Accept-Language, Cookie, CF-IPCountry");
-      } catch {
-        // setResponseHeader only works inside an active server request;
-        // ignore in test / non-request contexts.
-      }
-    }
+    const { setHomepageCacheHeaders } = await import("@/lib/cache-headers");
+    setHomepageCacheHeaders();
     return context.queryClient.ensureQueryData(homeFeaturedQueryOptions);
   },
   head: ({ loaderData }) => ({
