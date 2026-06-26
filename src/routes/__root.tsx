@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
+  
   createRootRouteWithContext,
   useRouter,
   HeadContent,
@@ -43,58 +43,10 @@ function useFaSafe(): boolean {
   }
 }
 
+import { NotFoundPage } from "./not-found";
+
 function NotFoundComponent() {
-  const fa = useFaSafe();
-  return (
-    <div
-      dir={fa ? "rtl" : "ltr"}
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-0 px-6"
-    >
-      {/* Ambient amber glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 35%, rgba(201,168,76,0.10), transparent 55%), linear-gradient(180deg, var(--bg-0), oklch(0.12 0 0))",
-        }}
-      />
-      <div className="relative z-10 max-w-lg text-center">
-        <span className="block text-[10px] font-semibold uppercase tracking-[0.40em] text-amber/90">
-          {fa ? "خطای ۴۰۴" : "Error 404"}
-        </span>
-        <h1
-          className="mt-5 font-display text-[110px] font-medium leading-none tracking-[-0.05em] text-cream-bright md:text-[160px]"
-          style={{ textShadow: "0 12px 60px rgba(201,168,76,0.20)" }}
-        >
-          404
-        </h1>
-        <div className="mx-auto mt-5 h-px w-16 bg-amber/60" aria-hidden />
-        <h2 className="mt-6 font-display text-xl font-medium tracking-[-0.01em] text-cream md:text-2xl">
-          {fa ? "این صحنه در آرشیو نیست" : "This reel isn't in the archive"}
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed text-cream/55">
-          {fa
-            ? "صفحه‌ای که دنبالش هستید پیدا نشد یا جابه‌جا شده است."
-            : "The page you're looking for doesn't exist or has been moved."}
-        </p>
-        <div className="mt-9 flex items-center justify-center gap-3">
-          <Link
-            to="/"
-            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-cream-bright px-6 py-3 text-[13px] font-semibold text-ink transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.4)] active:scale-[0.98]"
-          >
-            {fa ? "بازگشت به خانه" : "Back to home"}
-          </Link>
-          <Link
-            to="/browse"
-            className="inline-flex min-h-11 items-center rounded-md border border-cream/25 px-6 py-3 text-[13px] font-medium text-cream/85 transition-all duration-300 hover:border-amber/50 hover:text-amber"
-          >
-            {fa ? "جست‌وجو در آثار" : "Browse films"}
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  return <NotFoundPage />;
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
