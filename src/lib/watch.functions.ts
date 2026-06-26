@@ -90,12 +90,27 @@ export const getFilmStreamUrl = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: row, error: urlErr } = await supabaseAdmin
         .from("films")
-        .select("video_url")
+        .select("video_url, subtitles")
         .eq("id", film.id)
         .maybeSingle();
       if (urlErr) throw new Error(urlErr.message);
 
-      return { videoUrl: row?.video_url ?? null };
+      const rawSubs = (row as { subtitles?: unknown })?.subtitles;
+      const subtitles: SubtitleTrack[] = Array.isArray(rawSubs)
+        ? (rawSubs as unknown[]).flatMap((s) => {
+            if (!s || typeof s !== "object") return [];
+            const o = s as Record<string, unknown>;
+            if (typeof o.url !== "string" || typeof o.lang !== "string") return [];
+            return [{
+              lang: o.lang,
+              label: typeof o.label === "string" ? o.label : o.lang,
+              url: o.url,
+              default: o.default === true,
+            }];
+          })
+        : [];
+
+      return { videoUrl: row?.video_url ?? null, subtitles };
     } catch (e) {
       return { error: e instanceof Error ? e.message : "Failed to load stream" };
     }
