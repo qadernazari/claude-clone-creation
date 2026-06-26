@@ -480,6 +480,7 @@ export type Database = {
           season_number: number | null
           slug: string
           sort_order: number
+          subtitles: Json
           synopsis_en: string | null
           synopsis_fa: string | null
           thumbnail_url: string | null
@@ -517,6 +518,7 @@ export type Database = {
           season_number?: number | null
           slug: string
           sort_order?: number
+          subtitles?: Json
           synopsis_en?: string | null
           synopsis_fa?: string | null
           thumbnail_url?: string | null
@@ -554,6 +556,7 @@ export type Database = {
           season_number?: number | null
           slug?: string
           sort_order?: number
+          subtitles?: Json
           synopsis_en?: string | null
           synopsis_fa?: string | null
           thumbnail_url?: string | null

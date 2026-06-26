@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
@@ -113,18 +113,24 @@ function WatchPage() {
   useEffect(() => {
     if (!isLoading && isTrialExpired && !memberAllowed && !ticket) {
       setTrialModalOpen(true);
+      // Stop audio/video behind the modal so the user isn't paying for hidden playback.
+      try { videoRef.current?.pause(); } catch { /* ignore */ }
     }
   }, [isLoading, isTrialExpired, memberAllowed, ticket]);
 
   const fetchStreamUrl = useServerFn(getFilmStreamUrl);
+  const streamQueryKey = ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")];
+  const queryClient = useQueryClient();
   const { data: streamRes } = useQuery({
-    queryKey: ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")],
+    queryKey: streamQueryKey,
     queryFn: () => fetchStreamUrl({ data: { slug: film.slug } }),
     enabled: hasAccess,
     staleTime: 5 * 60_000,
   });
   const videoUrl =
     streamRes && "videoUrl" in streamRes ? streamRes.videoUrl : null;
+  const subtitles =
+    streamRes && "videoUrl" in streamRes ? streamRes.subtitles : [];
 
   const countdown = useCountdown(ticket?.expires_at);
 
@@ -270,6 +276,11 @@ function WatchPage() {
   const scrubRef = useRef<HTMLDivElement>(null);
   const tapStateRef = useRef<{ t: number; x: number } | null>(null);
   const [seekRipple, setSeekRipple] = useState<{ side: "left" | "right"; key: number } | null>(null);
+  const [buffering, setBuffering] = useState(false);
+  const [streamError, setStreamError] = useState(false);
+  const [ccOpen, setCcOpen] = useState(false);
+  const [activeCc, setActiveCc] = useState<string | null>(null); // lang code or null = off
+  const lastKnownPosRef = useRef<number>(0);
 
   const revealOverlay = useCallback(() => {
     setOverlayVisible(true);
@@ -307,10 +318,104 @@ function WatchPage() {
 
   const toggleFullscreen = useCallback(() => {
     const shell = playerShellRef.current;
-    if (!shell) return;
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-    else shell.requestFullscreen?.().catch(() => {});
+    const v = videoRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+      return;
+    }
+    // Desktop / Android Chrome — fullscreen the shell so overlay stays visible.
+    if (shell?.requestFullscreen) {
+      shell.requestFullscreen().catch(() => {
+        // iOS Safari fallback: native video fullscreen on the element itself.
+        v?.webkitEnterFullscreen?.();
+      });
+      return;
+    }
+    // iOS Safari (no Element.requestFullscreen) — use the native video API.
+    v?.webkitEnterFullscreen?.();
   }, []);
+
+  // Select / change subtitle track. Persists choice.
+  const selectCc = useCallback((lang: string | null) => {
+    setActiveCc(lang);
+    setCcOpen(false);
+    try { localStorage.setItem("player:cc", lang ?? ""); } catch {}
+    const v = videoRef.current;
+    if (!v) return;
+    const tracks = v.textTracks;
+    for (let i = 0; i < tracks.length; i++) {
+      tracks[i].mode = tracks[i].language === lang ? "showing" : "disabled";
+    }
+  }, []);
+
+  // Apply persisted CC choice once subtitles arrive.
+  useEffect(() => {
+    if (!videoUrl) return;
+    let saved: string | null = null;
+    try { saved = localStorage.getItem("player:cc"); } catch {}
+    if (saved && subtitles.some((s) => s.lang === saved)) {
+      selectCc(saved);
+    } else {
+      const def = subtitles.find((s) => s.default);
+      if (def) selectCc(def.lang);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoUrl, subtitles.length]);
+
+  // Buffering / error handlers
+  const onWaitingEvt = useCallback(() => setBuffering(true), []);
+  const onPlayingEvt = useCallback(() => { setBuffering(false); setStreamError(false); }, []);
+  const onCanPlayEvt = useCallback(() => setBuffering(false), []);
+  const onErrorEvt = useCallback(() => {
+    const v = videoRef.current;
+    if (v && v.currentTime > 0) lastKnownPosRef.current = v.currentTime;
+    setStreamError(true);
+    setBuffering(false);
+  }, []);
+  const retryStream = useCallback(async () => {
+    setStreamError(false);
+    setBuffering(true);
+    await queryClient.invalidateQueries({ queryKey: streamQueryKey });
+    // Restore position once the new src loads (handled by the load handler below).
+  }, [queryClient, streamQueryKey]);
+  // When src changes (e.g. after retry), jump back to last known position.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !videoUrl) return;
+    const pos = lastKnownPosRef.current;
+    if (pos <= 0) return;
+    const handler = () => {
+      try { v.currentTime = pos; } catch {}
+      v.play().catch(() => {});
+      v.removeEventListener("loadedmetadata", handler);
+    };
+    v.addEventListener("loadedmetadata", handler);
+    return () => v.removeEventListener("loadedmetadata", handler);
+  }, [videoUrl]);
+
+  // Flush playback progress on tab close / backgrounding so users don't lose up to 10s.
+  useEffect(() => {
+    if (!hasAccess) return;
+    const flush = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      const pos = Math.floor(v.currentTime);
+      if (pos <= 0) return;
+      const dur = v.duration && isFinite(v.duration) ? Math.floor(v.duration) : null;
+      lastSyncRef.current = Date.now();
+      saveProgress({
+        data: { filmId: film.id, positionSeconds: pos, durationSeconds: dur, completed: false },
+      }).catch(() => {});
+    };
+    const onVis = () => { if (document.visibilityState === "hidden") flush(); };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [hasAccess, film.id, saveProgress]);
+
 
   const scrubToClientX = useCallback((clientX: number) => {
     const v = videoRef.current;
@@ -341,7 +446,9 @@ function WatchPage() {
     revealOverlay();
   }, [revealOverlay]);
 
-  // Double-tap left / right edge → ±10s seek (mobile)
+  // Double-tap left / right edge → ±10s seek (mobile). When a double-tap fires we
+  // suppress the upcoming click so the play/pause toggle doesn't fight the seek.
+  const suppressNextClickRef = useRef(false);
   const onPlayerPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.pointerType !== "touch") return;
     const now = Date.now();
@@ -358,12 +465,21 @@ function WatchPage() {
         setCurrentTime(v.currentTime);
         setSeekRipple({ side: side === "right" ? "right" : "left", key: now });
         window.setTimeout(() => setSeekRipple((r) => (r && r.key === now ? null : r)), 600);
+        suppressNextClickRef.current = true;
       }
       tapStateRef.current = null;
       return;
     }
     tapStateRef.current = { t: now, x: e.clientX };
   }, [dir]);
+
+  const videoClick = useCallback(() => {
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false;
+      return;
+    }
+    togglePlay();
+  }, [togglePlay]);
 
   const onPlayEvt = useCallback(() => { setPlaying(true); revealOverlay(); }, [revealOverlay]);
   const onPauseEvt = useCallback(() => { setPlaying(false); setOverlayVisible(true); }, []);
@@ -578,18 +694,62 @@ function WatchPage() {
                 poster={film.cover_url || undefined}
                 autoPlay={resumePrompt === null}
                 playsInline
+                crossOrigin="anonymous"
                 controlsList="nodownload"
                 onLoadedMetadata={onLoadedMetadata}
-                onTimeUpdate={() => { onTimeUpdate(); onTimeTick(); }}
+                onTimeUpdate={() => {
+                  const v = videoRef.current;
+                  if (v) lastKnownPosRef.current = v.currentTime;
+                  onTimeUpdate(); onTimeTick();
+                }}
                 onEnded={() => { onEnded(); setPlaying(false); setOverlayVisible(true); }}
                 onVolumeChange={onVolumeChange}
                 onPlay={onPlayEvt}
                 onPause={onPauseEvt}
                 onDurationChange={onDurationChangeEvt}
                 onProgress={onProgressEvt}
-                onClick={togglePlay}
+                onWaiting={onWaitingEvt}
+                onPlaying={onPlayingEvt}
+                onCanPlay={onCanPlayEvt}
+                onStalled={onWaitingEvt}
+                onError={onErrorEvt}
+                onClick={videoClick}
                 className="absolute inset-0 h-full w-full bg-black cursor-pointer"
-              />
+              >
+                {subtitles.map((s) => (
+                  <track
+                    key={s.lang}
+                    kind="subtitles"
+                    src={s.url}
+                    srcLang={s.lang}
+                    label={s.label}
+                    default={activeCc ? s.lang === activeCc : !!s.default}
+                  />
+                ))}
+              </video>
+
+              {/* Buffering spinner */}
+              {buffering && !streamError && (
+                <div className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full border-2 border-cream/20 border-t-amber animate-spin" />
+                </div>
+              )}
+
+              {/* Stream error overlay */}
+              {streamError && (
+                <div className="absolute inset-0 z-[7] flex flex-col items-center justify-center gap-3 bg-black/70 px-6 text-center backdrop-blur-sm">
+                  <p className="font-display text-lg text-cream-bright">
+                    {fa ? "اتصال پخش قطع شد." : "Playback connection was lost."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={retryStream}
+                    className="rounded-md bg-amber px-5 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+                  >
+                    {fa ? "تلاش دوباره" : "Try again"}
+                  </button>
+                </div>
+              )}
 
               {/* ---- Cinematic overlay ---- */}
               <div
@@ -717,6 +877,49 @@ function WatchPage() {
                       {fmtTime(duration)}
                     </span>
                     <div className="flex-1" />
+                    {subtitles.length > 0 && (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setCcOpen((x) => !x)}
+                          aria-label={fa ? "زیرنویس" : "Subtitles"}
+                          aria-expanded={ccOpen}
+                          className={`flex h-9 min-w-9 items-center justify-center rounded-md px-1.5 text-[11px] font-semibold transition-all hover:scale-110 ${activeCc ? "text-amber" : "text-cream/85 hover:text-amber"}`}
+                        >
+                          CC
+                        </button>
+                        {ccOpen && (
+                          <div
+                            role="menu"
+                            className="absolute bottom-12 end-0 min-w-[160px] rounded-md border border-cream/15 bg-bg-0/95 p-1 text-[12px] shadow-2xl backdrop-blur"
+                          >
+                            <button
+                              type="button"
+                              role="menuitemradio"
+                              aria-checked={activeCc === null}
+                              onClick={() => selectCc(null)}
+                              className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-start hover:bg-cream/10 ${activeCc === null ? "text-amber" : "text-cream/85"}`}
+                            >
+                              <span>{fa ? "خاموش" : "Off"}</span>
+                              {activeCc === null && <span aria-hidden>✓</span>}
+                            </button>
+                            {subtitles.map((s) => (
+                              <button
+                                key={s.lang}
+                                type="button"
+                                role="menuitemradio"
+                                aria-checked={activeCc === s.lang}
+                                onClick={() => selectCc(s.lang)}
+                                className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-start hover:bg-cream/10 ${activeCc === s.lang ? "text-amber" : "text-cream/85"}`}
+                              >
+                                <span>{s.label}</span>
+                                {activeCc === s.lang && <span aria-hidden>✓</span>}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={toggleFullscreen}
