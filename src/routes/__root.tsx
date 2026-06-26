@@ -237,7 +237,7 @@ function RootShell({ children }: { children: ReactNode }) {
           the noir background + hero shell on the very first byte, without
           waiting for the Tailwind stylesheet to download/parse. Anything
           here MUST stay tiny (<2 KB gzipped) — everything else lives in
-          the regular stylesheet.
+          the regular stylesheet, injected non-blocking below.
         */}
         <style
           dangerouslySetInnerHTML={{
@@ -252,6 +252,22 @@ function RootShell({ children }: { children: ReactNode }) {
         />
 
         {/*
+          Non-blocking stylesheet load. The link is created with
+          media="print" so the browser fetches it without blocking
+          render, then we flip media back to "all" once it has loaded.
+          <noscript> fallback ensures the stylesheet still applies if
+          JS is disabled.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(appCss)};l.media='print';l.onload=function(){this.media='all';this.onload=null;};document.head.appendChild(l);})();`,
+          }}
+        />
+        <noscript>
+          <link rel="stylesheet" href={appCss} />
+        </noscript>
+
+        {/*
           Inject the resolved region as a global so <LocaleProvider> can
           initialize synchronously on the client — no useEffect flip, no
           flash of English for Iran visitors. Tab-bar visibility check
@@ -261,19 +277,8 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
-              // iPhone Safari exposes a smaller visual viewport while the
-              // bottom URL bar is visible. Set the offset in the head script
-              // before first paint so the tab bar never spends a frame glued
-              // to the layout viewport and then jumps after React hydrates.
               `try{var vv=window.visualViewport;var r=document.documentElement;var u=function(){if(!vv)return;var g=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);r.style.setProperty('--vv-chrome-bottom',Math.round(g)+'px');};u();if(vv){vv.addEventListener('resize',function(){requestAnimationFrame(u);},{passive:true});}}catch(e){}` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
-              // Inject the webfont stylesheet asynchronously so it never
-              // blocks first paint. display=optional means the browser
-              // uses the system fallback if the font isn't ready in ~100ms
-              // and never swaps later — eliminates the layout shift the
-              // large Persian/Latin headline caused on slow networks.
-              // Locale-aware: Iran visitors only fetch Vazirmatn; global
-              // visitors only fetch the Latin families.
               `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
                 locale === "fa"
                   ? "https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600&display=optional"
