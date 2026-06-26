@@ -19,22 +19,23 @@ export function FeaturedFilm() {
   const mobileImage = data ? data.mobile_cover_url || data.cover_url || data.thumbnail_url : null;
   const mobileImageRef = useRef<HTMLImageElement | null>(null);
   const desktopImageRef = useRef<HTMLImageElement | null>(null);
-  const [mobileImageReady, setMobileImageReady] = useState(false);
-  const [desktopImageReady, setDesktopImageReady] = useState(false);
+  // Start ready=true so the SSR HTML paints the hero img at opacity 1 the
+  // instant the preloaded bytes arrive — without waiting for React hydration
+  // + onLoad. This is the single biggest LCP win on the home route.
+  const [mobileImageReady, setMobileImageReady] = useState(true);
+  const [desktopImageReady, setDesktopImageReady] = useState(true);
 
   useEffect(() => {
-    setMobileImageReady(false);
     const img = mobileImageRef.current;
-    if (img?.complete && img.naturalWidth > 0) {
-      requestAnimationFrame(() => setMobileImageReady(true));
+    if (img && !img.complete) {
+      setMobileImageReady(false);
     }
   }, [mobileImage]);
 
   useEffect(() => {
-    setDesktopImageReady(false);
     const img = desktopImageRef.current;
-    if (img?.complete && img.naturalWidth > 0) {
-      requestAnimationFrame(() => setDesktopImageReady(true));
+    if (img && !img.complete) {
+      setDesktopImageReady(false);
     }
   }, [desktopImage]);
 
