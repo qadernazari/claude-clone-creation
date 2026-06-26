@@ -39,7 +39,7 @@ export function SiteFooter() {
             <Link to="/" onClick={handleHomeClick} aria-label="IRAN — home">
               <Logo size={28} />
             </Link>
-            <span className="text-[11px] uppercase tracking-[0.28em] text-cream/35">
+            <span className="text-[11px] uppercase tracking-[0.28em] text-cream/60">
               {fa ? "خانه‌ی سینمای ایران" : "Home of Iranian cinema"}
             </span>
           </div>
