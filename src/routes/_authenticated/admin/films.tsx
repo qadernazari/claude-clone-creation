@@ -365,6 +365,7 @@ function FilmEditorModal({
 }) {
   const [d, setD] = useState<FilmDraft>(draft);
   const [credits, setCredits] = useState<CreditDraft[]>([]);
+  const [subtitles, setSubtitles] = useState<SubtitleTrack[]>([]);
   const [saving, setSaving] = useState(false);
   const seriesOptions = allFilms.filter((f) => f.film_type === "series" && f.id !== d.id);
   const set = <K extends keyof FilmDraft>(k: K, v: FilmDraft[K]) => setD((p) => ({ ...p, [k]: v }));
