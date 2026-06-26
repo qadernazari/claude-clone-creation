@@ -3,7 +3,6 @@ import { useLocale } from "../lib/i18n";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 
-
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
@@ -11,207 +10,143 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "IRAN is a streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals. Fair pay for filmmakers.",
+          "IRAN is a streaming platform for Iranian cinema. Original documentaries, curated short films, in English and Persian.",
       },
       { property: "og:title", content: "About — IRAN" },
       {
         property: "og:description",
         content:
-          "Iranian short films, streaming worldwide. Membership with a free trial, plus Premium rentals. Fair pay for filmmakers.",
+          "IRAN is a streaming platform for Iranian cinema. Original documentaries, curated short films, in English and Persian.",
       },
       { property: "og:url", content: "https://ir.show/about" },
+      { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "https://ir.show/about" }],
   }),
   component: AboutPage,
 });
 
+type Section = {
+  heading: { en: string; fa: string };
+  body: { en: string; fa: string };
+};
+
+const SECTIONS: Section[] = [
+  {
+    heading: { en: "What we are", fa: "ما چه هستیم" },
+    body: {
+      en: "IRAN is a streaming platform dedicated entirely to Iranian cinema. We commission original documentaries, curate short films, and bring the voices of Iranian filmmakers to audiences everywhere — in English and Persian.",
+      fa: "ایران یک پلتفرم پخش است که به‌طور کامل به سینمای ایران اختصاص دارد. ما مستندهای اصلی سفارش می‌دهیم، فیلم‌های کوتاه را گزینش می‌کنیم، و صدای فیلم‌سازان ایرانی را به مخاطبان سراسر جهان می‌رسانیم — به انگلیسی و فارسی.",
+    },
+  },
+  {
+    heading: { en: "Why we built this", fa: "چرا این را ساختیم" },
+    body: {
+      en: "We built IRAN because we believe Iranian cinema deserves its own home. Not a subfolder on a general platform. Not a piracy site. A place built with care, where every film is chosen with intention and every filmmaker is treated with respect.",
+      fa: "ما ایران را ساختیم چون باور داریم سینمای ایران سزاوار خانه‌ای از آن خود است. نه یک زیرشاخه در یک پلتفرم عمومی. نه یک سایت غیرقانونی. مکانی که با دقت ساخته شده، جایی که هر فیلم با قصد انتخاب می‌شود و با هر فیلم‌ساز با احترام رفتار می‌شود.",
+    },
+  },
+  {
+    heading: { en: "How it works", fa: "چطور کار می‌کند" },
+    body: {
+      en: "Every film on IRAN is available with a membership — one flat price, no auto-renewal, no algorithm pushing you toward something louder. Just films, carefully chosen, waiting to be watched.",
+      fa: "هر فیلم در ایران با عضویت در دسترس است — یک قیمت ثابت، بدون تمدید خودکار، بدون الگوریتمی که شما را به سمت چیزی پرسروصداتر هل دهد. فقط فیلم‌ها، با دقت انتخاب‌شده، در انتظار دیده شدن.",
+    },
+  },
+  {
+    heading: { en: "The name", fa: "این نام" },
+    body: {
+      en: "We called it IRAN not as a political statement, but as a declaration of origin. These films come from Iran. They carry its light, its weight, and its humanity.",
+      fa: "ما آن را ایران نامیدیم، نه به عنوان یک بیانیه سیاسی، بلکه به عنوان اعلام خاستگاه. این فیلم‌ها از ایران می‌آیند. آن‌ها نور، وزن و انسانیت آن را با خود حمل می‌کنند.",
+    },
+  },
+];
+
 function AboutPage() {
   const { locale } = useLocale();
   const fa = locale === "fa";
 
-  const team = [
-    {
-      en: { name: "Curatorial Collective", role: "Programming & selection" },
-      fa: { name: "گروه برنامه‌ریزی", role: "گزینش و برنامه‌ریزی آثار" },
-    },
-    {
-      en: { name: "Filmmaker Liaison", role: "Artist relations & payouts" },
-      fa: { name: "رابط فیلم‌سازان", role: "ارتباط با هنرمندان و پرداخت‌ها" },
-    },
-    {
-      en: { name: "Engineering & Design", role: "Product, streaming, payments" },
-      fa: { name: "مهندسی و طراحی", role: "محصول، پخش و پرداخت" },
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-bg-0 text-cream">
+    <div dir={fa ? "rtl" : "ltr"} className="flex min-h-screen flex-col bg-bg-0">
       <SiteHeader current="about" />
 
-
-      <section className="relative isolate overflow-hidden">
-        <div
-          className="absolute inset-0 -z-10 opacity-60"
-          style={{
-            background:
-              "radial-gradient(ellipse at 30% 20%, oklch(0.35 0.06 60 / 0.55), transparent 60%), radial-gradient(ellipse at 70% 80%, oklch(0.40 0.10 75 / 0.45), transparent 60%)",
-          }}
-        />
-        <div className="mx-auto max-w-4xl px-6 py-24 md:py-32">
-          <p className="mb-6 text-xs uppercase tracking-[0.35em] text-amber">
-            {fa ? "درباره‌ی ایران" : "About IRAN"}
-          </p>
-          <h1 className="font-display text-5xl leading-[1.05] text-cream-bright md:text-6xl">
-            {fa
-              ? "فیلم‌های کوتاه ایرانی، در دسترس همه‌ی جهان."
-              : "Iranian short films, streaming worldwide."}
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg text-cream/70">
-            {fa
-              ? "ایران خانه‌ای آنلاین برای سینمای کوتاه ایران است. عضویت ماهانه با ۷ روز آزمایش رایگان، به‌علاوه‌ی بلیت‌های ویژه برای انتشارهای منتخب. پرداختِ منصفانه و شفاف به سازندگانِ فیلم."
-              : "A streaming home for Iranian short cinema. Membership with a 7-day free trial, plus Premium rentals for select releases. Fair, transparent pay for the people who made the film."}
-          </p>
-        </div>
-      </section>
-
-      <section className="hairline border-t">
-        <div className="mx-auto max-w-4xl px-6 py-20">
-          <h2 className="mb-6 font-display text-3xl text-cream-bright md:text-4xl">
-            {fa ? "مأموریت ما" : "Our mission"}
-          </h2>
-          <div className="space-y-5 text-cream/75">
-            <p>
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="relative overflow-hidden px-6 pt-24 pb-20 md:pt-36 md:pb-28">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.12), transparent 60%)",
+            }}
+          />
+          <div className="relative z-10 mx-auto max-w-3xl text-center">
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.40em] text-amber/90">
+              {fa ? "درباره ایران" : "About IRAN"}
+            </span>
+            <h1
+              className={`mt-6 font-display text-4xl font-medium leading-[1.05] tracking-[-0.025em] text-cream-bright md:text-6xl ${fa ? "font-vazir" : ""}`}
+              style={{ textShadow: "0 12px 60px rgba(201,168,76,0.15)" }}
+            >
+              {fa ? "خانه‌ای برای سینمای ایران." : "A home for Iranian cinema."}
+            </h1>
+            <div className="mx-auto mt-8 h-px w-16 bg-amber/60" aria-hidden />
+            <p
+              className={`mx-auto mt-8 max-w-2xl text-[18px] leading-relaxed text-cream/80 md:text-[20px] ${fa ? "font-vazir" : ""}`}
+            >
               {fa
-                ? "ما باور داریم سینمای کوتاهِ ایران شایسته‌ی خانه‌ای‌ست که در آن صدای حقیقی‌اش شنیده شود — بدون الگوریتم، بدون تبلیغاتِ پیش از پخش، و بدون واسطه‌های ناعادلانه میانِ فیلم‌ساز و تماشاگر."
-                : "Iranian short cinema deserves a home where its authentic voice is heard — without algorithms, without ad pre-rolls, and without unfair middlemen between filmmakers and the audience."}
-            </p>
-            <p>
-              {fa
-                ? "هر فیلم با دقت انتخاب می‌شود. هر عضویت و هر بلیت یک حمایت مستقیم از هنرمند است. هر تماشاگر، بخشی از یک جامعه‌ی کوچک اما واقعی‌ست."
-                : "Every film is hand-picked. Every membership and ticket supports the artist directly. Every viewer is part of a small but real community."}
+                ? "ایران یکی از غنی‌ترین سنت‌های سینمایی جهان را دارد — با این حال بیشتر آن برای دنیا ناپیدا مانده است. ما اینجاییم تا این را تغییر دهیم."
+                : "Iran has one of the world's most celebrated film traditions — yet most of it remains invisible to the world. IRAN exists to change that."}
             </p>
           </div>
+        </section>
 
-          <blockquote className="relative mt-14 max-w-3xl border-s-2 border-amber/60 ps-6">
-            <p className="font-editorial text-2xl italic leading-snug text-cream-bright md:text-3xl">
-              {fa
-                ? "«سینما، آن‌گاه که اجازه می‌یابی صدای خودش باشد، چیزی برای پنهان کردن ندارد.»"
-                : "“Cinema, when it is allowed to be its own voice, has nothing to hide.”"}
-            </p>
-            <footer className="mt-3 text-xs uppercase tracking-[0.25em] text-cream/45">
-              {fa ? "— از مانیفست ما" : "— From our manifesto"}
-            </footer>
-          </blockquote>
-        </div>
-      </section>
-
-      {/* Principles — three commitments */}
-      <section className="hairline border-t">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-amber">
-            {fa ? "اصول ما" : "Principles"}
-          </p>
-          <h2 className="mb-12 max-w-2xl font-display text-3xl text-cream-bright md:text-4xl">
-            {fa ? "سه تعهدی که نمی‌شکنیم." : "Three commitments we don't break."}
-          </h2>
-          <div className="grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
-            {[
-              {
-                en: ["Fair to filmmakers", "Filmmakers receive transparent revenue from every ticket and every membership stream, plus 100% of viewer tips. No hidden cuts."],
-                fa: ["عدالت با فیلم‌ساز", "بخش عمده‌ی هر بلیت به‌طور مستقیم به هنرمند می‌رسد. پرداخت شفاف، بدون کسر پنهان."],
-              },
-              {
-                en: ["Curated, never crowded", "We add films when they earn their place — not to fill a feed. Quality over quantity, always."],
-                fa: ["انتخاب‌شده، نه شلوغ", "فیلم را وقتی اضافه می‌کنیم که جایگاهش را به دست آورده باشد — نه برای پر کردن صفحه."],
-              },
-              {
-                en: ["Bilingual by design", "Persian and English at parity — both languages are first-class on every screen, every film."],
-                fa: ["دوزبانه از پایه", "فارسی و انگلیسی هم‌شأن — هر دو زبان روی هر صفحه و هر فیلم در رتبه‌ی اول."],
-              },
-            ].map((p, i) => {
-              const [title, desc] = fa ? p.fa : p.en;
-              return (
-                <div key={i} className="bg-bg-0 p-8">
-                  <div className="mb-5 flex items-baseline gap-3">
-                    <span className="font-display text-3xl font-extrabold text-amber/40 tabular-nums">
-                      0{i + 1}
-                    </span>
-                    <span className="h-px flex-1 bg-line" />
-                  </div>
-                  <h3 className="mb-3 font-display text-xl text-cream-bright">{title}</h3>
-                  <p className="text-sm leading-relaxed text-cream/60">{desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-
-      <section className="hairline border-t">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="mb-12 font-display text-3xl text-cream-bright md:text-4xl">
-            {fa ? "تیم" : "The team"}
-          </h2>
-          <div className="grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
-            {team.map((member, i) => {
-              const m = fa ? member.fa : member.en;
-              return (
-                <div key={i} className="bg-bg-0 p-8">
-                  <div className="mb-4 text-amber">●</div>
-                  <h3 className="mb-2 font-display text-xl text-cream-bright">
-                    {m.name}
-                  </h3>
-                  <p className="text-sm text-cream/65">{m.role}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="hairline border-t">
-        <div className="mx-auto max-w-4xl px-6 py-20">
-          <h2 className="mb-6 font-display text-3xl text-cream-bright md:text-4xl">
-            {fa ? "تماس" : "Contact"}
-          </h2>
-          <p className="mb-6 text-cream/75">
-            {fa
-              ? "برای ارسال اثر، همکاری، یا هر سؤالی، با ما در تماس باشید."
-              : "For submissions, partnerships, or any question — reach out."}
-          </p>
-          <div className="hairline rounded-2xl border bg-bg-1/40 p-8">
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-cream/50">
-                  {fa ? "ایمیل عمومی" : "General"}
-                </p>
-                <a
-                  href="mailto:info@ir.show"
-                  className="mt-1 block text-lg text-cream-bright hover:text-amber"
+        {/* Sections */}
+        <section className="px-6 pb-24">
+          <div className="mx-auto max-w-2xl">
+            {SECTIONS.map((s, i) => (
+              <article
+                key={i}
+                className={i > 0 ? "mt-14 border-t border-amber/15 pt-14" : ""}
+              >
+                <h2
+                  className={`text-[11px] font-semibold uppercase tracking-[0.32em] text-amber ${fa ? "font-vazir" : ""}`}
                 >
-                  info@ir.show
-                </a>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-cream/50">
-                  {fa ? "فیلم‌سازان" : "Filmmakers"}
-                </p>
-                <a
-                  href="mailto:info@ir.show"
-                  className="mt-1 block text-lg text-cream-bright hover:text-amber"
+                  {fa ? s.heading.fa : s.heading.en}
+                </h2>
+                <p
+                  className={`mt-5 text-[16px] leading-relaxed text-cream/70 ${fa ? "font-vazir" : ""}`}
                 >
-                  info@ir.show
+                  {fa ? s.body.fa : s.body.en}
+                </p>
+              </article>
+            ))}
+
+            {/* Closing */}
+            <div className="mt-20 border-t border-amber/15 pt-14 text-center">
+              <p
+                className={`font-display text-2xl italic leading-snug tracking-[-0.01em] text-amber md:text-3xl ${fa ? "font-vazir not-italic" : ""}`}
+              >
+                {fa
+                  ? "سینمای ایران، برای همه جهان."
+                  : "Iranian cinema, streamed worldwide."}
+              </p>
+              <p className={`mt-10 text-[13px] text-cream/55 ${fa ? "font-vazir" : ""}`}>
+                {fa ? "سوالی دارید؟ " : "Questions? "}
+                <a
+                  href="mailto:hello@ir.show"
+                  className="text-cream/80 underline decoration-amber/40 underline-offset-4 transition-colors hover:text-amber"
+                >
+                  hello@ir.show
                 </a>
-              </div>
+              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <SiteFooter />
-
     </div>
   );
 }
