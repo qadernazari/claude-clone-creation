@@ -68,8 +68,8 @@ export async function fetchBrowsePageData(): Promise<BrowsePageData> {
   const films = await Promise.all(
     filmsRaw.map(async (f) => {
       const [cover, thumbnail] = await Promise.all([
-        renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 600, 68),
-        renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 600, 68),
+        renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 520, 65),
+        renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 520, 65),
       ]);
       return { ...f, cover_url: cover, thumbnail_url: thumbnail } as BrowseFilm;
     }),
