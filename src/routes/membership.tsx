@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Check, Sparkles, Film, Monitor, VolumeX, RefreshCw, Smartphone, Globe } from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Sparkles, Film, Monitor, VolumeX, RefreshCw, Smartphone, Globe } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -73,23 +73,6 @@ function MembershipPage() {
     });
   }, []);
 
-  const benefits = useMemo(
-    () =>
-      fa
-        ? [
-            "تماشای نامحدود کل کاتالوگ",
-            "کیفیت HD و زیرنویس فارسی",
-            "بدون تبلیغات، در هر دستگاه",
-            "بدون تمدید خودکار — کنترل کامل با شما",
-          ]
-        : [
-            "Unlimited access to the full catalog",
-            "HD streaming with Persian subtitles",
-            "Ad-free, on every device",
-            "No auto-renewal — you stay in control",
-          ],
-    [fa],
-  );
 
   const handleChoose = (planId: MembershipPlanId) => {
     if (!user) {
