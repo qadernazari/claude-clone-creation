@@ -151,7 +151,7 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
       // Smaller render of the landscape thumbnail, served on mobile when
       // no dedicated portrait mobile_cover_url exists. Saves ~80 KiB.
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 760, 55),
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 55),
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 760, 60, 1350, "cover"),
     ]);
     return {
       ...featuredRaw,
