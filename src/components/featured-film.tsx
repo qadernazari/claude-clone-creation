@@ -97,7 +97,7 @@ export function FeaturedFilm() {
                 height={1280}
                 className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 block h-full w-full object-cover object-top md:hidden"
                 style={{ opacity: mobileImageReady ? 1 : 0, transition: "opacity 120ms ease-out" }}
-                loading="lazy"
+                loading="eager"
                 decoding="async"
                 sizes="100vw"
                 aria-hidden

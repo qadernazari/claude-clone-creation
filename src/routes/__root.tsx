@@ -202,12 +202,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "enamad", content: "52799420" },
     ],
     links: [
-      // Preload the stylesheet so the network fetch starts immediately;
-      // the actual <link rel="stylesheet"> is injected non-blocking
-      // (media="print" → swap to "all" onload) by the inline script in
-      // RootShell <head>. Combined with the inline critical CSS this
-      // eliminates the ~830ms render-blocking CSS hit on mobile.
+      // Stylesheet is render-blocking by spec — preload it so the browser
+      // starts fetching it the moment the HTML streams in, in parallel
+      // with HTML parsing, instead of waiting until the parser reaches
+      // the <link> tag.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
+      { rel: "stylesheet", href: appCss },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
@@ -236,41 +236,6 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang={locale} dir={dir} data-region={region} suppressHydrationWarning>
       <head>
-        {/*
-          Critical above-the-fold CSS, inlined so the browser can paint
-          the noir background + hero shell on the very first byte, without
-          waiting for the Tailwind stylesheet to download/parse. Anything
-          here MUST stay tiny (<2 KB gzipped) — everything else lives in
-          the regular stylesheet, injected non-blocking below.
-        */}
-        <style
-          dangerouslySetInnerHTML={{
-            __html:
-              "html,body{margin:0;background:#0d0d0d;color:#f5f4ef;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}" +
-              "body{min-height:100vh}" +
-              "[data-mobile-hero]{position:relative;width:100%;height:100svh;min-height:620px;overflow:hidden;background:#1a1a1a}" +
-              "@media(min-width:768px){[data-mobile-hero]{height:100dvh;min-height:640px}}" +
-              ".hero-mobile-poster{position:absolute;inset:0;pointer-events:none}" +
-              "img.cine-img{max-width:100%;height:auto}",
-          }}
-        />
-
-        {/*
-          Non-blocking stylesheet load. The link is created with
-          media="print" so the browser fetches it without blocking
-          render, then we flip media back to "all" once it has loaded.
-          <noscript> fallback ensures the stylesheet still applies if
-          JS is disabled.
-        */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(appCss)};l.media='print';l.onload=function(){this.media='all';this.onload=null;};document.head.appendChild(l);})();`,
-          }}
-        />
-        <noscript>
-          <link rel="stylesheet" href={appCss} />
-        </noscript>
-
         {/*
           Inject the resolved region as a global so <LocaleProvider> can
           initialize synchronously on the client — no useEffect flip, no
