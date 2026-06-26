@@ -363,15 +363,20 @@ function BrowsePage() {
                   key={film.id}
                   to="/films/$slug"
                   params={{ slug: film.slug }}
+                  preload="intent"
                   className="group block"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1.5 md:group-hover:ring-cream/20 md:group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-[320ms] [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] md:group-hover:-translate-y-1.5 md:group-hover:ring-cream/20 md:group-hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
                     {film.cover_url ? (
                       <img
                         src={film.cover_url}
                         alt=""
+                        width={520}
+                        height={780}
                         loading="lazy"
                         decoding="async"
+                        fetchPriority="low"
+                        sizes="(min-width: 1024px) 280px, (min-width: 768px) 240px, 45vw"
                         className="cine-img absolute inset-0 h-full w-full object-cover"
                       />
                     ) : (

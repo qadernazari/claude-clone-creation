@@ -177,15 +177,18 @@ function PosterRail({
             const bg = (r.poster_gradient as string) || fallbackGradient;
             return (
               <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
-                <Link to="/films/$slug" params={{ slug: r.slug }} className="group block">
-                  <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-500 md:group-hover:-translate-y-1.5 md:group-hover:ring-cream/25 md:group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
+                <Link to="/films/$slug" params={{ slug: r.slug }} preload="intent" className="group block">
+                  <div className="relative overflow-hidden rounded-xl ring-1 ring-cream/6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] transition-all duration-[320ms] [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] md:group-hover:-translate-y-1.5 md:group-hover:ring-cream/25 md:group-hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
                     <div className="aspect-[2/3] w-full" style={{ background: bg }}>
                       {r.cover_url && (
                         <img
                           src={r.cover_url}
                           alt=""
+                          width={380}
+                          height={570}
                           loading="lazy"
                           decoding="async"
+                          fetchPriority="low"
                           className="h-full w-full object-cover"
                           aria-hidden
                         />
