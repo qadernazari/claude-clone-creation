@@ -318,10 +318,104 @@ function WatchPage() {
 
   const toggleFullscreen = useCallback(() => {
     const shell = playerShellRef.current;
-    if (!shell) return;
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-    else shell.requestFullscreen?.().catch(() => {});
+    const v = videoRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+      return;
+    }
+    // Desktop / Android Chrome — fullscreen the shell so overlay stays visible.
+    if (shell?.requestFullscreen) {
+      shell.requestFullscreen().catch(() => {
+        // iOS Safari fallback: native video fullscreen on the element itself.
+        v?.webkitEnterFullscreen?.();
+      });
+      return;
+    }
+    // iOS Safari (no Element.requestFullscreen) — use the native video API.
+    v?.webkitEnterFullscreen?.();
   }, []);
+
+  // Select / change subtitle track. Persists choice.
+  const selectCc = useCallback((lang: string | null) => {
+    setActiveCc(lang);
+    setCcOpen(false);
+    try { localStorage.setItem("player:cc", lang ?? ""); } catch {}
+    const v = videoRef.current;
+    if (!v) return;
+    const tracks = v.textTracks;
+    for (let i = 0; i < tracks.length; i++) {
+      tracks[i].mode = tracks[i].language === lang ? "showing" : "disabled";
+    }
+  }, []);
+
+  // Apply persisted CC choice once subtitles arrive.
+  useEffect(() => {
+    if (!videoUrl) return;
+    let saved: string | null = null;
+    try { saved = localStorage.getItem("player:cc"); } catch {}
+    if (saved && subtitles.some((s) => s.lang === saved)) {
+      selectCc(saved);
+    } else {
+      const def = subtitles.find((s) => s.default);
+      if (def) selectCc(def.lang);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoUrl, subtitles.length]);
+
+  // Buffering / error handlers
+  const onWaitingEvt = useCallback(() => setBuffering(true), []);
+  const onPlayingEvt = useCallback(() => { setBuffering(false); setStreamError(false); }, []);
+  const onCanPlayEvt = useCallback(() => setBuffering(false), []);
+  const onErrorEvt = useCallback(() => {
+    const v = videoRef.current;
+    if (v && v.currentTime > 0) lastKnownPosRef.current = v.currentTime;
+    setStreamError(true);
+    setBuffering(false);
+  }, []);
+  const retryStream = useCallback(async () => {
+    setStreamError(false);
+    setBuffering(true);
+    await queryClient.invalidateQueries({ queryKey: streamQueryKey });
+    // Restore position once the new src loads (handled by the load handler below).
+  }, [queryClient, streamQueryKey]);
+  // When src changes (e.g. after retry), jump back to last known position.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !videoUrl) return;
+    const pos = lastKnownPosRef.current;
+    if (pos <= 0) return;
+    const handler = () => {
+      try { v.currentTime = pos; } catch {}
+      v.play().catch(() => {});
+      v.removeEventListener("loadedmetadata", handler);
+    };
+    v.addEventListener("loadedmetadata", handler);
+    return () => v.removeEventListener("loadedmetadata", handler);
+  }, [videoUrl]);
+
+  // Flush playback progress on tab close / backgrounding so users don't lose up to 10s.
+  useEffect(() => {
+    if (!hasAccess) return;
+    const flush = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      const pos = Math.floor(v.currentTime);
+      if (pos <= 0) return;
+      const dur = v.duration && isFinite(v.duration) ? Math.floor(v.duration) : null;
+      lastSyncRef.current = Date.now();
+      saveProgress({
+        data: { filmId: film.id, positionSeconds: pos, durationSeconds: dur, completed: false },
+      }).catch(() => {});
+    };
+    const onVis = () => { if (document.visibilityState === "hidden") flush(); };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [hasAccess, film.id, saveProgress]);
+
 
   const scrubToClientX = useCallback((clientX: number) => {
     const v = videoRef.current;
