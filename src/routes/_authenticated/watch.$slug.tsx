@@ -713,7 +713,7 @@ function WatchPage() {
                 onCanPlay={onCanPlayEvt}
                 onStalled={onWaitingEvt}
                 onError={onErrorEvt}
-                onClick={togglePlay}
+                onClick={videoClick}
                 className="absolute inset-0 h-full w-full bg-black cursor-pointer"
               >
                 {subtitles.map((s) => (
