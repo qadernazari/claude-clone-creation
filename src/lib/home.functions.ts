@@ -142,7 +142,7 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
     const [cover, thumbnail, mobile] = await Promise.all([
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 68),
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1400, 70),
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 62),
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 55),
     ]);
     return {
       ...featuredRaw,
