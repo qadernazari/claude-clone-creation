@@ -311,7 +311,6 @@ function RootComponent() {
             <Outlet />
             <MobileTabBar />
             <DeferredChrome />
-            <Toaster richColors position="top-center" />
           </PageOverlayProvider>
         </LocaleProvider>
       </AuthProvider>
