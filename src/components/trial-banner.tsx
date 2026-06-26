@@ -21,21 +21,21 @@ export function TrialBanner() {
   const msg =
     days === 0
       ? fa
-        ? "دوره آزمایشی شما امروز پایان می‌یابد."
+        ? "آزمایش رایگان شما امروز تمام می‌شود."
         : "Your free trial ends today."
       : days === 1
         ? fa
-          ? "دوره آزمایشی شما فردا پایان می‌یابد."
+          ? "آزمایش رایگان شما فردا تمام می‌شود."
           : "Your membership trial expires tomorrow."
         : fa
-          ? `${days} روز از دوره آزمایشی شما باقی‌مانده است.`
+          ? `${days} روز از آزمایش رایگان شما مانده است.`
           : `You have ${days} days remaining in your free trial.`;
 
   return (
     <div className="border-b border-amber/15 bg-amber/6 px-4 py-2 text-center text-[12px] text-cream/85">
       <span className="font-medium text-amber">{msg}</span>
       <a href="/account" className="ml-3 underline-offset-4 hover:underline">
-        {fa ? "ادامه دسترسی بدون وقفه" : "Continue your access without interruption"}
+        {fa ? "ادامه عضویت" : "Continue your access without interruption"}
       </a>
     </div>
   );

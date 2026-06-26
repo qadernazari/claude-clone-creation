@@ -418,7 +418,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               to="/membership"
               className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase leading-none tracking-[0.08em] text-ink shadow-sm transition-colors duration-200 hover:bg-amber/90 active:scale-95 sm:inline-flex"
             >
-              {fa ? "عضو شوید" : "Membership"}
+              {fa ? "عضویت" : "Membership"}
             </Link>
             {!authLoading && (
               user ? (

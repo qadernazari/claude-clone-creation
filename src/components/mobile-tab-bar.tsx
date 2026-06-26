@@ -91,7 +91,7 @@ export function MobileTabBar() {
 
   return (
     <nav
-      aria-label={fa ? "ناوبری" : "Primary"}
+      aria-label={fa ? "منوی اصلی" : "Primary"}
       dir={fa ? "rtl" : "ltr"}
       className="mobile-tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-cream/8 bg-bg-0/85 backdrop-blur-xl md:hidden"
       style={{
@@ -114,7 +114,7 @@ export function MobileTabBar() {
         />
         <TabItem
           to="/browse"
-          label={fa ? "آثار" : "Browse"}
+          label={fa ? "فیلم‌ها" : "Browse"}
           active={isBrowse}
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

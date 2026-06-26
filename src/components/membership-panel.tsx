@@ -32,27 +32,27 @@ export function MembershipPanel() {
 
   const t = {
     title: fa ? "عضویت" : "Membership",
-    none: fa ? "هنوز عضو نیستید." : "You're not a member yet.",
+    none: fa ? "هنوز عضو نشده‌اید." : "You're not a member yet.",
     noneSub: fa
-      ? "با عضویت، تمام آثار قابل تماشا را نامحدود ببینید."
+      ? "با عضویت، به همه آثار دسترسی نامحدود داشته باشید."
       : "Unlock unlimited streaming with an IRAN membership.",
-    start: fa ? "شروع رایگان ۷ روزه" : "Accept Free Trial",
-    manage: fa ? "مدیریت اشتراک" : "Manage subscription",
+    start: fa ? "شروع آزمایش رایگان" : "Accept Free Trial",
+    manage: fa ? "مدیریت عضویت" : "Manage subscription",
     statusActive: fa ? "فعال" : "Active",
-    statusTrial: fa ? "دوره آزمایشی" : "Trial",
-    statusPastDue: fa ? "پرداخت ناموفق" : "Payment failed",
-    statusCanceled: fa ? "لغو شده" : "Canceled",
-    nextBill: fa ? "تمدید بعدی" : "Renews on",
+    statusTrial: fa ? "آزمایش رایگان" : "Trial",
+    statusPastDue: fa ? "مشکل در پرداخت" : "Payment failed",
+    statusCanceled: fa ? "پایان‌یافته" : "Canceled",
+    nextBill: fa ? "تمدید در" : "Renews on",
     accessUntil: fa ? "دسترسی تا" : "Access until",
-    trialEnds: fa ? "پایان دوره آزمایشی" : "Trial ends",
+    trialEnds: fa ? "پایان آزمایش رایگان" : "Trial ends",
     canceledNote: fa
-      ? "اشتراک شما در پایان دوره فعلی لغو می‌شود."
+      ? "دسترسی شما تا پایان دوره جاری فعال است."
       : "Your subscription will end at the current period.",
     pastDueNote: fa
-      ? "آخرین پرداخت ناموفق بود. برای ادامه، روش پرداخت را به‌روزرسانی کنید."
+      ? "آخرین پرداخت انجام نشد. لطفاً روش پرداخت را به‌روز کنید."
       : "Your last payment failed. Update your payment method to keep access.",
     daysLeft: (n: number) =>
-      fa ? `${n} روز باقی‌مانده` : `${n} day${n === 1 ? "" : "s"} left`,
+      fa ? `${n} روز مانده` : `${n} day${n === 1 ? "" : "s"} left`,
   };
 
   const handlePortal = async () => {
@@ -90,7 +90,7 @@ export function MembershipPanel() {
         {!isTrialExpired && (
           <p className="mt-1 text-xs text-cream/55">
             {fa
-              ? "هفت روز دسترسی کامل — بدون نیاز به اطلاعات پرداخت."
+              ? "۷ روز دسترسی کامل — بدون نیاز به اطلاعات پرداختی."
               : "7 days of full access — no payment information required."}
           </p>
         )}
@@ -105,7 +105,7 @@ export function MembershipPanel() {
             to="/membership"
             className="inline-flex items-center rounded-md border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
           >
-            {fa ? "مشاهده پلن‌ها" : "View plans"}
+            {fa ? "مشاهده پلن‌های عضویت" : "View plans"}
           </Link>
         </div>
       </section>
@@ -123,7 +123,7 @@ export function MembershipPanel() {
               {t.title}
             </h2>
             <span className="mt-2 inline-flex items-center rounded-md border border-amber/30 bg-amber/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-amber">
-              {fa ? "دوره آزمایشی فعال" : "Free Trial Active"}
+              {fa ? "آزمایش رایگان فعال" : "Free Trial Active"}
               {days !== null && days > 0 ? ` · ${t.daysLeft(days)}` : ""}
             </span>
           </div>
@@ -131,13 +131,13 @@ export function MembershipPanel() {
             to="/membership"
             className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
           >
-            {fa ? "ارتقا به عضویت" : "Become a member"}
+            {fa ? "تبدیل به عضو" : "Become a member"}
           </Link>
         </div>
         <dl className="mt-6 grid gap-4 sm:grid-cols-2 text-sm">
           <div>
             <dt className="text-[11px] uppercase tracking-widest text-cream/55">
-              {fa ? "شروع دوره" : "Started on"}
+              {fa ? "شروع از" : "Started on"}
             </dt>
             <dd className="mt-1 text-cream-bright">{fmtDate(trial.started_at, fa)}</dd>
           </div>

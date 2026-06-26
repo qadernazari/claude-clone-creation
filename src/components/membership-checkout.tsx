@@ -57,7 +57,7 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
 
   const planAmountToman = baseToman ? tomanPriceForPlan(plan, baseToman) : undefined;
   const monthsLabel = fa
-    ? `${plan.months} ${plan.months === 1 ? "ماه" : "ماه"}`
+    ? plan.months === 1 ? "یک ماه" : `${plan.months} ماه`
     : `${plan.months} ${plan.months === 1 ? "Month" : "Months"}`;
 
   return (
@@ -95,20 +95,20 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
         ) : !started ? (
           <div className="p-6 sm:p-8">
             <div className="text-[11px] uppercase tracking-[0.18em] text-amber/90">
-              {fa ? "عضویت ایران" : "IRAN Membership"}
+              {fa ? "عضویت" : "IRAN Membership"}
             </div>
             <h2 className={`mt-1 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
               {monthsLabel}
             </h2>
             <p className="mt-2 text-sm text-cream/65">
               {fa
-                ? "پرداخت یکبار. بدون تمدید خودکار. هر زمان می‌توانید پلن جدید بخرید."
+                ? "پرداخت یک‌بار. بدون تمدید خودکار. هر وقت خواستید پلن جدید بخرید."
                 : "One-time payment. No auto-renewal. Buy another bundle anytime."}
             </p>
 
             <div className="mt-6">
               <p className="mb-2 text-[11px] uppercase tracking-widest text-cream/55">
-                {fa ? "کد تخفیف (اختیاری)" : "Promo code (optional)"}
+                {fa ? "کد تخفیف — اختیاری" : "Promo code (optional)"}
               </p>
               <CouponField
                 context="membership"
@@ -123,7 +123,7 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
               onClick={() => setStarted(true)}
               className="mt-6 w-full rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90"
             >
-              {fa ? "ادامه به پرداخت" : "Continue to payment"}
+              {fa ? "رفتن به درگاه پرداخت" : "Continue to payment"}
             </button>
           </div>
         ) : (

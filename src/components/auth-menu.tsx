@@ -212,26 +212,26 @@ export function AuthMenu() {
     label: string;
     tone: "amber" | "green" | "red" | "neutral";
   } = pastDue
-    ? { label: fa ? "پرداخت ناموفق" : "Payment failed", tone: "red" }
+    ? { label: fa ? "مشکل در پرداخت" : "Payment failed", tone: "red" }
     : isTrialActive && trial
       ? {
           label: fa
-            ? `دوره آزمایشی فعال · ${daysLeft(trial.ends_at)} روز باقی‌مانده`
+            ? `آزمایشی رایگان · ${daysLeft(trial.ends_at)} روز مانده`
             : `Free Trial Active · ${daysLeft(trial.ends_at)} day${daysLeft(trial.ends_at) === 1 ? "" : "s"} left`,
           tone: "amber",
         }
       : subActive
-        ? { label: fa ? "عضو فعال" : "Membership Active", tone: "green" }
+        ? { label: fa ? "عضویت فعال" : "Membership Active", tone: "green" }
         : subCanceledButValid && subscription?.current_period_end
           ? {
               label: fa
-                ? `فعال تا ${dateFmt(subscription.current_period_end)}`
+                ? `دسترسی تا ${dateFmt(subscription.current_period_end)}`
                 : `Active until ${dateFmt(subscription.current_period_end)}`,
               tone: "amber",
             }
           : isTrialExpired
-            ? { label: fa ? "دوره آزمایشی تمام شد" : "Trial Expired", tone: "red" }
-            : { label: fa ? "بدون اشتراک" : "No active plan", tone: "neutral" };
+            ? { label: fa ? "آزمایشی منقضی شد" : "Trial Expired", tone: "red" }
+            : { label: fa ? "بدون عضویت" : "No active plan", tone: "neutral" };
 
   if (isUserLoading) {
     return (
@@ -373,7 +373,7 @@ export function AuthMenu() {
               >
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
-                    {fa ? "وضعیت اشتراک" : "Membership"}
+                    {fa ? "اشتراک" : "Membership"}
                   </p>
                   <p
                     className={[
@@ -399,7 +399,7 @@ export function AuthMenu() {
             </div>
 
             {/* Library section */}
-            <Section title={fa ? "کتابخانه" : "Library"}>
+            <Section title={fa ? "کتابخانه‌ام" : "Library"}>
               <Row
                 to="/library"
                 icon={<Library size={17} strokeWidth={1.6} />}
@@ -409,11 +409,11 @@ export function AuthMenu() {
             </Section>
 
             {/* Account section */}
-            <Section title={fa ? "حساب" : "Account"}>
+            <Section title={fa ? "حساب کاربری" : "Account"}>
               <Row
                 to="/account"
                 icon={<UserIcon size={17} strokeWidth={1.6} />}
-                label={fa ? "تنظیمات حساب" : "Account Settings"}
+                label={fa ? "تنظیمات" : "Account Settings"}
                 onClick={() => setOpen(false)}
               />
 
@@ -426,7 +426,7 @@ export function AuthMenu() {
                 <span className="auth-menu-row-icon">
                   <Globe2 size={17} strokeWidth={1.6} />
                 </span>
-                <span className="flex-1">{fa ? "منطقه" : "Region"}</span>
+                <span className="flex-1">{fa ? "منطقه جغرافیایی" : "Region"}</span>
                 <span className="text-[12px] font-semibold text-cream/45" lang={region === "iran" ? "fa" : "en"}>
                   {region === "iran" ? "ایران" : "Global"}
                 </span>
@@ -435,7 +435,7 @@ export function AuthMenu() {
 
             {/* Admin */}
             {isAdmin && (
-              <Section title={fa ? "مدیریت" : "Administration"}>
+              <Section title={fa ? "مدیریت سایت" : "Administration"}>
                 <Row
                   to="/admin"
                   icon={<Shield size={17} strokeWidth={1.6} />}
@@ -447,7 +447,7 @@ export function AuthMenu() {
             )}
 
             {/* Sign out — same group/styling as other rows */}
-            <Section title={fa ? "نشست" : "Session"}>
+            <Section title={fa ? "خروج" : "Session"}>
               <button
                 type="button"
                 onClick={signOut}
@@ -456,7 +456,7 @@ export function AuthMenu() {
                 <span className="auth-menu-row-icon">
                   <LogOut size={17} strokeWidth={1.6} />
                 </span>
-                <span className="flex-1 truncate">{fa ? "خروج از حساب" : "Sign out"}</span>
+                <span className="flex-1 truncate">{fa ? "خروج از سیستم" : "Sign out"}</span>
                 <ChevronRight
                   size={15}
                   className="text-cream/30 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
