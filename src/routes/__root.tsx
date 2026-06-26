@@ -253,7 +253,7 @@ function RootShell({ children }: { children: ReactNode }) {
               "[data-mobile-hero]{position:relative;width:100%;height:100svh;min-height:620px;overflow:hidden;background:#1a1a1a}" +
               "@media(min-width:768px){[data-mobile-hero]{height:100dvh;min-height:640px}}" +
               ".hero-mobile-poster{position:absolute;inset:0;pointer-events:none}" +
-              "img.cine-img{display:block;max-width:100%;height:auto}",
+              "img.cine-img{max-width:100%;height:auto}",
           }}
         />
 
