@@ -212,6 +212,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://yasfnvftzwyuxdhpysof.supabase.co",
         crossOrigin: "anonymous",
       },
+      { rel: "dns-prefetch", href: "https://yasfnvftzwyuxdhpysof.supabase.co" },
       // Webfont CSS is injected asynchronously by the inline script in
       // RootShell <head> (media=print swap pattern). Keeping it out of the
       // SSR <link> list ensures it never blocks first paint.
