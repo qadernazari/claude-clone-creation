@@ -44,6 +44,7 @@ export const Route = createFileRoute("/membership")({
           "Unlimited Iranian cinema. 1, 3, 6, or 12 month plans — no auto-renewal, cancel anytime.",
       },
       { property: "og:url", content: "https://ir.show/membership" },
+      { property: "og:site_name", content: "IRAN" },
       ...(loaderData?.ogImage
         ? [
             { property: "og:image" as const, content: loaderData.ogImage },
