@@ -22,7 +22,7 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
           ✕
         </button>
         <h2 className={`text-2xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-          {fa ? "دوره آزمایشی شما پایان یافت" : "Your trial has ended"}
+          {fa ? "آزمایش رایگان شما پایان یافت" : "Your trial has ended"}
         </h2>
         <p className="mt-3 text-sm text-cream/70">
           {fa

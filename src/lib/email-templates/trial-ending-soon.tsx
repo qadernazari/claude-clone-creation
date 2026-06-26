@@ -39,7 +39,7 @@ const Email = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      Your {SITE_NAME} trial ends soon · پایان دوره آزمایشی نزدیک است
+      Your {SITE_NAME} trial ends soon · پایان آزمایش رایگان نزدیک است
     </Preview>
     <Body style={main}>
       <Container style={container}>

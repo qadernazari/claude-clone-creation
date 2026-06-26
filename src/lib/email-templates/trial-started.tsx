@@ -40,7 +40,7 @@ const Email = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>{`Your ${trialDays}-day ${SITE_NAME} trial has started · دوره آزمایشی شما آغاز شد`}</Preview>
+    <Preview>{`Your ${trialDays}-day ${SITE_NAME} trial has started · آزمایش رایگان شما آغاز شد`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{SITE_NAME}</Heading>
@@ -73,12 +73,12 @@ const Email = ({
         <Section dir="rtl" style={{ textAlign: 'right' }}>
           <Heading style={h1}>به {SITE_NAME} خوش آمدید</Heading>
           <Text style={text}>
-            دوره آزمایشی <strong>{trialDays} روزه</strong> شما فعال شد. به همه‌ی
+            آزمایش رایگان <strong>{trialDays} روزه</strong> شما فعال شد. به همه‌ی
             فیلم‌های مستقل ایرانی دسترسی دارید.
           </Text>
           {trialEndFormatted ? (
             <Text style={meta}>
-              پایان دوره آزمایشی: <strong>{trialEndFormatted}</strong>
+              پایان آزمایش رایگان: <strong>{trialEndFormatted}</strong>
             </Text>
           ) : null}
           <Section style={{ textAlign: 'center', margin: '28px 0' }}>
