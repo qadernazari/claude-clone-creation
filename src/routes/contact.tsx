@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Instagram, Youtube } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/contact")({
       { title: "Contact — IRAN" },
       {
         name: "description",
-        content: "Get in touch with IRAN. Questions, partnerships, or feedback welcome.",
+        content: "Get in touch with IRAN. Questions, bug reports, partnerships, or just a hello.",
       },
       { property: "og:title", content: "Contact — IRAN" },
       { property: "og:description", content: "Get in touch with IRAN." },
@@ -43,42 +44,51 @@ function ContactPage() {
           <h1
             className={`text-4xl leading-[1.05] text-cream-bright md:text-6xl ${fa ? "font-vazir" : "font-display"}`}
           >
-            {fa ? "با ما در ارتباط باشید" : "Get in touch"}
+            {fa ? "خوشحال می‌شویم از شما بشنویم." : "We'd love to hear from you."}
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-cream/70">
+          <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream/70">
             {fa
-              ? "برای سؤال، همکاری یا ارسال اثر، مستقیماً به ما ایمیل بزنید. معمولاً ظرف ۲ روز کاری پاسخ می‌دهیم."
-              : "Email us directly for questions, partnerships, or submissions. We usually reply within 2 business days."}
+              ? "سوال، گزارش مشکل، یا فقط یک سلام — بنویسید."
+              : "Whether it's a question, a bug report, or just a hello — reach out."}
           </p>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            <div className="hairline rounded-2xl border bg-bg-1/40 p-7">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/45">
-                {fa ? "عمومی" : "General"}
-              </p>
+          <div className="mt-14">
+            <a
+              href="mailto:hello@ir.show"
+              className={`inline-block text-3xl text-amber transition-colors hover:underline md:text-5xl ${fa ? "font-vazir" : "font-display"}`}
+            >
+              hello@ir.show
+            </a>
+            <p className="mt-5 text-[13px] tracking-wide text-cream/50">
+              {fa
+                ? "معمولاً ظرف ۲۴ ساعت پاسخ می‌دهیم."
+                : "We typically respond within 24 hours."}
+            </p>
+          </div>
+
+          <div className="mt-16 border-t border-amber/15 pt-8">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/45">
+              {fa ? "ما را دنبال کنید" : "Follow along"}
+            </p>
+            <div className="flex items-center gap-2">
               <a
-                href="mailto:hello@ir.show"
-                className="mt-2 block font-display text-xl text-cream-bright transition-colors hover:text-amber"
+                href="https://www.instagram.com/iran.show"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={fa ? "ایران در اینستاگرام" : "IRAN on Instagram"}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/15 text-cream/60 transition-colors hover:border-cream/35 hover:text-cream"
               >
-                hello@ir.show
+                <Instagram size={18} aria-hidden />
               </a>
-              <p className="mt-2 text-sm text-cream/55">
-                {fa ? "سؤال، بازخورد و حساب." : "Questions, feedback, account help."}
-              </p>
-            </div>
-            <div className="hairline rounded-2xl border bg-bg-1/40 p-7">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/45">
-                {fa ? "فیلم‌سازان و همکاران" : "Filmmakers & partners"}
-              </p>
               <a
-                href="mailto:partners@ir.show"
-                className="mt-2 block font-display text-xl text-cream-bright transition-colors hover:text-amber"
+                href="https://www.youtube.com/@iranshow"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={fa ? "ایران در یوتیوب" : "IRAN on YouTube"}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-cream/15 text-cream/60 transition-colors hover:border-cream/35 hover:text-cream"
               >
-                partners@ir.show
+                <Youtube size={18} aria-hidden />
               </a>
-              <p className="mt-2 text-sm text-cream/55">
-                {fa ? "ارسال اثر، توزیع، جشنواره‌ها." : "Submissions, distribution, festivals."}
-              </p>
             </div>
           </div>
         </div>
