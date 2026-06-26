@@ -1,0 +1,2 @@
+ALTER TABLE public.films ADD COLUMN IF NOT EXISTS subtitles jsonb NOT NULL DEFAULT '[]'::jsonb;
+COMMENT ON COLUMN public.films.subtitles IS 'Array of {lang, label, url, default?} subtitle/caption tracks (WebVTT URLs).';
