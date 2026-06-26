@@ -13,7 +13,11 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { LocaleProvider, useLocale } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { Toaster } from "@/components/ui/sonner";
+// Toaster (sonner) is lazy-loaded — it pulls a non-trivial chunk and is
+// never needed for first paint. Mounted via DeferredChrome after idle.
+const Toaster = lazy(() =>
+  import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })),
+);
 import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { AuthProvider } from "../lib/auth-context";
@@ -201,21 +205,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // is the biggest FCP win available without splitting the stylesheet.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
       { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
+      // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
         href: "https://yasfnvftzwyuxdhpysof.supabase.co",
         crossOrigin: "anonymous",
       },
       { rel: "dns-prefetch", href: "https://yasfnvftzwyuxdhpysof.supabase.co" },
-      // Webfont CSS is injected asynchronously by the inline script in
-      // RootShell <head> (media=print swap pattern). Keeping it out of the
-      // SSR <link> list ensures it never blocks first paint.
+      // Google Fonts preconnects intentionally removed — PageSpeed flagged
+      // them as unused because the webfont CSS is injected async via the
+      // inline script in RootShell <head> with display=optional, so the
+      // connection sat idle through FCP. The async load now opens its own
+      // connection only if/when the font is actually requested.
     ],
 
   }),
@@ -310,7 +311,6 @@ function RootComponent() {
             <Outlet />
             <MobileTabBar />
             <DeferredChrome />
-            <Toaster richColors position="top-center" />
           </PageOverlayProvider>
         </LocaleProvider>
       </AuthProvider>
@@ -342,6 +342,7 @@ function DeferredChrome() {
   return (
     <Suspense fallback={null}>
       <IranMirrorBanner />
+      <Toaster richColors position="top-center" />
     </Suspense>
   );
 }

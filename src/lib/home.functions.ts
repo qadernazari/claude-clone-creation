@@ -74,6 +74,10 @@ export type HomeFeaturedFilm = {
   poster_gradient: string | null;
   cover_url: string | null;
   thumbnail_url: string | null;
+  /** Mobile-sized version of thumbnail_url (760w q55), used when no
+   *  dedicated mobile_cover_url exists. Prevents serving the full 1400w
+   *  desktop hero to a 375px viewport. */
+  thumbnail_url_mobile: string | null;
   mobile_cover_url: string | null;
   is_premium: boolean | null;
 };
@@ -139,15 +143,19 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
     const featuredRaw = res.data as RawFilm | null;
     if (!featuredRaw) return null;
     const cache = makeRenderCache();
-    const [cover, thumbnail, mobile] = await Promise.all([
+    const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 68),
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1400, 70),
+      // Smaller render of the landscape thumbnail, served on mobile when
+      // no dedicated portrait mobile_cover_url exists. Saves ~80 KiB.
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 760, 55),
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 55),
     ]);
     return {
       ...featuredRaw,
       cover_url: cover,
       thumbnail_url: thumbnail,
+      thumbnail_url_mobile: thumbnailMobile,
       mobile_cover_url: mobile,
     } as HomeFeaturedFilm;
   },

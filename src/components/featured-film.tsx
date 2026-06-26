@@ -16,7 +16,12 @@ export function FeaturedFilm() {
   // art exists, fall back to the portrait cover_url; only as a last resort use the
   // landscape thumbnail (which will look cropped on a phone).
   const desktopImage = data ? data.thumbnail_url || data.cover_url : null;
-  const mobileImage = data ? data.mobile_cover_url || data.cover_url || data.thumbnail_url : null;
+  // Mobile fallback chain: portrait mobile cover → portrait cover → smaller
+  // render of the landscape thumbnail (760w q55) → original thumbnail.
+  // Never serves the 1400w desktop thumbnail to a phone.
+  const mobileImage = data
+    ? data.mobile_cover_url || data.cover_url || data.thumbnail_url_mobile || data.thumbnail_url
+    : null;
   const mobileImageRef = useRef<HTMLImageElement | null>(null);
   const desktopImageRef = useRef<HTMLImageElement | null>(null);
   // Start ready=true so the SSR HTML paints the hero img at opacity 1 the
