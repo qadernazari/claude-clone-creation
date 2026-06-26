@@ -437,17 +437,26 @@ function FilmPage() {
 
 
   const handleShare = async () => {
-    const url = typeof window !== "undefined" ? window.location.href : "";
+    const url = `https://ir.show/films/${film.slug}`;
+    const firstSentence = synopsis
+      ? (synopsis.replace(/\s+/g, " ").trim().match(/^[^.!?。！？]+[.!?。！？]?/)?.[0] ?? "").trim()
+      : "";
+    const shareData = { title, text: firstSentence, url };
     try {
-      if (navigator.share) {
-        await navigator.share({ title: `${title} — IRAN`, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1800);
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share(shareData);
+        return;
       }
     } catch {
-      /* user cancelled */
+      /* user cancelled or share failed — fall through to clipboard */
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success(t.copied);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked */
     }
   };
 
