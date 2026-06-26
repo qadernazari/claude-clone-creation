@@ -2,7 +2,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
+import { useAuthState } from "../lib/auth-context";
 import { Logo } from "./logo";
+
+
 
 
 function RegionGlobeIcon({ className = "", size = 18 }: { className?: string; size?: number }) {
@@ -315,6 +318,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
 
 export function SiteHeader({ current }: { current?: "home" | "browse" | "about" }) {
   const { locale } = useLocale();
+  const { user, isLoading: authLoading } = useAuthState();
   const location = useLocation();
   const isHome = location.pathname === "/";
   const fa = locale === "fa";
@@ -402,22 +406,45 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </svg>
             </Link>
             <RegionToggle />
+            {!authLoading && !user && (
+              <Link
+                to="/auth"
+                className="hidden h-10 shrink-0 items-center whitespace-nowrap px-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-cream-bright md:inline-flex"
+              >
+                {fa ? "ورود" : "Sign in"}
+              </Link>
+            )}
             <Link
               to="/membership"
               className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase leading-none tracking-[0.08em] text-ink shadow-sm transition-colors duration-200 hover:bg-amber/90 active:scale-95 sm:inline-flex"
             >
               {fa ? "عضو شوید" : "Membership"}
             </Link>
-            <Link
-              to="/account"
-              aria-label={fa ? "حساب کاربری" : "Account"}
-              className="mobile-signin-trigger hidden h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:inline-flex"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <circle cx="12" cy="8" r="3.5" />
-                <path d="M5 20c1.5-3.5 4.2-5 7-5s5.5 1.5 7 5" />
-              </svg>
-            </Link>
+            {!authLoading && (
+              user ? (
+                <Link
+                  to="/account"
+                  aria-label={fa ? "حساب کاربری" : "Account"}
+                  className="mobile-signin-trigger hidden h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:inline-flex"
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <circle cx="12" cy="8" r="3.5" />
+                    <path d="M5 20c1.5-3.5 4.2-5 7-5s5.5 1.5 7 5" />
+                  </svg>
+                </Link>
+              ) : (
+                <Link
+                  to="/auth"
+                  aria-label={fa ? "ورود" : "Sign in"}
+                  className="mobile-signin-trigger inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:hidden"
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <circle cx="12" cy="8" r="3.5" />
+                    <path d="M5 20c1.5-3.5 4.2-5 7-5s5.5 1.5 7 5" />
+                  </svg>
+                </Link>
+              )
+            )}
           </div>
 
         </div>

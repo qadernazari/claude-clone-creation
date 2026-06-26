@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -65,6 +67,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
   path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -73,6 +80,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MembershipRoute = MembershipRouteImport.update({
@@ -340,8 +352,10 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
   '/membership': typeof MembershipRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
@@ -391,8 +405,10 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
   '/membership': typeof MembershipRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/account': typeof AuthenticatedAccountRoute
   '/library': typeof AuthenticatedLibraryRoute
@@ -443,8 +459,10 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
   '/membership': typeof MembershipRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
@@ -496,8 +514,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/help'
     | '/membership'
+    | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/terms'
     | '/unsubscribe'
     | '/admin'
     | '/account'
@@ -547,8 +567,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/help'
     | '/membership'
+    | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/terms'
     | '/unsubscribe'
     | '/account'
     | '/library'
@@ -598,8 +620,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/help'
     | '/membership'
+    | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/terms'
     | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/account'
@@ -651,8 +675,10 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   HelpRoute: typeof HelpRoute
   MembershipRoute: typeof MembershipRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -677,6 +703,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -689,6 +722,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/membership': {
@@ -1120,8 +1160,10 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   HelpRoute: HelpRoute,
   MembershipRoute: MembershipRoute,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,

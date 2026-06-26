@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Check, Sparkles } from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Sparkles, Film, Monitor, VolumeX, RefreshCw, Smartphone, Globe } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -73,23 +73,6 @@ function MembershipPage() {
     });
   }, []);
 
-  const benefits = useMemo(
-    () =>
-      fa
-        ? [
-            "تماشای نامحدود کل کاتالوگ",
-            "کیفیت HD و زیرنویس فارسی",
-            "بدون تبلیغات، در هر دستگاه",
-            "بدون تمدید خودکار — کنترل کامل با شما",
-          ]
-        : [
-            "Unlimited access to the full catalog",
-            "HD streaming with Persian subtitles",
-            "Ad-free, on every device",
-            "No auto-renewal — you stay in control",
-          ],
-    [fa],
-  );
 
   const handleChoose = (planId: MembershipPlanId) => {
     if (!user) {
@@ -157,18 +140,43 @@ function MembershipPage() {
           ))}
         </section>
 
-        <section className="mx-auto mt-12 max-w-2xl">
-          <h2 className={`text-sm uppercase tracking-[0.18em] text-cream/55 ${fa ? "font-vazir" : ""}`}>
+        <section className="mx-auto mt-14 max-w-5xl">
+          <h2 className={`text-center text-xs uppercase tracking-[0.22em] text-cream/55 ${fa ? "font-vazir" : ""}`}>
             {fa ? "شامل همه پلن‌ها" : "Included with every plan"}
           </h2>
 
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-            {benefits.map((b) => (
-              <li key={b} className="flex items-start gap-2 text-sm text-cream/80">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber" />
-                <span>{b}</span>
-              </li>
-            ))}
+          <ul className="mt-8 grid gap-px overflow-hidden rounded-md bg-line sm:grid-cols-2 lg:grid-cols-3">
+            {(fa
+              ? [
+                  { icon: Film, title: "دسترسی به کل کاتالوگ", desc: "فیلم‌های نامحدود، آثار اختصاصی به‌طور منظم اضافه می‌شوند." },
+                  { icon: Monitor, title: "پخش HD", desc: "کیفیت شفاف روی هر نمایشگری." },
+                  { icon: VolumeX, title: "بدون تبلیغات", desc: "هیچ وقفه‌ای، هرگز." },
+                  { icon: RefreshCw, title: "بدون تمدید خودکار", desc: "کنترل کامل با شماست. هر زمان لغو کنید." },
+                  { icon: Smartphone, title: "همه‌ی دستگاه‌ها", desc: "روی موبایل، تبلت یا لپ‌تاپ تماشا کنید." },
+                  { icon: Globe, title: "دوزبانه", desc: "هر فیلم به انگلیسی و فارسی." },
+                ]
+              : [
+                  { icon: Film, title: "Full catalog access", desc: "Unlimited films, new originals added regularly." },
+                  { icon: Monitor, title: "HD streaming", desc: "Crystal-clear quality on any screen." },
+                  { icon: VolumeX, title: "Ad-free", desc: "No interruptions, ever." },
+                  { icon: RefreshCw, title: "No auto-renewal", desc: "You stay in control. Cancel anytime." },
+                  { icon: Smartphone, title: "All devices", desc: "Watch on phone, tablet, or laptop." },
+                  { icon: Globe, title: "Bilingual", desc: "Every film in English and Persian." },
+                ]
+            ).map((b) => {
+              const Icon = b.icon;
+              return (
+                <li key={b.title} className="flex items-start gap-4 bg-bg-0 p-5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-amber/30 bg-amber/8 text-amber">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className={`text-sm font-semibold text-cream-bright ${fa ? "font-vazir" : ""}`}>{b.title}</h3>
+                    <p className="mt-1 text-[13px] leading-relaxed text-cream/65">{b.desc}</p>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
 

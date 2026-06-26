@@ -57,8 +57,12 @@ export function SiteFooter() {
             <Link to="/contact" className="text-cream/50 transition-colors hover:text-cream">
               {fa ? "تماس" : "Contact"}
             </Link>
-            {pageBtn("privacy", fa ? "حریم خصوصی" : "Privacy")}
-            {pageBtn("terms", fa ? "قوانین" : "Terms")}
+            <Link to="/privacy" className="text-cream/50 transition-colors hover:text-cream">
+              {fa ? "حریم خصوصی" : "Privacy"}
+            </Link>
+            <Link to="/terms" className="text-cream/50 transition-colors hover:text-cream">
+              {fa ? "قوانین" : "Terms"}
+            </Link>
           </nav>
         </div>
 
