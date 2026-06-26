@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-type Result = { videoUrl: string | null } | { error: string };
+export type SubtitleTrack = { lang: string; label: string; url: string; default?: boolean };
+type Result = { videoUrl: string | null; subtitles: SubtitleTrack[] } | { error: string };
 
 export const getFilmStreamUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
