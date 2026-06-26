@@ -113,6 +113,8 @@ function WatchPage() {
   useEffect(() => {
     if (!isLoading && isTrialExpired && !memberAllowed && !ticket) {
       setTrialModalOpen(true);
+      // Stop audio/video behind the modal so the user isn't paying for hidden playback.
+      try { videoRef.current?.pause(); } catch { /* ignore */ }
     }
   }, [isLoading, isTrialExpired, memberAllowed, ticket]);
 
