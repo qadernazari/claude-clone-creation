@@ -56,7 +56,7 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        <div className="mt-12 border-t border-line pt-8 text-[10px] font-medium uppercase tracking-[0.28em] text-cream/25">
+        <div className="mt-12 border-t border-line pt-8 text-[10px] font-medium uppercase tracking-[0.28em] text-cream/70">
           © {new Date().getFullYear()} IRAN · {fa ? "تمامی حقوق محفوظ است" : "All rights reserved"}
         </div>
       </div>
