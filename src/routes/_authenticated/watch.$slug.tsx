@@ -276,6 +276,11 @@ function WatchPage() {
   const scrubRef = useRef<HTMLDivElement>(null);
   const tapStateRef = useRef<{ t: number; x: number } | null>(null);
   const [seekRipple, setSeekRipple] = useState<{ side: "left" | "right"; key: number } | null>(null);
+  const [buffering, setBuffering] = useState(false);
+  const [streamError, setStreamError] = useState(false);
+  const [ccOpen, setCcOpen] = useState(false);
+  const [activeCc, setActiveCc] = useState<string | null>(null); // lang code or null = off
+  const lastKnownPosRef = useRef<number>(0);
 
   const revealOverlay = useCallback(() => {
     setOverlayVisible(true);
