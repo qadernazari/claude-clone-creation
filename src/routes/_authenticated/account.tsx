@@ -402,7 +402,7 @@ function AccountPage() {
               {tr.ticketsTitle}
             </h2>
             {tickets.length > 0 && (
-              <Link to="/my-tickets" className="text-xs uppercase tracking-widest text-cream/60 hover:text-cream">
+              <Link to="/library" search={{ tab: "purchased" as const }} className="text-xs uppercase tracking-widest text-cream/60 hover:text-cream">
                 {tr.viewAll}
               </Link>
             )}

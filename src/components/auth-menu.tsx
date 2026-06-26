@@ -4,12 +4,12 @@ import { Link } from "@tanstack/react-router";
 import {
   User as UserIcon,
   Library,
-  Ticket,
   Globe2,
   Shield,
   LogOut,
   ChevronRight,
 } from "lucide-react";
+
 
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
@@ -416,12 +416,7 @@ export function AuthMenu() {
                 label={fa ? "تنظیمات حساب" : "Account Settings"}
                 onClick={() => setOpen(false)}
               />
-              <Row
-                to="/my-tickets"
-                icon={<Ticket size={17} strokeWidth={1.6} />}
-                label={fa ? "بلیط‌های من" : "My Tickets"}
-                onClick={() => setOpen(false)}
-              />
+
 
               <button
                 type="button"

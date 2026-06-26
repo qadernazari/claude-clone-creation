@@ -1,16 +1,27 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { z } from "zod";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { useLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getLibrary, toggleWatchlist, type LibraryFilm, type LibraryData } from "@/lib/library.functions";
 import { useSubscription } from "@/hooks/use-subscription";
 
+const librarySearchSchema = z.object({
+  tab: fallback(
+    z.enum(["continue", "watchlist", "purchased", "history", "expired"]),
+    "continue",
+  ).default("continue"),
+});
+
+
 export const Route = createFileRoute("/_authenticated/library")({
+  validateSearch: zodValidator(librarySearchSchema),
   component: LibraryPage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
@@ -31,6 +42,7 @@ export const Route = createFileRoute("/_authenticated/library")({
   ),
 });
 
+
 const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.18 0.03 240))";
 
 type TabKey = "continue" | "watchlist" | "purchased" | "history" | "expired";
@@ -40,13 +52,26 @@ function LibraryPage() {
   const fa = locale === "fa";
   const { isMember } = useSubscription();
   const fetchLibrary = useServerFn(getLibrary);
-  const [tab, setTab] = useState<TabKey>("continue");
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate({ from: "/library" });
+
+  function selectTab(next: TabKey) {
+    void navigate({
+      search: (prev: { tab?: TabKey }) => ({ ...prev, tab: next }),
+      replace: true,
+    });
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ["library"],
     queryFn: () => fetchLibrary(),
     staleTime: 30_000,
   });
+
+
+
+
+
 
   const lib: LibraryData = data ?? {
     continueWatching: [],
@@ -107,7 +132,7 @@ function LibraryPage() {
               <button
                 key={t.key}
                 type="button"
-                onClick={() => setTab(t.key)}
+                onClick={() => selectTab(t.key)}
                 className={`relative shrink-0 whitespace-nowrap px-3 py-3 text-[11px] uppercase tracking-[0.18em] transition-colors md:px-4 md:text-xs ${
                   active ? "text-cream-bright" : "text-cream/50 hover:text-cream/85"
                 }`}
