@@ -89,11 +89,8 @@ function MembershipPage() {
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 pt-24 pb-24 sm:px-6 md:pt-32">
         <header className="mx-auto max-w-2xl text-center">
-          <div className="text-[11px] uppercase tracking-[0.22em] text-amber/90">
-            {fa ? "عضویت ایران" : "IRAN Membership"}
-          </div>
           <h1
-            className={`mt-3 text-3xl text-cream-bright sm:text-5xl ${fa ? "font-vazir" : "font-display"}`}
+            className={`text-3xl text-cream-bright sm:text-5xl ${fa ? "font-vazir" : "font-display"}`}
           >
             {fa ? "پلن خود را انتخاب کنید" : "Choose your plan"}
           </h1>
@@ -193,9 +190,7 @@ function MembershipPage() {
             <>
               By purchasing a plan, you agree to our{" "}
               <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
-                Terms of Service
-              </button>
-              .
+                Terms of Service</button>.
             </>
           )}
         </p>
