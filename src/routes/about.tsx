@@ -96,7 +96,7 @@ function AboutPage() {
               className={`mx-auto mt-8 max-w-2xl text-[18px] leading-relaxed text-cream/80 md:text-[20px] ${fa ? "font-vazir" : ""}`}
             >
               {fa
-                ? "ایران یکی از غنی‌ترین سنت‌های سینمایی جهان را دارد — با این حال بیشتر آن برای دنیا ناپیدا مانده است. ما اینجاییم تا این را تغییر دهیم."
+                ? "ایران یکی از پُرعمق‌ترین سنت‌های سینمایی جهان را دارد — اما بیشتر آن هنوز برای دنیا ناشناخته مانده است. ما اینجاییم تا این را تغییر دهیم."
                 : "Iran has one of the world's most celebrated film traditions — yet most of it remains invisible to the world. IRAN exists to change that."}
             </p>
           </div>
@@ -129,11 +129,11 @@ function AboutPage() {
                 className={`font-display text-2xl italic leading-snug tracking-[-0.01em] text-amber md:text-3xl ${fa ? "font-vazir not-italic" : ""}`}
               >
                 {fa
-                  ? "سینمای ایران، برای همه جهان."
+                  ? "سینمای ایران، برای تمام جهان."
                   : "Iranian cinema, streamed worldwide."}
               </p>
               <p className={`mt-10 text-[13px] text-cream/55 ${fa ? "font-vazir" : ""}`}>
-                {fa ? "سوالی دارید؟ " : "Questions? "}
+                {fa ? "پرسشی دارید؟ " : "Questions? "}
                 <a
                   href="mailto:hello@ir.show"
                   className="text-cream/80 underline decoration-amber/40 underline-offset-4 transition-colors hover:text-amber"
