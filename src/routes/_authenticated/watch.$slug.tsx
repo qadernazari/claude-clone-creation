@@ -446,7 +446,9 @@ function WatchPage() {
     revealOverlay();
   }, [revealOverlay]);
 
-  // Double-tap left / right edge → ±10s seek (mobile)
+  // Double-tap left / right edge → ±10s seek (mobile). When a double-tap fires we
+  // suppress the upcoming click so the play/pause toggle doesn't fight the seek.
+  const suppressNextClickRef = useRef(false);
   const onPlayerPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.pointerType !== "touch") return;
     const now = Date.now();
@@ -463,12 +465,21 @@ function WatchPage() {
         setCurrentTime(v.currentTime);
         setSeekRipple({ side: side === "right" ? "right" : "left", key: now });
         window.setTimeout(() => setSeekRipple((r) => (r && r.key === now ? null : r)), 600);
+        suppressNextClickRef.current = true;
       }
       tapStateRef.current = null;
       return;
     }
     tapStateRef.current = { t: now, x: e.clientX };
   }, [dir]);
+
+  const videoClick = useCallback(() => {
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false;
+      return;
+    }
+    togglePlay();
+  }, [togglePlay]);
 
   const onPlayEvt = useCallback(() => { setPlaying(true); revealOverlay(); }, [revealOverlay]);
   const onPauseEvt = useCallback(() => { setPlaying(false); setOverlayVisible(true); }, []);
