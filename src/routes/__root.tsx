@@ -312,7 +312,7 @@ function RootComponent() {
             <AuthInvalidator />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
-            <MobileTabBar />
+            <Suspense fallback={null}><MobileTabBar /></Suspense>
             <DeferredChrome />
           </PageOverlayProvider>
         </LocaleProvider>
