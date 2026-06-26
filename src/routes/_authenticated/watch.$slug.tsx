@@ -117,14 +117,18 @@ function WatchPage() {
   }, [isLoading, isTrialExpired, memberAllowed, ticket]);
 
   const fetchStreamUrl = useServerFn(getFilmStreamUrl);
+  const streamQueryKey = ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")];
+  const queryClient = useQueryClient();
   const { data: streamRes } = useQuery({
-    queryKey: ["stream-url", film.slug, ticket?.id ?? (memberAllowed ? "member" : "none")],
+    queryKey: streamQueryKey,
     queryFn: () => fetchStreamUrl({ data: { slug: film.slug } }),
     enabled: hasAccess,
     staleTime: 5 * 60_000,
   });
   const videoUrl =
     streamRes && "videoUrl" in streamRes ? streamRes.videoUrl : null;
+  const subtitles =
+    streamRes && "videoUrl" in streamRes ? streamRes.subtitles : [];
 
   const countdown = useCountdown(ticket?.expires_at);
 
