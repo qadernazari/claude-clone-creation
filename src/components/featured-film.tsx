@@ -68,7 +68,7 @@ export function FeaturedFilm() {
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
+      <div className="relative h-[100svh] min-h-screen w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
         {/* Warm poster placeholder painted immediately by SSR — keeps the
             hero looking intentional (not an empty black box) until the
             actual image decodes. Hidden once the image is loaded. */}
@@ -95,13 +95,8 @@ export function FeaturedFilm() {
                 alt=""
                 width={720}
                 height={1280}
-                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 h-full w-full object-cover object-top md:hidden"
+                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 block h-full w-full object-cover object-top md:hidden"
                 style={{ opacity: mobileImageReady ? 1 : 0, transition: "opacity 120ms ease-out" }}
-
-                // lazy on purpose: React 19 auto-hoists eager imgs into a
-                // no-media <link rel="preload"> that also fires on desktop,
-                // duplicating bytes. The media-gated preload in the route
-                // head() already prioritises this image on mobile.
                 loading="lazy"
                 decoding="async"
                 sizes="100vw"
