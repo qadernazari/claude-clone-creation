@@ -58,10 +58,12 @@ function StarInput({
   value,
   onChange,
   disabled,
+  fa,
 }: {
   value: number;
   onChange: (v: number) => void;
   disabled?: boolean;
+  fa?: boolean;
 }) {
   const [hover, setHover] = useState(0);
   const display = hover || value;
@@ -78,7 +80,7 @@ function StarInput({
           onClick={() => onChange(n)}
           onMouseEnter={() => setHover(n)}
           className="p-1 text-cream-bright transition-transform hover:scale-110 disabled:opacity-50"
-          aria-label={`${n} star${n === 1 ? "" : "s"}`}
+          aria-label={fa ? `${n} ستاره` : `${n} star${n === 1 ? "" : "s"}`}
         >
           <Star filled={display >= n} />
         </button>
@@ -203,7 +205,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                   ? "ویرایش نقد"
                   : "Edit your review"
                 : fa
-                  ? "نقد بنویس"
+                  ? "نقد بنویسید"
                   : "Write a review"}
           </h3>
 
@@ -249,6 +251,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                   value={rating}
                   onChange={setRating}
                   disabled={submit.isPending}
+                  fa={fa}
                 />
                 <span className="text-xs text-cream/40">
                   {rating > 0

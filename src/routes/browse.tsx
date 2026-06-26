@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { browsePageQueryOptions, getBrowsePageData } from "../lib/browse.functions";
@@ -19,17 +19,26 @@ export const Route = createFileRoute("/browse")({
   validateSearch: zodValidator(browseSearchSchema),
   loader: async () => {
     // SSR-critical: fetch directly through the route loader and pass the
-    // result as loaderData/initialData. This avoids relying on QueryClient
-    // hydration for the first HTML render, so crawlers receive real film cards.
-    const [browseData, featured] = await Promise.all([
-      getBrowsePageData(),
-      getHomeFeatured(),
-    ]);
-
-    return {
-      ...browseData,
-      ogImage: featured?.thumbnail_url || featured?.cover_url || null,
-    };
+    // result as loaderData/initialData. Wrapped in try/catch so a server-side
+    // fetch failure doesn't kill SSR — the page still renders with empty
+    // state, and the client query can recover.
+    try {
+      const [browseData, featured] = await Promise.all([
+        getBrowsePageData(),
+        getHomeFeatured().catch(() => null),
+      ]);
+      return {
+        ...browseData,
+        ogImage: featured?.thumbnail_url || featured?.cover_url || null,
+      };
+    } catch (err) {
+      console.error("[browse loader] failed:", err);
+      return {
+        films: [] as BrowseFilm[],
+        categories: [] as BrowseCategory[],
+        ogImage: null as string | null,
+      };
+    }
   },
   pendingComponent: () => null,
   head: ({ loaderData }) => ({
@@ -97,7 +106,7 @@ function BrowsePage() {
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
   const loaderData = Route.useLoaderData();
-  const { data } = useQuery({
+  const { data } = useSuspenseQuery({
     ...browsePageQueryOptions,
     initialData: loaderData,
   });
