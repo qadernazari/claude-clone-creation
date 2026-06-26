@@ -85,7 +85,7 @@ export function FaqSection() {
         >
           {fa ? (
             <>
-              سؤالی دارید؟{" "}
+              پرسشی دارید؟{" "}
               <span className="font-editorial italic font-normal text-amber">پاسخ اینجاست</span>.
             </>
           ) : (

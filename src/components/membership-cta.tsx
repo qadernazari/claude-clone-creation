@@ -17,7 +17,7 @@ export function MembershipCta() {
   }
 
   if (hasUsedTrial) {
-    const label = fa ? "عضو شوید" : "Become a Member";
+    const label = fa ? "عضویت" : "Become a Member";
     return (
       <div className="hidden shrink-0 sm:block">
         <a
@@ -30,7 +30,7 @@ export function MembershipCta() {
     );
   }
 
-  const label = fa ? "شروع رایگان" : "Free Trial";
+  const label = fa ? "آزمایش رایگان" : "Free Trial";
   return (
     <div className="hidden shrink-0 sm:block">
       <AcceptTrialButton

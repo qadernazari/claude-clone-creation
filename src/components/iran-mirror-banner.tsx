@@ -50,7 +50,7 @@ export function IranMirrorBanner() {
             {fa ? "از ایران وصل شده‌اید؟" : "Visiting from Iran?"}
           </strong>{" "}
           {fa
-            ? "نسخه بهینه‌شده برای ایران سریع‌تر و بدون فیلترشکن باز می‌شود."
+            ? "نسخه اختصاصی ایران، بدون نیاز به فیلترشکن و سریع‌تر باز می‌شود."
             : "An Iran-optimized mirror loads without a VPN."}
         </div>
         <div className="flex shrink-0 gap-2">
