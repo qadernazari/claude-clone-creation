@@ -18,6 +18,7 @@ const SeriesEpisodes = lazy(() =>
 import { useSubscription, memberCanAccess, ppvAvailable } from "@/hooks/use-subscription";
 import { useServerFn } from "@tanstack/react-start";
 import { getResumePosition } from "@/lib/library.functions";
+import { relatedFilmsQueryOptions } from "@/lib/related-films.functions";
 
 // Lazy-loaded — Stripe SDK is ~200KB; only load when user opens checkout.
 const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
@@ -337,24 +338,9 @@ function FilmPage() {
 
 
 
-  const { data: related = [] } = useQuery({
-    queryKey: ["film", film.id, "related", film.category],
-    queryFn: async () => {
-      const q = supabase
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, duration_min, year, cover_url, poster_gradient"
-        )
-        .eq("visibility", "published")
-        .neq("id", film.id)
-        .order("sort_order", { ascending: true })
-        .limit(18);
-      if (film.category) q.eq("category", film.category);
-      const { data, error } = await q;
-      if (error) throw new Error(error.message);
-      return (data as RelatedFilm[]) ?? [];
-    },
-  });
+  const { data: related = [] } = useQuery(
+    relatedFilmsQueryOptions(film.id, film.category ?? null),
+  );
 
   const { data: categoryName } = useQuery({
     queryKey: ["category-name", film.category],
