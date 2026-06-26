@@ -40,7 +40,7 @@ export function SiteFooter() {
               <Logo size={28} />
             </Link>
             <span className="text-[12px] tracking-wide text-cream/55">
-              {fa ? "سینمای ایران، در سراسر جهان." : "Iranian cinema, streamed worldwide."}
+              {fa ? "سینمای ایران، در سراسر جهان." : "IRANIAN CINEMA, STREAMED WORLDWIDE."}
             </span>
           </div>
 
