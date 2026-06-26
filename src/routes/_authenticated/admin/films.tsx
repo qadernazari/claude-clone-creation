@@ -437,6 +437,7 @@ function FilmEditorModal({
 
       // Persist video_url through the admin server fn (column is hidden from clients).
       await setFilmVideoUrl({ data: { id: filmId!, videoUrl: d.video_url?.trim() || null } });
+      await setFilmSubtitles({ data: { id: filmId!, subtitles } });
 
       // Replace credits set
       await supabase.from("film_credits").delete().eq("film_id", filmId);
