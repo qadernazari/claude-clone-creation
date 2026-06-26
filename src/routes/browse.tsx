@@ -91,9 +91,10 @@ function BrowsePage() {
   const [q, setQ] = useState(initialQ);
   const [sortSheetOpen, setSortSheetOpen] = useState(false);
 
-  const { data, isLoading } = useQuery(browsePageQueryOptions);
-  const films = data?.films as Film[] | undefined;
-  const categories = data?.categories as Category[] | undefined;
+  const { data } = useSuspenseQuery(browsePageQueryOptions);
+  const films = data.films as Film[];
+  const categories = data.categories as Category[];
+  const isLoading = false;
 
   const usedCategoryIds = useMemo(
     () => new Set((films ?? []).map((f) => f.category).filter(Boolean) as string[]),
