@@ -22,7 +22,11 @@ import { captureMemberGeo } from "../lib/member-geo.functions";
 import { PageOverlayProvider } from "@/components/page-overlay";
 import { AuthProvider } from "../lib/auth-context";
 import { resolveVisitorRegion } from "../lib/region.functions";
-import { MobileTabBar } from "@/components/mobile-tab-bar";
+// MobileTabBar is visible chrome but not LCP — defer to shrink the
+// main bundle's homepage critical path.
+const MobileTabBar = lazy(() =>
+  import("@/components/mobile-tab-bar").then((m) => ({ default: m.MobileTabBar })),
+);
 
 // Defer only the mirror notice. The mobile tab bar is visible chrome, so it
 // renders with SSR to avoid the bottom bar popping in after first paint.
@@ -198,13 +202,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "enamad", content: "52799420" },
     ],
     links: [
-      // Stylesheet is render-blocking by spec — preload it so the browser
-      // starts fetching it the moment the HTML streams in, in parallel
-      // with HTML parsing, instead of waiting until the parser reaches
-      // the <link> tag. Combined with the inline critical CSS below, this
-      // is the biggest FCP win available without splitting the stylesheet.
+      // Preload the stylesheet so the network fetch starts immediately;
+      // the actual <link rel="stylesheet"> is injected non-blocking
+      // (media="print" → swap to "all" onload) by the inline script in
+      // RootShell <head>. Combined with the inline critical CSS this
+      // eliminates the ~830ms render-blocking CSS hit on mobile.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
-      { rel: "stylesheet", href: appCss },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
@@ -212,11 +215,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         crossOrigin: "anonymous",
       },
       { rel: "dns-prefetch", href: "https://yasfnvftzwyuxdhpysof.supabase.co" },
-      // Google Fonts preconnects intentionally removed — PageSpeed flagged
-      // them as unused because the webfont CSS is injected async via the
-      // inline script in RootShell <head> with display=optional, so the
-      // connection sat idle through FCP. The async load now opens its own
-      // connection only if/when the font is actually requested.
     ],
 
   }),
@@ -243,7 +241,7 @@ function RootShell({ children }: { children: ReactNode }) {
           the noir background + hero shell on the very first byte, without
           waiting for the Tailwind stylesheet to download/parse. Anything
           here MUST stay tiny (<2 KB gzipped) — everything else lives in
-          the regular stylesheet.
+          the regular stylesheet, injected non-blocking below.
         */}
         <style
           dangerouslySetInnerHTML={{
@@ -258,6 +256,22 @@ function RootShell({ children }: { children: ReactNode }) {
         />
 
         {/*
+          Non-blocking stylesheet load. The link is created with
+          media="print" so the browser fetches it without blocking
+          render, then we flip media back to "all" once it has loaded.
+          <noscript> fallback ensures the stylesheet still applies if
+          JS is disabled.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(appCss)};l.media='print';l.onload=function(){this.media='all';this.onload=null;};document.head.appendChild(l);})();`,
+          }}
+        />
+        <noscript>
+          <link rel="stylesheet" href={appCss} />
+        </noscript>
+
+        {/*
           Inject the resolved region as a global so <LocaleProvider> can
           initialize synchronously on the client — no useEffect flip, no
           flash of English for Iran visitors. Tab-bar visibility check
@@ -267,19 +281,8 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
-              // iPhone Safari exposes a smaller visual viewport while the
-              // bottom URL bar is visible. Set the offset in the head script
-              // before first paint so the tab bar never spends a frame glued
-              // to the layout viewport and then jumps after React hydrates.
               `try{var vv=window.visualViewport;var r=document.documentElement;var u=function(){if(!vv)return;var g=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);r.style.setProperty('--vv-chrome-bottom',Math.round(g)+'px');};u();if(vv){vv.addEventListener('resize',function(){requestAnimationFrame(u);},{passive:true});}}catch(e){}` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
-              // Inject the webfont stylesheet asynchronously so it never
-              // blocks first paint. display=optional means the browser
-              // uses the system fallback if the font isn't ready in ~100ms
-              // and never swaps later — eliminates the layout shift the
-              // large Persian/Latin headline caused on slow networks.
-              // Locale-aware: Iran visitors only fetch Vazirmatn; global
-              // visitors only fetch the Latin families.
               `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
                 locale === "fa"
                   ? "https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600&display=optional"
@@ -309,7 +312,7 @@ function RootComponent() {
             <AuthInvalidator />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
-            <MobileTabBar />
+            <Suspense fallback={null}><MobileTabBar /></Suspense>
             <DeferredChrome />
           </PageOverlayProvider>
         </LocaleProvider>

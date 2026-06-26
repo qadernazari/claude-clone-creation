@@ -27,22 +27,24 @@ async function renderResizedUrl(
   original: string | null | undefined,
   width: number,
   quality = 68,
+  height?: number,
+  resize: "contain" | "cover" | "fill" = "contain",
 ): Promise<string | null> {
   if (!original) return null;
   const parsed = parseSignedObjectUrl(original);
   if (!parsed) return original;
-  const key = `${parsed.bucket}|${parsed.path}|${width}|${quality}`;
+  const key = `${parsed.bucket}|${parsed.path}|${width}|${height ?? 0}|${resize}|${quality}`;
   const cached = GLOBAL_URL_CACHE.get(key);
   if (cached) return cached;
   const existing = cache.get(key);
   if (existing) return existing;
   const promise = (async () => {
     try {
+      const transform: { width: number; height?: number; quality: number; resize: "contain" | "cover" | "fill" } = { width, quality, resize };
+      if (height) transform.height = height;
       const { data, error } = await client.storage
         .from(parsed.bucket)
-        .createSignedUrl(parsed.path, ONE_YEAR, {
-          transform: { width, quality, resize: "contain" as const },
-        });
+        .createSignedUrl(parsed.path, ONE_YEAR, { transform });
       if (error || !data?.signedUrl) return original;
       const url = data.signedUrl as string;
       if (GLOBAL_URL_CACHE.size >= GLOBAL_URL_CACHE_MAX) {
@@ -149,7 +151,7 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
       // Smaller render of the landscape thumbnail, served on mobile when
       // no dedicated portrait mobile_cover_url exists. Saves ~80 KiB.
       renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 760, 55),
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 720, 55),
+      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 760, 60, 1350, "cover"),
     ]);
     return {
       ...featuredRaw,
