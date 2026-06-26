@@ -38,12 +38,13 @@ export const Route = createFileRoute("/browse")({
       {
         name: "description",
         content:
-          "Explore every film in the catalog. Filter by category, sort by newest or duration, and find your next watch.",
+          "Explore every film in the catalog. Sort by newest, duration, or our curated order. Iranian cinema, streaming worldwide.",
       },
       { property: "og:title", content: "Browse films" },
       {
         property: "og:description",
-        content: "Every film in the catalog, filterable by category and sort.",
+        content:
+          "Explore every film in the catalog. Sort by newest, duration, or our curated order. Iranian cinema, streaming worldwide.",
       },
       { property: "og:url", content: "https://ir.show/browse" },
       ...(loaderData?.ogImage

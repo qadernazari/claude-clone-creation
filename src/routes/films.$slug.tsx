@@ -60,6 +60,8 @@ export const Route = createFileRoute("/films/$slug")({
         { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
         { property: "og:type", content: "video.movie" },
         { property: "og:url", content: url },
         { property: "og:site_name", content: "IRAN" },
@@ -391,8 +393,8 @@ function FilmPage() {
       ? "مالکیت دائمی — همیشه در حساب شما"
       : "Yours forever — saved to your account",
     membershipNote: fa
-      ? "با عضویت ایران، نامحدود تماشا کنید"
-      : "Unlimited streaming with IRAN membership",
+      ? "۷ روز رایگان تماشا کنید — سپس از ماهی ۷٫۹۹ دلار"
+      : "Stream free for 7 days — then from $7.99/month",
     memberIncluded: fa ? "شامل عضویت شماست" : "Included in your membership",
     premiumNote: fa
       ? "این اثر ویژه و خارج از عضویت است"
@@ -687,7 +689,7 @@ function FilmPage() {
 
             {/* Synopsis — only truncate when genuinely long */}
             {heroSynopsis && (() => {
-              const isLong = heroSynopsis.length > 200;
+              const isLong = heroSynopsis.length > 400;
               const clamp = isLong && !synopsisOpen;
               return (
                 <div className="mt-5 max-w-xl">
@@ -811,7 +813,7 @@ function FilmPage() {
             </div>
 
             {/* Subtle access note — no boxed pricing */}
-            <p className="mt-5 text-[12px] tracking-wide text-cream/55">
+            <p className="mt-5 text-[12px] tracking-wide text-cream/50">
               {accessNote}
               {activeTicket?.expires_at && (
                 <span className="ms-2 text-cream/35">
@@ -972,9 +974,6 @@ function FilmPage() {
       {/* How to Watch — shown for non-members */}
       {!isMember && (
         <section className="mx-auto max-w-7xl px-6 pt-8 pb-8 md:px-10 [content-visibility:auto] [contain-intrinsic-size:1px_400px]">
-          <h2 className={`mb-5 font-display text-[20px] font-medium tracking-[-0.02em] text-cream-bright md:text-[24px] ${fa ? "font-vazir" : ""}`}>
-            {fa ? "روش تماشا" : "How to Watch"}
-          </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Membership / Trial card */}
             <div className="hairline relative overflow-hidden rounded-2xl border bg-gradient-to-br from-amber/10 via-bg-1/40 to-bg-1/40 p-6">
@@ -1002,6 +1001,9 @@ function FilmPage() {
               >
                 {t.becomeMember}
               </button>
+              <p className="mt-2 text-[11px] text-cream/40">
+                {fa ? "از ماهی ۷٫۹۹ دلار · بدون تمدید خودکار" : "From $7.99 / month · No auto-renewal"}
+              </p>
             </div>
 
             {/* PPV card if available */}
