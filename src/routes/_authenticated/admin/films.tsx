@@ -8,7 +8,8 @@ import { BilingualField } from "@/components/admin/bilingual-field";
 import { TwoClickDelete } from "@/components/admin/two-click-delete";
 import { FileUpload } from "@/components/admin/file-upload";
 import { capitalize } from "@/lib/cms";
-import { getFilmVideoUrl, setFilmVideoUrl, listFilmsWithVideo } from "@/lib/admin-films.functions";
+import { getFilmVideoUrl, setFilmVideoUrl, listFilmsWithVideo, getFilmSubtitles, setFilmSubtitles } from "@/lib/admin-films.functions";
+import { SubtitlesEditor, type SubtitleTrack } from "@/components/admin/subtitles-editor";
 
 export const Route = createFileRoute("/_authenticated/admin/films")({
   component: FilmsAdminPage,
@@ -364,12 +365,13 @@ function FilmEditorModal({
 }) {
   const [d, setD] = useState<FilmDraft>(draft);
   const [credits, setCredits] = useState<CreditDraft[]>([]);
+  const [subtitles, setSubtitles] = useState<SubtitleTrack[]>([]);
   const [saving, setSaving] = useState(false);
   const seriesOptions = allFilms.filter((f) => f.film_type === "series" && f.id !== d.id);
   const set = <K extends keyof FilmDraft>(k: K, v: FilmDraft[K]) => setD((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
-    if (!d.id) { setCredits([]); return; }
+    if (!d.id) { setCredits([]); setSubtitles([]); return; }
     supabase.from("film_credits").select("id, credit_type, label_en, value_en, value_fa, sort_order")
       .eq("film_id", d.id).order("sort_order")
       .then(({ data }) => {
@@ -379,9 +381,12 @@ function FilmEditorModal({
           sort_order: c.sort_order,
         })));
       });
-    // Load video_url via admin server fn (column is hidden from clients).
+    // Load video_url + subtitles via admin server fns (columns hidden from clients).
     getFilmVideoUrl({ data: { id: d.id } })
       .then((res) => setD((p) => ({ ...p, video_url: res.videoUrl ?? "" })))
+      .catch(() => {});
+    getFilmSubtitles({ data: { id: d.id } })
+      .then((res) => setSubtitles(res.subtitles ?? []))
       .catch(() => {});
   }, [d.id]);
 
@@ -432,6 +437,7 @@ function FilmEditorModal({
 
       // Persist video_url through the admin server fn (column is hidden from clients).
       await setFilmVideoUrl({ data: { id: filmId!, videoUrl: d.video_url?.trim() || null } });
+      await setFilmSubtitles({ data: { id: filmId!, subtitles } });
 
       // Replace credits set
       await supabase.from("film_credits").delete().eq("film_id", filmId);
@@ -528,6 +534,15 @@ function FilmEditorModal({
                 label="Upload Video (Full Film)"
                 description="The full feature. MP4 / WebM / MOV / MKV. Large files are supported — progress is shown as the upload runs."
                 maxBytes={5 * 1024 * 1024 * 1024}
+              />
+            </div>
+
+            <div className="mt-4">
+              <SubtitlesEditor
+                filmId={d.id}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                value={subtitles}
+                onChange={setSubtitles}
               />
             </div>
 

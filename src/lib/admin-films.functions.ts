@@ -49,6 +49,63 @@ export const setFilmVideoUrl = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const subtitleTrackSchema = z.object({
+  lang: z.string().min(1).max(16),
+  label: z.string().min(1).max(80),
+  url: z.string().min(1).max(2048),
+  default: z.boolean().optional(),
+});
+
+export const getFilmSubtitles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string }) =>
+    z.object({ id: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("films")
+      .select("subtitles")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    const raw = (row as { subtitles?: unknown } | null)?.subtitles;
+    const subs = Array.isArray(raw)
+      ? raw.filter((t): t is z.infer<typeof subtitleTrackSchema> => {
+          const r = subtitleTrackSchema.safeParse(t);
+          return r.success;
+        })
+      : [];
+    return { subtitles: subs };
+  });
+
+export const setFilmSubtitles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string; subtitles: unknown }) =>
+    z.object({
+      id: z.string().uuid(),
+      subtitles: z.array(subtitleTrackSchema).max(20),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Ensure at most one default track.
+    let seenDefault = false;
+    const cleaned = data.subtitles.map((t) => {
+      const isDef = !!t.default && !seenDefault;
+      if (isDef) seenDefault = true;
+      return { lang: t.lang, label: t.label, url: t.url, default: isDef };
+    });
+    const { error } = await supabaseAdmin
+      .from("films")
+      .update({ subtitles: cleaned })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const listFilmsWithVideo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -61,3 +118,4 @@ export const listFilmsWithVideo = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ids: (data ?? []).map((r: { id: string }) => r.id) };
   });
+
