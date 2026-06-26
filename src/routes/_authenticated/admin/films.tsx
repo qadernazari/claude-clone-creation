@@ -371,7 +371,7 @@ function FilmEditorModal({
   const set = <K extends keyof FilmDraft>(k: K, v: FilmDraft[K]) => setD((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
-    if (!d.id) { setCredits([]); return; }
+    if (!d.id) { setCredits([]); setSubtitles([]); return; }
     supabase.from("film_credits").select("id, credit_type, label_en, value_en, value_fa, sort_order")
       .eq("film_id", d.id).order("sort_order")
       .then(({ data }) => {
@@ -381,9 +381,12 @@ function FilmEditorModal({
           sort_order: c.sort_order,
         })));
       });
-    // Load video_url via admin server fn (column is hidden from clients).
+    // Load video_url + subtitles via admin server fns (columns hidden from clients).
     getFilmVideoUrl({ data: { id: d.id } })
       .then((res) => setD((p) => ({ ...p, video_url: res.videoUrl ?? "" })))
+      .catch(() => {});
+    getFilmSubtitles({ data: { id: d.id } })
+      .then((res) => setSubtitles(res.subtitles ?? []))
       .catch(() => {});
   }, [d.id]);
 
