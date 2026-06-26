@@ -41,7 +41,7 @@ function DeferredHomeRails() {
 
   useEffect(() => {
     const reveal = () => {
-      if (window.scrollY > 140) setShow(true);
+      if (window.scrollY > 60) setShow(true);
     };
     reveal();
     window.addEventListener("scroll", reveal, { passive: true });
