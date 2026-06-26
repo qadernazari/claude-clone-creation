@@ -692,6 +692,7 @@ function WatchPage() {
                 ref={videoRef}
                 src={videoUrl}
                 poster={film.cover_url || undefined}
+                preload="metadata"
                 autoPlay={resumePrompt === null}
                 playsInline
                 crossOrigin="anonymous"
