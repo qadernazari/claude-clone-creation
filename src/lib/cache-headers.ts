@@ -7,7 +7,7 @@ export const setHomepageCacheHeaders = createIsomorphicFn()
     try {
       setResponseHeader(
         "Cache-Control",
-        "public, s-maxage=60, stale-while-revalidate=300",
+        "public, s-maxage=120, stale-while-revalidate=600",
       );
       setResponseHeader("Vary", "Accept-Language, Cookie, CF-IPCountry");
     } catch {
