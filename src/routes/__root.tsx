@@ -194,6 +194,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "enamad", content: "52799420" },
     ],
     links: [
+      // Stylesheet is render-blocking by spec — preload it so the browser
+      // starts fetching it the moment the HTML streams in, in parallel
+      // with HTML parsing, instead of waiting until the parser reaches
+      // the <link> tag. Combined with the inline critical CSS below, this
+      // is the biggest FCP win available without splitting the stylesheet.
+      { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       {
