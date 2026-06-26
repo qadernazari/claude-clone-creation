@@ -91,7 +91,8 @@ export function FeaturedFilm() {
                 width={720}
                 height={1280}
                 className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 h-full w-full object-cover object-top md:hidden"
-                style={{ opacity: mobileImageReady ? 1 : 0, transition: "opacity 180ms ease-out" }}
+                style={{ opacity: mobileImageReady ? 1 : 0, transition: "opacity 120ms ease-out" }}
+
                 // lazy on purpose: React 19 auto-hoists eager imgs into a
                 // no-media <link rel="preload"> that also fires on desktop,
                 // duplicating bytes. The media-gated preload in the route
