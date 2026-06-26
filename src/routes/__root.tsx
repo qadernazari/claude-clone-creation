@@ -237,6 +237,25 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang={locale} dir={dir} data-region={region} suppressHydrationWarning>
       <head>
         {/*
+          Critical above-the-fold CSS, inlined so the browser can paint
+          the noir background + hero shell on the very first byte, without
+          waiting for the Tailwind stylesheet to download/parse. Anything
+          here MUST stay tiny (<2 KB gzipped) — everything else lives in
+          the regular stylesheet.
+        */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html:
+              "html,body{margin:0;background:#0d0d0d;color:#f5f4ef;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}" +
+              "body{min-height:100vh}" +
+              "[data-mobile-hero]{position:relative;width:100%;height:100svh;min-height:620px;overflow:hidden;background:#1a1a1a}" +
+              "@media(min-width:768px){[data-mobile-hero]{height:100dvh;min-height:640px}}" +
+              ".hero-mobile-poster{position:absolute;inset:0;pointer-events:none}" +
+              "img.cine-img{display:block;max-width:100%;height:auto}",
+          }}
+        />
+
+        {/*
           Inject the resolved region as a global so <LocaleProvider> can
           initialize synchronously on the client — no useEffect flip, no
           flash of English for Iran visitors. Tab-bar visibility check
