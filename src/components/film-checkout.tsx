@@ -59,7 +59,7 @@ export function FilmCheckout({ filmSlug, filmId, priceToman, returnUrl, onClose 
           ✕
         </button>
 
-        {irMode ? (
+        {false && irMode ? ( // TODO: re-enable when ZarinPal is wired
           <IrPayPanel
             kind="ticket"
             itemId={filmId ?? filmSlug}
