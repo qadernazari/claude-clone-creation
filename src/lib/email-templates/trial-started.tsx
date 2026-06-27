@@ -100,7 +100,7 @@ export const template = {
   subject: `Your ${SITE_NAME} free trial is active`,
   displayName: 'Trial started',
   previewData: {
-    trialDays: 7,
+    trialDays: 30,
     trialEndFormatted: 'Jun 11, 2026',
     manageUrl: 'https://ir.show/membership',
     browseUrl: 'https://ir.show/browse',
