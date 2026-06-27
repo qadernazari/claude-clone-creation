@@ -135,6 +135,7 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
+      console.error("[membership checkout error]", error);
       return { error: getStripeErrorMessage(error) };
     }
   });
