@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 const FAQ_EN: { q: string; a: string }[] = [
   {
     q: "How does the free trial work?",
-    a: "New accounts get 7 days of full access to the entire catalog — no payment required upfront. After 7 days you can choose a membership plan. If you don't subscribe, your access simply ends.",
+    a: "New accounts get 30 days of full access to the entire catalog — no payment required upfront. After 30 days you can choose a membership plan. If you don't subscribe, your access simply ends.",
   },
   {
     q: "What happens after my membership expires?",
@@ -43,7 +43,7 @@ const FAQ_EN: { q: string; a: string }[] = [
 const FAQ_FA: { q: string; a: string }[] = [
   {
     q: "دوره‌ی آزمایش رایگان چگونه کار می‌کند؟",
-    a: "حساب‌های جدید ۷ روز دسترسی کامل به همه‌ی کاتالوگ دارند — بدون نیاز به پرداخت اولیه. پس از ۷ روز می‌توانید پلن عضویت انتخاب کنید. اگر مشترک نشوید، دسترسی شما به‌سادگی پایان می‌یابد.",
+    a: "حساب‌های جدید ۳۰ روز دسترسی کامل به همه‌ی کاتالوگ دارند — بدون نیاز به پرداخت اولیه. پس از ۳۰ روز می‌توانید پلن عضویت انتخاب کنید. اگر مشترک نشوید، دسترسی شما به‌سادگی پایان می‌یابد.",
   },
   {
     q: "پس از پایان عضویتم چه می‌شود؟",

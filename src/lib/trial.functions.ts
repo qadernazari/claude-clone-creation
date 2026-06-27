@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const TRIAL_DAYS = 7;
+const TRIAL_DAYS = 30;
 const SITE_ORIGIN = "https://ir.show";
 
 type TrialRow = {
