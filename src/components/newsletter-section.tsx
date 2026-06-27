@@ -128,13 +128,13 @@ export function NewsletterSection() {
                 }}
                 placeholder={t.placeholder}
                 disabled={status === "submitting"}
-                className={`h-11 flex-1 rounded-md border border-cream/20 bg-bg-0 px-4 text-[14px] text-cream placeholder:text-cream/35 transition-colors focus:border-amber/50 focus:outline-none focus:ring-1 focus:ring-amber/40 disabled:opacity-60 ${fa ? "font-vazir text-right" : ""}`}
+                className={`h-14 flex-1 rounded-xl border border-cream/20 bg-bg-1 px-5 text-[15px] text-cream placeholder:text-cream/40 transition-all focus:border-amber/50 focus:outline-none focus:ring-1 focus:ring-amber/25 disabled:opacity-60 ${fa ? "font-vazir text-right" : ""}`}
                 dir={fa ? "rtl" : "ltr"}
               />
               <button
                 type="submit"
                 disabled={status === "submitting"}
-                className={`inline-flex h-11 items-center justify-center rounded-md bg-amber px-6 text-[13px] font-bold text-ink transition-all duration-200 hover:bg-amber-bright active:scale-[0.98] disabled:opacity-60 ${fa ? "font-vazir" : ""}`}
+                className={`inline-flex h-14 items-center justify-center rounded-xl bg-amber px-7 text-[13px] font-bold text-ink shadow-lg shadow-amber/10 transition-all duration-200 hover:bg-amber-bright active:scale-[0.98] disabled:opacity-60 ${fa ? "font-vazir" : ""}`}
               >
                 {status === "submitting" ? t.submitting : t.button}
               </button>
