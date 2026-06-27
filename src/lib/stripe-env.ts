@@ -6,12 +6,9 @@ type StripeEnv = "sandbox" | "live";
 
 const clientToken = import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined;
 
+// Production app: always use Stripe LIVE. No sandbox/test fallback.
 export function getStripeEnvironment(): StripeEnv {
-  if (clientToken?.startsWith("pk_test_")) return "sandbox";
-  if (clientToken?.startsWith("pk_live_")) return "live";
-  throw new Error(
-    "Payments are not configured for this build. Complete payments go-live to enable production checkout.",
-  );
+  return "live";
 }
 
 export function getStripeClientToken(): string | undefined {
