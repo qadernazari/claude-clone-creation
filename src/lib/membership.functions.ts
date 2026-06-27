@@ -62,6 +62,7 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
       const email = (claims as { email?: string })?.email;
 
       const stripe = createStripeClient(data.environment);
+      console.log("[membership checkout] env:", data.environment, "plan:", data.plan, "returnUrl:", data.returnUrl);
       const plan = getPlan(data.plan);
 
       // Resolve the membership price by lookup_key (stable across envs).
@@ -134,6 +135,7 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
+      console.error("[membership checkout error]", error);
       return { error: getStripeErrorMessage(error) };
     }
   });
