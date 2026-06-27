@@ -71,7 +71,7 @@ const SECTIONS_EN: { title: string; body: React.ReactNode }[] = [
     title: "4. Free trial",
     body: (
       <p>
-        New accounts receive a 7-day free trial with full access to the catalog. Only one free
+        New accounts receive a 30-day free trial with full access to the catalog. Only one free
         trial per person. We reserve the right to verify eligibility and revoke trials used in bad
         faith.
       </p>
@@ -262,7 +262,7 @@ const SECTIONS_FA: { body: React.ReactNode }[] = [
   {
     body: (
       <p>
-        حساب‌های جدید ۷ روز آزمایش رایگان با دسترسی کامل به کاتالوگ دریافت می‌کنند. هر شخص فقط یک
+        حساب‌های جدید ۳۰ روز آزمایش رایگان با دسترسی کامل به کاتالوگ دریافت می‌کنند. هر شخص فقط یک
         آزمایش رایگان می‌تواند داشته باشد. حق داریم صلاحیت را بررسی کنیم و آزمایش‌های استفاده‌شده
         به روش غیرمنصفانه را لغو کنیم.
       </p>

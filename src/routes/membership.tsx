@@ -109,7 +109,7 @@ function MembershipPage() {
               <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber" />
               <div className="flex-1">
                 <h2 className={`text-sm font-medium text-cream-bright ${fa ? "font-vazir" : ""}`}>
-                  {fa ? "۷ روز رایگان امتحان کنید" : "Try 7 days free"}
+                  {fa ? "۳۰ روز رایگان امتحان کنید" : "Try 30 days free"}
                 </h2>
                 <p className="mt-1 text-xs text-cream/65">
                   {fa
