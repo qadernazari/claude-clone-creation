@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { NewsletterSection } from "../components/newsletter-section";
 import { homeFeaturedQueryOptions, homeRailsQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
@@ -244,7 +243,6 @@ function Home() {
 
       </main>
 
-      <NewsletterSection />
       <SiteFooter />
     </div>
   );
