@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { createIrCheckout, type IrCheckoutKind } from "@/lib/ir-payments.functions";
 import { useLocale } from "@/lib/i18n";
+import type { IrCheckoutKind } from "@/lib/ir-payments.functions";
 
 interface IrPayPanelProps {
   kind: IrCheckoutKind;
@@ -12,98 +11,90 @@ interface IrPayPanelProps {
 
 /**
  * Iranian gateway checkout panel — replaces the Stripe embedded checkout
- * when the visitor is on the Iran mirror. Calls createIrCheckout, then
- * redirects the user to the gateway's hosted payment page.
+ * when the visitor is on the Iran mirror.
  *
- * Until an Iranian gateway is wired (see docs/iran-mirror.md §8), this
- * displays the configuration error returned by the server stub.
+ * Until an Iranian gateway (ZarinPal) is wired up, this shows a friendly
+ * coming-soon message with a contact link instead of a broken payment stub.
  */
-export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: IrPayPanelProps) {
+export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const formattedAmount = amountToman
-    ? amountToman.toLocaleString(fa ? "fa-IR" : "en-US")
-    : null;
-
-  const start = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await createIrCheckout({
-        data: {
-          kind,
-          itemId,
-          ...(amountToman ? { amountToman } : {}),
-          ...(couponCode ? { couponCode } : {}),
-        },
-      });
-      if ("error" in result) {
-        setError(result.error);
-        return;
-      }
-      window.location.href = result.redirectUrl;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
-  };
+  void kind;
+  void itemId;
+  void amountToman;
+  void couponCode;
 
   return (
     <div className="p-6 sm:p-8" dir={fa ? "rtl" : "ltr"}>
-      <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-        {fa ? "پرداخت با کارت ایرانی" : "Pay with Iranian bank card"}
-      </h2>
-      <p className="mt-2 text-sm text-cream/65">
-        {fa
-          ? "پرداخت از طریق درگاه ایرانی (شتاب) به تومان."
-          : "Secure Toman payment via an Iranian payment gateway."}
-      </p>
-
-      {formattedAmount && (
-        <div className="mt-5 rounded-xl border border-cream/10 bg-bg-0/40 px-4 py-3 text-center">
-          <div className="text-[10px] uppercase tracking-widest text-cream/55">
-            {fa ? "مبلغ قابل پرداخت" : "Amount due"}
-          </div>
-          <div className="mt-1 text-2xl text-cream-bright" dir={fa ? "rtl" : "ltr"}>
-            {formattedAmount} <span className="text-sm text-cream/65">{fa ? "تومان" : "Toman"}</span>
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-          {error}
-        </div>
-      )}
-
-      <button
-        type="button"
-        onClick={start}
-        disabled={loading}
-        className="mt-6 w-full rounded-md bg-amber px-5 py-3 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-60"
-      >
-        {loading
-          ? fa ? "در حال انتقال…" : "Redirecting…"
-          : fa ? "ادامه به درگاه پرداخت" : "Continue to gateway"}
-      </button>
-
       <button
         type="button"
         onClick={onClose}
-        className="mt-2 w-full rounded-md px-5 py-2 text-xs text-cream/60 hover:text-cream"
+        aria-label="Close checkout"
+        className="absolute top-3 z-10 grid h-9 w-9 place-items-center rounded-md bg-bg-0/80 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 ltr:right-3 rtl:left-3"
       >
-        {fa ? "انصراف" : "Cancel"}
+        ✕
       </button>
 
-      <p className="mt-4 text-center text-[11px] text-cream/40">
-        {fa
-          ? "پرداخت‌های بین‌المللی (ویزا/مسترکارت) در نسخه ایران فعال نیست."
-          : "International cards (Visa / Mastercard) are not available on the Iran mirror."}
-      </p>
+      <div className="flex flex-col items-center text-center pt-4 pb-2">
+        <div className="grid h-16 w-16 place-items-center rounded-full bg-amber/10 ring-1 ring-amber/25">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8 text-amber"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+        </div>
+
+        <h2 className={`mt-5 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+          {fa ? "درگاه پرداخت ایرانی" : "Iranian payment"}
+        </h2>
+
+        <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
+          {fa
+            ? "درگاه پرداخت ایرانی به زودی فعال می‌شود. برای عضویت، لطفاً با hello@ir.show تماس بگیرید."
+            : "Iranian payment coming soon. To subscribe, please use www.ir.show from outside Iran, or contact hello@ir.show for assistance."}
+        </p>
+
+        <a
+          href="mailto:hello@ir.show"
+          className="mt-5 inline-flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+            />
+          </svg>
+          hello@ir.show
+        </a>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-4 rounded-md px-5 py-2 text-xs text-cream/60 hover:text-cream transition-colors"
+        >
+          {fa ? "بستن" : "Close"}
+        </button>
+      </div>
     </div>
   );
 }
