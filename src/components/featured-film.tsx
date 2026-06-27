@@ -68,7 +68,7 @@ export function FeaturedFilm() {
   return (
     <section className="relative isolate overflow-hidden">
       {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[100svh] min-h-screen w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
+      <div className="relative h-[85svh] min-h-[580px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
         {/* Warm poster placeholder painted immediately by SSR — keeps the
             hero looking intentional (not an empty black box) until the
             actual image decodes. Hidden once the image is loaded. */}
@@ -181,8 +181,8 @@ export function FeaturedFilm() {
 
 
         {/* Content */}
-        <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-8 sm:px-6 md:px-12 md:pb-20">
+        <div className="relative z-10 flex h-full items-end md:items-end">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-6 md:px-12 md:pb-20">
             <div className="max-w-2xl">
               <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-5">
                 {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
@@ -262,7 +262,7 @@ function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa"
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="relative h-[100svh] min-h-[620px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
+      <div className="relative h-[85svh] min-h-[620px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
         <div
           className="absolute inset-0"
           style={{
