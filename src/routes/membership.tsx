@@ -39,7 +39,7 @@ export const Route = createFileRoute("/membership")({
       {
         name: "description",
         content:
-          "Choose your IRAN membership. 1, 3, 6, or 12 months — unlimited streaming, save up to 20%.",
+          "Choose your IRAN membership. 1, 3, 6, or 12 months — unlimited streaming, save up to 50%.",
       },
       { property: "og:title", content: "Membership — IRAN" },
       {

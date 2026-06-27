@@ -17,15 +17,22 @@ export interface MembershipPlan {
   popular?: boolean;
 }
 
-export const MEMBERSHIP_BASE_TOMAN = 290_000;
-export const MEMBERSHIP_BASE_CENTS = 999;
+export const MEMBERSHIP_BASE_TOMAN = 99_000;
+export const MEMBERSHIP_BASE_CENTS = 499;
 
 export const MEMBERSHIP_PLANS: MembershipPlan[] = [
-  { id: "1mo",  months: 1,  stripeLookupKey: "membership_1mo",  priceCentsUsd: 999,  discountPercent: 0 },
-  { id: "3mo",  months: 3,  stripeLookupKey: "membership_3mo",  priceCentsUsd: 2847, discountPercent: 5,  popular: true },
-  { id: "6mo",  months: 6,  stripeLookupKey: "membership_6mo",  priceCentsUsd: 5395, discountPercent: 10 },
-  { id: "12mo", months: 12, stripeLookupKey: "membership_12mo", priceCentsUsd: 9590, discountPercent: 20, bestValue: true },
+  { id: "1mo",  months: 1,  stripeLookupKey: "membership_1mo",  priceCentsUsd: 499,  discountPercent: 0 },
+  { id: "3mo",  months: 3,  stripeLookupKey: "membership_3mo",  priceCentsUsd: 999,  discountPercent: 33, popular: true },
+  { id: "6mo",  months: 6,  stripeLookupKey: "membership_6mo",  priceCentsUsd: 1799, discountPercent: 40 },
+  { id: "12mo", months: 12, stripeLookupKey: "membership_12mo", priceCentsUsd: 2999, discountPercent: 50, bestValue: true },
 ];
+
+const TOMAN_PRICES: Record<MembershipPlanId, number> = {
+  "1mo":  99_000,
+  "3mo":  199_000,
+  "6mo":  399_000,
+  "12mo": 699_000,
+};
 
 export function getPlan(id: MembershipPlanId): MembershipPlan {
   const plan = MEMBERSHIP_PLANS.find((p) => p.id === id);
@@ -33,8 +40,7 @@ export function getPlan(id: MembershipPlanId): MembershipPlan {
   return plan;
 }
 
-/** Compute Toman price for a plan from a base monthly Toman price. */
-export function tomanPriceForPlan(plan: MembershipPlan, baseToman = MEMBERSHIP_BASE_TOMAN): number {
-  const raw = baseToman * plan.months * (1 - plan.discountPercent / 100);
-  return Math.round(raw / 1000) * 1000; // round to nearest 1,000 toman
+/** Exact Toman price per plan (hardcoded lookup, not formula-derived). */
+export function tomanPriceForPlan(plan: MembershipPlan, _baseToman = MEMBERSHIP_BASE_TOMAN): number {
+  return TOMAN_PRICES[plan.id];
 }
