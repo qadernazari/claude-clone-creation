@@ -4,14 +4,16 @@
  * Resolution priority (highest first):
  *   1. `iran_region=manual:<region>` cookie — explicit user choice only
  *   2. `cf-ipcountry` / `x-vercel-ip-country` — trusted edge IP geolocation
- *   3. `x-iran-mirror` / `x-country-code` — Hetzner reverse proxy, injected
- *      only for verified Iranian IP ranges (Caddy IP matching)
+ *   3. Hetzner mirror detection — when `cf-connecting-ip` is our Hetzner
+ *      proxy (178.105.249.220), the request came through our Iran mirror.
+ *      We then trust `x-real-ip` (set by Hetzner/Caddy) as the visitor's
+ *      real IP and check it against Iranian IP ranges.
  *   4. Global / English — safe default when geo is unknown
  *
  * NOTE: host (ir.show) and mirror headers are NEVER used as Iran signals
  * by themselves — non-Iran visitors can hit those paths too. Persian is
- * selected only from a trusted Iran country header, the verified Hetzner
- * mirror header, or an explicit manual-selection cookie.
+ * selected only from a trusted Iran country header, verified Hetzner mirror
+ * traffic with an Iranian IP, or an explicit manual-selection cookie.
  *
  * This file is server-only — never imported from the client bundle.
  * Callers go through `src/lib/region.functions.ts`.
@@ -63,7 +65,7 @@ function applyRegionResponseHeaders(): void {
   try {
     setResponseHeader(
       "Vary",
-      "Cookie, CF-IPCountry, X-Vercel-IP-Country, X-Real-IP, X-Forwarded-For",
+      "Cookie, CF-IPCountry, X-Vercel-IP-Country, CF-Connecting-IP",
     );
     setResponseHeader("Cache-Control", "no-store");
   } catch {
@@ -174,14 +176,22 @@ export function readRegion(): ResolvedRegion {
     return { region: "global", locale: "en", source: "geo" };
   }
 
-  // 3. Real IP check — Caddy passes the visitor's real IP via `x-real-ip`,
-  // which Cloudflare Workers does NOT strip. Match against known Iranian
-  // IP ranges as the last automatic signal before defaulting to global.
-  const realIp =
-    getRequestHeader("x-real-ip") ??
-    getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim();
-  if (realIp && isIranianIp(realIp)) {
-    return { region: "iran", locale: "fa", source: "geo" };
+  // 3. Hetzner mirror detection — if `cf-connecting-ip` is our Hetzner server
+  // (178.105.249.220), the request came through our Iran mirror proxy. In that
+  // case we trust `x-real-ip` (set by Hetzner/Caddy) as the visitor's real IP,
+  // and check it against known Iranian IP ranges.
+  const cfConnectingIp = getRequestHeader("cf-connecting-ip");
+  const hetznerIp = "178.105.249.220";
+
+  if (cfConnectingIp === hetznerIp) {
+    const realIp =
+      getRequestHeader("x-real-ip") ??
+      getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim();
+    if (realIp && isIranianIp(realIp)) {
+      return { region: "iran", locale: "fa", source: "geo" };
+    }
+    // Came through Hetzner but not an Iranian IP (global user using ir.show)
+    return { region: "global", locale: "en", source: "geo" };
   }
 
   // 4. Unknown — default to global / English.
