@@ -88,7 +88,15 @@ export function readRegion(): ResolvedRegion {
     return { region: "global", locale: "en", source: "geo" };
   }
 
-  // 3. Unknown — default to global / English.
+  // 3. Hetzner mirror header — only injected for verified Iranian IPs
+  // by the Caddy reverse proxy (IP range matching). Safe third fallback
+  // because the manual cookie and Cloudflare/Vercel geo were checked first.
+  const irMirror = getRequestHeader("x-iran-mirror");
+  if (irMirror === "1") {
+    return { region: "iran", locale: "fa", source: "geo" };
+  }
+
+  // 4. Unknown — default to global / English.
   return { region: "global", locale: "en", source: "default" };
 }
 
