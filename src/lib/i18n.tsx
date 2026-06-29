@@ -37,13 +37,28 @@ declare global {
 }
 
 /**
- * Read the SSR-injected region. The root shell server-renders a tiny
- * `<script>window.__IRAN_REGION__ = {...}</script>` based on the
- * Host/cookie/cf-ipcountry, so the first React render is already correct —
- * no useEffect-driven flip, no flash of English/LTR for Iran visitors.
+ * Read the initial region for the client. Priority:
+ *   1. Explicit manual cookie (`iran_region=manual:<region>`) — user choice wins.
+ *   2. Bare `ir.show` hostname — always treated as the Iranian mirror.
+ *   3. SSR-injected region from `window.__IRAN_REGION__` (geo/cookie based).
+ *   4. localStorage fallback for local dev / missing SSR.
+ *   5. Global / English default.
  */
 function readInitialRegion(): Region {
   if (typeof window === "undefined") return "global";
+
+  // Respect explicit manual region choice cookie first, regardless of host.
+  const manualCookie = document.cookie
+    .split(";")
+    .find((c) => c.trim().startsWith("iran_region="))
+    ?.split("=")[1]
+    ?.trim();
+  if (manualCookie === "manual:iran") return "iran";
+  if (manualCookie === "manual:global") return "global";
+
+  // Bare ir.show (without www) is the Iranian mirror — default to Persian.
+  if (window.location.hostname === "ir.show") return "iran";
+
   const injected = window.__IRAN_REGION__?.region;
   if (injected === "iran" || injected === "global") return injected;
   // Local dev / no SSR — fall back to localStorage
@@ -51,6 +66,7 @@ function readInitialRegion(): Region {
   if (stored === "iran" || stored === "global") return stored;
   return "global";
 }
+
 
 function regionToLocale(r: Region): Locale {
   return r === "iran" ? "fa" : "en";
