@@ -4,8 +4,8 @@
  * Resolution priority (highest first):
  *   1. `iran_region=manual:<region>` cookie — explicit user choice only
  *   2. `cf-ipcountry` / `x-vercel-ip-country` — trusted edge IP geolocation
- *   3. `x-iran-mirror` — Hetzner reverse proxy, injected only for verified
- *      Iranian IP ranges (Caddy IP matching)
+ *   3. `x-iran-mirror` / `x-country-code` — Hetzner reverse proxy, injected
+ *      only for verified Iranian IP ranges (Caddy IP matching)
  *   4. Global / English — safe default when geo is unknown
  *
  * NOTE: host (ir.show) and mirror headers are NEVER used as Iran signals
