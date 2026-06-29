@@ -4,11 +4,14 @@
  * Resolution priority (highest first):
  *   1. `iran_region=manual:<region>` cookie — explicit user choice only
  *   2. `cf-ipcountry` / `x-vercel-ip-country` — trusted edge IP geolocation
- *   3. Global / English — safe default when geo is unknown
+ *   3. `x-iran-mirror` — Hetzner reverse proxy, injected only for verified
+ *      Iranian IP ranges (Caddy IP matching)
+ *   4. Global / English — safe default when geo is unknown
  *
- * NOTE: host (ir.show) and mirror headers are NEVER used as Iran signals —
- * non-Iran visitors hit those paths too. Persian is selected only from a
- * trusted Iran country header or a new explicit manual-selection cookie.
+ * NOTE: host (ir.show) and mirror headers are NEVER used as Iran signals
+ * by themselves — non-Iran visitors can hit those paths too. Persian is
+ * selected only from a trusted Iran country header, the verified Hetzner
+ * mirror header, or an explicit manual-selection cookie.
  *
  * This file is server-only — never imported from the client bundle.
  * Callers go through `src/lib/region.functions.ts`.
