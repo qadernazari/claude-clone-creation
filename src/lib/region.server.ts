@@ -60,7 +60,10 @@ function readManualRegionCookie(): Region | null {
 
 function applyRegionResponseHeaders(): void {
   try {
-    setResponseHeader("Vary", "Cookie, CF-IPCountry, X-Vercel-IP-Country");
+    setResponseHeader(
+      "Vary",
+      "Cookie, CF-IPCountry, X-Vercel-IP-Country, X-Iran-Mirror",
+    );
     setResponseHeader("Cache-Control", "no-store");
   } catch {
     // Response headers are only available during request handling.
