@@ -16,6 +16,7 @@
  * This file is server-only — never imported from the client bundle.
  * Callers go through `src/lib/region.functions.ts`.
  */
+// Last updated: force-redeploy-2026-06-30
 import {
   getCookie,
   getRequestHeader,
