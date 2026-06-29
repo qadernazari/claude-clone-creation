@@ -85,9 +85,7 @@ export function readRegion(): ResolvedRegion {
     };
   }
 
-  // 2. Trusted edge geo. Do not trust x-country-code or x-iran-mirror here:
-  // the mirror previously hard-coded them to IR, which made non-Iran visitors
-  // see Persian on ir.show.
+  // 2. Trusted edge geo (Cloudflare/Vercel).
   const country = readTrustedCountry();
   if (country) {
     if (country === "IR") return { region: "iran", locale: "fa", source: "geo" };
