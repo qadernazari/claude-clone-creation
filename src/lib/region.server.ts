@@ -4,8 +4,8 @@
  * Resolution priority (highest first):
  *   1. `iran_region=manual:<region>` cookie — explicit user choice only
  *   2. `cf-ipcountry` / `x-vercel-ip-country` — trusted edge IP geolocation
- *   3. `x-iran-mirror` — Hetzner reverse proxy, injected only for verified
- *      Iranian IP ranges (Caddy IP matching)
+ *   3. `x-iran-mirror` / `x-country-code` — Hetzner reverse proxy, injected
+ *      only for verified Iranian IP ranges (Caddy IP matching)
  *   4. Global / English — safe default when geo is unknown
  *
  * NOTE: host (ir.show) and mirror headers are NEVER used as Iran signals
@@ -62,7 +62,7 @@ function applyRegionResponseHeaders(): void {
   try {
     setResponseHeader(
       "Vary",
-      "Cookie, CF-IPCountry, X-Vercel-IP-Country, X-Iran-Mirror",
+      "Cookie, CF-IPCountry, X-Vercel-IP-Country, X-Iran-Mirror, X-Country-Code",
     );
     setResponseHeader("Cache-Control", "no-store");
   } catch {
@@ -92,11 +92,13 @@ export function readRegion(): ResolvedRegion {
     return { region: "global", locale: "en", source: "geo" };
   }
 
-  // 3. Hetzner mirror header — only injected for verified Iranian IPs
-  // by the Caddy reverse proxy (IP range matching). Safe third fallback
-  // because the manual cookie and Cloudflare/Vercel geo were checked first.
+  // 3. Hetzner reverse proxy headers — `x-iran-mirror` and `x-country-code`
+  // are injected only for verified Iranian IP ranges by Caddy (IP matching).
+  // Safe third fallback because the manual cookie and Cloudflare/Vercel geo
+  // are checked first.
   const irMirror = getRequestHeader("x-iran-mirror");
-  if (irMirror === "1") {
+  const countryCode = normalizeCountry(getRequestHeader("x-country-code"));
+  if (irMirror === "1" || countryCode === "IR") {
     return { region: "iran", locale: "fa", source: "geo" };
   }
 
