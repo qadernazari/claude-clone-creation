@@ -194,8 +194,8 @@ export function readRegion(): ResolvedRegion {
     return { region: "global", locale: "en", source: "geo" };
   }
 
-  // 4. Unknown — default to global / English.
-  return { region: "global", locale: "en", source: "default" };
+  // 4. Default to Persian / Iranian for all visitors.
+  return { region: "iran", locale: "fa", source: "default" };
 }
 
 

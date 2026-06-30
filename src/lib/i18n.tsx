@@ -42,10 +42,10 @@ declare global {
  *   2. Bare `ir.show` hostname — always treated as the Iranian mirror.
  *   3. SSR-injected region from `window.__IRAN_REGION__` (geo/cookie based).
  *   4. localStorage fallback for local dev / missing SSR.
- *   5. Global / English default.
+ *   5. Persian / Iranian default.
  */
 function readInitialRegion(): Region {
-  if (typeof window === "undefined") return "global";
+  if (typeof window === "undefined") return "iran";
 
   // Respect explicit manual region choice cookie first, regardless of host.
   const manualCookie = document.cookie
@@ -64,7 +64,8 @@ function readInitialRegion(): Region {
   // Local dev / no SSR — fall back to localStorage
   const stored = window.localStorage.getItem(STORAGE_REGION);
   if (stored === "iran" || stored === "global") return stored;
-  return "global";
+  // Default to Persian for all visitors
+  return "iran";
 }
 
 
