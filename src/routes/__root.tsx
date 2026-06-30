@@ -120,7 +120,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       };
       return {
         initialRegion:
-          w.__IRAN_REGION__ ?? { region: "global" as const, locale: "en" as const },
+          w.__IRAN_REGION__ ?? { region: "iran" as const, locale: "fa" as const },
       };
     }
     const r = await resolveVisitorRegion();
