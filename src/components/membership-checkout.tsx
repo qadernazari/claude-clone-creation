@@ -84,7 +84,7 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
           ✕
         </button>
 
-        {false && irMode ? ( // TODO: re-enable when ZarinPal is wired
+        {irMode ? (
           <IrPayPanel
             kind="membership"
             itemId={planId}
