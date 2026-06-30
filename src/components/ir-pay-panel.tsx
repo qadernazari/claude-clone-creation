@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import type { IrCheckoutKind } from "@/lib/ir-payments.functions";
 
