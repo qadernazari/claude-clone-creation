@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Instagram, Youtube } from "lucide-react";
+import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useLocale } from "../lib/i18n";
 import { Logo } from "./logo";
 import { usePageOverlay } from "./page-overlay";
