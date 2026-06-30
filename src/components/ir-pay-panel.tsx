@@ -70,7 +70,13 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
             ? "درگاه پرداخت ایرانی (زرین‌پال) به‌زودی فعال می‌شود. تا آن زمان می‌توانید از دوره آزمایشی ۳۰ روزه رایگان استفاده کنید."
             : "Our Iranian payment gateway (ZarinPal) is launching soon. In the meantime, start your free 30-day trial — no payment needed."}
         </p>
-
+        <Link
+          to="/account"
+          onClick={onClose}
+          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
+        >
+          {fa ? "شروع آزمایش رایگان" : "Start free trial instead"}
+        </Link>
 
         <a
           href="mailto:hello@ir.show"
