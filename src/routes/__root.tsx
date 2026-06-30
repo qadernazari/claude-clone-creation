@@ -10,6 +10,11 @@ import {
 import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+// Self-hosted Vazirmatn (Arabic subset only). The Latin glyphs come from
+// Space Grotesk / DM Sans / system fallbacks, so we skip the Latin and
+// Latin-Ext subsets entirely. This drops the Persian font payload from
+// ~80 KB (arabic + latin via Google Fonts) to ~46 KB (arabic only).
+import vazirArabicUrl from "@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { LocaleProvider, useLocale } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
