@@ -79,25 +79,10 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
         </Link>
 
         <a
-          href="mailto:hello@ir.show"
-          className="mt-5 inline-flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+          href="mailto:hello@ir.show?subject=Notify%20me%20—%20Iranian%20payment"
+          className="mt-3 inline-flex items-center gap-2 rounded-md border border-cream/20 px-4 py-2 text-xs text-cream/70 hover:text-cream hover:border-cream/40 transition-colors"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-            />
-          </svg>
-          hello@ir.show
+          {fa ? "وقتی آماده شد خبرم کن" : "Notify me when ready"}
         </a>
 
         <button
