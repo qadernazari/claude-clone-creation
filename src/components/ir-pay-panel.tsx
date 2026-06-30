@@ -55,15 +55,19 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
           </svg>
         </div>
 
-        <h2 className={`mt-5 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-          {fa ? "درگاه پرداخت ایرانی" : "Iranian payment"}
+        <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-amber/90">
+          {fa ? "درگاه ایرانی" : "ZarinPal"}
+        </span>
+        <h2 className={`mt-2 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+          {fa ? "تقریباً آماده است" : "Almost ready"}
         </h2>
 
         <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
           {fa
-            ? "درگاه پرداخت ایرانی به زودی فعال می‌شود. برای عضویت، لطفاً با hello@ir.show تماس بگیرید."
-            : "Iranian payment coming soon. To subscribe, please use www.ir.show from outside Iran, or contact hello@ir.show for assistance."}
+            ? "درگاه پرداخت ایرانی (زرین‌پال) به‌زودی فعال می‌شود. تا آن زمان می‌توانید از دوره آزمایشی ۳۰ روزه رایگان استفاده کنید."
+            : "Our Iranian payment gateway (ZarinPal) is launching soon. In the meantime, start your free 30-day trial — no payment needed."}
         </p>
+
 
         <a
           href="mailto:hello@ir.show"
