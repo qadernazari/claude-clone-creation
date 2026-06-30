@@ -47,11 +47,8 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
             strokeWidth={1.5}
             aria-hidden="true"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2 10h20" />
           </svg>
         </div>
 
