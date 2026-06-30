@@ -201,18 +201,45 @@ function RootShell({ children }: { children: ReactNode }) {
           initialize synchronously on the client — no useEffect flip, no
           flash of English for Iran visitors. Tab-bar visibility check
           stays inline so it runs before first paint.
+
+          Fonts:
+          - fa: self-hosted Vazirmatn (Arabic subset only, ~46 KB woff2).
+            Inlined @font-face + preload so the Arabic glyphs are on the
+            critical path with one same-origin request, no Google Fonts
+            CSS round-trip.
+          - en: Space Grotesk + DM Sans from Google Fonts, lazy-applied
+            via media=print swap to keep them off the critical path.
         */}
+        {locale === "fa" ? (
+          <>
+            <link
+              rel="preload"
+              as="font"
+              type="font/woff2"
+              href={vazirArabicUrl}
+              crossOrigin="anonymous"
+            />
+            <style
+              dangerouslySetInnerHTML={{
+                __html:
+                  `@font-face{font-family:'Vazirmatn';font-style:normal;font-display:swap;font-weight:100 900;` +
+                  `src:url(${vazirArabicUrl}) format('woff2-variations');` +
+                  `unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC;}`,
+              }}
+            />
+          </>
+        ) : null}
         <script
           dangerouslySetInnerHTML={{
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
               `try{var vv=window.visualViewport;var r=document.documentElement;var u=function(){if(!vv)return;var g=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);r.style.setProperty('--vv-chrome-bottom',Math.round(g)+'px');};u();if(vv){vv.addEventListener('resize',function(){requestAnimationFrame(u);},{passive:true});}}catch(e){}` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
-              `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
-                locale === "fa"
-                  ? "https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600&display=optional"
-                  : "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=optional",
-              )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`,
+              (locale === "fa"
+                ? ""
+                : `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
+                    "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=optional",
+                  )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`),
           }}
         />
 
