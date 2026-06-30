@@ -265,6 +265,10 @@ function RootComponent() {
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <Suspense fallback={null}><MobileTabBar /></Suspense>
+            {/* Welcome popup is a first-visit UX element — mount immediately,
+                not behind requestIdleCallback, so it shows as soon as the page
+                is interactive. */}
+            <Suspense fallback={null}><WelcomeRegionModal /></Suspense>
             <DeferredChrome />
           </PageOverlayProvider>
         </LocaleProvider>
@@ -297,7 +301,6 @@ function DeferredChrome() {
   return (
     <Suspense fallback={null}>
       <IranMirrorBanner />
-      <WelcomeRegionModal />
       <Toaster richColors position="top-center" />
     </Suspense>
   );
