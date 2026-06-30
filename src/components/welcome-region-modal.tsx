@@ -153,7 +153,6 @@ export function WelcomeRegionModal() {
                   : "border-cream/20 hover:border-cream/40"
               }`}
             >
-              <span className="mr-2">🌍</span>
               Global — English
             </button>
             <button
@@ -168,7 +167,6 @@ export function WelcomeRegionModal() {
               }`}
             >
               <span className="font-vazir">ایران — فارسی</span>
-              <span className="ml-2">🇮🇷</span>
             </button>
           </div>
 
