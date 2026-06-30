@@ -33,6 +33,9 @@ const MobileTabBar = lazy(() =>
 const IranMirrorBanner = lazy(() =>
   import("@/components/iran-mirror-banner").then((m) => ({ default: m.IranMirrorBanner })),
 );
+const WelcomeRegionModal = lazy(() =>
+  import("@/components/welcome-region-modal").then((m) => ({ default: m.WelcomeRegionModal })),
+);
 
 
 function useFaSafe(): boolean {
@@ -262,6 +265,7 @@ function DeferredChrome() {
   return (
     <Suspense fallback={null}>
       <IranMirrorBanner />
+      <WelcomeRegionModal />
       <Toaster richColors position="top-center" />
     </Suspense>
   );
