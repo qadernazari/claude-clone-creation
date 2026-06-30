@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import type { IrCheckoutKind } from "@/lib/ir-payments.functions";
 
@@ -47,17 +48,19 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
             strokeWidth={1.5}
             aria-hidden="true"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2 10h20" />
           </svg>
         </div>
 
         <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-amber/90">
           {fa ? "درگاه ایرانی" : "ZarinPal"}
         </span>
+        <div
+          className="mt-2 h-[2px] w-16 rounded-full"
+          style={{ background: "linear-gradient(90deg, #2DA84F, #f5f0e8, #DA0000)" }}
+          aria-hidden="true"
+        />
         <h2 className={`mt-2 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
           {fa ? "تقریباً آماده است" : "Almost ready"}
         </h2>
@@ -67,28 +70,19 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
             ? "درگاه پرداخت ایرانی (زرین‌پال) به‌زودی فعال می‌شود. تا آن زمان می‌توانید از دوره آزمایشی ۳۰ روزه رایگان استفاده کنید."
             : "Our Iranian payment gateway (ZarinPal) is launching soon. In the meantime, start your free 30-day trial — no payment needed."}
         </p>
-
+        <Link
+          to="/account"
+          onClick={onClose}
+          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
+        >
+          {fa ? "شروع آزمایش رایگان" : "Start free trial instead"}
+        </Link>
 
         <a
-          href="mailto:hello@ir.show"
-          className="mt-5 inline-flex items-center gap-2 rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 transition-colors"
+          href="mailto:hello@ir.show?subject=Notify%20me%20—%20Iranian%20payment"
+          className="mt-3 inline-flex items-center gap-2 rounded-md border border-cream/20 px-4 py-2 text-xs text-cream/70 hover:text-cream hover:border-cream/40 transition-colors"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-            />
-          </svg>
-          hello@ir.show
+          {fa ? "وقتی آماده شد خبرم کن" : "Notify me when ready"}
         </a>
 
         <button
