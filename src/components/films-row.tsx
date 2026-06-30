@@ -78,12 +78,23 @@ function Rail({
   year: (n: number) => string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const rtl = locale === "fa";
+  // In RTL, "next" (forward in reading order) means scrolling visually to the
+  // left. Browsers normalize RTL scrollLeft so a positive value still moves
+  // toward the end of the content — keep the same sign for both directions.
   const scroll = (dir: 1 | -1) => {
     const el = ref.current;
     if (!el) return;
     el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
   };
   if (films.length === 0) return null;
+
+  // Arrow glyphs: in LTR prev=‹ next=›; in RTL prev=› next=‹ so they point
+  // toward the start/end of the reading direction.
+  const prevPath = rtl ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6";
+  const nextPath = rtl ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6";
+  const prevLabel = rtl ? "قبلی" : "Previous";
+  const nextLabel = rtl ? "بعدی" : "Next";
 
   return (
     <section
@@ -109,18 +120,18 @@ function Rail({
           <button
             type="button"
             onClick={() => scroll(-1)}
-            aria-label="Previous"
+            aria-label={prevLabel}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-cream/10 text-cream/50 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={prevPath} /></svg>
           </button>
           <button
             type="button"
             onClick={() => scroll(1)}
-            aria-label="Next"
+            aria-label={nextLabel}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-cream/10 text-cream/50 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={nextPath} /></svg>
           </button>
         </div>
       </div>
