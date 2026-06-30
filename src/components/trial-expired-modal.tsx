@@ -10,14 +10,15 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md rounded-2xl border border-cream/10 bg-bg-1 p-8 shadow-2xl"
+        className="relative w-full max-w-md rounded-2xl border border-cream/10 bg-bg-1 p-8 pt-14 shadow-2xl"
+        dir={fa ? "rtl" : "ltr"}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-md text-cream/70 hover:text-cream-bright"
+          aria-label={fa ? "بستن" : "Close"}
+          className="absolute top-3 grid h-9 w-9 place-items-center rounded-md text-cream/70 hover:text-cream-bright ltr:right-3 rtl:left-3"
         >
           ✕
         </button>
