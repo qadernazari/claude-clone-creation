@@ -33,7 +33,7 @@ interface Props {
 }
 
 const Email = ({
-  trialDays = 7,
+  trialDays = 90,
   trialEndFormatted = '',
   manageUrl = '#',
   browseUrl = '#',
@@ -100,7 +100,7 @@ export const template = {
   subject: `Your ${SITE_NAME} free trial is active`,
   displayName: 'Trial started',
   previewData: {
-    trialDays: 30,
+    trialDays: 90,
     trialEndFormatted: 'Jun 11, 2026',
     manageUrl: 'https://ir.show/membership',
     browseUrl: 'https://ir.show/browse',
