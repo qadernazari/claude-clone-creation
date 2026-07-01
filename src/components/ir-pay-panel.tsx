@@ -30,7 +30,7 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
     try {
       const callbackUrl = `https://ir.show/api/public/ir-payments/callback?kind=${kind}&itemId=${encodeURIComponent(itemId)}&userId=${encodeURIComponent(user.id)}`;
 
-      const { requestZarinpalPayment } = await import("@/lib/ir-payments.client");
+      const { requestZarinpalPayment } = await import("@/lib/ir-payments-browser");
       const result = await requestZarinpalPayment({
         amountToman,
         kind,
