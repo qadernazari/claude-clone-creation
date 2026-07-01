@@ -97,31 +97,25 @@ export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: I
           </p>
         )}
 
-        {user && amountToman && amountToman >= 1000 ? (
-          <a
-            href={buildZarinpalPaymentUrl({ amountToman, kind, itemId, userId: user.id })}
-            target="_self"
-            rel="noreferrer"
-            className="mt-5 w-full block rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
-          >
-            {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
-          </a>
-        ) : !user ? (
-          <a
-            href="/auth"
-            className="mt-5 w-full block rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
-          >
-            {fa ? "ورود برای پرداخت" : "Sign in to pay"}
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="mt-5 w-full rounded-md bg-amber/50 px-5 py-3 text-sm font-semibold text-bg-0 cursor-not-allowed"
-          >
-            {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
-          </button>
+        {error && (
+          <p className="mt-3 text-xs text-red-400" role="alert">
+            {error}
+          </p>
         )}
+
+        <button
+          type="button"
+          onClick={handlePay}
+          disabled={loading || !amountToman || amountToman < 1000}
+          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center disabled:cursor-not-allowed disabled:bg-amber/50"
+        >
+          {loading
+            ? fa ? "در حال انتقال…" : "Redirecting…"
+            : !user
+              ? fa ? "ورود برای پرداخت" : "Sign in to pay"
+              : fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
+        </button>
+
 
         <Link
           to="/account"
