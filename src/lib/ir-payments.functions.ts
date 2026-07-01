@@ -75,6 +75,7 @@ export const createIrCheckout = createServerFn({ method: "POST" })
   });
 
 export const verifyIrCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: { authority: string; amountToman: number }) => data)
   .handler(async ({ data }): Promise<{ success: boolean; refId?: string; error?: string }> => {
     const merchantId = process.env.ZARINPAL_MERCHANT_ID;
