@@ -24,8 +24,7 @@ export const createIrCheckout = createServerFn({ method: "POST" })
     const merchantId = process.env.ZARINPAL_MERCHANT_ID;
     if (!merchantId) return { error: "Gateway not configured" };
 
-    const origin = process.env.PUBLIC_SITE_ORIGIN || "https://www.ir.show";
-    const callbackUrl = new URL("/api/public/ir-payments/callback", origin);
+    const callbackUrl = new URL("https://ir.show/api/public/ir-payments/callback");
     callbackUrl.searchParams.set("kind", data.kind);
     callbackUrl.searchParams.set("itemId", data.itemId);
     callbackUrl.searchParams.set("userId", userId);
