@@ -16,12 +16,14 @@ interface IrPayPanelProps {
 export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { user } = useAuthState();
-
-  const canPay = typeof amountToman === "number" && amountToman >= 1000 && !!user;
+  const user = useCurrentUser();
 
   const handlePay = () => {
-    if (!canPay || !amountToman || !user) return;
+    if (!amountToman || amountToman < 1000) return;
+    if (!user) {
+      window.location.href = "/auth";
+      return;
+    }
     const url = buildZarinpalPaymentUrl({
       amountToman,
       kind,
