@@ -5,9 +5,6 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
 import { IrPayPanel } from "@/components/ir-pay-panel";
-import { useIrMode } from "@/hooks/use-ir-mode";
-import { loadCmsKey } from "@/lib/cms-client";
-
 import { useLocale } from "@/lib/i18n";
 import { getPlan, tomanPriceForPlan, type MembershipPlanId } from "@/lib/membership-plans";
 
