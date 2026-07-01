@@ -4,9 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
 
-const ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json";
+// Route through Hetzner proxy (api.ir.show) because Cloudflare Workers
+// cannot reach api.zarinpal.com directly (HTTP 522 timeout).
+// Hetzner (Germany) reaches ZarinPal fine.
+const ZARINPAL_REQUEST_URL = "https://api.ir.show/zarinpal/pg/v4/payment/request.json";
 const ZARINPAL_STARTPAY_URL = "https://www.zarinpal.com/pg/StartPay/";
-const ZARINPAL_VERIFY_URL = "https://api.zarinpal.com/pg/v4/payment/verify.json";
+const ZARINPAL_VERIFY_URL = "https://api.ir.show/zarinpal/pg/v4/payment/verify.json";
+
 
 const inputSchema = z.object({
   kind: z.enum(["membership", "ticket", "contribution"]),
@@ -100,7 +104,7 @@ export const createIrCheckout = createServerFn({ method: "POST" })
         amountToman: data.amountToman,
         callbackUrl,
       });
-      return { error: `خطا در اتصال به درگاه پرداخت: ${msg}` };
+      return { error: "خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید." };
     }
 
   });

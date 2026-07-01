@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
             return Response.redirect(failureUrl.toString(), 302);
           }
 
-          const verifyRes = await fetch("https://api.zarinpal.com/pg/v4/payment/verify.json", {
+          const verifyRes = await fetch("https://api.ir.show/zarinpal/pg/v4/payment/verify.json", {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({
