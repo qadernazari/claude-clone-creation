@@ -30,7 +30,7 @@ const SECTIONS_EN: { title: string; body: React.ReactNode }[] = [
     body: (
       <p>
         ir.show is a video streaming platform featuring Iranian cinema — original documentaries,
-        short films, and curated collections. Content is available in English and Persian (فارسی).
+        short films, and curated collections. Content is available with English and/or Persian (فارسی) subtitles, depending on the film.
       </p>
     ),
   },
@@ -224,7 +224,7 @@ const SECTIONS_FA: { body: React.ReactNode }[] = [
     body: (
       <p>
         ir.show یک پلتفرم پخش ویدیو با محوریت سینمای ایران است — مستندهای اصلی، فیلم‌های کوتاه و
-        مجموعه‌های گزینش‌شده. محتوا به دو زبان فارسی و انگلیسی در دسترس است.
+        مجموعه‌های گزینش‌شده. محتوا با زیرنویس فارسی و/یا انگلیسی، بسته به هر فیلم، در دسترس است.
       </p>
     ),
   },
@@ -252,10 +252,9 @@ const SECTIONS_FA: { body: React.ReactNode }[] = [
           می‌شود. قبل از انقضا، ایمیل یادآوری دریافت خواهید کرد.
         </p>
         <p>
-          قیمت‌ها به دلار آمریکا نمایش داده می‌شوند. ممکن است بانک شما کارمزد تبدیل ارز اعمال کند
-          — ما مسئول آن نیستیم.
+          قیمت‌ها به تومان نمایش داده می‌شوند. پرداخت از طریق درگاه ایرانی زرین‌پال انجام می‌شود.
         </p>
-        <p>پرداخت‌ها به‌صورت امن توسط Stripe پردازش می‌شوند. اطلاعات کارت شما ذخیره نمی‌شود.</p>
+        <p>پرداخت‌ها به‌صورت امن توسط زرین‌پال پردازش می‌شوند. اطلاعات کارت شما ذخیره نمی‌شود.</p>
       </>
     ),
   },

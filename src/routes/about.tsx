@@ -10,13 +10,13 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "IRAN is a streaming platform for Iranian cinema. Original documentaries, curated short films, in English and Persian.",
+          "IRAN is a streaming platform for Iranian cinema. Original documentaries, curated short films, with English and/or Persian subtitles.",
       },
       { property: "og:title", content: "About — IRAN" },
       {
         property: "og:description",
         content:
-          "IRAN is a streaming platform for Iranian cinema. Original documentaries, curated short films, in English and Persian.",
+          "IRAN is a streaming platform for Iranian cinema. Original documentaries, curated short films, with English and/or Persian subtitles.",
       },
       { property: "og:url", content: "https://ir.show/about" },
       { property: "og:type", content: "website" },
@@ -35,8 +35,8 @@ const SECTIONS: Section[] = [
   {
     heading: { en: "What we are", fa: "ما چه هستیم" },
     body: {
-      en: "IRAN is a streaming platform dedicated entirely to Iranian cinema. We commission original documentaries, curate short films, and bring the voices of Iranian filmmakers to audiences everywhere — in English and Persian.",
-      fa: "ایران تنها پلتفرم پخش اختصاصی سینمای ایران است. ما مستند اصیل می‌سازیم، فیلم کوتاه گزینش می‌کنیم و صدای فیلم‌سازان ایرانی را به مخاطبان جهانی می‌رسانیم — به فارسی و انگلیسی.",
+      en: "IRAN is a streaming platform dedicated entirely to Iranian cinema. We commission original documentaries, curate short films, and bring the voices of Iranian filmmakers to audiences everywhere — with English and/or Persian subtitles, depending on the film.",
+      fa: "ایران تنها پلتفرم پخش اختصاصی سینمای ایران است. ما مستند اصیل می‌سازیم، فیلم کوتاه گزینش می‌کنیم و صدای فیلم‌سازان ایرانی را به مخاطبان جهانی می‌رسانیم — با زیرنویس فارسی و/یا انگلیسی، بسته به هر فیلم.",
     },
   },
   {

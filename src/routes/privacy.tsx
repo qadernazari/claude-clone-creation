@@ -80,6 +80,9 @@ const SECTIONS_EN: { title: string; body: React.ReactNode }[] = [
             <strong className="text-cream">Stripe</strong> — payment processing (stripe.com/privacy)
           </li>
           <li>
+            <strong className="text-cream">ZarinPal</strong> — Iranian payment processing for Iran-region users (zarinpal.com/policies/privacy)
+          </li>
+          <li>
             <strong className="text-cream">Supabase</strong> — database and file storage, hosted on
             AWS (supabase.com/privacy)
           </li>
@@ -219,7 +222,7 @@ const SECTIONS_FA: { body: React.ReactNode }[] = [
         </p>
         <p>
           <strong className="text-cream font-semibold">اطلاعات پرداخت</strong> — پرداخت‌ها توسط
-          Stripe پردازش می‌شوند. شماره کارت شما هرگز ذخیره نمی‌شود. تنها شناسه تراکنش و کشور
+          زرین‌پال پردازش می‌شوند. شماره کارت شما هرگز ذخیره نمی‌شود. تنها شناسه تراکنش و کشور
           صورت‌حساب را دریافت می‌کنیم.
         </p>
         <p>
@@ -262,8 +265,8 @@ const SECTIONS_FA: { body: React.ReactNode }[] = [
         <p>اطلاعات را تنها با موارد زیر به اشتراک می‌گذاریم:</p>
         <ul className="list-disc space-y-2 pr-5 text-cream/65 marker:text-amber/60">
           <li>
-            <strong className="text-cream font-semibold">Stripe</strong> — پردازش پرداخت
-            (stripe.com/privacy)
+            <strong className="text-cream font-semibold">زرین‌پال</strong> — پردازش پرداخت ایرانی
+            (zarinpal.com)
           </li>
           <li>
             <strong className="text-cream font-semibold">Supabase</strong> — پایگاه داده و
