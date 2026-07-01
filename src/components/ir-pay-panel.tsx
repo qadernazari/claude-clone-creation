@@ -1,7 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { Link, useServerFn } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-subscription";
-import { buildZarinpalPaymentUrl } from "@/lib/ir-payments-browser";
+import { createIrCheckout } from "@/lib/ir-payments.functions";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
 
@@ -13,10 +14,39 @@ interface IrPayPanelProps {
   onClose: () => void;
 }
 
-export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelProps) {
+export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const user = useCurrentUser();
+  const createCheckout = useServerFn(createIrCheckout);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handlePay = async () => {
+    if (!user) {
+      window.location.href = "/auth";
+      return;
+    }
+    if (!amountToman || amountToman < 1000) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await createCheckout({
+        data: { kind, itemId, amountToman, couponCode },
+      });
+      if ("url" in result) {
+        window.location.href = result.url;
+      } else {
+        setError(result.error);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("[IrPayPanel] createCheckout failed", err);
+      setError(fa ? "خطای غیرمنتظره رخ داد." : "Unexpected error.");
+      setLoading(false);
+    }
+  };
+
 
 
   return (
