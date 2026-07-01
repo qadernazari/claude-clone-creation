@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-subscription";
-import { buildZarinpalPaymentUrl } from "@/lib/ir-payments-browser";
+import { createIrCheckout } from "@/lib/ir-payments.functions";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
 
@@ -13,10 +15,39 @@ interface IrPayPanelProps {
   onClose: () => void;
 }
 
-export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelProps) {
+export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
   const user = useCurrentUser();
+  const createCheckout = useServerFn(createIrCheckout);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handlePay = async () => {
+    if (!user) {
+      window.location.href = "/auth";
+      return;
+    }
+    if (!amountToman || amountToman < 1000) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await createCheckout({
+        data: { kind, itemId, amountToman, couponCode },
+      });
+      if ("url" in result) {
+        window.location.href = result.url;
+      } else {
+        setError(result.error);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("[IrPayPanel] createCheckout failed", err);
+      setError(fa ? "خطای غیرمنتظره رخ داد." : "Unexpected error.");
+      setLoading(false);
+    }
+  };
+
 
 
   return (
@@ -66,31 +97,25 @@ export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelPro
           </p>
         )}
 
-        {user && amountToman && amountToman >= 1000 ? (
-          <a
-            href={buildZarinpalPaymentUrl({ amountToman, kind, itemId, userId: user.id })}
-            target="_self"
-            rel="noreferrer"
-            className="mt-5 w-full block rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
-          >
-            {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
-          </a>
-        ) : !user ? (
-          <a
-            href="/auth"
-            className="mt-5 w-full block rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
-          >
-            {fa ? "ورود برای پرداخت" : "Sign in to pay"}
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="mt-5 w-full rounded-md bg-amber/50 px-5 py-3 text-sm font-semibold text-bg-0 cursor-not-allowed"
-          >
-            {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
-          </button>
+        {error && (
+          <p className="mt-3 text-xs text-red-400" role="alert">
+            {error}
+          </p>
         )}
+
+        <button
+          type="button"
+          onClick={handlePay}
+          disabled={loading || !amountToman || amountToman < 1000}
+          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center disabled:cursor-not-allowed disabled:bg-amber/50"
+        >
+          {loading
+            ? fa ? "در حال انتقال…" : "Redirecting…"
+            : !user
+              ? fa ? "ورود برای پرداخت" : "Sign in to pay"
+              : fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
+        </button>
+
 
         <Link
           to="/account"
