@@ -100,16 +100,20 @@
   --input: var(--line);
   --ring: var(--amber);
 
-  --font-display: "Space Grotesk", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "DM Sans", "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-fa: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
-  --font-editorial: "Fraunces", "Vazirmatn", ui-serif, Georgia, serif;
+  /* Persian fallback stack: Tahoma ships on Windows/Android and renders
+     Persian perfectly, so users in Iran on slow connections see readable
+     text instantly while Vazirmatn loads in the background. */
+  --font-display: "Space Grotesk", "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-fa: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-vazir: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-editorial: "Fraunces", "Vazirmatn Variable", "Vazirmatn", "Tahoma", ui-serif, Georgia, serif;
 }
 
 /* Persian: swap to Vazirmatn for both display and body */
 [lang="fa"], [dir="rtl"] {
-  --font-display: "Vazirmatn", ui-sans-serif, sans-serif;
-  --font-body: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, sans-serif;
+  --font-body: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
