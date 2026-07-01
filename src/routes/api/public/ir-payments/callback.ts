@@ -83,7 +83,6 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
               user_id: userId,
               status: "active",
               environment: "live",
-              currency: "IRT",
               amount_toman: pending.amount_toman,
               ref_id: refId,
               authority,
