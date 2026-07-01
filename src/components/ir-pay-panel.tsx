@@ -83,7 +83,7 @@ export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelPro
         <button
           type="button"
           onClick={handlePay}
-          disabled={!canPay}
+          disabled={!amountToman || amountToman < 1000}
           className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
