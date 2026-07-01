@@ -222,7 +222,12 @@ function RootShell({ children }: { children: ReactNode }) {
             <style
               dangerouslySetInnerHTML={{
                 __html:
-                  `@font-face{font-family:'Vazirmatn';font-style:normal;font-display:swap;font-weight:100 900;` +
+                  // font-display: optional — browser uses the fallback
+                  // (Tahoma/Arial) immediately and only swaps in Vazirmatn
+                  // if it arrives within the first ~100ms. Iranian users
+                  // on slow links to the Cloudflare edge never wait on
+                  // this font, and the page renders instantly.
+                  `@font-face{font-family:'Vazirmatn';font-style:normal;font-display:optional;font-weight:100 900;` +
                   `src:url(${vazirArabicUrl}) format('woff2-variations');` +
                   `unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC;}`,
               }}
@@ -237,9 +242,9 @@ function RootShell({ children }: { children: ReactNode }) {
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
               (locale === "fa"
                 ? ""
-                : `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
+                 : `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
                     "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=optional",
-                  )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`),
+                  )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);setTimeout(function(){if(l.media!=='all'){try{l.remove();}catch(e){}}},3000);}catch(e){}`),
           }}
         />
 
