@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
-import { createIrCheckout, type IrCheckoutKind } from "@/lib/ir-payments.functions";
+import { useAuthState } from "@/lib/auth-context";
+import { requestZarinpalPayment } from "@/lib/ir-payments.client";
+import { recordIrPaymentRequest } from "@/lib/ir-payments.functions";
+
+export type IrCheckoutKind = "membership" | "ticket" | "contribution";
 
 interface IrPayPanelProps {
   kind: IrCheckoutKind;
@@ -14,29 +18,49 @@ interface IrPayPanelProps {
 export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
+  const { user } = useAuthState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canPay = typeof amountToman === "number" && amountToman >= 1000;
+  const canPay = typeof amountToman === "number" && amountToman >= 1000 && !!user;
 
   const handlePay = async () => {
-    if (!canPay || !amountToman) return;
+    if (!canPay || !amountToman || !user) return;
     setLoading(true);
     setError(null);
     try {
-      const result = await createIrCheckout({
+      const callbackUrl = `https://ir.show/api/public/ir-payments/callback?kind=${kind}&itemId=${encodeURIComponent(itemId)}&userId=${encodeURIComponent(user.id)}`;
+
+      const result = await requestZarinpalPayment({
+        amountToman,
+        kind,
+        itemId,
+        userId: user.id,
+        callbackUrl,
+      });
+
+      if ("error" in result) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
+
+      // Persist pending request server-side so the callback can verify it.
+      const recorded = await recordIrPaymentRequest({
         data: {
+          authority: result.authority,
           kind,
           itemId,
           amountToman,
           ...(couponCode ? { couponCode } : {}),
         },
       });
-      if ("error" in result) {
-        setError(result.error);
+      if ("error" in recorded) {
+        setError(recorded.error);
         setLoading(false);
         return;
       }
+
       window.location.href = result.redirectUrl;
     } catch (err) {
       console.error("[IrPayPanel] payment error", err);
@@ -92,7 +116,11 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
           </p>
         ) : (
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
-            {fa
+            {!user
+              ? fa
+                ? "برای پرداخت ابتدا وارد حساب کاربری شوید."
+                : "Please sign in to continue."
+              : fa
               ? "مبلغ در دسترس نیست. لطفاً دوباره تلاش کنید."
               : "Amount unavailable. Please try again."}
           </p>
