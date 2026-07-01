@@ -20,6 +20,12 @@ export const createIrCheckout = createServerFn({ method: "POST" })
   .inputValidator((data: z.infer<typeof inputSchema>) => inputSchema.parse(data))
   .handler(async ({ data, context }): Promise<{ redirectUrl: string } | { error: string }> => {
     const merchantId = process.env.ZARINPAL_MERCHANT_ID;
+    console.log("[ZarinPal createIrCheckout] start", {
+      merchantIdMasked: merchantId ? `${merchantId.slice(0, 8)}...` : "MISSING",
+      kind: data.kind,
+      itemId: data.itemId,
+      amountToman: data.amountToman,
+    });
     if (!merchantId) {
       return { error: "درگاه پرداخت پیکربندی نشده است." };
     }
@@ -79,7 +85,13 @@ export const createIrCheckout = createServerFn({ method: "POST" })
       const errMsg = errObj?.message ?? `ZarinPal error code: ${json.data?.code ?? "unknown"}`;
       return { error: errMsg };
     } catch (err) {
-      console.error("[ZarinPal createIrCheckout error]", err);
+      console.error("[ZarinPal createIrCheckout error]", {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        merchantIdMasked: merchantId ? `${merchantId.slice(0, 8)}...` : "MISSING",
+        amountToman: data.amountToman,
+        callbackUrl,
+      });
       return { error: "خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید." };
     }
   });
