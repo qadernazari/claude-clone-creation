@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
-import type { IrCheckoutKind } from "@/lib/ir-payments.functions";
+import { createIrCheckout, type IrCheckoutKind } from "@/lib/ir-payments.functions";
 
 interface IrPayPanelProps {
   kind: IrCheckoutKind;
@@ -10,21 +11,39 @@ interface IrPayPanelProps {
   onClose: () => void;
 }
 
-/**
- * Iranian gateway checkout panel — replaces the Stripe embedded checkout
- * when the visitor is on the Iran mirror.
- *
- * Until an Iranian gateway (ZarinPal) is wired up, this shows a friendly
- * coming-soon message with a contact link instead of a broken payment stub.
- */
 export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  void kind;
-  void itemId;
-  void amountToman;
-  void couponCode;
+  const canPay = typeof amountToman === "number" && amountToman >= 1000;
+
+  const handlePay = async () => {
+    if (!canPay || !amountToman) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await createIrCheckout({
+        data: {
+          kind,
+          itemId,
+          amountToman,
+          ...(couponCode ? { couponCode } : {}),
+        },
+      });
+      if ("error" in result) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
+      window.location.href = result.redirectUrl;
+    } catch (err) {
+      console.error("[IrPayPanel] payment error", err);
+      setError(fa ? "خطا در اتصال به درگاه پرداخت." : "Payment gateway error.");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 sm:p-8" dir={fa ? "rtl" : "ltr"}>
@@ -53,8 +72,8 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
           </svg>
         </div>
 
-        <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-amber/90">
-          {fa ? "درگاه ایرانی" : "ZarinPal"}
+        <span className="mt-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-amber/90">
+          {fa ? "درگاه ایرانی — زرین‌پال" : "ZarinPal"}
         </span>
         <div
           className="mt-2 h-[2px] w-16 rounded-full"
@@ -62,33 +81,57 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
           aria-hidden="true"
         />
         <h2 className={`mt-2 text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
-          {fa ? "تقریباً آماده است" : "Almost ready"}
+          {fa ? "پرداخت با کارت ایرانی" : "Pay with Iranian card"}
         </h2>
 
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
-          {fa
-            ? "درگاه پرداخت ایرانی (زرین‌پال) به‌زودی فعال می‌شود. تا آن زمان می‌توانید از دوره آزمایشی ۳۰ روزه رایگان استفاده کنید."
-            : "Our Iranian payment gateway (ZarinPal) is launching soon. In the meantime, start your free 30-day trial — no payment needed."}
-        </p>
+        {canPay ? (
+          <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
+            {fa
+              ? `مبلغ قابل پرداخت: ${amountToman!.toLocaleString("fa-IR")} تومان`
+              : `Amount: ${amountToman!.toLocaleString("en-US")} Toman`}
+          </p>
+        ) : (
+          <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
+            {fa
+              ? "مبلغ در دسترس نیست. لطفاً دوباره تلاش کنید."
+              : "Amount unavailable. Please try again."}
+          </p>
+        )}
+
+        {error && (
+          <p className="mt-3 max-w-sm text-sm text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={handlePay}
+          disabled={!canPay || loading}
+          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <span className="h-4 w-4 rounded-full border-2 border-bg-0/30 border-t-bg-0 animate-spin" aria-hidden="true" />
+              {fa ? "در حال اتصال…" : "Connecting…"}
+            </>
+          ) : (
+            fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"
+          )}
+        </button>
+
         <Link
           to="/account"
           onClick={onClose}
-          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
+          className="mt-3 text-xs text-cream/60 hover:text-cream transition-colors"
         >
-          {fa ? "شروع آزمایش رایگان" : "Start free trial instead"}
+          {fa ? "یا شروع دوره آزمایشی ۳۰ روزه رایگان" : "Or start 30-day free trial"}
         </Link>
-
-        <a
-          href="mailto:hello@ir.show?subject=Notify%20me%20—%20Iranian%20payment"
-          className="mt-3 inline-flex items-center gap-2 rounded-md border border-cream/20 px-4 py-2 text-xs text-cream/70 hover:text-cream hover:border-cream/40 transition-colors"
-        >
-          {fa ? "وقتی آماده شد خبرم کن" : "Notify me when ready"}
-        </a>
 
         <button
           type="button"
           onClick={onClose}
-          className="mt-4 rounded-md px-5 py-2 text-xs text-cream/60 hover:text-cream transition-colors"
+          className="mt-3 rounded-md px-5 py-2 text-xs text-cream/60 hover:text-cream transition-colors"
         >
           {fa ? "بستن" : "Close"}
         </button>
