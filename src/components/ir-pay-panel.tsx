@@ -122,7 +122,7 @@ export function IrPayPanel({ kind, itemId, amountToman, couponCode, onClose }: I
           onClick={onClose}
           className="mt-3 text-xs text-cream/60 hover:text-cream transition-colors"
         >
-          {fa ? "یا شروع دوره آزمایشی ۳۰ روزه رایگان" : "Or start 30-day free trial"}
+          {fa ? "یا شروع دوره آزمایشی ۹۰ روزه رایگان" : "Or start 90-day free trial"}
         </Link>
 
         <button
