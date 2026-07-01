@@ -66,19 +66,30 @@ export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelPro
           </p>
         )}
 
-        <button
-          type="button"
-          onClick={handlePay}
-          disabled={!amountToman || amountToman < 1000}
-          className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
-        </button>
-
-        {!user && (
-          <p className="mt-2 text-xs text-cream/60">
-            {fa ? "برای پرداخت ابتدا وارد شوید." : "Please sign in to continue."}
-          </p>
+        {user && amountToman && amountToman >= 1000 ? (
+          <a
+            href={buildZarinpalPaymentUrl({ amountToman, kind, itemId, userId: user.id })}
+            target="_self"
+            rel="noreferrer"
+            className="mt-5 w-full block rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
+          >
+            {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
+          </a>
+        ) : !user ? (
+          <a
+            href="/auth"
+            className="mt-5 w-full block rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors text-center"
+          >
+            {fa ? "ورود برای پرداخت" : "Sign in to pay"}
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="mt-5 w-full rounded-md bg-amber/50 px-5 py-3 text-sm font-semibold text-bg-0 cursor-not-allowed"
+          >
+            {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
+          </button>
         )}
 
         <Link
