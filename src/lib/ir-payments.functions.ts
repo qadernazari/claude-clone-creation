@@ -43,6 +43,11 @@ export const createIrCheckout = createServerFn({ method: "POST" })
         : "حمایت از ایران";
 
     try {
+      console.log("[ZarinPal] about to fetch", ZARINPAL_REQUEST_URL, {
+        merchantId: merchantId.slice(0, 8) + "...",
+        amountToman,
+        callbackUrl,
+      });
       const res = await fetch(ZARINPAL_REQUEST_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -60,6 +65,7 @@ export const createIrCheckout = createServerFn({ method: "POST" })
           },
         }),
       });
+
 
       const json = (await res.json()) as {
         data?: { code: number; authority: string; fee_type: string; fee: number };
