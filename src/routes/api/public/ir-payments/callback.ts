@@ -7,21 +7,14 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
         const url = new URL(request.url);
         const status = url.searchParams.get("Status");
         const authority = url.searchParams.get("Authority");
-        const kind = url.searchParams.get("kind") as
-          | "membership"
-          | "ticket"
-          | "contribution"
-          | null;
-        const itemId = url.searchParams.get("itemId");
-        const userId = url.searchParams.get("userId");
 
         const failureUrl = new URL("https://ir.show/account");
         failureUrl.searchParams.set("ir_payment", "failed");
 
-
-        if (status !== "OK" || !authority || !kind || !itemId || !userId) {
+        if (status !== "OK" || !authority) {
           return Response.redirect(failureUrl.toString(), 302);
         }
+
 
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
