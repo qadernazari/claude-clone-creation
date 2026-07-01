@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useServerFn } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useLocale } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { createIrCheckout } from "@/lib/ir-payments.functions";
