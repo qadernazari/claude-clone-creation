@@ -5,6 +5,7 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
 import { IrPayPanel } from "@/components/ir-pay-panel";
+import { useIrMode } from "@/hooks/use-ir-mode";
 import { useLocale } from "@/lib/i18n";
 import { getPlan, tomanPriceForPlan, type MembershipPlanId } from "@/lib/membership-plans";
 
@@ -20,15 +21,7 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
   const irMode = useIrMode();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
   const [started, setStarted] = useState(false);
-  const [baseToman, setBaseToman] = useState<number | undefined>(undefined);
   const plan = getPlan(planId);
-
-  useEffect(() => {
-    if (!irMode) return;
-    loadCmsKey<{ membershipPriceToman?: number }>("general_settings").then((d) => {
-      if (d?.membershipPriceToman) setBaseToman(d.membershipPriceToman);
-    });
-  }, [irMode]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -52,7 +45,7 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
 
   const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
-  const planAmountToman = baseToman ? tomanPriceForPlan(plan, baseToman) : undefined;
+  const planAmountToman = tomanPriceForPlan(plan);
   const monthsLabel = fa
     ? plan.months === 1 ? "یک ماه" : `${plan.months} ماه`
     : `${plan.months} ${plan.months === 1 ? "Month" : "Months"}`;
