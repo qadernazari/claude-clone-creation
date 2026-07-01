@@ -827,12 +827,12 @@ export type Database = {
           environment: string
           id: string
           ir_gateway: string | null
-          price_id: string
-          product_id: string
+          price_id: string | null
+          product_id: string | null
           ref_id: string | null
           status: string
-          stripe_customer_id: string
-          stripe_subscription_id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           trial_end: string | null
           updated_at: string
           user_id: string
@@ -847,12 +847,12 @@ export type Database = {
           environment?: string
           id?: string
           ir_gateway?: string | null
-          price_id: string
-          product_id: string
+          price_id?: string | null
+          product_id?: string | null
           ref_id?: string | null
           status?: string
-          stripe_customer_id: string
-          stripe_subscription_id: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_end?: string | null
           updated_at?: string
           user_id: string
@@ -867,12 +867,12 @@ export type Database = {
           environment?: string
           id?: string
           ir_gateway?: string | null
-          price_id?: string
-          product_id?: string
+          price_id?: string | null
+          product_id?: string | null
           ref_id?: string | null
           status?: string
-          stripe_customer_id?: string
-          stripe_subscription_id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_end?: string | null
           updated_at?: string
           user_id?: string
