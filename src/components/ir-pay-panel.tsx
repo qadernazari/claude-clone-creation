@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import { useAuthState } from "@/lib/auth-context";
-import { requestZarinpalPayment } from "@/lib/ir-payments.client";
 import { recordIrPaymentRequest } from "@/lib/ir-payments.functions";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
@@ -31,6 +30,7 @@ export function IrPayPanel({ onClose, kind, itemId, amountToman, couponCode }: I
     try {
       const callbackUrl = `https://ir.show/api/public/ir-payments/callback?kind=${kind}&itemId=${encodeURIComponent(itemId)}&userId=${encodeURIComponent(user.id)}`;
 
+      const { requestZarinpalPayment } = await import("@/lib/ir-payments.client");
       const result = await requestZarinpalPayment({
         amountToman,
         kind,
