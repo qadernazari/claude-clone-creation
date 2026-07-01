@@ -13,7 +13,7 @@ const EN: QA[] = [
   },
   {
     q: "What's included in membership vs. Premium tickets?",
-    a: "Most films stream unlimited with membership. Premium films are sold separately as a 48-hour rental, even for members. Each film page shows which it is.",
+    a: "Most films stream unlimited with membership. Premium films are sold separately as a permanent purchase — yours to watch anytime, forever. Each film page shows which it is.",
   },
   {
     q: "Can I cancel anytime?",
@@ -44,7 +44,7 @@ const FA: QA[] = [
   },
   {
     q: "تفاوت عضویت و بلیت ویژه چیست؟",
-    a: "بیشترِ فیلم‌ها با عضویت به‌صورت نامحدود پخش می‌شوند. آثار ویژه جداگانه به‌صورت اجاره‌ی ۴۸ ساعته فروخته می‌شوند، حتی برای اعضا. صفحه‌ی هر فیلم دقیقاً نشان می‌دهد کدام مورد است.",
+    a: "بیشترِ فیلم‌ها با عضویت به‌صورت نامحدود پخش می‌شوند. آثار ویژه جداگانه به‌صورت خرید دائمی فروخته می‌شوند — برای همیشه در دسترس شما خواهد بود. صفحه‌ی هر فیلم دقیقاً نشان می‌دهد کدام مورد است.",
   },
   {
     q: "آیا می‌توانم هر زمان لغو کنم؟",

@@ -325,7 +325,7 @@ function FilmPage() {
         .select("id, expires_at")
         .eq("film_id", film.id)
         .eq("status", "paid")
-        .gt("expires_at", new Date().toISOString())
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .order("expires_at", { ascending: false })
         .limit(1)
         .maybeSingle();

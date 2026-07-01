@@ -152,7 +152,7 @@ function MembershipPage() {
                   { icon: VolumeX, title: "بدون تبلیغات", desc: "هیچ وقفه‌ای، هرگز." },
                   { icon: RefreshCw, title: "بدون تمدید خودکار", desc: "کنترل کامل با شماست. هر زمان لغو کنید." },
                   { icon: Smartphone, title: "همه‌ی دستگاه‌ها", desc: "روی موبایل، تبلت یا لپ‌تاپ تماشا کنید." },
-                  { icon: Globe, title: "دوزبانه", desc: "هر فیلم به انگلیسی و فارسی." },
+                  { icon: Globe, title: "زیرنویس دوزبانه", desc: "زیرنویس فارسی و/یا انگلیسی، بسته به هر فیلم." },
                 ]
               : [
                   { icon: Film, title: "Full catalog access", desc: "Unlimited films, new originals added regularly." },
@@ -160,7 +160,7 @@ function MembershipPage() {
                   { icon: VolumeX, title: "Ad-free", desc: "No interruptions, ever." },
                   { icon: RefreshCw, title: "No auto-renewal", desc: "You stay in control. Cancel anytime." },
                   { icon: Smartphone, title: "All devices", desc: "Watch on phone, tablet, or laptop." },
-                  { icon: Globe, title: "Bilingual", desc: "Every film in English and Persian." },
+                  { icon: Globe, title: "Bilingual subtitles", desc: "English and/or Persian subtitles, depending on the film." },
                 ]
             ).map((b) => {
               const Icon = b.icon;
