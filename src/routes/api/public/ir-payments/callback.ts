@@ -1,41 +1,107 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// ---------------------------------------------------------------------------
-// Iranian gateway return callback — stub
-// ---------------------------------------------------------------------------
-// Iranian payment gateways (ZarinPal, IDPay, NextPay) redirect the user
-// back here after payment with a status + reference in the query string.
-// This handler will:
-//   1. Verify the reference with the gateway (server-to-server)
-//   2. On success, mark the corresponding tickets/subscriptions/contributions
-//      row as paid using supabaseAdmin
-//   3. Redirect the user to a success/failure page on the site
-//
-// Until a gateway is wired, this just renders a friendly placeholder so
-// admins can confirm the route is reachable from the mirror domain.
-
 export const Route = createFileRoute("/api/public/ir-payments/callback")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const status = url.searchParams.get("Status") ?? url.searchParams.get("status");
-        const authority =
-          url.searchParams.get("Authority") ??
-          url.searchParams.get("trackId") ??
-          url.searchParams.get("order_id");
+        const status = url.searchParams.get("Status");
+        const authority = url.searchParams.get("Authority");
+        const kind = url.searchParams.get("kind") as
+          | "membership"
+          | "ticket"
+          | "contribution"
+          | null;
+        const itemId = url.searchParams.get("itemId");
+        const userId = url.searchParams.get("userId");
 
-        // TODO: verify `authority` with the active gateway, then update DB.
-        // For now, just bounce the user back to /account with the raw result.
-        const target = new URL("/account", url.origin);
-        if (status) target.searchParams.set("ir_payment", status);
-        if (authority) target.searchParams.set("ref", authority);
+        const failureUrl = new URL("/account", url.origin);
+        failureUrl.searchParams.set("ir_payment", "failed");
 
-        return Response.redirect(target.toString(), 302);
+        if (status !== "OK" || !authority || !kind || !itemId || !userId) {
+          return Response.redirect(failureUrl.toString(), 302);
+        }
+
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+          const { data: pending } = await supabaseAdmin
+            .from("ir_payment_requests")
+            .select("*")
+            .eq("authority", authority)
+            .eq("status", "pending")
+            .maybeSingle();
+
+          if (!pending) {
+            return Response.redirect(failureUrl.toString(), 302);
+          }
+
+          const merchantId = process.env.ZARINPAL_MERCHANT_ID;
+          if (!merchantId) {
+            return Response.redirect(failureUrl.toString(), 302);
+          }
+
+          const verifyRes = await fetch("https://api.zarinpal.com/pg/v4/payment/verify.json", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({
+              merchant_id: merchantId,
+              amount: pending.amount_toman,
+              authority,
+            }),
+          });
+
+          const verifyJson = (await verifyRes.json()) as {
+            data?: { code: number; ref_id: number };
+            errors?: { code: number };
+          };
+
+          const verified = verifyJson.data?.code === 100 || verifyJson.data?.code === 101;
+
+          if (!verified) {
+            await supabaseAdmin
+              .from("ir_payment_requests")
+              .update({ status: "failed" })
+              .eq("authority", authority);
+            return Response.redirect(failureUrl.toString(), 302);
+          }
+
+          const refId = String(verifyJson.data!.ref_id);
+
+          await supabaseAdmin
+            .from("ir_payment_requests")
+            .update({ status: "paid", ref_id: refId })
+            .eq("authority", authority);
+
+          if (kind === "membership") {
+            const months = Math.max(1, Math.round(pending.amount_toman / 99_000));
+            const now = new Date();
+            const expiresAt = new Date(now);
+            expiresAt.setMonth(expiresAt.getMonth() + months);
+
+            await supabaseAdmin.from("subscriptions").insert({
+              user_id: userId,
+              status: "active",
+              environment: "live",
+              currency: "IRT",
+              amount_toman: pending.amount_toman,
+              ref_id: refId,
+              authority,
+              ir_gateway: "zarinpal",
+              current_period_end: expiresAt.toISOString(),
+            });
+          }
+
+          const successUrl = new URL("/account", url.origin);
+          successUrl.searchParams.set("ir_payment", "success");
+          successUrl.searchParams.set("ref", refId);
+          return Response.redirect(successUrl.toString(), 302);
+        } catch (err) {
+          console.error("[ZarinPal callback error]", err);
+          return Response.redirect(failureUrl.toString(), 302);
+        }
       },
       POST: async ({ request }) => {
-        // Some gateways POST the webhook server-to-server. Verify signature
-        // here before processing.
         void request;
         return new Response("ok", { status: 200 });
       },
