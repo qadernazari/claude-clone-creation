@@ -18,26 +18,6 @@ export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelPro
   const fa = locale === "fa";
   const user = useCurrentUser();
 
-  const handlePay = () => {
-    if (!amountToman || amountToman < 1000) return;
-    if (!user) {
-      window.location.href = "/auth";
-      return;
-    }
-    const url = buildZarinpalPaymentUrl({
-      amountToman,
-      kind,
-      itemId,
-      userId: user.id,
-    });
-    // Use anchor click to bypass TanStack Router interception
-    const a = document.createElement("a");
-    a.href = url;
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
 
   return (
     <div className="p-6 sm:p-8" dir={fa ? "rtl" : "ltr"}>
