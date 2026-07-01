@@ -79,7 +79,7 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
             expiresAt.setMonth(expiresAt.getMonth() + months);
 
             await supabaseAdmin.from("subscriptions").insert({
-              user_id: userId,
+              user_id: trustedUserId,
               status: "active",
               environment: "live",
               amount_toman: pending.amount_toman,
