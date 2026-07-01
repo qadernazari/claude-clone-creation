@@ -1,5 +1,3 @@
-const MERCHANT_ID = "2952f848-cfec-4ab9-8581-753ef5c42b02";
-
 export function buildZarinpalPaymentUrl({
   amountToman,
   kind,
@@ -28,5 +26,5 @@ export function buildZarinpalPaymentUrl({
     callbackUrl,
   });
 
-  return `https://zarinp.al/${MERCHANT_ID}?${params.toString()}`;
+  return `https://pay.ir.show?${params.toString()}`;
 }
