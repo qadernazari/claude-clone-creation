@@ -91,15 +91,18 @@ export const createIrCheckout = createServerFn({ method: "POST" })
       const errMsg = errObj?.message ?? `ZarinPal error code: ${json.data?.code ?? "unknown"}`;
       return { error: errMsg };
     } catch (err) {
-      console.error("[ZarinPal createIrCheckout error]", {
-        message: err instanceof Error ? err.message : String(err),
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[ZarinPal createIrCheckout FETCH ERROR]", {
+        message: msg,
+        cause: err instanceof Error ? (err as { cause?: unknown }).cause : undefined,
         stack: err instanceof Error ? err.stack : undefined,
         merchantIdMasked: merchantId ? `${merchantId.slice(0, 8)}...` : "MISSING",
         amountToman: data.amountToman,
         callbackUrl,
       });
-      return { error: "خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید." };
+      return { error: `خطا در اتصال به درگاه پرداخت: ${msg}` };
     }
+
   });
 
 export const verifyIrCheckout = createServerFn({ method: "POST" })
