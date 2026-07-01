@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
-import { useAuthState } from "@/lib/auth-context";
+import { useCurrentUser } from "@/hooks/use-subscription";
 import { buildZarinpalPaymentUrl } from "@/lib/ir-payments-browser";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
@@ -16,12 +16,14 @@ interface IrPayPanelProps {
 export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelProps) {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { user } = useAuthState();
-
-  const canPay = typeof amountToman === "number" && amountToman >= 1000 && !!user;
+  const user = useCurrentUser();
 
   const handlePay = () => {
-    if (!canPay || !amountToman || !user) return;
+    if (!amountToman || amountToman < 1000) return;
+    if (!user) {
+      window.location.href = "/auth";
+      return;
+    }
     const url = buildZarinpalPaymentUrl({
       amountToman,
       kind,
@@ -81,7 +83,7 @@ export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelPro
         <button
           type="button"
           onClick={handlePay}
-          disabled={!canPay}
+          disabled={!amountToman || amountToman < 1000}
           className="mt-5 w-full rounded-md bg-amber px-5 py-3 text-sm font-semibold text-bg-0 hover:bg-amber/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {fa ? "پرداخت با زرین‌پال" : "Pay with ZarinPal"}
