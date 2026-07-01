@@ -242,9 +242,9 @@ function RootShell({ children }: { children: ReactNode }) {
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
               (locale === "fa"
                 ? ""
-                : `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
+                 : `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
                     "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=optional",
-                  )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);}catch(e){}`),
+                  )};l.media='print';l.onload=function(){this.media='all';};document.head.appendChild(l);setTimeout(function(){if(l.media!=='all'){try{l.remove();}catch(e){}}},3000);}catch(e){}`),
           }}
         />
 
