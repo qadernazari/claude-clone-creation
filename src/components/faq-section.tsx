@@ -5,11 +5,11 @@ type QA = { q: string; a: string };
 const EN: QA[] = [
   {
     q: "What is IRAN Membership?",
-    a: "A monthly subscription that unlocks our full catalog — originals, documentaries, and curated collections. New titles added regularly. Start with a 30-day free trial.",
+    a: "A monthly subscription that unlocks our full catalog — originals, documentaries, and curated collections. New titles added regularly. Start with a 90-day free trial.",
   },
   {
     q: "How much does it cost? Is there a free trial?",
-    a: "Pricing is shown at checkout in your local currency. New members get a 30-day free trial — no charge during the trial, cancel anytime.",
+    a: "Pricing is shown at checkout in your local currency. New members get a 90-day free trial — no charge during the trial, cancel anytime.",
   },
   {
     q: "What's included in membership vs. Premium tickets?",
@@ -36,11 +36,11 @@ const EN: QA[] = [
 const FA: QA[] = [
   {
     q: "عضویت IRAN چیست؟",
-    a: "عضویتِ ماهانه‌ای که به کلِ کاتالوگ ما — آثار اوریجینال، مستندها و مجموعه‌های منتخب — دسترسی می‌دهد. آثار تازه به‌طور منظم اضافه می‌شود. با ۳۰ روز آزمایش رایگان شروع کنید.",
+    a: "عضویتِ ماهانه‌ای که به کلِ کاتالوگ ما — آثار اوریجینال، مستندها و مجموعه‌های منتخب — دسترسی می‌دهد. آثار تازه به‌طور منظم اضافه می‌شود. با ۹۰ روز آزمایش رایگان شروع کنید.",
   },
   {
     q: "هزینه چقدر است؟ آزمایش رایگان وجود دارد؟",
-    a: "قیمت هنگام پرداخت به ارز محلی شما نشان داده می‌شود. اعضای جدید ۳۰ روز آزمایش رایگان دارند — در این مدت مبلغی برداشت نمی‌شود و هر زمان می‌توانید لغو کنید.",
+    a: "قیمت هنگام پرداخت به ارز محلی شما نشان داده می‌شود. اعضای جدید ۹۰ روز آزمایش رایگان دارند — در این مدت مبلغی برداشت نمی‌شود و هر زمان می‌توانید لغو کنید.",
   },
   {
     q: "تفاوت عضویت و بلیت ویژه چیست؟",

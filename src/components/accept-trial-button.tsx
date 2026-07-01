@@ -15,7 +15,7 @@ interface Props {
 /**
  * Universal "Accept Free Trial" CTA.
  * - Signed out: links to /auth
- * - Signed in: activates the 30-day trial instantly (no credit card)
+ * - Signed in: activates the 90-day trial instantly (no credit card)
  */
 export function AcceptTrialButton({ className, label, fullWidth }: Props) {
   const { locale } = useLocale();

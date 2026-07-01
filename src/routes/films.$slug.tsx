@@ -386,7 +386,7 @@ function FilmPage() {
   const t = {
     buy: fa ? "خرید بلیط" : "Buy ticket",
     watch: fa ? "تماشای فیلم" : "Watch now",
-    startTrial: fa ? "شروع رایگان ۳۰ روزه" : "Accept Free Trial",
+    startTrial: fa ? "شروع رایگان ۹۰ روزه" : "Accept Free Trial",
     becomeMember: fa ? "عضو شوید" : "Become a Member",
     contribute: fa ? "حمایت می‌کنم" : "Contribute",
     signinToBuy: fa ? "ورود برای خرید بلیط" : "Sign in to buy a ticket",
@@ -395,8 +395,8 @@ function FilmPage() {
       ? "مالکیت دائمی — همیشه در حساب شما"
       : "Yours forever — saved to your account",
     membershipNote: fa
-      ? "۳۰ روز رایگان تماشا کنید — سپس از ماهی ۷٫۹۹ دلار"
-      : "Stream free for 30 days — then from $7.99/month",
+      ? "۹۰ روز رایگان تماشا کنید — سپس از ماهی ۷٫۹۹ دلار"
+      : "Stream free for 90 days — then from $7.99/month",
     memberIncluded: fa ? "شامل عضویت شماست" : "Included in your membership",
     premiumNote: fa
       ? "این اثر ویژه و خارج از عضویت است"
@@ -992,7 +992,7 @@ function FilmPage() {
               <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
                 {hasUsedTrial
                   ? (fa ? "عضویت خود را فعال کنید" : "Activate your membership")
-                  : (fa ? "۳۰ روز رایگان امتحان کنید" : "Start with 30 days free")}
+                  : (fa ? "۹۰ روز رایگان امتحان کنید" : "Start with 90 days free")}
               </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-cream/65">
                 {hasUsedTrial

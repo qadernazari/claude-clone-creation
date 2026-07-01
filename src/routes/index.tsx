@@ -126,7 +126,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "A premium streaming destination for Iranian cinema. Originals, award-winners, documentaries, and curated collections. 30-day free trial.",
+          "A premium streaming destination for Iranian cinema. Originals, award-winners, documentaries, and curated collections. 90-day free trial.",
       },
       { property: "og:title", content: "ir.show — Home of Iranian cinema" },
       {
