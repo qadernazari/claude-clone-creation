@@ -30,10 +30,15 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
             return Response.redirect(failureUrl.toString(), 302);
           }
 
+          const trustedUserId = pending.user_id;
+          const kind = pending.kind;
+          const itemId = pending.item_id;
+
           const merchantId = process.env.ZARINPAL_MERCHANT_ID;
           if (!merchantId) {
             return Response.redirect(failureUrl.toString(), 302);
           }
+
 
           const verifyRes = await fetch("https://api.ir.show/zarinpal/pg/v4/payment/verify.json", {
             method: "POST",
