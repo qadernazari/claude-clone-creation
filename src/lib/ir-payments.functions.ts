@@ -20,6 +20,12 @@ export const createIrCheckout = createServerFn({ method: "POST" })
   .inputValidator((data: z.infer<typeof inputSchema>) => inputSchema.parse(data))
   .handler(async ({ data, context }): Promise<{ redirectUrl: string } | { error: string }> => {
     const merchantId = process.env.ZARINPAL_MERCHANT_ID;
+    console.log("[ZarinPal createIrCheckout] start", {
+      merchantIdMasked: merchantId ? `${merchantId.slice(0, 8)}...` : "MISSING",
+      kind: data.kind,
+      itemId: data.itemId,
+      amountToman: data.amountToman,
+    });
     if (!merchantId) {
       return { error: "درگاه پرداخت پیکربندی نشده است." };
     }
