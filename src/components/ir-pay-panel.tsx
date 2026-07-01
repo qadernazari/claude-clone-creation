@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
-import { useAuthState } from "@/lib/auth-context";
+import { useCurrentUser } from "@/hooks/use-subscription";
 import { buildZarinpalPaymentUrl } from "@/lib/ir-payments-browser";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
