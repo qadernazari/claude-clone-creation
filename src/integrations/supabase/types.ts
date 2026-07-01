@@ -585,6 +585,48 @@ export type Database = {
           },
         ]
       }
+      ir_payment_requests: {
+        Row: {
+          amount_toman: number
+          authority: string
+          coupon_code: string | null
+          created_at: string
+          id: string
+          item_id: string
+          kind: string
+          ref_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_toman: number
+          authority: string
+          coupon_code?: string | null
+          created_at?: string
+          id?: string
+          item_id: string
+          kind: string
+          ref_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_toman?: number
+          authority?: string
+          coupon_code?: string | null
+          created_at?: string
+          id?: string
+          item_id?: string
+          kind?: string
+          ref_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -776,49 +818,61 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          amount_toman: number | null
+          authority: string | null
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
           environment: string
           id: string
-          price_id: string
-          product_id: string
+          ir_gateway: string | null
+          price_id: string | null
+          product_id: string | null
+          ref_id: string | null
           status: string
-          stripe_customer_id: string
-          stripe_subscription_id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           trial_end: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          amount_toman?: number | null
+          authority?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
           environment?: string
           id?: string
-          price_id: string
-          product_id: string
+          ir_gateway?: string | null
+          price_id?: string | null
+          product_id?: string | null
+          ref_id?: string | null
           status?: string
-          stripe_customer_id: string
-          stripe_subscription_id: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_end?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          amount_toman?: number | null
+          authority?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
           environment?: string
           id?: string
-          price_id?: string
-          product_id?: string
+          ir_gateway?: string | null
+          price_id?: string | null
+          product_id?: string | null
+          ref_id?: string | null
           status?: string
-          stripe_customer_id?: string
-          stripe_subscription_id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_end?: string | null
           updated_at?: string
           user_id?: string
