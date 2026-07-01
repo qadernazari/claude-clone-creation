@@ -104,7 +104,7 @@ export const createIrCheckout = createServerFn({ method: "POST" })
         amountToman: data.amountToman,
         callbackUrl,
       });
-      return { error: `خطا در اتصال به درگاه پرداخت: ${msg}` };
+      return { error: "خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید." };
     }
 
   });
