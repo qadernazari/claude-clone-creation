@@ -15,8 +15,9 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
         const itemId = url.searchParams.get("itemId");
         const userId = url.searchParams.get("userId");
 
-        const failureUrl = new URL("/account", url.origin);
+        const failureUrl = new URL("https://ir.show/account");
         failureUrl.searchParams.set("ir_payment", "failed");
+
 
         if (status !== "OK" || !authority || !kind || !itemId || !userId) {
           return Response.redirect(failureUrl.toString(), 302);
@@ -91,10 +92,11 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
             });
           }
 
-          const successUrl = new URL("/account", url.origin);
+          const successUrl = new URL("https://ir.show/account");
           successUrl.searchParams.set("ir_payment", "success");
           successUrl.searchParams.set("ref", refId);
           return Response.redirect(successUrl.toString(), 302);
+
         } catch (err) {
           console.error("[ZarinPal callback error]", err);
           return Response.redirect(failureUrl.toString(), 302);
