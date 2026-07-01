@@ -30,7 +30,13 @@ export function IrPayPanel({ kind, itemId, amountToman, onClose }: IrPayPanelPro
       itemId,
       userId: user.id,
     });
-    window.location.href = url;
+    // Use anchor click to bypass TanStack Router interception
+    const a = document.createElement("a");
+    a.href = url;
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
