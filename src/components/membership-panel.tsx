@@ -90,8 +90,8 @@ export function MembershipPanel() {
         {!isTrialExpired && (
           <p className="mt-1 text-xs text-cream/55">
             {fa
-              ? "۳۰ روز دسترسی کامل — بدون نیاز به اطلاعات پرداختی."
-              : "30 days of full access — no payment information required."}
+              ? "۹۰ روز دسترسی کامل — بدون نیاز به اطلاعات پرداختی."
+              : "90 days of full access — no payment information required."}
           </p>
         )}
         <div className="mt-5 flex flex-wrap gap-3">

@@ -145,19 +145,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Stream original Iranian short films. Monthly membership with a 30-day free trial, plus Premium rentals. Bilingual, worldwide, no ads.",
+          "Stream original Iranian short films. Monthly membership with a 90-day free trial, plus Premium rentals. Bilingual, worldwide, no ads.",
       },
       { name: "author", content: "IRAN" },
       { property: "og:site_name", content: "IRAN" },
       { property: "og:title", content: "IRAN — Iranian short films, streaming worldwide" },
       {
         property: "og:description",
-        content: "Original Iranian short films, streaming worldwide. 30-day free trial, then membership or Premium rentals. Bilingual.",
+        content: "Original Iranian short films, streaming worldwide. 90-day free trial, then membership or Premium rentals. Bilingual.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "IRAN — Iranian short films, streaming worldwide" },
-      { name: "twitter:description", content: "Original Iranian short films, streaming worldwide. 30-day free trial, then membership or Premium rentals." },
+      { name: "twitter:description", content: "Original Iranian short films, streaming worldwide. 90-day free trial, then membership or Premium rentals." },
       { name: "google-site-verification", content: "zoKuyFN67EFMHi4pIwq3FrqFrbDasxMAE2kVfYSTGks" },
       { name: "enamad", content: "52799420" },
     ],
