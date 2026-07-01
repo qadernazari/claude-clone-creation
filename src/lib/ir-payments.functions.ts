@@ -4,109 +4,45 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type IrCheckoutKind = "membership" | "ticket" | "contribution";
 
-// Route through Hetzner proxy (api.ir.show) because Cloudflare Workers
-// cannot reach api.zarinpal.com directly (HTTP 522 timeout).
-// Hetzner (Germany) reaches ZarinPal fine.
-const ZARINPAL_REQUEST_URL = "https://api.ir.show/zarinpal/pg/v4/payment/request.json";
-const ZARINPAL_STARTPAY_URL = "https://www.zarinpal.com/pg/StartPay/";
-const ZARINPAL_VERIFY_URL = "https://api.ir.show/zarinpal/pg/v4/payment/verify.json";
+const ZARINPAL_VERIFY_URL = "https://api.zarinpal.com/pg/v4/payment/verify.json";
 
-
-const inputSchema = z.object({
+const recordSchema = z.object({
+  authority: z.string().min(1).max(120),
   kind: z.enum(["membership", "ticket", "contribution"]),
   itemId: z.string().min(1).max(120),
   amountToman: z.number().int().min(1000).max(500_000_000),
   couponCode: z.string().min(1).max(64).optional(),
 });
 
-export const createIrCheckout = createServerFn({ method: "POST" })
+/**
+ * Records a pending ZarinPal payment request AFTER the browser has
+ * successfully called ZarinPal directly (see src/lib/ir-payments.client.ts).
+ *
+ * Cloudflare Workers and Hetzner cannot reach api.zarinpal.com from outside
+ * Iran, so the payment request itself is made from the user's browser.
+ * This function only persists the resulting authority so the callback route
+ * can verify the payment later.
+ */
+export const recordIrPaymentRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: z.infer<typeof inputSchema>) => inputSchema.parse(data))
-  .handler(async ({ data, context }): Promise<{ redirectUrl: string } | { error: string }> => {
-    const merchantId = process.env.ZARINPAL_MERCHANT_ID;
-    console.log("[ZarinPal createIrCheckout] start", {
-      merchantIdMasked: merchantId ? `${merchantId.slice(0, 8)}...` : "MISSING",
-      kind: data.kind,
-      itemId: data.itemId,
-      amountToman: data.amountToman,
-    });
-    if (!merchantId) {
-      return { error: "درگاه پرداخت پیکربندی نشده است." };
-    }
-
+  .inputValidator((data: z.infer<typeof recordSchema>) => recordSchema.parse(data))
+  .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { userId } = context;
-    const amountToman = data.amountToman;
-
-    const callbackUrl = `https://ir.show/api/public/ir-payments/callback?kind=${data.kind}&itemId=${encodeURIComponent(data.itemId)}&userId=${encodeURIComponent(userId)}`;
-
-    const description =
-      data.kind === "membership"
-        ? "عضویت در پلتفرم ایران"
-        : data.kind === "ticket"
-        ? "بلیت فیلم ایران"
-        : "حمایت از ایران";
-
-    try {
-      console.log("[ZarinPal] about to fetch", ZARINPAL_REQUEST_URL, {
-        merchantId: merchantId.slice(0, 8) + "...",
-        amountToman,
-        callbackUrl,
-      });
-      const res = await fetch(ZARINPAL_REQUEST_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          merchant_id: merchantId,
-          amount: amountToman,
-          currency: "IRT",
-          description,
-          callback_url: callbackUrl,
-          metadata: {
-            kind: data.kind,
-            itemId: data.itemId,
-            userId,
-            couponCode: data.couponCode ?? null,
-          },
-        }),
-      });
-
-
-      const json = (await res.json()) as {
-        data?: { code: number; authority: string; fee_type: string; fee: number };
-        errors?: { code: number; message: string; validations?: unknown[] } | unknown[];
-      };
-
-      if (json.data?.code === 100 && json.data.authority) {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin.from("ir_payment_requests").insert({
-          authority: json.data.authority,
-          user_id: userId,
-          kind: data.kind,
-          item_id: data.itemId,
-          amount_toman: amountToman,
-          coupon_code: data.couponCode ?? null,
-          status: "pending",
-        });
-
-        return { redirectUrl: `${ZARINPAL_STARTPAY_URL}${json.data.authority}` };
-      }
-
-      const errObj = json.errors && !Array.isArray(json.errors) ? json.errors : null;
-      const errMsg = errObj?.message ?? `ZarinPal error code: ${json.data?.code ?? "unknown"}`;
-      return { error: errMsg };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error("[ZarinPal createIrCheckout FETCH ERROR]", {
-        message: msg,
-        cause: err instanceof Error ? (err as { cause?: unknown }).cause : undefined,
-        stack: err instanceof Error ? err.stack : undefined,
-        merchantIdMasked: merchantId ? `${merchantId.slice(0, 8)}...` : "MISSING",
-        amountToman: data.amountToman,
-        callbackUrl,
-      });
-      return { error: "خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("ir_payment_requests").insert({
+      authority: data.authority,
+      user_id: userId,
+      kind: data.kind,
+      item_id: data.itemId,
+      amount_toman: data.amountToman,
+      coupon_code: data.couponCode ?? null,
+      status: "pending",
+    });
+    if (error) {
+      console.error("[recordIrPaymentRequest] insert failed", error);
+      return { error: "ثبت درخواست ناموفق بود." };
     }
-
+    return { ok: true };
   });
 
 export const verifyIrCheckout = createServerFn({ method: "POST" })
@@ -141,5 +77,3 @@ export const verifyIrCheckout = createServerFn({ method: "POST" })
       return { success: false, error: "Verification request failed" };
     }
   });
-
-export const irCheckoutSchema = inputSchema;
