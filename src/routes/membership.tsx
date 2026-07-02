@@ -90,18 +90,20 @@ function MembershipPage() {
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 pt-24 pb-24 sm:px-6 md:pt-32">
-        <header className="mx-auto max-w-2xl text-center">
-          <h1
-            className={`text-3xl text-cream-bright sm:text-5xl ${fa ? "font-vazir" : "font-display"}`}
-          >
-            {fa ? "پلن خود را انتخاب کنید" : "Choose your plan"}
-          </h1>
-          <p className="mt-4 text-sm text-cream/65 sm:text-base">
-            {fa
-              ? "پرداخت یکبار برای ۱، ۳، ۶ یا ۱۲ ماه. بدون تمدید خودکار. هر زمان لغو کنید."
-              : "One-time payment for 1, 3, 6, or 12 months. No auto-renewal. Cancel anytime."}
-          </p>
-        </header>
+        {!isMember && (
+          <header className="mx-auto max-w-2xl text-center">
+            <h1
+              className={`text-3xl text-cream-bright sm:text-5xl ${fa ? "font-vazir" : "font-display"}`}
+            >
+              {fa ? "پلن خود را انتخاب کنید" : "Choose your plan"}
+            </h1>
+            <p className="mt-4 text-sm text-cream/65 sm:text-base">
+              {fa
+                ? "پرداخت یکبار برای ۱، ۳، ۶ یا ۱۲ ماه. بدون تمدید خودکار. هر زمان لغو کنید."
+                : "One-time payment for 1, 3, 6, or 12 months. No auto-renewal. Cancel anytime."}
+            </p>
+          </header>
+        )}
 
         {isMember && sub && !isTrialActive ? (
           <ActiveMembershipCard fa={fa} sub={sub} num={num} />
@@ -190,23 +192,25 @@ function MembershipPage() {
           </ul>
         </section>
 
-        <p className="mt-10 text-center text-xs text-cream/45">
-          {fa ? (
-            <>
-              با خرید عضویت، شما{" "}
-              <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
-                شرایط استفاده
-              </button>{" "}
-              را می‌پذیرید.
-            </>
-          ) : (
-            <>
-              By purchasing a plan, you agree to our{" "}
-              <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
-                Terms of Service</button>.
-            </>
-          )}
-        </p>
+        {!isMember && (
+          <p className="mt-10 text-center text-xs text-cream/45">
+            {fa ? (
+              <>
+                با خرید عضویت، شما{" "}
+                <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
+                  شرایط استفاده
+                </button>{" "}
+                را می‌پذیرید.
+              </>
+            ) : (
+              <>
+                By purchasing a plan, you agree to our{" "}
+                <button type="button" onClick={() => openPage("terms")} className="underline hover:text-cream/80">
+                  Terms of Service</button>.
+              </>
+            )}
+          </p>
+        )}
       </main>
       <SiteFooter />
 
