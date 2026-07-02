@@ -11,9 +11,15 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
         const failureUrl = new URL("https://ir.show/account");
         failureUrl.searchParams.set("ir_payment", "failed");
 
+        const cancelledUrl = new URL("https://ir.show/account");
+        cancelledUrl.searchParams.set("ir_payment", "cancelled");
+
         if (status !== "OK" || !authority) {
+          // ZarinPal sends Status=NOK when the user cancels at the gateway.
+          if (status === "NOK") return Response.redirect(cancelledUrl.toString(), 302);
           return Response.redirect(failureUrl.toString(), 302);
         }
+
 
 
         try {
