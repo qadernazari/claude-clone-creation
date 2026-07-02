@@ -103,13 +103,14 @@ function MembershipPage() {
           </p>
         </header>
 
-        {isMember && sub ? (
+        {isMember && sub && !isTrialActive ? (
           <ActiveMembershipCard fa={fa} sub={sub} num={num} />
-        ) : isTrialActive && trial ? (
-          <TrialActiveCard fa={fa} endsAt={trial.ends_at} />
         ) : (
           <>
-            {showTrialBanner && (
+            {isTrialActive && trial && (
+              <TrialActiveCard fa={fa} endsAt={trial.ends_at} />
+            )}
+            {showTrialBanner && !isTrialActive && (
               <section className="mx-auto mt-10 max-w-2xl rounded-md border border-amber/25 bg-amber/5 p-5">
                 <div className="flex items-start gap-3">
                   <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber" />
@@ -131,7 +132,7 @@ function MembershipPage() {
               </section>
             )}
 
-            <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <section id="plans" className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {MEMBERSHIP_PLANS.map((plan) => (
                 <PlanCard
                   key={plan.id}
@@ -146,6 +147,7 @@ function MembershipPage() {
             </section>
           </>
         )}
+
 
 
         <section className="mx-auto mt-14 max-w-5xl">
