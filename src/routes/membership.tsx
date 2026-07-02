@@ -64,7 +64,7 @@ function MembershipPage() {
   const fa = locale === "fa";
   const { openPage } = usePageOverlay();
   const navigate = useNavigate();
-  const { user, isLoading: isAuthLoading, hasUsedTrial, isMember } = useSubscription();
+  const { user, isLoading: isAuthLoading, hasUsedTrial, isMember, isTrialActive, subscription: sub, trial } = useSubscription();
   const irMode = useIrMode();
   const [baseToman, setBaseToman] = useState<number>(MEMBERSHIP_BASE_TOMAN);
   const [checkoutPlan, setCheckoutPlan] = useState<MembershipPlanId | null>(null);
