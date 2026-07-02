@@ -95,12 +95,13 @@ export function MembershipPanel() {
           </p>
         )}
         <div className="mt-5 flex flex-wrap gap-3">
-          {!hasUsedTrial && (
+          {!hasUsedTrial && !isTrialActive && (
             <AcceptTrialButton
               className="inline-flex items-center rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
               label={t.start}
             />
           )}
+
           <Link
             to="/membership"
             className="inline-flex items-center rounded-md border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
