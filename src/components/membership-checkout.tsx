@@ -22,7 +22,9 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
   const { locale } = useLocale();
   const fa = locale === "fa";
   const irMode = useIrMode();
+  const { isMember } = useSubscription();
   const [applied, setApplied] = useState<{ code: string; label: string } | null>(null);
+
   const [started, setStarted] = useState(false);
   const plan = getPlan(planId);
 
