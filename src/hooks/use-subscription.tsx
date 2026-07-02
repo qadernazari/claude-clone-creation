@@ -11,11 +11,15 @@ export type SubscriptionRow = {
   id: string;
   status: string;
   current_period_end: string | null;
+  current_period_start: string | null;
   cancel_at_period_end: boolean;
   trial_end: string | null;
-  price_id: string;
+  price_id: string | null;
   environment: string;
+  ir_gateway: string | null;
+  amount_toman: number | null;
 };
+
 
 export type TrialRow = {
   id: string;
@@ -61,11 +65,15 @@ export function useSubscription() {
     enabled: !!user && !!env,
     queryFn: async (): Promise<SubscriptionRow | null> => {
       if (!user || !env) return null;
+      // Include both Stripe subscriptions matching the current env AND any
+      // ZarinPal (Iran) subscriptions — those are always inserted with
+      // environment='live' and must show up even when the client build is
+      // running against Stripe sandbox.
       const { data, error } = await supabase
         .from("subscriptions")
-        .select("id, status, current_period_end, cancel_at_period_end, trial_end, price_id, environment")
+        .select("id, status, current_period_end, current_period_start, cancel_at_period_end, trial_end, price_id, environment, ir_gateway, amount_toman")
         .eq("user_id", user.id)
-        .eq("environment", env)
+        .or(`environment.eq.${env},ir_gateway.eq.zarinpal`)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -74,6 +82,7 @@ export function useSubscription() {
     },
     staleTime: 30_000,
   });
+
 
   const trialQ = useQuery({
     queryKey: ["my-trial", user?.id ?? "anon"],

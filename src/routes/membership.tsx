@@ -64,7 +64,7 @@ function MembershipPage() {
   const fa = locale === "fa";
   const { openPage } = usePageOverlay();
   const navigate = useNavigate();
-  const { user, isLoading: isAuthLoading, hasUsedTrial, isMember } = useSubscription();
+  const { user, isLoading: isAuthLoading, hasUsedTrial, isMember, isTrialActive, subscription: sub, trial } = useSubscription();
   const irMode = useIrMode();
   const [baseToman, setBaseToman] = useState<number>(MEMBERSHIP_BASE_TOMAN);
   const [checkoutPlan, setCheckoutPlan] = useState<MembershipPlanId | null>(null);
@@ -103,41 +103,52 @@ function MembershipPage() {
           </p>
         </header>
 
-        {showTrialBanner && (
-          <section className="mx-auto mt-10 max-w-2xl rounded-md border border-amber/25 bg-amber/5 p-5">
-            <div className="flex items-start gap-3">
-              <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber" />
-              <div className="flex-1">
-                <h2 className={`text-sm font-medium text-cream-bright ${fa ? "font-vazir" : ""}`}>
-                  {fa ? "۹۰ روز رایگان امتحان کنید" : "Try 90 days free"}
-                </h2>
-                <p className="mt-1 text-xs text-cream/65">
-                  {fa
-                    ? "بدون نیاز به اطلاعات پرداخت. در صورت تمایل بعدا پلن انتخاب کنید."
-                    : "No payment details required. Pick a plan later if you like it."}
-                </p>
-              </div>
-              <AcceptTrialButton
-                label={fa ? "شروع رایگان" : "Start free trial"}
-                className="inline-flex shrink-0 items-center rounded-md bg-amber px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:bg-amber/90 disabled:opacity-70"
-              />
-            </div>
-          </section>
+        {isMember && sub && !isTrialActive ? (
+          <ActiveMembershipCard fa={fa} sub={sub} num={num} />
+        ) : (
+          <>
+            {isTrialActive && trial && (
+              <TrialActiveCard fa={fa} endsAt={trial.ends_at} />
+            )}
+            {showTrialBanner && !isTrialActive && (
+              <section className="mx-auto mt-10 max-w-2xl rounded-md border border-amber/25 bg-amber/5 p-5">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber" />
+                  <div className="flex-1">
+                    <h2 className={`text-sm font-medium text-cream-bright ${fa ? "font-vazir" : ""}`}>
+                      {fa ? "۹۰ روز رایگان امتحان کنید" : "Try 90 days free"}
+                    </h2>
+                    <p className="mt-1 text-xs text-cream/65">
+                      {fa
+                        ? "بدون نیاز به اطلاعات پرداخت. در صورت تمایل بعدا پلن انتخاب کنید."
+                        : "No payment details required. Pick a plan later if you like it."}
+                    </p>
+                  </div>
+                  <AcceptTrialButton
+                    label={fa ? "شروع رایگان" : "Start free trial"}
+                    className="inline-flex shrink-0 items-center rounded-md bg-amber px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:bg-amber/90 disabled:opacity-70"
+                  />
+                </div>
+              </section>
+            )}
+
+            <section id="plans" className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {MEMBERSHIP_PLANS.map((plan) => (
+                <PlanCard
+                  key={plan.id}
+                  plan={plan}
+                  fa={fa}
+                  irMode={irMode}
+                  baseToman={baseToman}
+                  num={num}
+                  onChoose={() => handleChoose(plan.id)}
+                />
+              ))}
+            </section>
+          </>
         )}
 
-        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {MEMBERSHIP_PLANS.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              fa={fa}
-              irMode={irMode}
-              baseToman={baseToman}
-              num={num}
-              onChoose={() => handleChoose(plan.id)}
-            />
-          ))}
-        </section>
+
 
         <section className="mx-auto mt-14 max-w-5xl">
           <h2 className={`text-center text-xs uppercase tracking-[0.22em] text-cream/55 ${fa ? "font-vazir" : ""}`}>
@@ -308,3 +319,134 @@ function PlanCard({
     </div>
   );
 }
+
+function fmtDay(iso: string | null, fa: boolean): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString(fa ? "fa-IR" : "en-US", { dateStyle: "long" });
+}
+
+function daysRemaining(iso: string | null): number {
+  if (!iso) return 0;
+  const ms = new Date(iso).getTime() - Date.now();
+  return ms <= 0 ? 0 : Math.ceil(ms / 86_400_000);
+}
+
+function derivePlanMonths(sub: {
+  current_period_start: string | null;
+  current_period_end: string | null;
+  amount_toman: number | null;
+}): number {
+  if (sub.current_period_start && sub.current_period_end) {
+    const s = new Date(sub.current_period_start);
+    const e = new Date(sub.current_period_end);
+    const months = Math.round(
+      (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()),
+    );
+    if (months >= 1) return months;
+  }
+  if (sub.amount_toman && sub.amount_toman > 0) {
+    return Math.max(1, Math.round(sub.amount_toman / 99_000));
+  }
+  return 1;
+}
+
+function ActiveMembershipCard({
+  fa,
+  sub,
+  num,
+}: {
+  fa: boolean;
+  sub: {
+    current_period_start: string | null;
+    current_period_end: string | null;
+    amount_toman: number | null;
+  };
+  num: (n: number) => string;
+}) {
+  const months = derivePlanMonths(sub);
+  const monthsLabel = fa
+    ? `${num(months)} ماهه`
+    : `${months}-month`;
+  const remaining = daysRemaining(sub.current_period_end);
+
+  return (
+    <section className="mx-auto mt-10 max-w-2xl rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.06] p-6 md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <span className="inline-flex items-center rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-emerald-400">
+            {fa ? "فعال" : "Active"}
+          </span>
+          <h2 className={`mt-3 text-2xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+            {fa ? `عضویت ${monthsLabel}` : `${monthsLabel} membership`}
+          </h2>
+          <p className="mt-2 text-sm text-cream/70">
+            {fa
+              ? "از دسترسی نامحدود به تمام فیلم‌ها لذت ببرید."
+              : "You're all set — enjoy unlimited access to all films."}
+          </p>
+        </div>
+        <Link
+          to="/browse"
+          className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+        >
+          {fa ? "شروع تماشا" : "Start watching"}
+        </Link>
+      </div>
+      <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-3">
+        <div>
+          <dt className="text-[11px] uppercase tracking-widest text-cream/55">
+            {fa ? "فعال‌سازی" : "Activated"}
+          </dt>
+          <dd className="mt-1 text-cream-bright">{fmtDay(sub.current_period_start, fa)}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-widest text-cream/55">
+            {fa ? "پایان دسترسی" : "Expires"}
+          </dt>
+          <dd className="mt-1 text-cream-bright">{fmtDay(sub.current_period_end, fa)}</dd>
+        </div>
+        <div>
+          <dt className="text-[11px] uppercase tracking-widest text-cream/55">
+            {fa ? "روز باقی‌مانده" : "Days remaining"}
+          </dt>
+          <dd className="mt-1 text-cream-bright">{num(remaining)}</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+function TrialActiveCard({ fa, endsAt }: { fa: boolean; endsAt: string }) {
+  const remaining = daysRemaining(endsAt);
+  return (
+    <section className="mx-auto mt-10 max-w-2xl rounded-2xl border border-amber/30 bg-amber/[0.06] p-6 md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <span className="inline-flex items-center rounded-md border border-amber/30 bg-amber/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest text-amber">
+            {fa ? "آزمایش رایگان فعال" : "Free trial active"}
+          </span>
+          <h2 className={`mt-3 text-2xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
+            {fa
+              ? `${remaining} روز مانده تا پایان آزمایش`
+              : `${remaining} day${remaining === 1 ? "" : "s"} left in your trial`}
+          </h2>
+          <p className="mt-2 text-sm text-cream/70">
+            {fa
+              ? "برای ادامه دسترسی نامحدود بعد از آزمایش، یکی از پلن‌های زیر را انتخاب کنید."
+              : "Upgrade to a paid plan any time to keep watching after your trial ends."}
+          </p>
+        </div>
+        <a
+          href="#plans"
+          className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-bg-0 hover:bg-amber/90"
+        >
+          {fa ? "همین حالا ارتقا دهید" : "Upgrade now"}
+        </a>
+      </div>
+      <p className="mt-4 text-xs text-cream/55">
+        {fa ? `پایان دوره آزمایش: ${fmtDay(endsAt, fa)}` : `Trial ends: ${fmtDay(endsAt, fa)}`}
+      </p>
+    </section>
+  );
+}
+

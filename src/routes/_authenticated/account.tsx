@@ -70,6 +70,28 @@ function AccountPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
 
+  const [paymentNotice, setPaymentNotice] = useState<
+    { type: "success" | "failed" | "cancelled"; ref?: string } | null
+  >(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const irPayment = params.get("ir_payment");
+    const ref = params.get("ref") ?? undefined;
+    if (irPayment === "success") {
+      setPaymentNotice({ type: "success", ref });
+      qc.invalidateQueries({ queryKey: ["subscription"] });
+      window.history.replaceState({}, "", "/account");
+    } else if (irPayment === "failed") {
+      setPaymentNotice({ type: "failed" });
+      window.history.replaceState({}, "", "/account");
+    } else if (irPayment === "cancelled") {
+      setPaymentNotice({ type: "cancelled" });
+      window.history.replaceState({}, "", "/account");
+    }
+  }, [qc]);
+
+
   const { data: profile } = useQuery({
     queryKey: ["account", "profile"],
     queryFn: async () => {
@@ -225,6 +247,84 @@ function AccountPage() {
       <SiteHeader />
 
       <main className="mx-auto max-w-5xl px-5 pt-20 pb-12 space-y-10 md:px-6 md:pt-32 md:space-y-12">
+        {paymentNotice && (
+          <div
+            className={`flex items-start gap-4 rounded-xl border px-5 py-4 ${
+              paymentNotice.type === "success"
+                ? "border-emerald-500/30 bg-emerald-500/10"
+                : paymentNotice.type === "cancelled"
+                  ? "border-cream/20 bg-cream/5"
+                  : "border-rose-500/30 bg-rose-500/10"
+            }`}
+            role="status"
+          >
+            <div
+              className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full ${
+                paymentNotice.type === "success"
+                  ? "bg-emerald-500"
+                  : paymentNotice.type === "cancelled"
+                    ? "bg-cream/40"
+                    : "bg-rose-500"
+              }`}
+            >
+              {paymentNotice.type === "success" ? (
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M3 3l6 6M9 3l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              )}
+            </div>
+            <div className="flex-1">
+              <p
+                className={`text-sm font-semibold ${
+                  paymentNotice.type === "success"
+                    ? "text-emerald-400"
+                    : paymentNotice.type === "cancelled"
+                      ? "text-cream"
+                      : "text-rose-400"
+                }`}
+              >
+                {paymentNotice.type === "success"
+                  ? fa
+                    ? "پرداخت موفق — عضویت شما فعال شد!"
+                    : "Payment successful — your membership is now active!"
+                  : paymentNotice.type === "cancelled"
+                    ? fa
+                      ? "پرداخت لغو شد."
+                      : "Payment cancelled."
+                    : fa
+                      ? "پرداخت ناموفق — لطفاً دوباره تلاش کنید."
+                      : "Payment failed — please try again."}
+              </p>
+              {paymentNotice.type === "success" && paymentNotice.ref && (
+                <p className="mt-1 text-xs text-cream/55">
+                  {fa ? `شماره تراکنش: ${paymentNotice.ref}` : `Transaction ref: ${paymentNotice.ref}`}
+                </p>
+              )}
+              {paymentNotice.type !== "success" && (
+                <p className="mt-1 text-xs text-cream/55">
+                  {fa
+                    ? "هیچ مبلغی از حساب شما کسر نشده است."
+                    : "No amount has been charged to your account."}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setPaymentNotice(null)}
+              className="text-cream/40 hover:text-cream"
+              aria-label={fa ? "بستن" : "Dismiss"}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <div>
           <h1 className={`text-3xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
             {tr.title}

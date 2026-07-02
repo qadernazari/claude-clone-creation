@@ -95,12 +95,13 @@ export function MembershipPanel() {
           </p>
         )}
         <div className="mt-5 flex flex-wrap gap-3">
-          {!hasUsedTrial && (
+          {!hasUsedTrial && !isTrialActive && (
             <AcceptTrialButton
               className="inline-flex items-center rounded-md bg-amber px-5 py-2.5 text-sm font-medium text-bg-0 hover:bg-amber/90 disabled:opacity-70"
               label={t.start}
             />
           )}
+
           <Link
             to="/membership"
             className="inline-flex items-center rounded-md border border-cream/25 px-5 py-2.5 text-sm text-cream hover:bg-cream/5"
@@ -160,8 +161,10 @@ export function MembershipPanel() {
   const isPastDue = sub.status === "past_due";
   const isCanceledScheduled =
     sub.cancel_at_period_end || sub.status === "canceled";
+  const isZarinpal = sub.ir_gateway === "zarinpal";
 
   const trialDays = isTrial ? daysUntil(sub.trial_end) : null;
+  const remainingDays = daysUntil(sub.current_period_end);
 
   const statusLabel = isTrial
     ? t.statusTrial
@@ -179,6 +182,28 @@ export function MembershipPanel() {
         ? "bg-cream/10 text-cream/70 border-cream/20"
         : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
 
+  // Derive plan months from period dates or amount
+  let planMonths = 0;
+  if (sub.current_period_start && sub.current_period_end) {
+    const s = new Date(sub.current_period_start);
+    const e = new Date(sub.current_period_end);
+    planMonths = Math.round(
+      (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()),
+    );
+  }
+  if (planMonths < 1 && sub.amount_toman && sub.amount_toman > 0) {
+    planMonths = Math.max(1, Math.round(sub.amount_toman / 99_000));
+  }
+  const planLabel =
+    planMonths >= 1
+      ? fa
+        ? `پلن ${planMonths} ماهه`
+        : `${planMonths}-month plan`
+      : null;
+
+  const showRemainingInBadge =
+    !isTrial && !isPastDue && remainingDays !== null && remainingDays > 0;
+
   return (
     <section className="hairline rounded-2xl border bg-bg-1/40 p-6 md:p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -186,21 +211,34 @@ export function MembershipPanel() {
           <h2 className={`text-xl text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
             {t.title}
           </h2>
+          {planLabel && !isTrial && (
+            <p className="mt-1 text-sm text-cream/70">{planLabel}</p>
+          )}
           <span
             className={`mt-2 inline-flex items-center rounded-md border px-2.5 py-0.5 text-[11px] uppercase tracking-widest ${statusTone}`}
           >
             {statusLabel}
             {isTrial && trialDays !== null && trialDays > 0 ? ` · ${t.daysLeft(trialDays)}` : ""}
+            {showRemainingInBadge ? ` · ${t.daysLeft(remainingDays!)}` : ""}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={handlePortal}
-          disabled={loadingPortal}
-          className="rounded-md border border-cream/25 px-4 py-2 text-sm text-cream hover:bg-cream/5 disabled:opacity-60"
-        >
-          {loadingPortal ? "…" : t.manage}
-        </button>
+        {isZarinpal ? (
+          <a
+            href="mailto:hello@ir.show"
+            className="rounded-md border border-cream/25 px-4 py-2 text-sm text-cream hover:bg-cream/5"
+          >
+            {fa ? "تماس با پشتیبانی" : "Contact support"}
+          </a>
+        ) : (
+          <button
+            type="button"
+            onClick={handlePortal}
+            disabled={loadingPortal}
+            className="rounded-md border border-cream/25 px-4 py-2 text-sm text-cream hover:bg-cream/5 disabled:opacity-60"
+          >
+            {loadingPortal ? "…" : t.manage}
+          </button>
+        )}
       </div>
 
       <dl className="mt-6 grid gap-4 sm:grid-cols-2 text-sm">
@@ -215,7 +253,11 @@ export function MembershipPanel() {
         {sub.current_period_end && (
           <div>
             <dt className="text-[11px] uppercase tracking-widest text-cream/55">
-              {isCanceledScheduled ? t.accessUntil : t.nextBill}
+              {isCanceledScheduled
+                ? t.accessUntil
+                : isZarinpal
+                  ? t.accessUntil
+                  : t.nextBill}
             </dt>
             <dd className="mt-1 text-cream-bright">
               {fmtDate(sub.current_period_end, fa)}
@@ -234,3 +276,4 @@ export function MembershipPanel() {
     </section>
   );
 }
+

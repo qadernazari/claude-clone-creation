@@ -11,9 +11,15 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
         const failureUrl = new URL("https://ir.show/account");
         failureUrl.searchParams.set("ir_payment", "failed");
 
+        const cancelledUrl = new URL("https://ir.show/account");
+        cancelledUrl.searchParams.set("ir_payment", "cancelled");
+
         if (status !== "OK" || !authority) {
+          // ZarinPal sends Status=NOK when the user cancels at the gateway.
+          if (status === "NOK") return Response.redirect(cancelledUrl.toString(), 302);
           return Response.redirect(failureUrl.toString(), 302);
         }
+
 
 
         try {
@@ -72,11 +78,15 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
             .update({ status: "paid", ref_id: refId })
             .eq("authority", authority);
 
+          let monthsForEmail = 0;
+          let expiresIso: string | null = null;
           if (kind === "membership") {
             const months = Math.max(1, Math.round(pending.amount_toman / 99_000));
+            monthsForEmail = months;
             const now = new Date();
             const expiresAt = new Date(now);
             expiresAt.setMonth(expiresAt.getMonth() + months);
+            expiresIso = expiresAt.toISOString();
 
             await supabaseAdmin.from("subscriptions").insert({
               user_id: trustedUserId,
@@ -86,9 +96,46 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
               ref_id: refId,
               authority,
               ir_gateway: "zarinpal",
-              current_period_end: expiresAt.toISOString(),
+              current_period_start: now.toISOString(),
+              current_period_end: expiresIso,
             });
           }
+
+          // Fire off a confirmation email. Never let a mail failure block redirect.
+          try {
+            if (kind === "membership") {
+              const { data: userData } = await supabaseAdmin.auth.admin.getUserById(trustedUserId);
+              const userEmail = userData?.user?.email;
+              const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+              if (userEmail && serviceKey) {
+                const expiresFormatted = expiresIso
+                  ? new Date(expiresIso).toLocaleDateString("en-US", { dateStyle: "long" })
+                  : "";
+                await fetch("https://ir.show/lovable/email/transactional/send", {
+                  method: "POST",
+                  headers: {
+                    "content-type": "application/json",
+                    authorization: `Bearer ${serviceKey}`,
+                  },
+                  body: JSON.stringify({
+                    templateName: "membership-activated",
+                    recipientEmail: userEmail,
+                    idempotencyKey: `ir-membership-${refId}`,
+                    templateData: {
+                      monthsLabel: `${monthsForEmail} month${monthsForEmail === 1 ? "" : "s"}`,
+                      expiresFormatted,
+                      refId,
+                      browseUrl: "https://ir.show/browse",
+                      accountUrl: "https://ir.show/account",
+                    },
+                  }),
+                });
+              }
+            }
+          } catch (emailErr) {
+            console.error("[ZarinPal callback] email send failed:", emailErr);
+          }
+
 
           const successUrl = new URL("https://ir.show/account");
           successUrl.searchParams.set("ir_payment", "success");
