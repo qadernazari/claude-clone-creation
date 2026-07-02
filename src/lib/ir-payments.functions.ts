@@ -89,6 +89,7 @@ export const verifyIrCheckout = createServerFn({ method: "POST" })
         body: JSON.stringify({
           merchant_id: merchantId,
           amount: data.amountToman,
+          currency: "IRT",
           authority: data.authority,
         }),
       });
