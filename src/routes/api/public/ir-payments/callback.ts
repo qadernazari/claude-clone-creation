@@ -53,6 +53,7 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
             body: JSON.stringify({
               merchant_id: merchantId,
               amount: pending.amount_toman,
+              currency: "IRT",
               authority,
             }),
           });
