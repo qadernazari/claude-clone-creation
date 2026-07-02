@@ -34,4 +34,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'trial-expired': trialExpired,
   'payment-failed': paymentFailed,
   'subscription-canceled': subscriptionCanceled,
+  'membership-activated': membershipActivated,
 }
+
