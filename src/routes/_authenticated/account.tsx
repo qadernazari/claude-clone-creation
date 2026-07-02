@@ -70,6 +70,28 @@ function AccountPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
 
+  const [paymentNotice, setPaymentNotice] = useState<
+    { type: "success" | "failed" | "cancelled"; ref?: string } | null
+  >(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const irPayment = params.get("ir_payment");
+    const ref = params.get("ref") ?? undefined;
+    if (irPayment === "success") {
+      setPaymentNotice({ type: "success", ref });
+      qc.invalidateQueries({ queryKey: ["subscription"] });
+      window.history.replaceState({}, "", "/account");
+    } else if (irPayment === "failed") {
+      setPaymentNotice({ type: "failed" });
+      window.history.replaceState({}, "", "/account");
+    } else if (irPayment === "cancelled") {
+      setPaymentNotice({ type: "cancelled" });
+      window.history.replaceState({}, "", "/account");
+    }
+  }, [qc]);
+
+
   const { data: profile } = useQuery({
     queryKey: ["account", "profile"],
     queryFn: async () => {
