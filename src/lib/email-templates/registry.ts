@@ -10,6 +10,8 @@ import { template as trialFinalDay } from './trial-final-day'
 import { template as trialExpired } from './trial-expired'
 import { template as paymentFailed } from './payment-failed'
 import { template as subscriptionCanceled } from './subscription-canceled'
+import { template as membershipActivated } from './membership-activated'
+
 
 export interface TemplateEntry {
   component: ComponentType<any>
