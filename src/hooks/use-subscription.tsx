@@ -11,11 +11,15 @@ export type SubscriptionRow = {
   id: string;
   status: string;
   current_period_end: string | null;
+  current_period_start: string | null;
   cancel_at_period_end: boolean;
   trial_end: string | null;
-  price_id: string;
+  price_id: string | null;
   environment: string;
+  ir_gateway: string | null;
+  amount_toman: number | null;
 };
+
 
 export type TrialRow = {
   id: string;
