@@ -10,13 +10,13 @@ import { AcceptTrialButton } from "./accept-trial-button";
 export function MembershipCta() {
   const { locale } = useLocale();
   const fa = locale === "fa";
-  const { isMember, isLoading, hasUsedTrial } = useSubscription();
+  const { isMember, isLoading, hasUsedTrial, isTrialActive } = useSubscription();
 
   if (isLoading || isMember) {
     return <div className="hidden h-10 w-[120px] shrink-0 sm:block" aria-hidden />;
   }
 
-  if (hasUsedTrial) {
+  if (isTrialActive || hasUsedTrial) {
     const label = fa ? "عضویت" : "Become a Member";
     return (
       <div className="hidden shrink-0 sm:block">
@@ -29,6 +29,7 @@ export function MembershipCta() {
       </div>
     );
   }
+
 
   const label = fa ? "آزمایش رایگان" : "Free Trial";
   return (
