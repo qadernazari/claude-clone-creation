@@ -83,7 +83,18 @@ export const Route = createFileRoute("/api/public/ir-payments/callback")({
           let monthsForEmail = 0;
           let expiresIso: string | null = null;
           if (kind === "membership") {
-            const months = Math.max(1, Math.round(pending.amount_toman / 99_000));
+            let months = 1;
+            try {
+              months = getPlan(pending.item_id as MembershipPlanId).months;
+            } catch {
+              const tomanPrices: Record<string, number> = {
+                "1mo": 99_000, "3mo": 199_000, "6mo": 399_000, "12mo": 699_000,
+              };
+              const entry = Object.entries(tomanPrices).find(
+                ([, v]) => Math.abs(v - pending.amount_toman) < 10_000,
+              );
+              months = entry ? parseInt(entry[0]) : 1;
+            }
             monthsForEmail = months;
             const now = new Date();
             const expiresAt = new Date(now);
