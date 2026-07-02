@@ -103,41 +103,50 @@ function MembershipPage() {
           </p>
         </header>
 
-        {showTrialBanner && (
-          <section className="mx-auto mt-10 max-w-2xl rounded-md border border-amber/25 bg-amber/5 p-5">
-            <div className="flex items-start gap-3">
-              <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber" />
-              <div className="flex-1">
-                <h2 className={`text-sm font-medium text-cream-bright ${fa ? "font-vazir" : ""}`}>
-                  {fa ? "۹۰ روز رایگان امتحان کنید" : "Try 90 days free"}
-                </h2>
-                <p className="mt-1 text-xs text-cream/65">
-                  {fa
-                    ? "بدون نیاز به اطلاعات پرداخت. در صورت تمایل بعدا پلن انتخاب کنید."
-                    : "No payment details required. Pick a plan later if you like it."}
-                </p>
-              </div>
-              <AcceptTrialButton
-                label={fa ? "شروع رایگان" : "Start free trial"}
-                className="inline-flex shrink-0 items-center rounded-md bg-amber px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:bg-amber/90 disabled:opacity-70"
-              />
-            </div>
-          </section>
+        {isMember && sub ? (
+          <ActiveMembershipCard fa={fa} sub={sub} num={num} />
+        ) : isTrialActive && trial ? (
+          <TrialActiveCard fa={fa} endsAt={trial.ends_at} />
+        ) : (
+          <>
+            {showTrialBanner && (
+              <section className="mx-auto mt-10 max-w-2xl rounded-md border border-amber/25 bg-amber/5 p-5">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-amber" />
+                  <div className="flex-1">
+                    <h2 className={`text-sm font-medium text-cream-bright ${fa ? "font-vazir" : ""}`}>
+                      {fa ? "۹۰ روز رایگان امتحان کنید" : "Try 90 days free"}
+                    </h2>
+                    <p className="mt-1 text-xs text-cream/65">
+                      {fa
+                        ? "بدون نیاز به اطلاعات پرداخت. در صورت تمایل بعدا پلن انتخاب کنید."
+                        : "No payment details required. Pick a plan later if you like it."}
+                    </p>
+                  </div>
+                  <AcceptTrialButton
+                    label={fa ? "شروع رایگان" : "Start free trial"}
+                    className="inline-flex shrink-0 items-center rounded-md bg-amber px-4 py-2 text-xs font-bold uppercase tracking-wider text-ink hover:bg-amber/90 disabled:opacity-70"
+                  />
+                </div>
+              </section>
+            )}
+
+            <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {MEMBERSHIP_PLANS.map((plan) => (
+                <PlanCard
+                  key={plan.id}
+                  plan={plan}
+                  fa={fa}
+                  irMode={irMode}
+                  baseToman={baseToman}
+                  num={num}
+                  onChoose={() => handleChoose(plan.id)}
+                />
+              ))}
+            </section>
+          </>
         )}
 
-        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {MEMBERSHIP_PLANS.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              fa={fa}
-              irMode={irMode}
-              baseToman={baseToman}
-              num={num}
-              onChoose={() => handleChoose(plan.id)}
-            />
-          ))}
-        </section>
 
         <section className="mx-auto mt-14 max-w-5xl">
           <h2 className={`text-center text-xs uppercase tracking-[0.22em] text-cream/55 ${fa ? "font-vazir" : ""}`}>
