@@ -36,6 +36,7 @@ export const createIrCheckout = createServerFn({ method: "POST" })
         body: JSON.stringify({
           merchant_id: merchantId,
           amount: data.amountToman,
+          currency: "IRT",
           callback_url: callbackUrl.toString(),
           description: data.description ?? `Payment for ${data.kind} ${data.itemId}`,
         }),
