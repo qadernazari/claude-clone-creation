@@ -55,7 +55,43 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
     ? plan.months === 1 ? "یک ماه" : `${plan.months} ماه`
     : `${plan.months} ${plan.months === 1 ? "Month" : "Months"}`;
 
+  if (isMember) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg-0/85 p-4 backdrop-blur-md sm:p-6"
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          className="relative w-full max-w-md rounded-2xl bg-bg-1 p-8 text-center shadow-2xl ring-1 ring-cream/10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute top-3 z-10 grid h-9 w-9 place-items-center rounded-md bg-bg-0/80 text-cream/80 hover:text-cream-bright shadow-lg border border-cream/15 ltr:right-3 rtl:left-3"
+          >
+            ✕
+          </button>
+          <p className={`text-lg text-cream-bright ${fa ? "font-vazir" : ""}`}>
+            {fa ? "شما قبلاً عضو هستید!" : "You're already a member!"}
+          </p>
+          <Link
+            to="/account"
+            onClick={onClose}
+            className="mt-4 inline-block text-amber hover:underline"
+          >
+            {fa ? "مشاهده حساب کاربری" : "View your account"}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
+
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg-0/85 p-4 backdrop-blur-md sm:p-6"
       onClick={onClose}
