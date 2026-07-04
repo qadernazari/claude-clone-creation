@@ -86,6 +86,19 @@ function MembershipPage() {
 
   const showTrialBanner = !isAuthLoading && !!user && !hasUsedTrial && !isMember;
 
+  // Don't render anything until we know the user's subscription status
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-bg-0 text-cream">
+        <SiteHeader />
+        <main className="mx-auto max-w-6xl px-4 pt-24 pb-24 sm:px-6 md:pt-32 flex items-center justify-center min-h-[50vh]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader />
