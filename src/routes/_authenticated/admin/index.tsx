@@ -451,6 +451,52 @@ function AdminDashboard() {
         </Card>
       </div>
 
+      <div className="mt-6">
+        <Card title="Recent memberships" linkTo="/admin/memberships" linkLabel="All memberships">
+          {!recentMemberships ? (
+            <SkeletonRows />
+          ) : recentMemberships.length === 0 ? (
+            <EmptyRow message="No active memberships yet." />
+          ) : (
+            <ul className="divide-y divide-border">
+              {recentMemberships.map((m) => {
+                const isZp = m.ir_gateway === "zarinpal";
+                return (
+                  <li key={m.id} className="py-3 grid grid-cols-[1fr_auto] gap-3 text-sm items-center">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {m.user_id.slice(0, 8)}
+                        </span>
+                        <span
+                          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                            isZp
+                              ? "bg-emerald-500/15 text-emerald-500"
+                              : "bg-blue-500/15 text-blue-500"
+                          }`}
+                        >
+                          {isZp ? "ZarinPal" : "Stripe"}
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        {fmtDate(m.current_period_start)} → {fmtDate(m.current_period_end)}
+                      </div>
+                    </div>
+                    <div className="text-sm tabular-nums text-foreground">
+                      {isZp && m.amount_toman
+                        ? `${Number(m.amount_toman).toLocaleString()} T`
+                        : "—"}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
+      </div>
+
+
+
       <section className="mt-10">
         <h2 className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
           Quick actions
