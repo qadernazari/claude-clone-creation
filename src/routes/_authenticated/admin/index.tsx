@@ -64,6 +64,8 @@ async function getCounts(): Promise<Counts> {
     pastDueSubs,
     canceledSubs,
     ticketRev30d,
+    zarinpalActive,
+    zarinpalPaidAll,
   ] = await Promise.all([
     supabase.from("films").select("*", { count: "exact", head: true }),
     supabase
