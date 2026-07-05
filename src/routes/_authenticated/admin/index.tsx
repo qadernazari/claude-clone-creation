@@ -322,6 +322,33 @@ function AdminDashboard() {
         />
       </div>
 
+      {/* ZarinPal KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+        <Stat
+          label="ZarinPal subs"
+          value={data?.zarinpalActiveSubs}
+          sub="Active"
+          icon={CreditCard}
+          loading={isLoading}
+          to="/admin/memberships"
+        />
+        <Stat
+          label="Toman revenue (all time)"
+          value={data?.zarinpalRevenueTotalToman}
+          sub={data ? `${data.zarinpalRevenueTotalToman.toLocaleString()} T` : undefined}
+          icon={TrendingUp}
+          loading={isLoading}
+        />
+        <Stat
+          label="Active Toman /period"
+          value={data?.zarinpalActiveRevenueToman}
+          sub={data ? `${data.zarinpalActiveRevenueToman.toLocaleString()} T` : undefined}
+          icon={CreditCard}
+          loading={isLoading}
+        />
+      </div>
+
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat
           label="Films"
