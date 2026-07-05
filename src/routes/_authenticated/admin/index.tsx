@@ -138,6 +138,10 @@ async function getCounts(): Promise<Counts> {
     0,
   );
   const active = activeSubs.count ?? 0;
+  const zpActiveRows = (zarinpalActive.data ?? []) as { amount_toman: number | null }[];
+  const zpActiveRevenueToman = zpActiveRows.reduce((s, r) => s + Number(r.amount_toman ?? 0), 0);
+  const zpPaidRows = (zarinpalPaidAll.data ?? []) as { amount_toman: number | null }[];
+  const zpRevenueTotalToman = zpPaidRows.reduce((s, r) => s + Number(r.amount_toman ?? 0), 0);
   return {
     films: films.count ?? 0,
     publishedFilms: publishedFilms.count ?? 0,
@@ -155,6 +159,9 @@ async function getCounts(): Promise<Counts> {
     canceledSubs: canceledSubs.count ?? 0,
     mrrCents: active * ASSUMED_MONTHLY_PRICE_CENTS,
     ticketRevenue30dCents: ticketRev,
+    zarinpalActiveSubs: zpActiveRows.length,
+    zarinpalRevenueTotalToman: zpRevenueTotalToman,
+    zarinpalActiveRevenueToman: zpActiveRevenueToman,
   };
 }
 
