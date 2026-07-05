@@ -288,7 +288,7 @@ function AdminDashboard() {
       {/* Subscription KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
         <Stat
-          label="MRR (est.)"
+          label="MRR (Stripe est.)"
           value={data ? Math.round(data.mrrCents / 100) : undefined}
           sub={data ? `$${(data.mrrCents / 100).toFixed(2)}/mo` : undefined}
           icon={TrendingUp}
