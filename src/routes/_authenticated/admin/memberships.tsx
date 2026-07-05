@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Search, CreditCard, RefreshCw, CheckCircle, Clock, Ban } from "lucide-react";
+import { Search, CreditCard, RefreshCw, CheckCircle, Clock, Ban, Gift } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/memberships")({
   component: MembershipsPage,
@@ -88,6 +88,8 @@ function statusOf(r: Subscription): { label: string; cls: string } {
 }
 
 function gatewayBadge(r: Subscription) {
+  if (r.ir_gateway === "admin_grant")
+    return { label: "Admin Grant", cls: "bg-amber-500/15 text-amber-500" };
   const zp = r.ir_gateway === "zarinpal";
   if (zp) return { label: "ZarinPal", cls: "bg-emerald-500/15 text-emerald-500" };
   if (r.stripe_subscription_id) return { label: "Stripe", cls: "bg-blue-500/15 text-blue-500" };
@@ -99,6 +101,9 @@ function MembershipsPage() {
   const { data, isLoading } = useQuery({ queryKey: ["admin", "memberships"], queryFn: fetchAll });
   const [q, setQ] = useState("");
   const [armedId, setArmedId] = useState<string | null>(null);
+  const [, setRestoreId] = useState<string | null>(null);
+  const [grantEmail, setGrantEmail] = useState("");
+  const [grantMonths, setGrantMonths] = useState(1);
 
   const revoke = useMutation({
     mutationFn: async (id: string) => {
@@ -107,16 +112,77 @@ function MembershipsPage() {
         .update({
           status: "canceled",
           current_period_end: new Date().toISOString(),
-          cancel_at_period_end: false,
         })
         .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Membership revoked");
+      toast.success("Membership revoked — user access ended immediately.");
       qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
       qc.invalidateQueries({ queryKey: ["admin", "counts"] });
       setArmedId(null);
+    },
+    onError: (e) => toast.error(`Revoke failed: ${(e as Error).message}`),
+  });
+
+  const restore = useMutation({
+    mutationFn: async ({ id, months }: { id: string; months: number }) => {
+      const now = new Date();
+      const expiresAt = new Date(now);
+      expiresAt.setMonth(expiresAt.getMonth() + months);
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({
+          status: "active",
+          current_period_start: now.toISOString(),
+          current_period_end: expiresAt.toISOString(),
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_, { months }) => {
+      toast.success(`Membership restored for ${months} month${months > 1 ? "s" : ""}.`);
+      qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
+      qc.invalidateQueries({ queryKey: ["admin", "counts"] });
+      setRestoreId(null);
+    },
+    onError: (e) => toast.error(`Restore failed: ${(e as Error).message}`),
+  });
+
+  const grantFree = useMutation({
+    mutationFn: async ({ email, months }: { email: string; months: number }) => {
+      const { data: profiles, error: profileErr } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .eq("email", email.trim().toLowerCase())
+        .limit(1);
+      if (profileErr) throw profileErr;
+      if (!profiles || profiles.length === 0)
+        throw new Error("User not found. Make sure they have signed up first.");
+
+      const userId = profiles[0].id;
+      const now = new Date();
+      const expiresAt = new Date(now);
+      expiresAt.setMonth(expiresAt.getMonth() + months);
+
+      const { error } = await supabase.from("subscriptions").insert({
+        user_id: userId,
+        status: "active",
+        ir_gateway: "admin_grant",
+        amount_toman: 0,
+        current_period_start: now.toISOString(),
+        current_period_end: expiresAt.toISOString(),
+        environment: "live",
+      });
+      if (error) throw error;
+      return { email, months };
+    },
+    onSuccess: ({ email, months }) => {
+      toast.success(`Free ${months}-month membership granted to ${email}`);
+      qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
+      qc.invalidateQueries({ queryKey: ["admin", "counts"] });
+      setGrantEmail("");
+      setGrantMonths(1);
     },
     onError: (e) => toast.error((e as Error).message),
   });
@@ -140,7 +206,7 @@ function MembershipsPage() {
     const rows = data?.rows ?? [];
     const active = rows.filter((r) => (r.status === "active" || r.status === "trialing") && !isExpired(r));
     const zp = active.filter((r) => r.ir_gateway === "zarinpal");
-    const stripe = active.filter((r) => r.ir_gateway !== "zarinpal");
+    const stripe = active.filter((r) => r.ir_gateway !== "zarinpal" && r.ir_gateway !== "admin_grant");
     const tomanTotal = rows
       .filter((r) => r.ir_gateway === "zarinpal")
       .reduce((s, r) => s + Number(r.amount_toman ?? 0), 0);
@@ -185,6 +251,50 @@ function MembershipsPage() {
         <Kpi label="Active trials" value={summary.trials} icon={Clock} />
       </div>
 
+      {/* Grant free membership */}
+      <div className="mb-4 rounded-lg border border-border bg-card/40 p-4">
+        <h2 className="text-sm font-medium mb-3 flex items-center gap-2">
+          <Gift className="h-4 w-4 text-amber-500" />
+          Grant free membership
+        </h2>
+        <div className="flex flex-wrap gap-2 items-end">
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-xs text-muted-foreground mb-1 block">User email</label>
+            <input
+              type="email"
+              value={grantEmail}
+              onChange={(e) => setGrantEmail(e.target.value)}
+              placeholder="user@example.com"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Duration</label>
+            <select
+              value={grantMonths}
+              onChange={(e) => setGrantMonths(parseInt(e.target.value))}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            >
+              <option value={1}>1 month</option>
+              <option value={3}>3 months</option>
+              <option value={6}>6 months</option>
+              <option value={12}>12 months</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            disabled={!grantEmail.trim() || grantFree.isPending}
+            onClick={() => grantFree.mutate({ email: grantEmail, months: grantMonths })}
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {grantFree.isPending ? "Granting…" : "Grant access"}
+          </button>
+        </div>
+        {grantFree.isError && (
+          <p className="mt-2 text-xs text-destructive">{(grantFree.error as Error).message}</p>
+        )}
+      </div>
+
       <div className="mb-3 relative max-w-md">
         <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input
@@ -222,7 +332,9 @@ function MembershipsPage() {
                 const s = statusOf(r);
                 const g = gatewayBadge(r);
                 const days = daysUntil(r.current_period_end);
-                const canRevoke = r.status === "active" || r.status === "trialing" || r.status === "past_due";
+                const expired = isExpired(r);
+                const isActive = (r.status === "active" || r.status === "trialing" || r.status === "past_due") && !expired;
+                const isCancelledOrExpired = r.status === "canceled" || expired;
                 const armed = armedId === r.id;
                 return (
                   <tr key={r.id} className="hover:bg-accent/30">
@@ -240,7 +352,9 @@ function MembershipsPage() {
                       </span>
                     </td>
                     <td className="px-3 py-2.5 tabular-nums">
-                      {r.ir_gateway === "zarinpal" && r.amount_toman
+                      {r.ir_gateway === "admin_grant"
+                        ? "Free"
+                        : r.ir_gateway === "zarinpal" && r.amount_toman
                         ? `${Number(r.amount_toman).toLocaleString()} T`
                         : r.stripe_subscription_id
                         ? "USD"
@@ -257,7 +371,7 @@ function MembershipsPage() {
                       {days === null ? "—" : days < 0 ? <span className="text-red-500">expired</span> : `${days}d`}
                     </td>
                     <td className="px-3 py-2.5 text-right">
-                      {canRevoke ? (
+                      {isActive && (
                         <button
                           type="button"
                           disabled={revoke.isPending}
@@ -281,7 +395,28 @@ function MembershipsPage() {
                           <Ban className="h-3.5 w-3.5" />
                           {armed ? "Confirm end access" : "Revoke"}
                         </button>
-                      ) : (
+                      )}
+                      {isCancelledOrExpired && (
+                        <div className="flex items-center gap-1 justify-end">
+                          <select
+                            className="rounded border border-border bg-background px-1.5 py-1 text-xs"
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                restore.mutate({ id: r.id, months: parseInt(e.target.value) });
+                                e.target.value = "";
+                              }
+                            }}
+                            defaultValue=""
+                          >
+                            <option value="" disabled>Restore…</option>
+                            <option value="1">1 month</option>
+                            <option value="3">3 months</option>
+                            <option value="6">6 months</option>
+                            <option value="12">12 months</option>
+                          </select>
+                        </div>
+                      )}
+                      {!isActive && !isCancelledOrExpired && (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </td>
