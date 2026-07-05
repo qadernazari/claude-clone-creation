@@ -5,13 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { requireAdmin } from "@/lib/admin.functions";
 import {
   LayoutDashboard, Film, LogOut, Home, Users, Receipt, Settings, Globe,
-  ShieldAlert, Copy, RefreshCw,
 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import { useAuthState } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: ({ context }) => {
