@@ -38,9 +38,12 @@ type Counts = {
   canceledSubs: number;
   mrrCents: number;
   ticketRevenue30dCents: number;
+  zarinpalActiveSubs: number;
+  zarinpalRevenueTotalToman: number;
+  zarinpalActiveRevenueToman: number;
 };
 
-// Rough MRR estimate; replace with real Stripe price lookup when needed.
+// Approx monthly value for Stripe subs (real per-price lookup TBD).
 const ASSUMED_MONTHLY_PRICE_CENTS = 999;
 
 async function getCounts(): Promise<Counts> {
