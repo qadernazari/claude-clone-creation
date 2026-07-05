@@ -38,9 +38,12 @@ type Counts = {
   canceledSubs: number;
   mrrCents: number;
   ticketRevenue30dCents: number;
+  zarinpalActiveSubs: number;
+  zarinpalRevenueTotalToman: number;
+  zarinpalActiveRevenueToman: number;
 };
 
-// Rough MRR estimate; replace with real Stripe price lookup when needed.
+// Approx monthly value for Stripe subs (real per-price lookup TBD).
 const ASSUMED_MONTHLY_PRICE_CENTS = 999;
 
 async function getCounts(): Promise<Counts> {
@@ -61,6 +64,8 @@ async function getCounts(): Promise<Counts> {
     pastDueSubs,
     canceledSubs,
     ticketRev30d,
+    zarinpalActive,
+    zarinpalPaidAll,
   ] = await Promise.all([
     supabase.from("films").select("*", { count: "exact", head: true }),
     supabase
@@ -113,6 +118,16 @@ async function getCounts(): Promise<Counts> {
       .eq("status", "paid")
       .eq("currency", "usd")
       .gte("created_at", thirtyDaysAgo),
+    supabase
+      .from("subscriptions")
+      .select("amount_toman")
+      .eq("status", "active")
+      .eq("ir_gateway", "zarinpal")
+      .not("amount_toman", "is", null),
+    supabase
+      .from("ir_payment_requests")
+      .select("amount_toman")
+      .eq("status", "paid"),
   ]);
   const contribTotal = (contributions.data ?? []).reduce(
     (sum, row) => sum + Number((row as { amount: number }).amount ?? 0),
@@ -123,6 +138,10 @@ async function getCounts(): Promise<Counts> {
     0,
   );
   const active = activeSubs.count ?? 0;
+  const zpActiveRows = (zarinpalActive.data ?? []) as { amount_toman: number | null }[];
+  const zpActiveRevenueToman = zpActiveRows.reduce((s, r) => s + Number(r.amount_toman ?? 0), 0);
+  const zpPaidRows = (zarinpalPaidAll.data ?? []) as { amount_toman: number | null }[];
+  const zpRevenueTotalToman = zpPaidRows.reduce((s, r) => s + Number(r.amount_toman ?? 0), 0);
   return {
     films: films.count ?? 0,
     publishedFilms: publishedFilms.count ?? 0,
@@ -140,6 +159,9 @@ async function getCounts(): Promise<Counts> {
     canceledSubs: canceledSubs.count ?? 0,
     mrrCents: active * ASSUMED_MONTHLY_PRICE_CENTS,
     ticketRevenue30dCents: ticketRev,
+    zarinpalActiveSubs: zpActiveRows.length,
+    zarinpalRevenueTotalToman: zpRevenueTotalToman,
+    zarinpalActiveRevenueToman: zpActiveRevenueToman,
   };
 }
 
@@ -180,6 +202,31 @@ async function getRecent() {
   };
 }
 
+type RecentMembership = {
+  id: string;
+  status: string;
+  amount_toman: number | null;
+  ir_gateway: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  user_id: string;
+};
+
+async function getRecentMemberships(): Promise<RecentMembership[]> {
+  const { data } = await supabase
+    .from("subscriptions")
+    .select("id, status, amount_toman, ir_gateway, current_period_start, current_period_end, user_id")
+    .eq("status", "active")
+    .order("current_period_start", { ascending: false })
+    .limit(5);
+  return (data ?? []) as RecentMembership[];
+}
+
+function fmtDate(iso: string | null) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 function money(amount: number, currency: string) {
   if (currency === "usd") return `$${(amount / 100).toFixed(2)}`;
   if (currency === "toman") return `${amount.toLocaleString()} T`;
@@ -207,6 +254,10 @@ function AdminDashboard() {
   const { data: recent } = useQuery({
     queryKey: ["admin", "recent"],
     queryFn: getRecent,
+  });
+  const { data: recentMemberships } = useQuery({
+    queryKey: ["admin", "recent-memberships"],
+    queryFn: getRecentMemberships,
   });
 
   return (
@@ -237,7 +288,7 @@ function AdminDashboard() {
       {/* Subscription KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
         <Stat
-          label="MRR (est.)"
+          label="MRR (Stripe est.)"
           value={data ? Math.round(data.mrrCents / 100) : undefined}
           sub={data ? `$${(data.mrrCents / 100).toFixed(2)}/mo` : undefined}
           icon={TrendingUp}
@@ -270,6 +321,33 @@ function AdminDashboard() {
           loading={isLoading}
         />
       </div>
+
+      {/* ZarinPal KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+        <Stat
+          label="ZarinPal subs"
+          value={data?.zarinpalActiveSubs}
+          sub="Active"
+          icon={CreditCard}
+          loading={isLoading}
+          to="/admin/memberships"
+        />
+        <Stat
+          label="Toman revenue (all time)"
+          value={data?.zarinpalRevenueTotalToman}
+          sub={data ? `${data.zarinpalRevenueTotalToman.toLocaleString()} T` : undefined}
+          icon={TrendingUp}
+          loading={isLoading}
+        />
+        <Stat
+          label="Active Toman /period"
+          value={data?.zarinpalActiveRevenueToman}
+          sub={data ? `${data.zarinpalActiveRevenueToman.toLocaleString()} T` : undefined}
+          icon={CreditCard}
+          loading={isLoading}
+        />
+      </div>
+
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat
@@ -372,6 +450,52 @@ function AdminDashboard() {
           )}
         </Card>
       </div>
+
+      <div className="mt-6">
+        <Card title="Recent memberships" linkTo="/admin/memberships" linkLabel="All memberships">
+          {!recentMemberships ? (
+            <SkeletonRows />
+          ) : recentMemberships.length === 0 ? (
+            <EmptyRow message="No active memberships yet." />
+          ) : (
+            <ul className="divide-y divide-border">
+              {recentMemberships.map((m) => {
+                const isZp = m.ir_gateway === "zarinpal";
+                return (
+                  <li key={m.id} className="py-3 grid grid-cols-[1fr_auto] gap-3 text-sm items-center">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {m.user_id.slice(0, 8)}
+                        </span>
+                        <span
+                          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                            isZp
+                              ? "bg-emerald-500/15 text-emerald-500"
+                              : "bg-blue-500/15 text-blue-500"
+                          }`}
+                        >
+                          {isZp ? "ZarinPal" : "Stripe"}
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        {fmtDate(m.current_period_start)} → {fmtDate(m.current_period_end)}
+                      </div>
+                    </div>
+                    <div className="text-sm tabular-nums text-foreground">
+                      {isZp && m.amount_toman
+                        ? `${Number(m.amount_toman).toLocaleString()} T`
+                        : "—"}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
+      </div>
+
+
 
       <section className="mt-10">
         <h2 className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
