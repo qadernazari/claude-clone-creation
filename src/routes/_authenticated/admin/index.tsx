@@ -202,6 +202,31 @@ async function getRecent() {
   };
 }
 
+type RecentMembership = {
+  id: string;
+  status: string;
+  amount_toman: number | null;
+  ir_gateway: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  user_id: string;
+};
+
+async function getRecentMemberships(): Promise<RecentMembership[]> {
+  const { data } = await supabase
+    .from("subscriptions")
+    .select("id, status, amount_toman, ir_gateway, current_period_start, current_period_end, user_id")
+    .eq("status", "active")
+    .order("current_period_start", { ascending: false })
+    .limit(5);
+  return (data ?? []) as RecentMembership[];
+}
+
+function fmtDate(iso: string | null) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 function money(amount: number, currency: string) {
   if (currency === "usd") return `$${(amount / 100).toFixed(2)}`;
   if (currency === "toman") return `${amount.toLocaleString()} T`;
