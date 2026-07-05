@@ -173,7 +173,6 @@ function MembershipsPage() {
         current_period_start: now.toISOString(),
         current_period_end: expiresAt.toISOString(),
         environment: "live",
-        currency: "free",
       });
       if (error) throw error;
       return { email, months };
