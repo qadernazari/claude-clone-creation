@@ -255,6 +255,10 @@ function AdminDashboard() {
     queryKey: ["admin", "recent"],
     queryFn: getRecent,
   });
+  const { data: recentMemberships } = useQuery({
+    queryKey: ["admin", "recent-memberships"],
+    queryFn: getRecentMemberships,
+  });
 
   return (
     <div className="p-8 max-w-6xl">
