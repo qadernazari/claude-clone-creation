@@ -43,6 +43,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPagesRouteImport } from './routes/_authenticated/admin/pages'
 import { Route as AuthenticatedAdminNotifyListRouteImport } from './routes/_authenticated/admin/notify-list'
 import { Route as AuthenticatedAdminMenuRouteImport } from './routes/_authenticated/admin/menu'
+import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin/memberships'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminFooterRouteImport } from './routes/_authenticated/admin/footer'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
@@ -238,6 +239,12 @@ const AuthenticatedAdminMenuRoute = AuthenticatedAdminMenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminMembershipsRoute =
+  AuthenticatedAdminMembershipsRouteImport.update({
+    id: '/memberships',
+    path: '/memberships',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminHomepageRoute =
   AuthenticatedAdminHomepageRouteImport.update({
     id: '/homepage',
@@ -388,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/footer': typeof AuthenticatedAdminFooterRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
   '/admin/pages': typeof AuthenticatedAdminPagesRoute
@@ -442,6 +450,7 @@ export interface FileRoutesByTo {
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/footer': typeof AuthenticatedAdminFooterRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
   '/admin/pages': typeof AuthenticatedAdminPagesRoute
@@ -499,6 +508,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/_authenticated/admin/footer': typeof AuthenticatedAdminFooterRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/_authenticated/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/_authenticated/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
   '/_authenticated/admin/pages': typeof AuthenticatedAdminPagesRoute
@@ -556,6 +566,7 @@ export interface FileRouteTypes {
     | '/admin/films'
     | '/admin/footer'
     | '/admin/homepage'
+    | '/admin/memberships'
     | '/admin/menu'
     | '/admin/notify-list'
     | '/admin/pages'
@@ -610,6 +621,7 @@ export interface FileRouteTypes {
     | '/admin/films'
     | '/admin/footer'
     | '/admin/homepage'
+    | '/admin/memberships'
     | '/admin/menu'
     | '/admin/notify-list'
     | '/admin/pages'
@@ -666,6 +678,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/films'
     | '/_authenticated/admin/footer'
     | '/_authenticated/admin/homepage'
+    | '/_authenticated/admin/memberships'
     | '/_authenticated/admin/menu'
     | '/_authenticated/admin/notify-list'
     | '/_authenticated/admin/pages'
@@ -960,6 +973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMenuRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/memberships': {
+      id: '/_authenticated/admin/memberships'
+      path: '/memberships'
+      fullPath: '/admin/memberships'
+      preLoaderRoute: typeof AuthenticatedAdminMembershipsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/homepage': {
       id: '/_authenticated/admin/homepage'
       path: '/homepage'
@@ -1132,6 +1152,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminFilmsRoute: typeof AuthenticatedAdminFilmsRouteWithChildren
   AuthenticatedAdminFooterRoute: typeof AuthenticatedAdminFooterRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
+  AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminMenuRoute: typeof AuthenticatedAdminMenuRoute
   AuthenticatedAdminNotifyListRoute: typeof AuthenticatedAdminNotifyListRoute
   AuthenticatedAdminPagesRoute: typeof AuthenticatedAdminPagesRoute
@@ -1155,6 +1176,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminFilmsRoute: AuthenticatedAdminFilmsRouteWithChildren,
     AuthenticatedAdminFooterRoute: AuthenticatedAdminFooterRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
+    AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
     AuthenticatedAdminMenuRoute: AuthenticatedAdminMenuRoute,
     AuthenticatedAdminNotifyListRoute: AuthenticatedAdminNotifyListRoute,
     AuthenticatedAdminPagesRoute: AuthenticatedAdminPagesRoute,
