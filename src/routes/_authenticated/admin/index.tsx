@@ -118,6 +118,16 @@ async function getCounts(): Promise<Counts> {
       .eq("status", "paid")
       .eq("currency", "usd")
       .gte("created_at", thirtyDaysAgo),
+    supabase
+      .from("subscriptions")
+      .select("amount_toman")
+      .eq("status", "active")
+      .eq("ir_gateway", "zarinpal")
+      .not("amount_toman", "is", null),
+    supabase
+      .from("ir_payment_requests")
+      .select("amount_toman")
+      .eq("status", "paid"),
   ]);
   const contribTotal = (contributions.data ?? []).reduce(
     (sum, row) => sum + Number((row as { amount: number }).amount ?? 0),
