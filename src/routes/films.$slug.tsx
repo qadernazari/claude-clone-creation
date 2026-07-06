@@ -46,7 +46,17 @@ export const Route = createFileRoute("/films/$slug")({
     const ogImage = await getResizedOgImage({
       data: { url: data.thumbnail_url || data.cover_url || null },
     });
-    return { film: data, ogImage };
+
+    // Pre-generate high-quality hero URLs for desktop and mobile
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { renderResizedUrl, makeRenderCache } = await import("@/lib/storage-render.server");
+    const renderCache = makeRenderCache();
+    const [heroDesktop, heroMobile] = await Promise.all([
+      renderResizedUrl(supabaseAdmin, renderCache, data.thumbnail_url || data.cover_url, 1920, 90),
+      renderResizedUrl(supabaseAdmin, renderCache, data.mobile_cover_url || data.cover_url, 800, 90),
+    ]);
+
+    return { film: data, ogImage, heroDesktop, heroMobile };
   },
   head: ({ params, loaderData }) => {
     const f = loaderData?.film;
@@ -231,7 +241,7 @@ function PosterRail({
 }
 
 function FilmPage() {
-  const { film } = Route.useLoaderData();
+  const { film, heroDesktop, heroMobile } = Route.useLoaderData();
   const { locale, region, num, year, dir } = useLocale();
   const fa = locale === "fa";
   const { isMember, isLoading: isAuthLoading, user, hasUsedTrial } = useSubscription();
@@ -575,7 +585,7 @@ function FilmPage() {
             {/* Mobile: 9:16 vertical poster */}
             {heroArtMobile ? (
               <img
-                src={heroArtMobile}
+                src={heroMobile || heroArtMobile}
                 alt=""
                 decoding="async"
                 className="film-hero-kenburns absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
@@ -589,7 +599,7 @@ function FilmPage() {
                 already preloads the right image. */}
             {heroArtDesktop ? (
               <img
-                src={heroArtDesktop}
+                src={heroDesktop || heroArtDesktop}
                 alt=""
                 decoding="async"
                 className="film-hero-kenburns absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"

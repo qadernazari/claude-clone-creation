@@ -22,7 +22,7 @@ export async function renderResizedUrl(
   cache: Map<string, Promise<string | null>>,
   original: string | null | undefined,
   width: number,
-  quality = 68,
+  quality = 90,
 ): Promise<string | null> {
   if (!original) return null;
   const parsed = parseSignedObjectUrl(original);

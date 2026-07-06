@@ -16,5 +16,5 @@ export const getResizedOgImage = createServerFn({ method: "GET" })
     if (!data.url) return null;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const cache = makeRenderCache();
-    return renderResizedUrl(supabaseAdmin, cache, data.url, 1200, 75);
+    return renderResizedUrl(supabaseAdmin, cache, data.url, 1200, 85);
   });
