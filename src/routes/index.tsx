@@ -19,7 +19,7 @@ const ContinueWatching = lazy(() =>
 // Warm the lazy chunks + rails data on idle so the moment the user scrolls
 // the rails render instantly — no chunk fetch, no query wait.
 function prefetchRails(queryClient: ReturnType<typeof useQueryClient>) {
-  void import("../components/films-row");
+  void import("../components/prime/home-rails");
   void import("../components/continue-watching");
   void queryClient.prefetchQuery(homeRailsQueryOptions);
 }
@@ -67,7 +67,7 @@ function DeferredHomeRails() {
       </Suspense>
       <Suspense fallback={<div className="min-h-[400px]" aria-hidden />}>
         <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
-          <FilmsRow />
+          <HomeRails />
         </div>
       </Suspense>
     </>
@@ -236,7 +236,7 @@ function Home() {
       <SiteHeader current="home" />
       <main>
         {/* 1. Cinematic hero = featured film */}
-        <FeaturedFilm />
+        <HeroCarousel />
         <div className="h-3 bg-bg-0 md:hidden" aria-hidden />
 
         <DeferredHomeRails />
