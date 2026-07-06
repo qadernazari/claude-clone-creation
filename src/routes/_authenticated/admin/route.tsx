@@ -71,6 +71,7 @@ const NAV: ReadonlyArray<NavItem> = [
   { to: "/admin/films", label: "Films", icon: Film },
   { to: "/admin/tickets", label: "Sales & tickets", icon: Receipt },
   { to: "/admin/memberships", label: "Memberships", icon: CreditCard },
+  { to: "/admin/revenue", label: "Revenue", icon: TrendingUp },
   { to: "/admin/users", label: "Members", icon: Users },
   { to: "/admin/homepage", label: "Site content", icon: Globe },
   { to: "/admin/settings", label: "Settings", icon: Settings },
