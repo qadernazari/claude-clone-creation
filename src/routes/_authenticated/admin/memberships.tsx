@@ -428,24 +428,47 @@ function MembershipsPage() {
                       )}
                       {isCancelledOrExpired && (
                         <div className="flex items-center gap-1 justify-end">
-                          <select
-                            className="rounded border border-border bg-background px-1.5 py-1 text-xs"
-                            onChange={(e) => {
-                              if (e.target.value) {
-                                restore.mutate({ id: r.id, months: parseInt(e.target.value) });
-                                e.target.value = "";
-                              }
-                            }}
-                            defaultValue=""
-                          >
-                            <option value="" disabled>Restore…</option>
-                            <option value="1">1 month</option>
-                            <option value="3">3 months</option>
-                            <option value="6">6 months</option>
-                            <option value="12">12 months</option>
-                          </select>
+                          {pendingRestore?.id === r.id ? (
+                            <>
+                              <button
+                                type="button"
+                                disabled={restore.isPending}
+                                onClick={() => restore.mutate(pendingRestore)}
+                                className="inline-flex items-center rounded-md bg-emerald-500 px-2.5 py-1 text-xs font-medium text-black hover:opacity-90 disabled:opacity-50"
+                              >
+                                {restore.isPending
+                                  ? "Restoring…"
+                                  : `Confirm restore ${pendingRestore.months}mo`}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPendingRestore(null)}
+                                className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <select
+                              className="rounded border border-border bg-background px-1.5 py-1 text-xs"
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  setPendingRestore({ id: r.id, months: parseInt(e.target.value) });
+                                  e.target.value = "";
+                                }
+                              }}
+                              defaultValue=""
+                            >
+                              <option value="" disabled>Restore…</option>
+                              <option value="1">1 month</option>
+                              <option value="3">3 months</option>
+                              <option value="6">6 months</option>
+                              <option value="12">12 months</option>
+                            </select>
+                          )}
                         </div>
                       )}
+
                       {!isActive && !isCancelledOrExpired && (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
