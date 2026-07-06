@@ -48,7 +48,7 @@ export function HeroCarousel() {
       if (out.length >= 5) break;
     }
     return out;
-  }, [featured, rails, locale, t]);
+  }, [featured, rails, locale]);
 
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
