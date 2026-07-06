@@ -4,6 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Search, CreditCard, RefreshCw, CheckCircle, Clock, Ban, Gift } from "lucide-react";
+import {
+  revokeSubscription,
+  restoreSubscription,
+  grantFreeSubscription,
+} from "@/lib/admin.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin/memberships")({
   component: MembershipsPage,
