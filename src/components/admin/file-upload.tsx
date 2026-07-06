@@ -50,7 +50,7 @@ function accepts(file: File, accept: string) {
  * Cuts a typical 2-5 MB JPEG cover down to 100-250 KB and lets every
  * mobile client paint the poster in a single TCP window.
  */
-async function compressImage(file: File, maxWidth = 1600, quality = 0.82): Promise<File> {
+async function compressImage(file: File, maxWidth = 2400, quality = 0.92): Promise<File> {
   if (!file.type.startsWith("image/") || file.type === "image/svg+xml") return file;
   try {
     const bitmap = await createImageBitmap(file);
