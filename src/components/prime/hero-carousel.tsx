@@ -93,7 +93,7 @@ export function HeroCarousel() {
             locale={locale}
             num={num}
             year={year}
-            t={t}
+            
             rtl={rtl}
           />
         ))}
