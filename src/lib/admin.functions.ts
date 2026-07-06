@@ -22,9 +22,6 @@ export const requireAdmin = createServerFn({ method: "GET" })
   });
 
 async function assertAdmin(userId: string) {
-  const { supabase } = await import("@/integrations/supabase/auth-middleware")
-    .then(async () => ({ supabase: null })); // no-op to satisfy TS if unused
-  void supabase;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("user_roles")
@@ -35,6 +32,7 @@ async function assertAdmin(userId: string) {
   if (error) throw new Error(`Role check failed: ${error.message}`);
   if (!data) throw new Error("Unauthorized: admin access required");
 }
+
 
 export const revokeSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
