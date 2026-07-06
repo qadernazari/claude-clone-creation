@@ -34,6 +34,20 @@ async function assertAdmin(userId: string) {
 }
 
 
+async function getUserEmail(userId: string): Promise<string | null> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .maybeSingle();
+  return data?.email ?? null;
+}
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
 export const revokeSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -42,6 +56,13 @@ export const revokeSubscription = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: sub } = await supabaseAdmin
+      .from("subscriptions")
+      .select("user_id")
+      .eq("id", data.subscriptionId)
+      .maybeSingle();
+
     const { error } = await supabaseAdmin
       .from("subscriptions")
       .update({
@@ -50,6 +71,19 @@ export const revokeSubscription = createServerFn({ method: "POST" })
       })
       .eq("id", data.subscriptionId);
     if (error) throw new Error(error.message);
+
+    if (sub?.user_id) {
+      const email = await getUserEmail(sub.user_id);
+      if (email) {
+        const { sendTransactionalEmail } = await import("@/lib/send-email.server");
+        await sendTransactionalEmail({
+          to: email,
+          templateName: "membership-revoked",
+          templateData: { membershipUrl: "https://ir.show/membership" },
+          idempotencyKey: `membership-revoked-${data.subscriptionId}-${Date.now()}`,
+        }).catch((e) => console.error("revoke email failed:", e));
+      }
+    }
     return { success: true };
   });
 
@@ -78,6 +112,29 @@ export const restoreSubscription = createServerFn({ method: "POST" })
       })
       .eq("id", data.subscriptionId);
     if (error) throw new Error(error.message);
+
+    const { data: sub } = await supabaseAdmin
+      .from("subscriptions")
+      .select("user_id")
+      .eq("id", data.subscriptionId)
+      .maybeSingle();
+
+    if (sub?.user_id) {
+      const email = await getUserEmail(sub.user_id);
+      if (email) {
+        const { sendTransactionalEmail } = await import("@/lib/send-email.server");
+        await sendTransactionalEmail({
+          to: email,
+          templateName: "membership-restored",
+          templateData: {
+            monthsLabel: `${data.months} month${data.months > 1 ? "s" : ""}`,
+            expiresFormatted: fmtDate(expiresAt),
+            browseUrl: "https://ir.show/browse",
+          },
+          idempotencyKey: `membership-restored-${data.subscriptionId}-${Date.now()}`,
+        }).catch((e) => console.error("restore email failed:", e));
+      }
+    }
     return { success: true };
   });
 
@@ -118,5 +175,20 @@ export const grantFreeSubscription = createServerFn({ method: "POST" })
       environment: "live",
     });
     if (error) throw new Error(error.message);
+
+    const { sendTransactionalEmail } = await import("@/lib/send-email.server");
+    await sendTransactionalEmail({
+      to: email,
+      templateName: "membership-granted",
+      templateData: {
+        monthsLabel: `${data.months} month${data.months > 1 ? "s" : ""}`,
+        expiresFormatted: fmtDate(expiresAt),
+        browseUrl: "https://ir.show/browse",
+        accountUrl: "https://ir.show/account",
+      },
+      idempotencyKey: `membership-granted-${targetProfile.id}-${now.getTime()}`,
+    }).catch((e) => console.error("grant email failed:", e));
+
     return { success: true, email, months: data.months };
   });
+
