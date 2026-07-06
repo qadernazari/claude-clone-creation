@@ -290,16 +290,18 @@ function SlideLayer({
   );
 }
 
-function toSlideFromFeatured(
-  f: HomeFeaturedFilm,
-  locale: "en" | "fa",
-  t: <T>(o: { en: T; fa: T } | null | undefined, fallback?: T) => T | undefined,
-): Slide {
+function pickLang<T extends string | null>(locale: "en" | "fa", en: T, fa: T): string {
+  const primary = locale === "fa" ? fa : en;
+  const fallback = locale === "fa" ? en : fa;
+  return (primary || fallback || "") as string;
+}
+
+function toSlideFromFeatured(f: HomeFeaturedFilm, locale: "en" | "fa"): Slide {
   return {
     id: f.id,
     slug: f.slug,
-    title: t({ en: f.title_en, fa: f.title_fa || f.title_en }),
-    synopsis: t({ en: f.synopsis_en || "", fa: f.synopsis_fa || f.synopsis_en || "" }),
+    title: pickLang(locale, f.title_en, f.title_fa),
+    synopsis: pickLang(locale, f.synopsis_en, f.synopsis_fa),
     year: f.year,
     duration_min: f.duration_min,
     is_premium: f.is_premium,
@@ -310,15 +312,11 @@ function toSlideFromFeatured(
   };
 }
 
-function toSlideFromRail(
-  f: HomeRailFilm,
-  locale: "en" | "fa",
-  t: <T>(o: { en: T; fa: T } | null | undefined, fallback?: T) => T | undefined,
-): Slide {
+function toSlideFromRail(f: HomeRailFilm, locale: "en" | "fa"): Slide {
   return {
     id: f.id,
     slug: f.slug,
-    title: t({ en: f.title_en, fa: f.title_fa || f.title_en }),
+    title: pickLang(locale, f.title_en, f.title_fa),
     synopsis: "",
     year: f.year,
     duration_min: f.duration_min,
