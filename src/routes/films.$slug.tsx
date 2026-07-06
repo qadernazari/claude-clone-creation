@@ -585,7 +585,7 @@ function FilmPage() {
             {/* Mobile: 9:16 vertical poster */}
             {heroArtMobile ? (
               <img
-                src={heroArtMobile}
+                src={heroMobile || heroArtMobile}
                 alt=""
                 decoding="async"
                 className="film-hero-kenburns absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
@@ -599,7 +599,7 @@ function FilmPage() {
                 already preloads the right image. */}
             {heroArtDesktop ? (
               <img
-                src={heroArtDesktop}
+                src={heroDesktop || heroArtDesktop}
                 alt=""
                 decoding="async"
                 className="film-hero-kenburns absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"
