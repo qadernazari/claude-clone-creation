@@ -39,5 +39,9 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'payment-failed': paymentFailed,
   'subscription-canceled': subscriptionCanceled,
   'membership-activated': membershipActivated,
+  'membership-revoked': membershipRevoked,
+  'membership-granted': membershipGranted,
+  'membership-restored': membershipRestored,
 }
+
 
