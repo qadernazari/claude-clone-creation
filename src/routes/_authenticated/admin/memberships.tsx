@@ -101,9 +101,11 @@ function MembershipsPage() {
   const { data, isLoading } = useQuery({ queryKey: ["admin", "memberships"], queryFn: fetchAll });
   const [q, setQ] = useState("");
   const [armedId, setArmedId] = useState<string | null>(null);
-  const [, setRestoreId] = useState<string | null>(null);
+  const [pendingRestore, setPendingRestore] = useState<{ id: string; months: number } | null>(null);
+  const [grantArmed, setGrantArmed] = useState(false);
   const [grantEmail, setGrantEmail] = useState("");
   const [grantMonths, setGrantMonths] = useState(1);
+
 
   const revoke = useMutation({
     mutationFn: async (id: string) => {
@@ -144,7 +146,7 @@ function MembershipsPage() {
       toast.success(`Membership restored for ${months} month${months > 1 ? "s" : ""}.`);
       qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
       qc.invalidateQueries({ queryKey: ["admin", "counts"] });
-      setRestoreId(null);
+      setPendingRestore(null);
     },
     onError: (e) => toast.error(`Restore failed: ${(e as Error).message}`),
   });
@@ -183,6 +185,8 @@ function MembershipsPage() {
       qc.invalidateQueries({ queryKey: ["admin", "counts"] });
       setGrantEmail("");
       setGrantMonths(1);
+      setGrantArmed(false);
+
     },
     onError: (e) => toast.error((e as Error).message),
   });
@@ -263,7 +267,7 @@ function MembershipsPage() {
             <input
               type="email"
               value={grantEmail}
-              onChange={(e) => setGrantEmail(e.target.value)}
+              onChange={(e) => { setGrantEmail(e.target.value); setGrantArmed(false); }}
               placeholder="user@example.com"
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             />
@@ -272,7 +276,7 @@ function MembershipsPage() {
             <label className="text-xs text-muted-foreground mb-1 block">Duration</label>
             <select
               value={grantMonths}
-              onChange={(e) => setGrantMonths(parseInt(e.target.value))}
+              onChange={(e) => { setGrantMonths(parseInt(e.target.value)); setGrantArmed(false); }}
               className="rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             >
               <option value={1}>1 month</option>
@@ -284,16 +288,42 @@ function MembershipsPage() {
           <button
             type="button"
             disabled={!grantEmail.trim() || grantFree.isPending}
-            onClick={() => grantFree.mutate({ email: grantEmail, months: grantMonths })}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+            onClick={() => {
+              if (!grantArmed) {
+                setGrantArmed(true);
+                setTimeout(() => setGrantArmed((v) => v), 0);
+                return;
+              }
+              grantFree.mutate({ email: grantEmail, months: grantMonths });
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${
+              grantArmed
+                ? "bg-amber-500 text-black hover:opacity-90"
+                : "bg-primary text-primary-foreground hover:opacity-90"
+            }`}
+            title={grantArmed ? "Click again to confirm" : "Grant access"}
           >
-            {grantFree.isPending ? "Granting…" : "Grant access"}
+            {grantFree.isPending
+              ? "Granting…"
+              : grantArmed
+              ? `Confirm grant ${grantMonths}mo → ${grantEmail.trim()}`
+              : "Grant access"}
           </button>
+          {grantArmed && !grantFree.isPending && (
+            <button
+              type="button"
+              onClick={() => setGrantArmed(false)}
+              className="inline-flex items-center rounded-md border border-border px-3 py-2 text-xs text-muted-foreground hover:bg-accent"
+            >
+              Cancel
+            </button>
+          )}
         </div>
         {grantFree.isError && (
           <p className="mt-2 text-xs text-destructive">{(grantFree.error as Error).message}</p>
         )}
       </div>
+
 
       <div className="mb-3 relative max-w-md">
         <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -398,24 +428,47 @@ function MembershipsPage() {
                       )}
                       {isCancelledOrExpired && (
                         <div className="flex items-center gap-1 justify-end">
-                          <select
-                            className="rounded border border-border bg-background px-1.5 py-1 text-xs"
-                            onChange={(e) => {
-                              if (e.target.value) {
-                                restore.mutate({ id: r.id, months: parseInt(e.target.value) });
-                                e.target.value = "";
-                              }
-                            }}
-                            defaultValue=""
-                          >
-                            <option value="" disabled>Restore…</option>
-                            <option value="1">1 month</option>
-                            <option value="3">3 months</option>
-                            <option value="6">6 months</option>
-                            <option value="12">12 months</option>
-                          </select>
+                          {pendingRestore?.id === r.id ? (
+                            <>
+                              <button
+                                type="button"
+                                disabled={restore.isPending}
+                                onClick={() => restore.mutate(pendingRestore)}
+                                className="inline-flex items-center rounded-md bg-emerald-500 px-2.5 py-1 text-xs font-medium text-black hover:opacity-90 disabled:opacity-50"
+                              >
+                                {restore.isPending
+                                  ? "Restoring…"
+                                  : `Confirm restore ${pendingRestore.months}mo`}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPendingRestore(null)}
+                                className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <select
+                              className="rounded border border-border bg-background px-1.5 py-1 text-xs"
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  setPendingRestore({ id: r.id, months: parseInt(e.target.value) });
+                                  e.target.value = "";
+                                }
+                              }}
+                              defaultValue=""
+                            >
+                              <option value="" disabled>Restore…</option>
+                              <option value="1">1 month</option>
+                              <option value="3">3 months</option>
+                              <option value="6">6 months</option>
+                              <option value="12">12 months</option>
+                            </select>
+                          )}
                         </div>
                       )}
+
                       {!isActive && !isCancelledOrExpired && (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
