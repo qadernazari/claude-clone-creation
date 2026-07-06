@@ -47,14 +47,14 @@ export const Route = createFileRoute("/films/$slug")({
       data: { url: data.thumbnail_url || data.cover_url || null },
     });
 
-    // Pre-generate high-quality hero URLs for desktop and mobile
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { renderResizedUrl, makeRenderCache } = await import("@/lib/storage-render.server");
-    const renderCache = makeRenderCache();
-    const [heroDesktop, heroMobile] = await Promise.all([
-      renderResizedUrl(supabaseAdmin, renderCache, data.thumbnail_url || data.cover_url, 1920, 90),
-      renderResizedUrl(supabaseAdmin, renderCache, data.mobile_cover_url || data.cover_url, 800, 90),
-    ]);
+    // Hero images: serve the raw signed URL directly (no transform).
+    // The Supabase render endpoint re-encodes as WebP, which double-
+    // compresses already-optimized uploads and softens small sources
+    // (it caps at source width, so requesting 1920 on a 1600px master
+    // just re-encodes at lower effective quality). Passing the raw
+    // /object/sign URL preserves the original bytes at full quality.
+    const heroDesktop = data.thumbnail_url || data.cover_url;
+    const heroMobile = data.mobile_cover_url || data.cover_url;
 
     return { film: data, ogImage, heroDesktop, heroMobile };
   },
