@@ -185,6 +185,8 @@ function MembershipsPage() {
       qc.invalidateQueries({ queryKey: ["admin", "counts"] });
       setGrantEmail("");
       setGrantMonths(1);
+      setGrantArmed(false);
+
     },
     onError: (e) => toast.error((e as Error).message),
   });
