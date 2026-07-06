@@ -164,7 +164,6 @@ function SlideLayer({
   locale,
   num,
   year,
-  t: _t,
   rtl,
 }: {
   slide: Slide;
@@ -173,7 +172,6 @@ function SlideLayer({
   locale: "en" | "fa";
   num: (n: number) => string;
   year: (n: number) => string;
-  t: <T>(o: { en: T; fa: T } | null | undefined, fallback?: T) => T | undefined;
   rtl: boolean;
 }) {
   const fallbackBg =
