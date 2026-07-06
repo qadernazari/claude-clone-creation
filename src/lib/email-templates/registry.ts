@@ -11,6 +11,10 @@ import { template as trialExpired } from './trial-expired'
 import { template as paymentFailed } from './payment-failed'
 import { template as subscriptionCanceled } from './subscription-canceled'
 import { template as membershipActivated } from './membership-activated'
+import { template as membershipRevoked } from './membership-revoked'
+import { template as membershipGranted } from './membership-granted'
+import { template as membershipRestored } from './membership-restored'
+
 
 
 export interface TemplateEntry {
