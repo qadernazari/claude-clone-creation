@@ -50,7 +50,7 @@ function accepts(file: File, accept: string) {
  * Cuts a typical 2-5 MB JPEG cover down to 100-250 KB and lets every
  * mobile client paint the poster in a single TCP window.
  */
-async function compressImage(file: File, maxWidth = 1600, quality = 0.82): Promise<File> {
+async function compressImage(file: File, maxWidth = 2400, quality = 0.92): Promise<File> {
   if (!file.type.startsWith("image/") || file.type === "image/svg+xml") return file;
   try {
     const bitmap = await createImageBitmap(file);
@@ -83,10 +83,15 @@ export function FileUpload({
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
-  const [meta, setMeta] = useState<{ size?: number; duration?: number } | null>(null);
+  const [meta, setMeta] = useState<{ size?: number; duration?: number; width?: number; height?: number } | null>(null);
 
   async function upload(rawFile: File) {
-    const file = kind === "image" ? await compressImage(rawFile) : rawFile;
+    // Higher fidelity for hero/cover art; smaller portrait cards stay lean.
+    const isHeroLandscape = bucket === "film-thumbnails"; // 16:9 desktop hero
+    const isCoverPortrait = bucket === "film-covers";      // 2:3 portrait + 9:16 mobile hero
+    const maxWidth = isHeroLandscape ? 2400 : isCoverPortrait ? 2000 : 2400;
+    const quality = isHeroLandscape ? 0.93 : isCoverPortrait ? 0.92 : 0.9;
+    const file = kind === "image" ? await compressImage(rawFile, maxWidth, quality) : rawFile;
     if (maxBytes && file.size > maxBytes) {
 
       toast.error(`File too large — max ${fmtBytes(maxBytes)}`);
@@ -205,13 +210,24 @@ export function FileUpload({
       {hasFile && progress === null && (
         <div className="mt-3 flex items-center gap-3">
           {kind === "image" ? (
-            <img src={value!} alt="" className="h-20 w-14 rounded object-cover bg-muted" />
+            <img
+              src={value!}
+              alt=""
+              className="h-20 w-14 rounded object-cover bg-muted"
+              onLoad={(e) => {
+                const img = e.currentTarget;
+                setMeta((prev) => ({ ...(prev ?? {}), width: img.naturalWidth, height: img.naturalHeight }));
+              }}
+            />
           ) : (
             <video src={value!} className="h-20 w-32 rounded object-cover bg-muted" muted playsInline />
           )}
           <div className="text-xs text-muted-foreground space-y-0.5 min-w-0">
             <div className="text-foreground truncate">{decodeURIComponent(value!.split("/").pop()?.split("?")[0] || "uploaded")}</div>
             {meta?.size != null && <div>Size: {fmtBytes(meta.size)}</div>}
+            {kind === "image" && meta?.width && meta?.height && (
+              <div>{meta.width} × {meta.height}px</div>
+            )}
             {kind === "video" && meta?.duration != null && <div>Duration: {fmtDur(meta.duration)}</div>}
           </div>
         </div>

@@ -488,7 +488,7 @@ function FilmEditorModal({
                 onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
                 label="Upload Cover Poster (Portrait)"
-                description="Main portrait poster (~2:3). Used on homepage rails, collection cards, search results and as the share image. Hi-res JPG, PNG, WebP or AVIF."
+                description="Portrait card image — recommended 400×600px or larger (2:3 ratio). Used on homepage rails, collection cards, search results and as the share image."
                 maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
@@ -499,7 +499,7 @@ function FilmEditorModal({
                 onChange={(u) => set("thumbnail_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
                 label="Upload Desktop Cover (16:9)"
-                description="Landscape cinematic art (~16:9). Used as the hero on desktop and tablet, and on grids, suggestions and previews."
+                description="Landscape hero image — recommended 1920×1080px or larger (16:9 ratio). Used as the hero on desktop and tablet."
                 maxBytes={15 * 1024 * 1024}
               />
               <FileUpload
@@ -510,7 +510,7 @@ function FilmEditorModal({
                 onChange={(u) => set("mobile_cover_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
                 label="Upload Mobile Cover (9:16)"
-                description="Dedicated vertical poster (~9:16) for phones. Used as the hero on mobile so faces, titles and key art aren't cropped from the landscape art. Falls back to the portrait cover if unset."
+                description="Portrait mobile hero — recommended 800×1422px or larger (9:16 ratio). Falls back to the portrait cover if unset."
                 maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
