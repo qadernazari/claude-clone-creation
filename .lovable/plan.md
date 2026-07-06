@@ -1,38 +1,37 @@
-## Plan: Refine newsletter section design
+## Why the cover still looks soft
 
-The user selected the **Cinematic dark refined** direction for the newsletter email capture section. This stays close to the current dark, cinematic IRAN aesthetic while tightening the form into a more premium, weighted input/button pair.
+The hero `<img>` on `/films/zayandeh-rud` is currently served from:
 
-### What will change
+```
+/storage/v1/render/image/sign/film-thumbnails/…webp?width=1920&quality=90
+```
 
-File: `src/components/newsletter-section.tsx`
+Its **natural resolution is only 1600×900** — that's the actual size of the file stored in the bucket for this film. Supabase's transform endpoint does not upscale, so asking for `width=1920` returns the 1600px source re-encoded as WebP.
 
-1. **Input field**
-   - Height: `h-11` → `h-14` (54 px, matches the selected direction)
-   - Radius: `rounded-md` → `rounded-xl`
-   - Background: `bg-bg-0` → `bg-bg-1` (darker, richer field surface)
-   - Horizontal padding: `px-4` → `px-5`
-   - Placeholder opacity: `text-cream/35` → `text-cream/40`
-   - Focus ring: `focus:ring-amber/40` → `focus:ring-amber/25` for a subtler glow
-   - Keep existing `focus:border-amber/50` and transition behavior
+The desktop hero then stretches that 1600×900 image to roughly **1612×1854 devicepixels** (viewport 1318 CSS px × dpr 2, plus the `h-[112%]` + `object-cover` Ken Burns crop chops off the sides). So the browser is sampling a ~1600px source across a ~1854px tall crop — that's what reads as "low quality." The 68 → 90 quality bump helped a little, but the source file is the ceiling.
 
-2. **Submit button**
-   - Height: `h-11` → `h-14` to match the input
-   - Radius: `rounded-md` → `rounded-xl`
-   - Horizontal padding: `px-6` → `px-7`
-   - Add soft depth: `shadow-lg shadow-amber/10`
-   - Keep `bg-amber`, `text-ink`, `hover:bg-amber-bright`, `active:scale-[0.98]`, and `disabled:opacity-60`
+There are two independent fixes; pick whichever you want (or both):
 
-3. **Layout**
-   - Keep the existing `flex-col gap-3 sm:flex-row` form layout; the larger, rounder controls make the stacked mobile view feel more intentional.
-   - Preserve Persian (Vazirmatn) text-align and font overrides for the `fa` locale.
+### Option A — Re-upload higher-resolution masters (recommended)
+The real fix. In Admin → Films → Zayandeh Rud, replace **Thumbnail (desktop 16:9)** and **Mobile cover (9:16)** with source files at least:
+- Desktop: **2400×1350** (3200×1800 is better for retina)
+- Mobile: **1200×2133**
 
-### What will NOT change
+Nothing to code — quality snaps up immediately because the transform pipeline finally has pixels to work with. This is the only fix that helps every film going forward.
 
-- Copy/translations (`Stay in the loop`, `Notify Me`, etc.)
-- Section heading, subtitle, and label
-- Success/duplicate/error states
-- Supabase insert logic and validation
+### Option B — Stop double-compressing small sources
+Right now `renderResizedUrl` re-encodes even when the requested width is bigger than the source, which just adds a second WebP compression pass on top of whatever quality the file was uploaded at. Two small code changes remove that penalty:
 
-### Verification
+1. **`src/lib/storage-render.server.ts`** — probe the object's stored dimensions with `supabase.storage.from(bucket).info(path)` (or a HEAD on the object URL) and:
+   - If `sourceWidth <= requestedWidth`, return the **original signed object URL** untouched (no re-encode at all).
+   - Otherwise, transform as today at `quality: 90`.
+2. **`src/routes/films.$slug.tsx`** — on desktop, drop the `h-[112%]` + `-top-[10%]` overscan when the source is smaller than the viewport width, so we don't crop away pixels we can't afford to lose. Keep the Ken Burns effect only for images ≥ 2000w.
 
-After implementation, open the homepage on a mobile viewport and confirm the newsletter input and button are the same height, share `rounded-xl`, and the button has the subtle amber shadow.
+Option B narrows the loss but cannot invent detail — a 1600px master will still look soft on a 4K monitor.
+
+### Also worth checking
+- **Storage bucket transform quota** — Supabase's image transform has a monthly render quota; if it's exhausted, transforms silently fall back to the untransformed original. Not likely here (the URL clearly shows `/render/image/`), but worth glancing at if quality regressions appear later.
+- **`file-upload.tsx`** does not currently enforce a minimum resolution on cover uploads. We could add a client-side check that warns when a cover is uploaded below 2400w so this doesn't happen again.
+
+### My recommendation
+Do **Option A first** (re-upload Zayandeh Rud's cover at 2400w+). If you also want the pass-through-when-source-is-small behavior so future small uploads at least don't get double-compressed, I'll implement Option B in the same pass. Tell me which — or "both" — and I'll switch to build mode.
