@@ -146,7 +146,7 @@ function MembershipsPage() {
       toast.success(`Membership restored for ${months} month${months > 1 ? "s" : ""}.`);
       qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
       qc.invalidateQueries({ queryKey: ["admin", "counts"] });
-      setRestoreId(null);
+      setPendingRestore(null);
     },
     onError: (e) => toast.error(`Restore failed: ${(e as Error).message}`),
   });
