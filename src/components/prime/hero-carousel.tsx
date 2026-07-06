@@ -38,13 +38,13 @@ export function HeroCarousel() {
 
   const slides = useMemo<Slide[]>(() => {
     const out: Slide[] = [];
-    if (featured) out.push(toSlideFromFeatured(featured, locale, t));
+    if (featured) out.push(toSlideFromFeatured(featured, locale));
     const seen = new Set(out.map((s) => s.id));
     for (const f of rails?.films ?? []) {
       if (seen.has(f.id)) continue;
       // Only add rail films that actually have hero-worthy landscape art.
       if (!f.thumbnail_url) continue;
-      out.push(toSlideFromRail(f, locale, t));
+      out.push(toSlideFromRail(f, locale));
       if (out.length >= 5) break;
     }
     return out;
