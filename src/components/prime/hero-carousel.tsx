@@ -31,7 +31,7 @@ const AUTOPLAY_MS = 7000;
  * once we have >1 slide.
  */
 export function HeroCarousel() {
-  const { locale, num, year, t } = useLocale();
+  const { locale, num, year } = useLocale();
   const { data: featured } = useSuspenseQuery(homeFeaturedQueryOptions);
   // Rails query is deferred elsewhere; we opt in here without suspending.
   const { data: rails } = useQuery({ ...homeRailsQueryOptions, enabled: true });
