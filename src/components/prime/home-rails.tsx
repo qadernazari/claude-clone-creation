@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useLocale } from "../lib/i18n";
-import { homeRailsQueryOptions } from "../lib/home.functions";
-import { TopTenRow } from "./prime/top-ten-row";
-import { HoverExpandRow } from "./prime/hover-row";
+import { useLocale } from "../../lib/i18n";
+import { homeRailsQueryOptions } from "../../lib/home.functions";
+import { TopTenRow } from "./top-ten-row";
+import { HoverExpandRow } from "./hover-row";
 
 /**
  * Top-of-fold below-hero content on the homepage:
