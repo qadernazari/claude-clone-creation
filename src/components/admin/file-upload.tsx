@@ -210,13 +210,24 @@ export function FileUpload({
       {hasFile && progress === null && (
         <div className="mt-3 flex items-center gap-3">
           {kind === "image" ? (
-            <img src={value!} alt="" className="h-20 w-14 rounded object-cover bg-muted" />
+            <img
+              src={value!}
+              alt=""
+              className="h-20 w-14 rounded object-cover bg-muted"
+              onLoad={(e) => {
+                const img = e.currentTarget;
+                setMeta((prev) => ({ ...(prev ?? {}), width: img.naturalWidth, height: img.naturalHeight }));
+              }}
+            />
           ) : (
             <video src={value!} className="h-20 w-32 rounded object-cover bg-muted" muted playsInline />
           )}
           <div className="text-xs text-muted-foreground space-y-0.5 min-w-0">
             <div className="text-foreground truncate">{decodeURIComponent(value!.split("/").pop()?.split("?")[0] || "uploaded")}</div>
             {meta?.size != null && <div>Size: {fmtBytes(meta.size)}</div>}
+            {kind === "image" && meta?.width && meta?.height && (
+              <div>{meta.width} × {meta.height}px</div>
+            )}
             {kind === "video" && meta?.duration != null && <div>Duration: {fmtDur(meta.duration)}</div>}
           </div>
         </div>
