@@ -114,16 +114,7 @@ function MembershipsPage() {
 
 
   const revoke = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("subscriptions")
-        .update({
-          status: "canceled",
-          current_period_end: new Date().toISOString(),
-        })
-        .eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => revokeSubscription({ data: { subscriptionId: id } }),
     onSuccess: () => {
       toast.success("Membership revoked — user access ended immediately.");
       qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
@@ -134,20 +125,8 @@ function MembershipsPage() {
   });
 
   const restore = useMutation({
-    mutationFn: async ({ id, months }: { id: string; months: number }) => {
-      const now = new Date();
-      const expiresAt = new Date(now);
-      expiresAt.setMonth(expiresAt.getMonth() + months);
-      const { error } = await supabase
-        .from("subscriptions")
-        .update({
-          status: "active",
-          current_period_start: now.toISOString(),
-          current_period_end: expiresAt.toISOString(),
-        })
-        .eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: ({ id, months }: { id: string; months: number }) =>
+      restoreSubscription({ data: { subscriptionId: id, months } }),
     onSuccess: (_, { months }) => {
       toast.success(`Membership restored for ${months} month${months > 1 ? "s" : ""}.`);
       qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
@@ -158,44 +137,19 @@ function MembershipsPage() {
   });
 
   const grantFree = useMutation({
-    mutationFn: async ({ email, months }: { email: string; months: number }) => {
-      const { data: profiles, error: profileErr } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .eq("email", email.trim().toLowerCase())
-        .limit(1);
-      if (profileErr) throw profileErr;
-      if (!profiles || profiles.length === 0)
-        throw new Error("User not found. Make sure they have signed up first.");
-
-      const userId = profiles[0].id;
-      const now = new Date();
-      const expiresAt = new Date(now);
-      expiresAt.setMonth(expiresAt.getMonth() + months);
-
-      const { error } = await supabase.from("subscriptions").insert({
-        user_id: userId,
-        status: "active",
-        ir_gateway: "admin_grant",
-        amount_toman: 0,
-        current_period_start: now.toISOString(),
-        current_period_end: expiresAt.toISOString(),
-        environment: "live",
-      });
-      if (error) throw error;
-      return { email, months };
-    },
-    onSuccess: ({ email, months }) => {
-      toast.success(`Free ${months}-month membership granted to ${email}`);
+    mutationFn: ({ email, months }: { email: string; months: number }) =>
+      grantFreeSubscription({ data: { email, months } }),
+    onSuccess: (result) => {
+      toast.success(`Free ${result.months}-month membership granted to ${result.email}`);
       qc.invalidateQueries({ queryKey: ["admin", "memberships"] });
       qc.invalidateQueries({ queryKey: ["admin", "counts"] });
       setGrantEmail("");
       setGrantMonths(1);
       setGrantArmed(false);
-
     },
     onError: (e) => toast.error((e as Error).message),
   });
+
 
   const filtered = useMemo(() => {
     const rows = data?.rows ?? [];
