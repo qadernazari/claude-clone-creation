@@ -267,7 +267,7 @@ function MembershipsPage() {
             <input
               type="email"
               value={grantEmail}
-              onChange={(e) => setGrantEmail(e.target.value)}
+              onChange={(e) => { setGrantEmail(e.target.value); setGrantArmed(false); }}
               placeholder="user@example.com"
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             />
@@ -276,7 +276,7 @@ function MembershipsPage() {
             <label className="text-xs text-muted-foreground mb-1 block">Duration</label>
             <select
               value={grantMonths}
-              onChange={(e) => setGrantMonths(parseInt(e.target.value))}
+              onChange={(e) => { setGrantMonths(parseInt(e.target.value)); setGrantArmed(false); }}
               className="rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             >
               <option value={1}>1 month</option>
@@ -288,16 +288,42 @@ function MembershipsPage() {
           <button
             type="button"
             disabled={!grantEmail.trim() || grantFree.isPending}
-            onClick={() => grantFree.mutate({ email: grantEmail, months: grantMonths })}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+            onClick={() => {
+              if (!grantArmed) {
+                setGrantArmed(true);
+                setTimeout(() => setGrantArmed((v) => v), 0);
+                return;
+              }
+              grantFree.mutate({ email: grantEmail, months: grantMonths });
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${
+              grantArmed
+                ? "bg-amber-500 text-black hover:opacity-90"
+                : "bg-primary text-primary-foreground hover:opacity-90"
+            }`}
+            title={grantArmed ? "Click again to confirm" : "Grant access"}
           >
-            {grantFree.isPending ? "Granting…" : "Grant access"}
+            {grantFree.isPending
+              ? "Granting…"
+              : grantArmed
+              ? `Confirm grant ${grantMonths}mo → ${grantEmail.trim()}`
+              : "Grant access"}
           </button>
+          {grantArmed && !grantFree.isPending && (
+            <button
+              type="button"
+              onClick={() => setGrantArmed(false)}
+              className="inline-flex items-center rounded-md border border-border px-3 py-2 text-xs text-muted-foreground hover:bg-accent"
+            >
+              Cancel
+            </button>
+          )}
         </div>
         {grantFree.isError && (
           <p className="mt-2 text-xs text-destructive">{(grantFree.error as Error).message}</p>
         )}
       </div>
+
 
       <div className="mb-3 relative max-w-md">
         <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
