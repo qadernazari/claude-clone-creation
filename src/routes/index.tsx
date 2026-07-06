@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { HeroCarousel } from "../components/prime/hero-carousel";
+import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { homeFeaturedQueryOptions, homeRailsQueryOptions } from "@/lib/home.functions";
@@ -9,8 +9,8 @@ import { homeFeaturedQueryOptions, homeRailsQueryOptions } from "@/lib/home.func
 // Below-the-fold rails are lazy-loaded and only mounted when the user
 // approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
 // and removes their queries / image lists from the hydration critical path.
-const HomeRails = lazy(() =>
-  import("../components/prime/home-rails").then((m) => ({ default: m.HomeRails })),
+const FilmsRow = lazy(() =>
+  import("../components/films-row").then((m) => ({ default: m.FilmsRow })),
 );
 const ContinueWatching = lazy(() =>
   import("../components/continue-watching").then((m) => ({ default: m.ContinueWatching })),
@@ -19,7 +19,7 @@ const ContinueWatching = lazy(() =>
 // Warm the lazy chunks + rails data on idle so the moment the user scrolls
 // the rails render instantly — no chunk fetch, no query wait.
 function prefetchRails(queryClient: ReturnType<typeof useQueryClient>) {
-  void import("../components/prime/home-rails");
+  void import("../components/films-row");
   void import("../components/continue-watching");
   void queryClient.prefetchQuery(homeRailsQueryOptions);
 }
@@ -67,7 +67,7 @@ function DeferredHomeRails() {
       </Suspense>
       <Suspense fallback={<div className="min-h-[400px]" aria-hidden />}>
         <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
-          <HomeRails />
+          <FilmsRow />
         </div>
       </Suspense>
     </>
@@ -236,7 +236,7 @@ function Home() {
       <SiteHeader current="home" />
       <main>
         {/* 1. Cinematic hero = featured film */}
-        <HeroCarousel />
+        <FeaturedFilm />
         <div className="h-3 bg-bg-0 md:hidden" aria-hidden />
 
         <DeferredHomeRails />
