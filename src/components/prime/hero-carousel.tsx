@@ -173,7 +173,7 @@ function SlideLayer({
   locale: "en" | "fa";
   num: (n: number) => string;
   year: (n: number) => string;
-  t: (o: { en: string; fa: string }) => string;
+  t: <T>(o: { en: T; fa: T } | null | undefined, fallback?: T) => T | undefined;
   rtl: boolean;
 }) {
   const fallbackBg =
@@ -293,7 +293,7 @@ function SlideLayer({
 function toSlideFromFeatured(
   f: HomeFeaturedFilm,
   locale: "en" | "fa",
-  t: (o: { en: string; fa: string }) => string,
+  t: <T>(o: { en: T; fa: T } | null | undefined, fallback?: T) => T | undefined,
 ): Slide {
   return {
     id: f.id,
@@ -313,7 +313,7 @@ function toSlideFromFeatured(
 function toSlideFromRail(
   f: HomeRailFilm,
   locale: "en" | "fa",
-  t: (o: { en: string; fa: string }) => string,
+  t: <T>(o: { en: T; fa: T } | null | undefined, fallback?: T) => T | undefined,
 ): Slide {
   return {
     id: f.id,
