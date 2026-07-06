@@ -101,9 +101,11 @@ function MembershipsPage() {
   const { data, isLoading } = useQuery({ queryKey: ["admin", "memberships"], queryFn: fetchAll });
   const [q, setQ] = useState("");
   const [armedId, setArmedId] = useState<string | null>(null);
-  const [, setRestoreId] = useState<string | null>(null);
+  const [pendingRestore, setPendingRestore] = useState<{ id: string; months: number } | null>(null);
+  const [grantArmed, setGrantArmed] = useState(false);
   const [grantEmail, setGrantEmail] = useState("");
   const [grantMonths, setGrantMonths] = useState(1);
+
 
   const revoke = useMutation({
     mutationFn: async (id: string) => {
