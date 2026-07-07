@@ -139,7 +139,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       {mobileImage ? (
         <img
           src={mobileImage}
-          alt=""
+          alt={title}
           width={720}
           height={1280}
           className={`absolute inset-0 block h-full w-full object-cover object-center md:hidden ${
@@ -153,7 +153,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       {desktopImage ? (
         <img
           src={desktopImage}
-          alt=""
+          alt={title}
           width={1600}
           height={900}
           className={`absolute inset-0 hidden h-full w-full object-cover object-center md:block ${

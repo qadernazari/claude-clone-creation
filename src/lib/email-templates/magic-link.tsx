@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Button, Container, Head, Heading, Html, Preview, Section, Text,
+  Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text,
 } from '@react-email/components'
 
 interface MagicLinkEmailProps {
@@ -11,7 +11,7 @@ interface MagicLinkEmailProps {
 export const MagicLinkEmail = ({ siteName, confirmationUrl }: MagicLinkEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your sign-in link for {siteName}</Preview>
+    <Preview>{`Your sign-in link for ${siteName} · لینک ورود شما`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{siteName}</Heading>
@@ -24,6 +24,20 @@ export const MagicLinkEmail = ({ siteName, confirmationUrl }: MagicLinkEmailProp
           <Button style={button} href={confirmationUrl}>Sign in</Button>
           <Text style={footer}>
             If you didn't request this link, you can safely ignore this email.
+          </Text>
+        </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>لینک ورود شما</Heading>
+          <Text style={text}>
+            برای ورود به {siteName} روی دکمه زیر بزنید. این لینک به‌زودی منقضی
+            می‌شود و فقط یک بار قابل استفاده است.
+          </Text>
+          <Button style={button} href={confirmationUrl}>ورود</Button>
+          <Text style={footer}>
+            اگر این لینک را درخواست نکرده‌اید، این ایمیل را نادیده بگیرید.
           </Text>
         </Section>
       </Container>
@@ -40,3 +54,4 @@ const h1 = { fontSize: '22px', fontWeight: 'bold' as const, color: '#0a0807', ma
 const text = { fontSize: '15px', color: '#3a3531', lineHeight: '1.6', margin: '0 0 20px' }
 const button = { backgroundColor: '#0a0807', color: '#fefdfb', padding: '12px 22px', borderRadius: '6px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }
 const footer = { fontSize: '12px', color: '#999', margin: '24px 0 0' }
+const hr = { borderColor: '#e8e4dd', margin: '24px 0' }

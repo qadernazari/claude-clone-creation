@@ -4,6 +4,12 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/checkout/return")({
+  head: () => ({
+    meta: [
+      { title: "Payment complete — ir.show" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>): { session_id?: string; film?: string; kind?: string } => ({
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
     film: typeof search.film === "string" ? search.film : undefined,

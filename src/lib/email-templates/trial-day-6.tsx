@@ -10,7 +10,7 @@ interface Props { trialEndFormatted?: string; membershipUrl?: string }
 const Email = ({ trialEndFormatted = '', membershipUrl = '#' }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your free trial ends soon</Preview>
+    <Preview>{`Your free trial ends soon · روز ۶ آزمایش رایگان`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{SITE_NAME}</Heading>
@@ -29,6 +29,25 @@ const Email = ({ trialEndFormatted = '', membershipUrl = '#' }: Props) => (
           </Section>
           <Text style={meta}>You don't need to do anything if you'd rather let the trial end.</Text>
         </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>روز ۶ آزمایش رایگان</Heading>
+          <Text style={text}>
+            دوره آزمایش عضویت شما در {SITE_NAME} فردا
+            {trialEndFormatted ? <> ({<strong>{trialEndFormatted}</strong>})</> : null} به پایان می‌رسد.
+          </Text>
+          <Text style={text}>
+            اگر می‌خواهید بدون وقفه تماشا را ادامه دهید، می‌توانید همین حالا به
+            عضویت کامل ارتقا دهید.
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '28px 0' }}>
+            <Button href={membershipUrl} style={button}>مشاهده گزینه‌های عضویت</Button>
+          </Section>
+          <Text style={meta}>اگر ترجیح می‌دهید آزمایش به پایان برسد، نیازی به هیچ کاری نیست.</Text>
+        </Section>
+
         <Hr style={hr} />
         <Text style={footer}>{SITE_NAME} · ir.show</Text>
       </Container>

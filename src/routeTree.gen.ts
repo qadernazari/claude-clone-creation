@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OriginalsRouteImport } from './routes/originals'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as HelpRouteImport } from './routes/help'
@@ -94,6 +95,11 @@ const RefundsRoute = RefundsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OriginalsRoute = OriginalsRouteImport.update({
+  id: '/originals',
+  path: '/originals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotFoundRoute = NotFoundRouteImport.update({
@@ -379,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/membership': typeof MembershipRoute
   '/not-found': typeof NotFoundRoute
+  '/originals': typeof OriginalsRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -436,6 +443,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/membership': typeof MembershipRoute
   '/not-found': typeof NotFoundRoute
+  '/originals': typeof OriginalsRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -494,6 +502,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/membership': typeof MembershipRoute
   '/not-found': typeof NotFoundRoute
+  '/originals': typeof OriginalsRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -553,6 +562,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/membership'
     | '/not-found'
+    | '/originals'
     | '/privacy'
     | '/refunds'
     | '/reset-password'
@@ -610,6 +620,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/membership'
     | '/not-found'
+    | '/originals'
     | '/privacy'
     | '/refunds'
     | '/reset-password'
@@ -667,6 +678,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/membership'
     | '/not-found'
+    | '/originals'
     | '/privacy'
     | '/refunds'
     | '/reset-password'
@@ -726,6 +738,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   MembershipRoute: typeof MembershipRoute
   NotFoundRoute: typeof NotFoundRoute
+  OriginalsRoute: typeof OriginalsRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundsRoute: typeof RefundsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -788,6 +801,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/originals': {
+      id: '/originals'
+      path: '/originals'
+      fullPath: '/originals'
+      preLoaderRoute: typeof OriginalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/not-found': {
@@ -1245,6 +1265,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   MembershipRoute: MembershipRoute,
   NotFoundRoute: NotFoundRoute,
+  OriginalsRoute: OriginalsRoute,
   PrivacyRoute: PrivacyRoute,
   RefundsRoute: RefundsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -1267,13 +1288,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
