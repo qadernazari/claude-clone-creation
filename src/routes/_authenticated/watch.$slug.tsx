@@ -177,6 +177,14 @@ function WatchPage() {
       const savedMuted = localStorage.getItem("player:muted");
       if (savedMuted === "1") v.muted = true;
     } catch {}
+    // Restore persisted playback speed
+    try {
+      const savedSpeed = parseFloat(localStorage.getItem("player:speed") ?? "");
+      if (!Number.isNaN(savedSpeed) && savedSpeed > 0) {
+        v.playbackRate = savedSpeed;
+        setSpeed(savedSpeed);
+      }
+    } catch {}
     const saved = resumePosRef.current;
     if (saved > 5 && saved < (v.duration || 0) - 10 && !resumedRef.current) {
       v.pause();
@@ -184,6 +192,7 @@ function WatchPage() {
       setResumePrompt(saved);
     }
   }, []);
+
 
   const acceptResume = useCallback(() => {
     const v = videoRef.current;
