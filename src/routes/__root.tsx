@@ -205,37 +205,12 @@ function RootShell({ children }: { children: ReactNode }) {
           stays inline so it runs before first paint.
 
           Fonts:
-          - fa: self-hosted Vazirmatn (Arabic subset only, ~46 KB woff2).
-            Inlined @font-face + preload so the Arabic glyphs are on the
-            critical path with one same-origin request, no Google Fonts
-            CSS round-trip.
+          - fa: self-hosted IranSansX Pro via /fonts/iransansx.css (linked
+            in the route head above). Cached at the browser and edge with
+            a swap policy so Tahoma/Arial paints instantly on slow links.
           - en: Space Grotesk + DM Sans from Google Fonts, lazy-applied
             via media=print swap to keep them off the critical path.
         */}
-        {locale === "fa" ? (
-          <>
-            <link
-              rel="preload"
-              as="font"
-              type="font/woff2"
-              href={vazirArabicUrl}
-              crossOrigin="anonymous"
-            />
-            <style
-              dangerouslySetInnerHTML={{
-                __html:
-                  // font-display: optional — browser uses the fallback
-                  // (Tahoma/Arial) immediately and only swaps in Vazirmatn
-                  // if it arrives within the first ~100ms. Iranian users
-                  // on slow links to the Cloudflare edge never wait on
-                  // this font, and the page renders instantly.
-                  `@font-face{font-family:'Vazirmatn';font-style:normal;font-display:optional;font-weight:100 900;` +
-                  `src:url(${vazirArabicUrl}) format('woff2-variations');` +
-                  `unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC;}`,
-              }}
-            />
-          </>
-        ) : null}
         <script
           dangerouslySetInnerHTML={{
             __html:
