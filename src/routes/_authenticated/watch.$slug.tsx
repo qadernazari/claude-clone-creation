@@ -624,7 +624,8 @@ function WatchPage() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [hasAccess, videoUrl, fa, flashHud]);
+  }, [hasAccess, videoUrl, fa, flashHud, changeSpeed]);
+
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
   const director = fa ? film.director_fa || film.director_en : film.director_en;
