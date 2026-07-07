@@ -214,6 +214,53 @@ export const homeFeaturedQueryOptions = queryOptions({
   gcTime: 30 * 60_000,
 });
 
+/**
+ * Top N featured films for the hero slider. Reuses the same shape as the
+ * single-featured query so existing consumers keep working.
+ */
+export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
+  async (): Promise<HomeFeaturedFilm[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const res = await supabaseAdmin
+      .from("films")
+      .select(
+        "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
+      )
+      .eq("visibility", "published")
+      .neq("film_type", "episode")
+      .order("sort_order", { ascending: true })
+      .limit(5);
+    if (res.error) throw new Error(res.error.message);
+    const rows = (res.data as RawFilm[] | null) ?? [];
+    if (!rows.length) return [];
+    const cache = makeRenderCache();
+    return Promise.all(
+      rows.map(async (raw) => {
+        const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
+          renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1200, 88),
+          renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1200, 88),
+          renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 800, 85),
+          renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
+        ]);
+        return {
+          ...raw,
+          cover_url: cover,
+          thumbnail_url: thumbnail,
+          thumbnail_url_mobile: thumbnailMobile,
+          mobile_cover_url: mobile,
+        } as HomeFeaturedFilm;
+      }),
+    );
+  },
+);
+
+export const homeFeaturedSlidesQueryOptions = queryOptions({
+  queryKey: ["home", "featured-slides"],
+  queryFn: () => getHomeFeaturedSlides(),
+  staleTime: 5 * 60_000,
+  gcTime: 30 * 60_000,
+});
+
 export const homeRailsQueryOptions = queryOptions({
   queryKey: ["home", "rails"],
   queryFn: () => getHomeRails(),

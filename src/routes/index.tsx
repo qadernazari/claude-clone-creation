@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FeaturedFilm } from "../components/featured-film";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { homeFeaturedQueryOptions, homeRailsQueryOptions } from "@/lib/home.functions";
+import { homeFeaturedQueryOptions, homeFeaturedSlidesQueryOptions, homeRailsQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
 // approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
@@ -118,7 +118,13 @@ export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     const { setHomepageCacheHeaders } = await import("@/lib/cache-headers");
     setHomepageCacheHeaders();
-    return context.queryClient.ensureQueryData(homeFeaturedQueryOptions);
+    const slides = await context.queryClient.ensureQueryData(homeFeaturedSlidesQueryOptions);
+    const featured = slides[0] ?? null;
+    if (featured) {
+      // Seed the single-featured cache so other consumers hit warm data.
+      context.queryClient.setQueryData(homeFeaturedQueryOptions.queryKey, featured);
+    }
+    return featured;
   },
   head: ({ loaderData }) => ({
     meta: [

@@ -1,240 +1,241 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
-import { homeFeaturedQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
+import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
-type Film = HomeFeaturedFilm;
+const AUTOPLAY_MS = 6500;
 
 export function FeaturedFilm() {
-  const { locale, num, year, t } = useLocale();
-  const { data } = useSuspenseQuery(homeFeaturedQueryOptions);
-  // Desktop hero = 16:9 cinematic art (thumbnail_url) with cover_url as fallback.
-  // Mobile hero = dedicated 9:16 portrait art (mobile_cover_url). When no mobile
-  // art exists, fall back to the portrait cover_url; only as a last resort use the
-  // landscape thumbnail (which will look cropped on a phone).
-  const desktopImage = data ? data.thumbnail_url || data.cover_url : null;
-  // Mobile fallback chain: portrait mobile cover → portrait cover → smaller
-  // render of the landscape thumbnail (760w q55) → original thumbnail.
-  // Never serves the 1400w desktop thumbnail to a phone.
-  const mobileImage = data
-    ? data.mobile_cover_url || data.cover_url || data.thumbnail_url_mobile || data.thumbnail_url
-    : null;
-  const mobileImageRef = useRef<HTMLImageElement | null>(null);
-  const desktopImageRef = useRef<HTMLImageElement | null>(null);
-  // Start ready=true so the SSR HTML paints the hero img at opacity 1 the
-  // instant the preloaded bytes arrive — without waiting for React hydration
-  // + onLoad. This is the single biggest LCP win on the home route.
-  const [mobileImageReady, setMobileImageReady] = useState(true);
-  const [desktopImageReady, setDesktopImageReady] = useState(true);
+  const { data: slides } = useSuspenseQuery(homeFeaturedSlidesQueryOptions);
 
+  if (!slides || slides.length === 0) return <FeaturedFilmFallback />;
+  if (slides.length === 1) return <SingleSlide film={slides[0]} />;
+
+  return <FeaturedSlider slides={slides} />;
+}
+
+function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const go = useCallback(
+    (next: number) => {
+      const len = slides.length;
+      setIndex(((next % len) + len) % len);
+    },
+    [slides.length],
+  );
+  const next = useCallback(() => go(index + 1), [go, index]);
+  const prev = useCallback(() => go(index - 1), [go, index]);
+
+  // Autoplay
   useEffect(() => {
-    const img = mobileImageRef.current;
-    if (img && !img.complete) {
-      setMobileImageReady(false);
+    if (paused) return;
+    timer.current = setTimeout(next, AUTOPLAY_MS);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [index, paused, next]);
+
+  // Swipe / drag support (pointer events)
+  const startX = useRef<number | null>(null);
+  const onPointerDown = (e: React.PointerEvent) => {
+    startX.current = e.clientX;
+    setPaused(true);
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (startX.current == null) return;
+    const dx = e.clientX - startX.current;
+    startX.current = null;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) next();
+      else prev();
     }
-  }, [mobileImage]);
-
-  useEffect(() => {
-    const img = desktopImageRef.current;
-    if (img && !img.complete) {
-      setDesktopImageReady(false);
-    }
-  }, [desktopImage]);
-
-  if (!data) return <FeaturedFilmFallback />;
-
-
-
-  const title = t({ en: data.title_en, fa: data.title_fa || data.title_fa || data.title_en });
-  const director = t({
-    en: data.director_en || "",
-    fa: data.director_fa || data.director_en || "",
-  });
-  const synopsis = t({
-    en: data.synopsis_en || "",
-    fa: data.synopsis_fa || data.synopsis_en || "",
-  });
-  const hasAnyImage = !!(desktopImage || mobileImage);
-  const isDesktopLandscape = !!data.thumbnail_url;
-  const fallbackBg =
-    data.poster_gradient ||
-    "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
-  
-
+    setPaused(false);
+  };
 
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* Full-bleed cinematic hero — replaces the marketing hero entirely */}
-      <div className="relative h-[85svh] min-h-[580px] w-full overflow-hidden bg-bg-1 md:h-[100dvh] md:min-h-[640px]" style={{ background: fallbackBg }} data-mobile-hero>
-        {/* Warm poster placeholder painted immediately by SSR — keeps the
-            hero looking intentional (not an empty black box) until the
-            actual image decodes. Hidden once the image is loaded. */}
-        <div
-          className="hero-mobile-poster pointer-events-none absolute inset-0 md:hidden"
-          style={{ background: fallbackBg }}
-          aria-hidden
-        />
-        {hasAnyImage ? (
-          <>
-            {/*
-              Hero images. IMPORTANT: do NOT set fetchPriority="high" on
-              these <img> tags. React 19 hoists every high-priority img
-              src into an unconditional ReactDOM.preload() in <head>,
-              ignoring media queries / Tailwind responsive classes — which
-              caused mobile to also download the 1920w desktop thumbnail.
-              The correct preload (with `media`) is emitted by the route
-              `head()` in src/routes/index.tsx.
-            */}
-            {mobileImage ? (
-              <img
-                ref={mobileImageRef}
-                src={mobileImage}
-                alt=""
-                width={720}
-                height={1280}
-                className="hero-mobile-img cine-img absolute inset-x-0 bottom-0 top-0 block h-full w-full object-cover object-top md:hidden"
-                style={{ opacity: mobileImageReady ? 1 : 0, transition: "opacity 120ms ease-out" }}
-                loading="eager"
-                decoding="async"
-                sizes="100vw"
-                aria-hidden
-                onLoad={() => setMobileImageReady(true)}
-              />
-            ) : null}
+    <section
+      className="group/hero relative isolate overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => {
+        startX.current = null;
+        setPaused(false);
+      }}
+      aria-roledescription="carousel"
+    >
+      <div className="relative h-[62svh] min-h-[440px] w-full overflow-hidden bg-bg-1 md:h-[72dvh] md:min-h-[520px] md:max-h-[720px]">
+        {slides.map((film, i) => (
+          <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
+        ))}
 
+        {/* Nav arrows — desktop only */}
+        <button
+          type="button"
+          onClick={prev}
+          aria-label="Previous"
+          className="absolute left-4 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-3 text-cream-bright opacity-0 backdrop-blur-md transition-all duration-300 hover:bg-black/60 group-hover/hero:opacity-100 md:inline-flex"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={next}
+          aria-label="Next"
+          className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-3 text-cream-bright opacity-0 backdrop-blur-md transition-all duration-300 hover:bg-black/60 group-hover/hero:opacity-100 md:inline-flex"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
 
-            {/* Desktop / tablet: 16:9 cinematic art.
-                loading="lazy" here is critical: React 19 auto-hoists every
-                eager <img> into an unconditional <link rel=preload> in <head>,
-                which on mobile caused the 1600w desktop thumbnail to be
-                downloaded alongside the real mobile cover. Lazy disables
-                that auto-preload; the correct media-gated preload still
-                fires from the route head() on real desktops. */}
-            {desktopImage ? (
-              isDesktopLandscape ? (
-                <img
-                  ref={desktopImageRef}
-                  src={desktopImage}
-                  alt=""
-                  width={1600}
-                  height={900}
-                  className="cine-img absolute inset-0 hidden h-full w-full scale-[1.03] object-cover object-center opacity-0 transition-opacity duration-700 ease-out md:block"
-                  style={{ opacity: desktopImageReady ? 1 : 0 }}
-                  loading="lazy"
-                  decoding="async"
-                  aria-hidden
-                  onLoad={() => setDesktopImageReady(true)}
-                />
-              ) : (
-                <div className="absolute inset-0 hidden md:block">
-                  <div
-                    className="absolute inset-0 scale-110"
-                    style={{
-                      background: `center / cover no-repeat url(${desktopImage})`,
-                      filter: "blur(60px) saturate(1.1) brightness(0.55)",
-                      opacity: 0.55,
-                    }}
-                    aria-hidden
-                  />
-                  <img
-                    ref={desktopImageRef}
-                    src={desktopImage}
-                    alt={title}
-                    width={1200}
-                    height={1600}
-                    className="absolute inset-0 h-full w-full object-contain object-center opacity-0 transition-opacity duration-700 ease-out"
-                    style={{ opacity: desktopImageReady ? 1 : 0 }}
-                    loading="lazy"
-                    decoding="async"
-                    onLoad={() => setDesktopImageReady(true)}
-                  />
-                </div>
-              )
-            ) : null}
-          </>
-        ) : (
-          <div
-            className="absolute inset-0 cine-img"
-            style={{ background: fallbackBg }}
-            aria-hidden
-          />
-        )}
-        {/* Vertical fade for legibility + handoff to bg-0 */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(13,13,13,0.55) 0%, rgba(13,13,13,0.10) 30%, rgba(13,13,13,0.55) 70%, var(--bg-0) 100%)",
-          }}
-        />
-        {/* Horizontal fade — lights the left side where copy lives */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.55) 35%, rgba(13,13,13,0.15) 60%, transparent 80%)",
-          }}
-        />
-
-
-        {/* Content */}
-        <div className="relative z-10 flex h-full items-end md:items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-10 sm:px-6 md:px-12 md:pb-20">
-            <div className="max-w-2xl">
-              <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-5">
-                {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-              </span>
-              <h1 className="font-display text-[2.5rem] font-medium leading-[0.98] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
-                {title}
-              </h1>
-              <p className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-medium uppercase tracking-[0.24em] text-cream/60 md:mt-5 md:text-[11px]">
-                {director && <span>{director}</span>}
-                {director && data.year ? <span className="text-amber/60">·</span> : null}
-                {data.year ? <span>{year(data.year)}</span> : null}
-                {data.duration_min ? (
-                  <>
-                    <span className="text-amber/60">·</span>
-                    <span>
-                      {num(data.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
-                    </span>
-                  </>
-                ) : null}
-              </p>
-              {synopsis ? (
-                <p className="mt-5 hidden max-w-xl text-[14px] leading-relaxed text-cream/75 line-clamp-3 sm:line-clamp-3 sm:block md:mt-7 md:text-base">
-                  {synopsis}
-                </p>
-              ) : null}
-              <div className="mt-7 flex flex-wrap items-center gap-2.5 md:mt-10 md:gap-3">
-                <Link
-                  to="/films/$slug"
-                  params={{ slug: data.slug }}
-                  className="inline-flex min-h-11 items-center gap-2.5 rounded-md bg-cream-bright px-7 py-3 text-[13px] font-semibold text-ink transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] md:px-8 md:py-3.5 md:text-sm"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
-                </Link>
-                <WatchlistCta slug={data.slug} locale={locale} />
-
-              </div>
-            </div>
-          </div>
+        {/* Dots */}
+        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center gap-2 md:bottom-6">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => go(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                i === index ? "w-8 bg-cream-bright" : "w-1.5 bg-cream/40 hover:bg-cream/70"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-/**
- * Desktop-only secondary CTA. Hidden on mobile (md:inline-flex), and even
- * on desktop the auth check is deferred until idle so useCurrentUser
- * doesn't run during hero hydration.
- */
+function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
+  const { locale, num, year, t } = useLocale();
+  const desktopImage = film.thumbnail_url || film.cover_url;
+  const mobileImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url_mobile || film.thumbnail_url;
+  const fallbackBg =
+    film.poster_gradient ||
+    "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
+  const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
+  const director = t({ en: film.director_en || "", fa: film.director_fa || film.director_en || "" });
+  const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
+
+  return (
+    <div
+      className={`absolute inset-0 transition-opacity duration-[900ms] ease-out ${
+        active ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+      }`}
+      aria-hidden={!active}
+      style={{ background: fallbackBg }}
+    >
+      {mobileImage ? (
+        <img
+          src={mobileImage}
+          alt=""
+          width={720}
+          height={1280}
+          className={`absolute inset-0 block h-full w-full object-cover object-center md:hidden ${
+            active ? "cine-img-in" : ""
+          }`}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          sizes="100vw"
+        />
+      ) : null}
+      {desktopImage ? (
+        <img
+          src={desktopImage}
+          alt=""
+          width={1600}
+          height={900}
+          className={`absolute inset-0 hidden h-full w-full object-cover object-center md:block ${
+            active ? "cine-img-in" : ""
+          }`}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+        />
+      ) : null}
+
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(13,13,13,0.55) 0%, rgba(13,13,13,0.10) 30%, rgba(13,13,13,0.55) 70%, var(--bg-0) 100%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.55) 35%, rgba(13,13,13,0.15) 60%, transparent 80%)",
+        }}
+      />
+
+      <div className="relative z-10 flex h-full items-end">
+        <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-16">
+          <div className="max-w-xl">
+            <span className="mb-2.5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-3">
+              {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+            </span>
+            <h2 className="font-display text-[2rem] font-medium leading-[1] tracking-[-0.03em] text-cream-bright sm:text-4xl md:text-5xl lg:text-6xl">
+              {title}
+            </h2>
+            <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-medium uppercase tracking-[0.24em] text-cream/60 md:mt-3 md:text-[11px]">
+              {director && <span>{director}</span>}
+              {director && film.year ? <span className="text-amber/60">·</span> : null}
+              {film.year ? <span>{year(film.year)}</span> : null}
+              {film.duration_min ? (
+                <>
+                  <span className="text-amber/60">·</span>
+                  <span>
+                    {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
+                  </span>
+                </>
+              ) : null}
+            </p>
+            {synopsis ? (
+              <p className="mt-3 hidden max-w-lg text-[13px] leading-relaxed text-cream/75 line-clamp-2 sm:block md:mt-4 md:text-sm">
+                {synopsis}
+              </p>
+            ) : null}
+            <div className="mt-5 flex flex-wrap items-center gap-2.5 md:mt-6">
+              <Link
+                to="/films/$slug"
+                params={{ slug: film.slug }}
+                className="inline-flex min-h-10 items-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[12px] font-semibold text-ink transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] md:px-6 md:py-3 md:text-[13px]"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+              </Link>
+              <WatchlistCta slug={film.slug} locale={locale} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SingleSlide({ film }: { film: HomeFeaturedFilm }) {
+  return (
+    <section className="relative isolate overflow-hidden">
+      <div className="relative h-[62svh] min-h-[440px] w-full overflow-hidden bg-bg-1 md:h-[72dvh] md:min-h-[520px] md:max-h-[720px]">
+        <Slide film={film} active eager />
+      </div>
+    </section>
+  );
+}
+
 function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
   const ready = useDeferredMount();
   if (!ready) return null;
@@ -248,9 +249,9 @@ function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa"
     <Link
       to="/films/$slug"
       params={{ slug }}
-      className="hidden min-h-11 items-center gap-2 rounded-md border border-cream/30 bg-bg-0/70 px-6 py-3 text-[13px] font-medium text-cream-bright backdrop-blur-md transition-colors duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:inline-flex md:bg-cream/10 md:px-7 md:py-3.5 md:text-sm"
+      className="hidden min-h-10 items-center gap-2 rounded-md border border-cream/30 bg-bg-0/70 px-5 py-2.5 text-[12px] font-medium text-cream-bright backdrop-blur-md transition-colors duration-300 hover:border-amber/50 hover:bg-amber/10 hover:text-amber-bright active:scale-[0.98] md:inline-flex md:bg-cream/10 md:px-6 md:py-3 md:text-[13px]"
     >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <line x1="12" y1="5" x2="12" y2="19" />
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
@@ -262,7 +263,7 @@ function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa"
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden">
-      <div className="relative h-[85svh] min-h-[620px] w-full overflow-hidden bg-bg-0 md:h-[100dvh] md:min-h-[640px]">
+      <div className="relative h-[62svh] min-h-[440px] w-full overflow-hidden bg-bg-0 md:h-[72dvh] md:min-h-[520px]">
         <div
           className="absolute inset-0"
           style={{
@@ -273,15 +274,15 @@ function FeaturedFilmFallback() {
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg-0 via-bg-0/60 to-transparent" />
         <div className="relative z-10 flex h-full items-end">
-          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-20">
-            <div className="max-w-2xl">
-              <span className="mb-5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
+          <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-16">
+            <div className="max-w-xl">
+              <span className="mb-3 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
                 Original Iranian Cinema
               </span>
-              <h1 className="font-display text-5xl font-medium leading-[0.95] tracking-[-0.03em] text-cream-bright sm:text-6xl md:text-7xl lg:text-8xl">
+              <h2 className="font-display text-4xl font-medium leading-[0.95] tracking-[-0.03em] text-cream-bright sm:text-5xl md:text-6xl">
                 ir.show
-              </h1>
-              <p className="mt-7 max-w-xl text-[15px] leading-relaxed text-cream/75 md:text-base">
+              </h2>
+              <p className="mt-4 max-w-lg text-[14px] leading-relaxed text-cream/75">
                 A premium streaming home for Iranian films, documentaries, and curated stories.
               </p>
             </div>
