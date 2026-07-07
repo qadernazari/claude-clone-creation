@@ -338,6 +338,16 @@ function WatchPage() {
     v?.webkitEnterFullscreen?.();
   }, []);
 
+  const changeSpeed = useCallback((s: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.playbackRate = s;
+    setSpeed(s);
+    setSpeedOpen(false);
+    try { localStorage.setItem("player:speed", String(s)); } catch {}
+  }, []);
+
+
   // Select / change subtitle track. Persists choice.
   const selectCc = useCallback((lang: string | null) => {
     setActiveCc(lang);
