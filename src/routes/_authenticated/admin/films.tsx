@@ -481,26 +481,26 @@ function FilmEditorModal({
           >
             <div className="space-y-3">
               <FileUpload
-                bucket="film-covers"
-                kind="image"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                value={d.cover_url ?? null}
-                onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
-                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Cover Poster (Portrait)"
-                description="Portrait card image — recommended 400×600px or larger (2:3 ratio). Used on homepage rails, collection cards, search results and as the share image."
-                maxBytes={25 * 1024 * 1024}
-              />
-              <FileUpload
                 bucket="film-thumbnails"
                 kind="image"
                 accept="image/jpeg,image/png,image/webp,image/avif"
                 value={d.thumbnail_url ?? null}
                 onChange={(u) => set("thumbnail_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Desktop Cover (16:9)"
-                description="Landscape hero image — recommended 1920×1080px or larger (16:9 ratio). Used as the hero on desktop and tablet."
+                label="Upload Rail / Hero Image (16:9) — required"
+                description="Landscape image used on homepage rails, browse grid, and the desktop hero. Recommended 1920×1080px (16:9). This is the primary artwork shown everywhere except the share preview."
                 maxBytes={15 * 1024 * 1024}
+              />
+              <FileUpload
+                bucket="film-covers"
+                kind="image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                value={d.cover_url ?? null}
+                onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
+                pathPrefix={d.id ?? `new-${d.slug || "film"}`}
+                label="Upload Poster (2:3, optional)"
+                description="Portrait poster used for share previews and poster-style views. Recommended 400×600px or larger (2:3). Falls back to the 16:9 image if unset."
+                maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
                 bucket="film-covers"
@@ -509,10 +509,11 @@ function FilmEditorModal({
                 value={d.mobile_cover_url ?? null}
                 onChange={(u) => set("mobile_cover_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Mobile Cover (9:16)"
-                description="Portrait mobile hero — recommended 800×1422px or larger (9:16 ratio). Falls back to the portrait cover if unset."
+                label="Upload Mobile Cover (9:16, optional)"
+                description="Portrait mobile hero — recommended 800×1422px or larger (9:16 ratio). Falls back to the portrait poster if unset."
                 maxBytes={25 * 1024 * 1024}
               />
+
               <FileUpload
                 bucket="film-trailers"
                 kind="video"
