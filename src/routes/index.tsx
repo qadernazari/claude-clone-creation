@@ -118,13 +118,18 @@ export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     const { setHomepageCacheHeaders } = await import("@/lib/cache-headers");
     setHomepageCacheHeaders();
-    const slides = await context.queryClient.ensureQueryData(homeFeaturedSlidesQueryOptions);
-    const featured = slides[0] ?? null;
-    if (featured) {
-      // Seed the single-featured cache so other consumers hit warm data.
-      context.queryClient.setQueryData(homeFeaturedQueryOptions.queryKey, featured);
+    try {
+      const slides = await context.queryClient.ensureQueryData(homeFeaturedSlidesQueryOptions);
+      const featured = slides[0] ?? null;
+      if (featured) {
+        // Seed the single-featured cache so other consumers hit warm data.
+        context.queryClient.setQueryData(homeFeaturedQueryOptions.queryKey, featured);
+      }
+      return featured;
+    } catch (error) {
+      console.error("home loader failed:", error);
+      return null;
     }
-    return featured;
   },
   head: ({ loaderData }) => ({
     meta: [
