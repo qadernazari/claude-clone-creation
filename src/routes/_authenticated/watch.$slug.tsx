@@ -595,11 +595,32 @@ function WatchPage() {
           e.preventDefault();
           bumpVolume(v, -0.1);
           break;
+        case ">":
+        case ".":
+          e.preventDefault();
+          {
+            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+            const nextIdx = Math.min(speeds.indexOf(speedRef.current) + 1, speeds.length - 1);
+            changeSpeed(speeds[nextIdx]);
+            flashHud(`${speeds[nextIdx]}×`);
+          }
+          break;
+        case "<":
+        case ",":
+          e.preventDefault();
+          {
+            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+            const prevIdx = Math.max(speeds.indexOf(speedRef.current) - 1, 0);
+            changeSpeed(speeds[prevIdx]);
+            flashHud(`${speeds[prevIdx]}×`);
+          }
+          break;
         case "t":
           e.preventDefault();
           setTheater((x) => !x);
           break;
       }
+
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
