@@ -296,6 +296,9 @@ function WatchPage() {
   const [activeCc, setActiveCc] = useState<string | null>(null); // lang code or null = off
   const lastKnownPosRef = useRef<number>(0);
 
+  useEffect(() => { speedRef.current = speed; }, [speed]);
+
+
   const revealOverlay = useCallback(() => {
     setOverlayVisible(true);
     if (overlayTimerRef.current) window.clearTimeout(overlayTimerRef.current);
