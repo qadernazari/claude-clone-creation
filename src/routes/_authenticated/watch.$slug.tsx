@@ -1107,8 +1107,11 @@ function WatchPage() {
                       {fa ? "ادامه تماشا" : "Continue watching"}
                     </p>
                     <p className="mt-2 font-display text-xl text-cream-bright">
-                      {fa ? "از " : "Resume from "}{fmtTime(resumePrompt)}?
+                      {fa
+                        ? `از ${fmtTime(resumePrompt).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)])}؟`
+                        : `Resume from ${fmtTime(resumePrompt)}?`}
                     </p>
+
                     <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
                       <button
                         type="button"
