@@ -130,35 +130,40 @@ type RawFilm = Record<string, unknown>;
  */
 export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomeFeaturedFilm | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const res = await supabaseAdmin
-      .from("films")
-      .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
-      )
-      .eq("visibility", "published")
-      .neq("film_type", "episode")
-      .order("sort_order", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    if (res.error) throw new Error(res.error.message);
-    const featuredRaw = res.data as RawFilm | null;
-    if (!featuredRaw) return null;
-    const cache = makeRenderCache();
-    const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 88),
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1200, 88),
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 800, 85),
-      renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
-    ]);
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const res = await supabaseAdmin
+        .from("films")
+        .select(
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
+        )
+        .eq("visibility", "published")
+        .neq("film_type", "episode")
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (res.error) throw new Error(res.error.message);
+      const featuredRaw = res.data as RawFilm | null;
+      if (!featuredRaw) return null;
+      const cache = makeRenderCache();
+      const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 88),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1200, 88),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 800, 85),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
+      ]);
 
-    return {
-      ...featuredRaw,
-      cover_url: cover,
-      thumbnail_url: thumbnail,
-      thumbnail_url_mobile: thumbnailMobile,
-      mobile_cover_url: mobile,
-    } as HomeFeaturedFilm;
+      return {
+        ...featuredRaw,
+        cover_url: cover,
+        thumbnail_url: thumbnail,
+        thumbnail_url_mobile: thumbnailMobile,
+        mobile_cover_url: mobile,
+      } as HomeFeaturedFilm;
+    } catch (error) {
+      console.error("getHomeFeatured failed:", error);
+      return null;
+    }
   },
 );
 
@@ -169,40 +174,45 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
  */
 export const getHomeRails = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomeRailsData> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [filmsRes, categoriesRes] = await Promise.all([
-      supabaseAdmin
-        .from("films")
-        .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, access_type, is_premium, sort_order",
-        )
-        .eq("visibility", "published")
-        .neq("film_type", "episode")
-        .order("sort_order", { ascending: true })
-        .limit(60),
-      supabaseAdmin
-        .from("categories")
-        .select("id, name_en, name_fa, sort_order")
-        .order("sort_order", { ascending: true }),
-    ]);
-    if (filmsRes.error) throw new Error(filmsRes.error.message);
-    if (categoriesRes.error) throw new Error(categoriesRes.error.message);
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const [filmsRes, categoriesRes] = await Promise.all([
+        supabaseAdmin
+          .from("films")
+          .select(
+            "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, poster_gradient, cover_url, thumbnail_url, access_type, is_premium, sort_order",
+          )
+          .eq("visibility", "published")
+          .neq("film_type", "episode")
+          .order("sort_order", { ascending: true })
+          .limit(60),
+        supabaseAdmin
+          .from("categories")
+          .select("id, name_en, name_fa, sort_order")
+          .order("sort_order", { ascending: true }),
+      ]);
+      if (filmsRes.error) throw new Error(filmsRes.error.message);
+      if (categoriesRes.error) throw new Error(categoriesRes.error.message);
 
-    const cache = makeRenderCache();
-    const filmsRaw = (filmsRes.data as RawFilm[] | null) ?? [];
-    const films = await Promise.all(
-      filmsRaw.map(async (f) => {
-        const [cover, thumbnail] = await Promise.all([
-          renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 400, 80),
-          renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 680, 78, 383, "cover"),
-        ]);
-        return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
-      }),
-    );
-    return {
-      films,
-      categories: (categoriesRes.data as HomeCategory[] | null) ?? [],
-    };
+      const cache = makeRenderCache();
+      const filmsRaw = (filmsRes.data as RawFilm[] | null) ?? [];
+      const films = await Promise.all(
+        filmsRaw.map(async (f) => {
+          const [cover, thumbnail] = await Promise.all([
+            renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 400, 80),
+            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 680, 78, 383, "cover"),
+          ]);
+          return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
+        }),
+      );
+      return {
+        films,
+        categories: (categoriesRes.data as HomeCategory[] | null) ?? [],
+      };
+    } catch (error) {
+      console.error("getHomeRails failed:", error);
+      return { films: [], categories: [] };
+    }
   },
 );
 
@@ -219,37 +229,42 @@ export const homeFeaturedQueryOptions = queryOptions({
  */
 export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomeFeaturedFilm[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const res = await supabaseAdmin
-      .from("films")
-      .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
-      )
-      .eq("visibility", "published")
-      .neq("film_type", "episode")
-      .order("sort_order", { ascending: true })
-      .limit(5);
-    if (res.error) throw new Error(res.error.message);
-    const rows = (res.data as RawFilm[] | null) ?? [];
-    if (!rows.length) return [];
-    const cache = makeRenderCache();
-    return Promise.all(
-      rows.map(async (raw) => {
-        const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
-          renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1200, 88),
-          renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1200, 88),
-          renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 800, 85),
-          renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
-        ]);
-        return {
-          ...raw,
-          cover_url: cover,
-          thumbnail_url: thumbnail,
-          thumbnail_url_mobile: thumbnailMobile,
-          mobile_cover_url: mobile,
-        } as HomeFeaturedFilm;
-      }),
-    );
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const res = await supabaseAdmin
+        .from("films")
+        .select(
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
+        )
+        .eq("visibility", "published")
+        .neq("film_type", "episode")
+        .order("sort_order", { ascending: true })
+        .limit(5);
+      if (res.error) throw new Error(res.error.message);
+      const rows = (res.data as RawFilm[] | null) ?? [];
+      if (!rows.length) return [];
+      const cache = makeRenderCache();
+      return Promise.all(
+        rows.map(async (raw) => {
+          const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
+            renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1200, 88),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1200, 88),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 800, 85),
+            renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
+          ]);
+          return {
+            ...raw,
+            cover_url: cover,
+            thumbnail_url: thumbnail,
+            thumbnail_url_mobile: thumbnailMobile,
+            mobile_cover_url: mobile,
+          } as HomeFeaturedFilm;
+        }),
+      );
+    } catch (error) {
+      console.error("getHomeFeaturedSlides failed:", error);
+      return [];
+    }
   },
 );
 
