@@ -1,17 +1,30 @@
-Make the rail thumbnails actually 16:9 at the transform layer so we download pre-cropped landscape images instead of relying on CSS `object-cover` to crop portrait sources.
 
-In `src/lib/home.functions.ts`, inside `getHomeRails`, change the `renderResizedUrl` calls for each rail film from:
+## Problem
 
+Rail cards render `film.cover_url`, which is the **portrait 2:3 poster** uploaded in admin. The CSS forces it into a 16:9 box via `object-cover`, so portrait posters get cropped top/bottom and look wrong. Meanwhile, admin already collects a proper **16:9 landscape image** (`thumbnail_url`, labeled "Desktop Cover (16:9)"), but the rails ignore it.
+
+## Fix
+
+### 1. `src/components/films-row.tsx`
+In `PosterCard`, prefer `film.thumbnail_url` (true 16:9) for the rail image, and fall back to `cover_url` only if a film has no landscape uploaded yet:
+
+```tsx
+const railImg = film.thumbnail_url || film.cover_url;
 ```
-renderResizedUrl(supabaseAdmin, cache, f.cover_url, 400, 80)
-renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url, 400, 80)
-```
+Use `railImg` in the `<img src>` and the conditional. No other layout changes — cards stay 16:9, title stays below.
 
-to request a 16:9 crop at a size that matches the card widths (up to 340px CSS × 2 DPR ≈ 680w):
+### 2. `src/lib/home.functions.ts` — `getHomeRails`
+Both `cover_url` and `thumbnail_url` are already being transformed to 680×383 "cover". Keep `thumbnail_url` at that transform (it's now the primary rail image). Change `cover_url` back to a portrait-friendly transform (`400, 80` default `contain`) so it isn't cropped when used elsewhere / as fallback.
 
-```
-renderResizedUrl(supabaseAdmin, cache, f.cover_url, 680, 78, 383, "cover")
-renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url, 680, 78, 383, "cover")
-```
+### 3. `src/routes/_authenticated/admin/films.tsx` — admin labels
+Make the intent crystal clear for future films:
+- Rename "Upload Desktop Cover (16:9)" → **"Upload Rail / Hero Image (16:9) — required"** with description noting it's used on homepage rails, browse grid, and desktop hero. Recommend 1920×1080.
+- Rename "Upload Cover Poster (Portrait)" → **"Upload Poster (2:3, optional)"** with description noting it's used for share previews / poster views only, and that the 16:9 image will be used everywhere else.
+- Reorder so 16:9 comes first in the Media section.
 
-Effect: Supabase Storage returns 680×383 (16:9) images cropped to fill, so every card is truly 16:9 regardless of the original poster aspect ratio, and no bandwidth is wasted on cropped-off pixels. No changes to `films-row.tsx` or the data schema.
+No schema changes, no data migration. Existing films that only have a portrait `cover_url` keep working via the fallback; admins can upload the 16:9 version whenever.
+
+## Files touched
+- `src/components/films-row.tsx`
+- `src/lib/home.functions.ts`
+- `src/routes/_authenticated/admin/films.tsx`

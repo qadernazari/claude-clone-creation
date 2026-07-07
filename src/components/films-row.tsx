@@ -19,6 +19,7 @@ function fallbackGradient(seed: string) {
 function PosterCard({ film, locale, year }: { film: Film; locale: string; year: (n: number) => string }) {
   const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
   const director = locale === "fa" ? film.director_fa || film.director_en : film.director_en;
+  const railImg = film.thumbnail_url || film.cover_url;
 
   return (
     <Link
@@ -28,9 +29,9 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
       className="group block w-[56vw] shrink-0 snap-start sm:w-[260px] md:w-[300px] lg:w-[340px]"
     >
       <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/8 transition-transform duration-300 md:group-hover:scale-[1.02]">
-        {film.cover_url ? (
+        {railImg ? (
           <img
-            src={film.cover_url}
+            src={railImg}
             alt=""
             width={680}
             height={383}
