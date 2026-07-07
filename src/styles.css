@@ -8,7 +8,7 @@
 /*
  * IRAN design system.
  * Warm near-black background, cream type, amber accents.
- * Fonts: Fraunces (EN display), Sora (EN body), Vazirmatn (Persian all).
+ * Fonts: Fraunces (EN display), Sora (EN body), IranSansX Pro (Persian all).
  * Persian is true RTL — set <html dir="rtl"> via the locale provider.
  */
 
@@ -154,7 +154,7 @@
     }
   }
 
-  /* Persian typography: slightly larger, more open leading for Vazirmatn */
+  /* Persian typography: slightly larger, more open leading for IranSansX */
   [lang="fa"] body,
   [dir="rtl"] body {
     font-feature-settings: "kern", "calt", "liga";
