@@ -18,12 +18,31 @@ export function makeRenderCache() {
 
 export async function renderResizedUrl(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _client: any,
-  _cache: Map<string, Promise<string | null>>,
+  client: any,
+  cache: Map<string, Promise<string | null>>,
   original: string | null | undefined,
-  _width: number,
-  _quality = 90,
+  width: number,
+  quality = 90,
 ): Promise<string | null> {
-  // Serve original uploaded file — no transform, no re-encode.
-  return original ?? null;
+  if (!original) return null;
+  const parsed = parseSignedObjectUrl(original);
+  if (!parsed) return original;
+  const key = `${parsed.bucket}|${parsed.path}|${width}|${quality}`;
+  const existing = cache.get(key);
+  if (existing) return existing;
+  const promise = (async () => {
+    try {
+      const { data, error } = await client.storage
+        .from(parsed.bucket)
+        .createSignedUrl(parsed.path, ONE_YEAR, {
+          transform: { width, quality, resize: "cover" as const },
+        });
+      if (error || !data?.signedUrl) return original;
+      return data.signedUrl as string;
+    } catch {
+      return original;
+    }
+  })();
+  cache.set(key, promise);
+  return promise;
 }

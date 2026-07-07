@@ -1,22 +1,64 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+function parseSignedObjectUrl(u: string | null | undefined) {
+  if (!u) return null;
+  const m = u.match(/\/storage\/v1\/object\/sign\/([^/]+)\/([^?]+)/);
+  return m ? { bucket: m[1], path: decodeURIComponent(m[2]) } : null;
+}
+
+// Cross-request in-memory cache for resized signed URLs. A signed URL with a
+// 1-year expiry is safe to memoize for the lifetime of the worker instance —
+// repeat SSR calls then skip the expensive `storage.createSignedUrl` round
+// trip entirely. Cap to keep memory bounded.
+const GLOBAL_URL_CACHE = new Map<string, string>();
+const GLOBAL_URL_CACHE_MAX = 2000;
+
 function makeRenderCache() {
   return new Map<string, Promise<string | null>>();
 }
 
 async function renderResizedUrl(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _client: unknown,
-  _cache: Map<string, Promise<string | null>>,
+  client: any,
+  cache: Map<string, Promise<string | null>>,
   original: string | null | undefined,
-  _width: number,
-  _quality = 68,
-  _height?: number,
-  _resize: "contain" | "cover" | "fill" = "contain",
+  width: number,
+  quality = 68,
+  height?: number,
+  resize: "contain" | "cover" | "fill" = "contain",
 ): Promise<string | null> {
-  // Serve original uploaded file — no transform, no re-encode.
-  return original ?? null;
+  if (!original) return null;
+  const parsed = parseSignedObjectUrl(original);
+  if (!parsed) return original;
+  const key = `${parsed.bucket}|${parsed.path}|${width}|${height ?? 0}|${resize}|${quality}`;
+  const cached = GLOBAL_URL_CACHE.get(key);
+  if (cached) return cached;
+  const existing = cache.get(key);
+  if (existing) return existing;
+  const promise = (async () => {
+    try {
+      const transform: { width: number; height?: number; quality: number; resize: "contain" | "cover" | "fill" } = { width, quality, resize };
+      if (height) transform.height = height;
+      const { data, error } = await client.storage
+        .from(parsed.bucket)
+        .createSignedUrl(parsed.path, ONE_YEAR, { transform });
+      if (error || !data?.signedUrl) return original;
+      const url = data.signedUrl as string;
+      if (GLOBAL_URL_CACHE.size >= GLOBAL_URL_CACHE_MAX) {
+        const firstKey = GLOBAL_URL_CACHE.keys().next().value;
+        if (firstKey) GLOBAL_URL_CACHE.delete(firstKey);
+      }
+      GLOBAL_URL_CACHE.set(key, url);
+      return url;
+    } catch {
+      return original;
+    }
+  })();
+  cache.set(key, promise);
+  return promise;
 }
 
 export type HomeFeaturedFilm = {

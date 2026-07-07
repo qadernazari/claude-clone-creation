@@ -91,9 +91,7 @@ export function FileUpload({
     const isCoverPortrait = bucket === "film-covers";      // 2:3 portrait + 9:16 mobile hero
     const maxWidth = isHeroLandscape ? 2400 : isCoverPortrait ? 2000 : 2400;
     const quality = isHeroLandscape ? 0.93 : isCoverPortrait ? 0.92 : 0.9;
-    // Upload original file without any compression — preserve full quality/resolution.
-    void compressImage; void maxWidth; void quality;
-    const file = rawFile;
+    const file = kind === "image" ? await compressImage(rawFile, maxWidth, quality) : rawFile;
     if (maxBytes && file.size > maxBytes) {
 
       toast.error(`File too large — max ${fmtBytes(maxBytes)}`);
