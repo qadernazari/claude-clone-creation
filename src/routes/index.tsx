@@ -118,6 +118,8 @@ export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     const { setHomepageCacheHeaders } = await import("@/lib/cache-headers");
     setHomepageCacheHeaders();
+    // Kick off both — return the single featured for head() metadata.
+    void context.queryClient.prefetchQuery(homeFeaturedSlidesQueryOptions);
     return context.queryClient.ensureQueryData(homeFeaturedQueryOptions);
   },
   head: ({ loaderData }) => ({
