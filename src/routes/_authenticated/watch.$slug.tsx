@@ -450,7 +450,7 @@ function WatchPage() {
     if (!v || !bar || !v.duration || !isFinite(v.duration)) return;
     const rect = bar.getBoundingClientRect();
     let pct = (clientX - rect.left) / rect.width;
-    if (dir === "rtl") pct = 1 - pct;
+
     pct = Math.max(0, Math.min(1, pct));
     v.currentTime = v.duration * pct;
     setCurrentTime(v.currentTime);

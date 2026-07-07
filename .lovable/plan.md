@@ -1,11 +1,12 @@
+## Bug
+
+After the previous fix that forced the control bar to LTR, two seek handlers still flip direction when the page is in RTL — so in Persian, dragging the scrubber right seeks backward, and dragging left seeks forward. Same inversion applies to the mobile double-tap seek.
+
 ## Fix
 
-In `src/routes/_authenticated/watch.$slug.tsx`, the resume-watching modal (line 1110) shows `از 0:30?` with a Latin question mark and Latin digits.
+In `src/routes/_authenticated/watch.$slug.tsx`, remove the RTL branches from both seek handlers so the timeline always behaves as LTR (matching the visual scrubber that already fills left→right):
 
-**Change line 1110** — in the Persian branch:
-- Convert the time string to Persian digits (`0` → `۰`, `1` → `۱`, …, `9` → `۹`).
-- Replace `?` with Persian question mark `؟`.
+1. **`scrubToClientX`** (line 453) — delete `if (dir === "rtl") pct = 1 - pct;`
+2. **Double-tap seek** (line 489, inside `onPlayerPointerDown`) — delete `if (dir === "rtl") side = side === "left" ? "right" : "left";`
 
-Implementation: small inline helper `toFa(s)` that maps ASCII digits to `۰۱۲۳۴۵۶۷۸۹`, applied only in the `fa` branch. Result: `از ۰:۳۰؟` in Persian; English branch stays `Resume from 0:30?`.
-
-Scope limited to this one line — the player HUD clock (currentTime / duration) keeps Latin digits as before.
+After this, tapping/dragging right = forward, left = back, regardless of language — consistent with the visual progress bar and industry-standard player behavior.
