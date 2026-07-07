@@ -25,19 +25,19 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
       to="/films/$slug"
       params={{ slug: film.slug }}
       preload="intent"
-      className="group block w-[42vw] shrink-0 snap-start sm:w-[220px] md:w-[240px] lg:w-[260px]"
+      className="group block w-[56vw] shrink-0 snap-start sm:w-[260px] md:w-[300px] lg:w-[340px]"
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/8 transition-transform duration-300 md:group-hover:scale-[1.02]">
+      <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/8 transition-transform duration-300 md:group-hover:scale-[1.02]">
         {film.cover_url ? (
           <img
             src={film.cover_url}
             alt=""
-            width={520}
-            height={780}
+            width={680}
+            height={383}
             loading="lazy"
             decoding="async"
             fetchPriority="low"
-            sizes="(min-width: 1024px) 260px, (min-width: 768px) 240px, (min-width: 640px) 220px, 42vw"
+            sizes="(min-width: 1024px) 340px, (min-width: 768px) 300px, (min-width: 640px) 260px, 56vw"
             className="cine-img absolute inset-0 h-full w-full object-cover"
           />
         ) : (
