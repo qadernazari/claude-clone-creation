@@ -102,18 +102,18 @@
 
   /* Persian fallback stack: Tahoma ships on Windows/Android and renders
      Persian perfectly, so users in Iran on slow connections see readable
-     text instantly while Vazirmatn loads in the background. */
-  --font-display: "Space Grotesk", "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "DM Sans", "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-fa: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-vazir: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-editorial: "Fraunces", "Vazirmatn Variable", "Vazirmatn", "Tahoma", ui-serif, Georgia, serif;
+     text instantly while IranSansX loads in the background. */
+  --font-display: "Space Grotesk", "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-fa: "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-vazir: "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-editorial: "Fraunces", "IranSansX", "Tahoma", ui-serif, Georgia, serif;
 }
 
-/* Persian: swap to Vazirmatn for both display and body */
+/* Persian: swap to IranSansX for both display and body */
 [lang="fa"], [dir="rtl"] {
-  --font-display: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, sans-serif;
-  --font-body: "Vazirmatn Variable", "Vazirmatn", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "IranSansX", "Tahoma", "Arial", ui-sans-serif, sans-serif;
+  --font-body: "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
