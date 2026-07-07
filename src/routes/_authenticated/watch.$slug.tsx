@@ -485,8 +485,8 @@ function WatchPage() {
       const shell = playerShellRef.current;
       if (v && shell && v.duration && isFinite(v.duration)) {
         const rect = shell.getBoundingClientRect();
-        let side: "left" | "right" = e.clientX < rect.left + rect.width / 2 ? "left" : "right";
-        if (dir === "rtl") side = side === "left" ? "right" : "left";
+        const side: "left" | "right" = e.clientX < rect.left + rect.width / 2 ? "left" : "right";
+
         const delta = side === "right" ? 10 : -10;
         v.currentTime = Math.min(v.duration, Math.max(0, v.currentTime + delta));
         setCurrentTime(v.currentTime);
