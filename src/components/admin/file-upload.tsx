@@ -86,13 +86,20 @@ export function FileUpload({
   const [meta, setMeta] = useState<{ size?: number; duration?: number; width?: number; height?: number } | null>(null);
 
   async function upload(rawFile: File) {
-    // Higher fidelity for hero/cover art; smaller portrait cards stay lean.
-    const isHeroLandscape = bucket === "film-thumbnails"; // 16:9 desktop hero
-    const isCoverPortrait = bucket === "film-covers";      // 2:3 portrait + 9:16 mobile hero
-    const maxWidth = isHeroLandscape ? 2400 : isCoverPortrait ? 2000 : 2400;
-    const quality = isHeroLandscape ? 0.93 : isCoverPortrait ? 0.92 : 0.9;
-    const file = kind === "image" ? await compressImage(rawFile, maxWidth, quality) : rawFile;
+    let file = rawFile;
+    if (kind === "image") {
+      if (bucket === "film-covers") {
+        file = await compressImage(rawFile, 1920, 0.92);
+      } else if (bucket === "film-thumbnails") {
+        file = await compressImage(rawFile, 600, 0.88);
+      } else if (bucket === "film-trailers") {
+        file = await compressImage(rawFile, 1280, 0.88);
+      } else {
+        file = await compressImage(rawFile, 1920, 0.9);
+      }
+    }
     if (maxBytes && file.size > maxBytes) {
+
 
       toast.error(`File too large — max ${fmtBytes(maxBytes)}`);
       return;
