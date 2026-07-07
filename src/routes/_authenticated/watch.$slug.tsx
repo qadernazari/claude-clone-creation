@@ -849,7 +849,7 @@ function WatchPage() {
 
                 {/* Bottom gradient + control bar */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-                <div className={`pointer-events-auto absolute inset-x-0 bottom-0 px-4 pb-3 pt-2 md:px-6 md:pb-5 ${overlayVisible || !playing ? "" : "pointer-events-none"}`}>
+                <div dir="ltr" className={`pointer-events-auto absolute inset-x-0 bottom-0 px-4 pb-3 pt-2 md:px-6 md:pb-5 ${overlayVisible || !playing ? "" : "pointer-events-none"}`}>
                   {/* Scrubber */}
                   <div
                     ref={scrubRef}
@@ -867,19 +867,18 @@ function WatchPage() {
                     <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-cream/15 transition-all group-hover/scrub:h-[5px]" />
                     <div
                       className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-cream/25 transition-all group-hover/scrub:h-[5px]"
-                      style={dir === "rtl" ? { right: 0, width: `${bufPct}%` } : { left: 0, width: `${bufPct}%` }}
+                      style={{ left: 0, width: `${bufPct}%` }}
                     />
                     <div
                       className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.6)] transition-all group-hover/scrub:h-[5px]"
-                      style={dir === "rtl" ? { right: 0, width: `${pct}%` } : { left: 0, width: `${pct}%` }}
+                      style={{ left: 0, width: `${pct}%` }}
                     />
                     <div
                       className={`absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-amber shadow-[0_0_10px_rgba(201,168,76,0.8)] transition-transform ${scrubbing ? "scale-125" : "scale-0 group-hover/scrub:scale-100"}`}
-                      style={dir === "rtl"
-                        ? { right: `calc(${pct}% - 7px)` }
-                        : { left: `calc(${pct}% - 7px)` }}
+                      style={{ left: `calc(${pct}% - 7px)` }}
                     />
                   </div>
+
 
                   {/* Time + buttons row */}
                   <div className="mt-2 flex items-center gap-3 text-[12px] text-cream/85">
