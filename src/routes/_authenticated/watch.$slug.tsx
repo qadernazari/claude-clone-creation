@@ -268,7 +268,10 @@ function WatchPage() {
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [muted, setMuted] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [speedOpen, setSpeedOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
   const [overlayVisible, setOverlayVisible] = useState(true);
   const [scrubbing, setScrubbing] = useState(false);
   const overlayTimerRef = useRef<number | null>(null);
