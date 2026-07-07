@@ -873,25 +873,85 @@ function WatchPage() {
                         </svg>
                       )}
                     </button>
+
+                    {/* Skip back 10s */}
                     <button
                       type="button"
-                      onClick={toggleMute}
-                      aria-label={muted ? (fa ? "صدادار" : "Unmute") : (fa ? "بی‌صدا" : "Mute")}
+                      onClick={() => {
+                        const v = videoRef.current;
+                        if (!v) return;
+                        v.currentTime = Math.max(0, v.currentTime - 10);
+                        flashHud("-10s");
+                      }}
+                      aria-label={fa ? "۱۰ ثانیه به عقب" : "Skip back 10s"}
                       className="hidden h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
                     >
-                      {muted ? (
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                          <path d="M11 5 6 9H2v6h4l5 4Z" />
-                          <path d="m22 9-6 6M16 9l6 6" />
-                        </svg>
-                      ) : (
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                          <path d="M11 5 6 9H2v6h4l5 4Z" />
-                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                        </svg>
-                      )}
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                        <text x="9" y="15" fontSize="6" fontWeight="bold" fill="currentColor" stroke="none">10</text>
+                      </svg>
                     </button>
+
+                    {/* Skip forward 10s */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const v = videoRef.current;
+                        if (!v) return;
+                        v.currentTime = Math.min(v.duration || 0, v.currentTime + 10);
+                        flashHud("+10s");
+                      }}
+                      aria-label={fa ? "۱۰ ثانیه به جلو" : "Skip forward 10s"}
+                      className="hidden h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <text x="9" y="15" fontSize="6" fontWeight="bold" fill="currentColor" stroke="none">10</text>
+                      </svg>
+                    </button>
+
+                    <div className="hidden sm:flex items-center gap-1 group/vol">
+                      {/* Mute toggle */}
+                      <button
+                        type="button"
+                        onClick={toggleMute}
+                        aria-label={muted ? (fa ? "صدادار" : "Unmute") : (fa ? "بی‌صدا" : "Mute")}
+                        className="flex h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber"
+                      >
+                        {muted ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M11 5 6 9H2v6h4l5 4Z"/>
+                            <path d="m22 9-6 6M16 9l6 6"/>
+                          </svg>
+                        ) : (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M11 5 6 9H2v6h4l5 4Z"/>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                          </svg>
+                        )}
+                      </button>
+                      {/* Volume slider — visible on hover */}
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={muted ? 0 : (videoRef.current?.volume ?? 1)}
+                        onChange={(e) => {
+                          const v = videoRef.current;
+                          if (!v) return;
+                          v.volume = parseFloat(e.target.value);
+                          v.muted = false;
+                          try { localStorage.setItem("player:volume", e.target.value); } catch {}
+                        }}
+                        aria-label={fa ? "میزان صدا" : "Volume"}
+                        className="w-0 group-hover/vol:w-20 transition-all duration-200 overflow-hidden accent-amber cursor-pointer"
+                        style={{ height: "3px" }}
+                      />
+                    </div>
                     <span className="tabular-nums tracking-wide text-cream-bright drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
                       {fmtTime(currentTime)}
                     </span>
@@ -943,6 +1003,36 @@ function WatchPage() {
                         )}
                       </div>
                     )}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setSpeedOpen((x) => !x)}
+                        aria-label={fa ? "سرعت پخش" : "Playback speed"}
+                        className={`flex h-9 min-w-9 items-center justify-center rounded-md px-1.5 text-[11px] font-semibold transition-all hover:scale-110 ${speed !== 1 ? "text-amber" : "text-cream/85 hover:text-amber"}`}
+                      >
+                        {speed}×
+                      </button>
+                      {speedOpen && (
+                        <div
+                          role="menu"
+                          className="absolute bottom-12 end-0 min-w-[120px] rounded-md border border-cream/15 bg-bg-0/95 p-1 text-[12px] shadow-2xl backdrop-blur"
+                        >
+                          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              role="menuitemradio"
+                              aria-checked={speed === s}
+                              onClick={() => changeSpeed(s)}
+                              className={`flex w-full items-center justify-between rounded px-3 py-1.5 hover:bg-cream/10 ${speed === s ? "text-amber" : "text-cream/85"}`}
+                            >
+                              <span>{s}×</span>
+                              {speed === s && <span aria-hidden>✓</span>}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={toggleFullscreen}
@@ -960,6 +1050,7 @@ function WatchPage() {
                       )}
                     </button>
                   </div>
+
                 </div>
               </div>
 
