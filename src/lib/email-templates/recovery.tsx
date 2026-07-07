@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Button, Container, Head, Heading, Html, Preview, Section, Text,
+  Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text,
 } from '@react-email/components'
 
 interface RecoveryEmailProps {
@@ -11,7 +11,7 @@ interface RecoveryEmailProps {
 export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+    <Preview>{`Reset your password for ${siteName} · بازیابی رمز عبور`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{siteName}</Heading>
@@ -25,6 +25,21 @@ export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps)
           <Text style={footer}>
             If you didn't request a reset, you can safely ignore this email —
             your password will stay the same.
+          </Text>
+        </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>بازیابی رمز عبور</Heading>
+          <Text style={text}>
+            درخواستی برای بازیابی رمز عبور {siteName} شما دریافت کردیم. برای
+            انتخاب رمز جدید روی دکمه زیر بزنید.
+          </Text>
+          <Button style={button} href={confirmationUrl}>بازیابی رمز عبور</Button>
+          <Text style={footer}>
+            اگر این درخواست را نداده‌اید، این ایمیل را نادیده بگیرید — رمز عبور
+            شما تغییری نمی‌کند.
           </Text>
         </Section>
       </Container>
@@ -41,3 +56,4 @@ const h1 = { fontSize: '22px', fontWeight: 'bold' as const, color: '#0a0807', ma
 const text = { fontSize: '15px', color: '#3a3531', lineHeight: '1.6', margin: '0 0 20px' }
 const button = { backgroundColor: '#0a0807', color: '#fefdfb', padding: '12px 22px', borderRadius: '6px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }
 const footer = { fontSize: '12px', color: '#999', margin: '24px 0 0' }
+const hr = { borderColor: '#e8e4dd', margin: '24px 0' }

@@ -10,7 +10,7 @@ interface Props { browseUrl?: string }
 const Email = ({ browseUrl = '#' }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>You're enjoying unlimited access</Preview>
+    <Preview>{`You're enjoying unlimited access · روز ۵ آزمایش رایگان`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{SITE_NAME}</Heading>
@@ -27,6 +27,23 @@ const Email = ({ browseUrl = '#' }: Props) => (
             <Button href={browseUrl} style={button}>Continue watching</Button>
           </Section>
         </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>روز ۵ آزمایش رایگان</Heading>
+          <Text style={text}>
+            یادآوری: دوره آزمایش عضویت شما به تمام کتابخانه فیلم‌ها، مستندها و
+            محتوای اختصاصی ما دسترسی می‌دهد.
+          </Text>
+          <Text style={text}>
+            تازه‌واردید؟ مجموعه‌های منتخب، برندگان جوایز و آثار اصلی را ببینید.
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '28px 0' }}>
+            <Button href={browseUrl} style={button}>ادامه تماشا</Button>
+          </Section>
+        </Section>
+
         <Hr style={hr} />
         <Text style={footer}>{SITE_NAME} · ir.show</Text>
       </Container>

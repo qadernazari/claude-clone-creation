@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Container, Head, Heading, Html, Link, Preview, Section, Text,
+  Body, Container, Head, Heading, Hr, Html, Link, Preview, Section, Text,
 } from '@react-email/components'
 
 interface SignupEmailProps {
@@ -16,7 +16,7 @@ export const SignupEmail = ({
 }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your {siteName} verification code{token ? `: ${token}` : ''}</Preview>
+    <Preview>{`Your ${siteName} verification code${token ? `: ${token}` : ''} · کد تأیید شما`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{siteName}</Heading>
@@ -37,6 +37,24 @@ export const SignupEmail = ({
             If you didn't create an account, you can safely ignore this email.
           </Text>
         </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>خوش آمدید</Heading>
+          <Text style={text}>
+            به <Link href={siteUrl} style={link}><strong>{siteName}</strong></Link> خوش آمدید.
+            برای تأیید <strong>{recipient}</strong> کد ۶ رقمی زیر را وارد کنید.
+          </Text>
+          {token && <Text style={codeStyle}>{token}</Text>}
+          <Text style={hint}>
+            این کد تا ۶۰ دقیقه اعتبار دارد. یا می‌توانید با{' '}
+            <Link href={confirmationUrl} style={link}>این لینک</Link> تأیید کنید.
+          </Text>
+          <Text style={footer}>
+            اگر شما حساب کاربری ایجاد نکرده‌اید، این ایمیل را نادیده بگیرید.
+          </Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -53,3 +71,4 @@ const link = { color: '#0a0807', textDecoration: 'underline' }
 const codeStyle = { fontFamily: 'Menlo, Courier, monospace', fontSize: '32px', letterSpacing: '0.35em', fontWeight: 'bold' as const, color: '#0a0807', margin: '8px 0 20px' }
 const hint = { fontSize: '13px', color: '#666', lineHeight: '1.6', margin: '0 0 16px' }
 const footer = { fontSize: '12px', color: '#999', margin: '24px 0 0' }
+const hr = { borderColor: '#e8e4dd', margin: '24px 0' }

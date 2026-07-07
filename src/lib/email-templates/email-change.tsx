@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text,
+  Body, Button, Container, Head, Heading, Hr, Html, Link, Preview, Section, Text,
 } from '@react-email/components'
 
 interface EmailChangeEmailProps {
@@ -16,7 +16,7 @@ export const EmailChangeEmail = ({
 }: EmailChangeEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Confirm your email change for {siteName}</Preview>
+    <Preview>{`Confirm your email change for ${siteName} · تأیید تغییر ایمیل`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{siteName}</Heading>
@@ -34,6 +34,22 @@ export const EmailChangeEmail = ({
             immediately.
           </Text>
         </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>تأیید تغییر ایمیل</Heading>
+          <Text style={text}>
+            درخواست تغییر ایمیل حساب {siteName} شما از{' '}
+            <Link href={`mailto:${oldEmail}`} style={link}>{oldEmail}</Link>{' '}
+            به{' '}
+            <Link href={`mailto:${newEmail}`} style={link}>{newEmail}</Link> ثبت شد.
+          </Text>
+          <Button style={button} href={confirmationUrl}>تأیید تغییر</Button>
+          <Text style={footer}>
+            اگر این تغییر را درخواست نکرده‌اید، لطفاً فوراً حساب خود را ایمن کنید.
+          </Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -49,3 +65,4 @@ const text = { fontSize: '15px', color: '#3a3531', lineHeight: '1.6', margin: '0
 const link = { color: '#0a0807', textDecoration: 'underline' }
 const button = { backgroundColor: '#0a0807', color: '#fefdfb', padding: '12px 22px', borderRadius: '6px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }
 const footer = { fontSize: '12px', color: '#999', margin: '24px 0 0' }
+const hr = { borderColor: '#e8e4dd', margin: '24px 0' }

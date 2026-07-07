@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text,
+  Body, Button, Container, Head, Heading, Hr, Html, Link, Preview, Section, Text,
 } from '@react-email/components'
 
 interface InviteEmailProps {
@@ -12,7 +12,7 @@ interface InviteEmailProps {
 export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>You've been invited to join {siteName}</Preview>
+    <Preview>{`You've been invited to join ${siteName} · دعوتنامه`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{siteName}</Heading>
@@ -26,6 +26,21 @@ export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailP
           <Button style={button} href={confirmationUrl}>Accept invitation</Button>
           <Text style={footer}>
             If you weren't expecting this, you can safely ignore this email.
+          </Text>
+        </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>دعوتنامه</Heading>
+          <Text style={text}>
+            شما به{' '}
+            <Link href={siteUrl} style={link}><strong>{siteName}</strong></Link>
+            {' '}دعوت شده‌اید. برای ساخت حساب کاربری، دعوت را بپذیرید.
+          </Text>
+          <Button style={button} href={confirmationUrl}>پذیرش دعوت</Button>
+          <Text style={footer}>
+            اگر انتظار این ایمیل را نداشتید، می‌توانید آن را نادیده بگیرید.
           </Text>
         </Section>
       </Container>
@@ -43,3 +58,4 @@ const text = { fontSize: '15px', color: '#3a3531', lineHeight: '1.6', margin: '0
 const link = { color: '#0a0807', textDecoration: 'underline' }
 const button = { backgroundColor: '#0a0807', color: '#fefdfb', padding: '12px 22px', borderRadius: '6px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }
 const footer = { fontSize: '12px', color: '#999', margin: '24px 0 0' }
+const hr = { borderColor: '#e8e4dd', margin: '24px 0' }

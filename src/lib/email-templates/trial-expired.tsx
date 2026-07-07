@@ -10,7 +10,7 @@ interface Props { membershipUrl?: string }
 const Email = ({ membershipUrl = '#' }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Continue watching with membership</Preview>
+    <Preview>{`Continue watching with membership · دوره آزمایشی شما پایان یافت`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={brand}>{SITE_NAME}</Heading>
@@ -27,6 +27,23 @@ const Email = ({ membershipUrl = '#' }: Props) => (
             <Button href={membershipUrl} style={button}>Become a member</Button>
           </Section>
         </Section>
+
+        <Hr style={hr} />
+
+        <Section dir="rtl" style={{ textAlign: 'right' }}>
+          <Heading style={h1}>دوره آزمایشی شما پایان یافت</Heading>
+          <Text style={text}>
+            دوره آزمایش رایگان شما به پایان رسیده است. حساب کاربری، لیست تماشا و
+            تاریخچه‌ی شما ذخیره است — هر زمان آماده بودید از همان‌جا ادامه دهید.
+          </Text>
+          <Text style={text}>
+            برای دسترسی مجدد به کل کتابخانه، به عضویت {SITE_NAME} بپیوندید.
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '28px 0' }}>
+            <Button href={membershipUrl} style={button}>عضو شوید</Button>
+          </Section>
+        </Section>
+
         <Hr style={hr} />
         <Text style={footer}>{SITE_NAME} · ir.show</Text>
       </Container>
