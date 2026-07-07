@@ -1177,12 +1177,14 @@ function WatchPage() {
                 { k: "Space / K", v: fa ? "پخش/مکث" : "Play / Pause" },
                 { k: "←  →", v: fa ? "۵ ثانیه" : "Seek 5s" },
                 { k: "J / L", v: fa ? "۱۰ ثانیه" : "Seek 10s" },
+                { k: "> / <", v: fa ? "سرعت" : "Speed" },
                 { k: "↑  ↓", v: fa ? "صدا" : "Volume" },
                 { k: "0–9", v: fa ? "پرش درصدی" : "Jump to %" },
                 { k: "F", v: fa ? "تمام‌صفحه" : "Fullscreen" },
                 { k: "M", v: fa ? "بی‌صدا" : "Mute" },
                 { k: "T", v: fa ? "حالت سینما" : "Theater" },
               ].map(({ k, v }) => (
+
                 <div key={k} className="flex items-center justify-between gap-2">
                   <kbd className="rounded border border-cream/15 bg-cream/4 px-1.5 py-0.5 font-mono text-[10px] text-cream/80">
                     {k}
