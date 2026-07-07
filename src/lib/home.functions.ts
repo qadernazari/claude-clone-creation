@@ -193,9 +193,8 @@ export const getHomeRails = createServerFn({ method: "GET" }).handler(
     const films = await Promise.all(
       filmsRaw.map(async (f) => {
         const [cover, thumbnail] = await Promise.all([
-          renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 400, 80),
-          renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 400, 80),
-
+          renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 680, 78, 383, "cover"),
+          renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 680, 78, 383, "cover"),
         ]);
         return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
       }),
