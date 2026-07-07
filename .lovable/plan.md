@@ -1,30 +1,27 @@
-
 ## Problem
 
-Rail cards render `film.cover_url`, which is the **portrait 2:3 poster** uploaded in admin. The CSS forces it into a 16:9 box via `object-cover`, so portrait posters get cropped top/bottom and look wrong. Meanwhile, admin already collects a proper **16:9 landscape image** (`thumbnail_url`, labeled "Desktop Cover (16:9)"), but the rails ignore it.
+In Persian (RTL) mode, the video player's bottom control bar mirrors along with page direction, so:
+- Fullscreen, speed (×1), and CC end up on the **left**
+- Play/pause, volume, time end up on the **right**
+
+That's wrong. A video timeline is inherently left-to-right (progress flows forward in time regardless of language), and industry-standard players (YouTube, Netflix, Aparat) keep the transport controls in a fixed layout even in RTL locales.
 
 ## Fix
 
-### 1. `src/components/films-row.tsx`
-In `PosterCard`, prefer `film.thumbnail_url` (true 16:9) for the rail image, and fall back to `cover_url` only if a film has no landscape uploaded yet:
+Force the player chrome to stay LTR regardless of page language. Persian text inside labels/menus still renders correctly (browsers handle inline text direction from the characters themselves).
 
-```tsx
-const railImg = film.thumbnail_url || film.cover_url;
-```
-Use `railImg` in the `<img src>` and the conditional. No other layout changes — cards stay 16:9, title stays below.
+### Changes in `src/routes/_authenticated/watch.$slug.tsx`
 
-### 2. `src/lib/home.functions.ts` — `getHomeRails`
-Both `cover_url` and `thumbnail_url` are already being transformed to 680×383 "cover". Keep `thumbnail_url` at that transform (it's now the primary rail image). Change `cover_url` back to a portrait-friendly transform (`400, 80` default `contain`) so it isn't cropped when used elsewhere / as fallback.
+1. **Bottom control row** (the `<div>` at line ~852 wrapping the scrubber + controls): add `dir="ltr"` so:
+   - Play/pause, skip ±10s, volume, current/total time stay on the **left**
+   - CC, speed (×1), fullscreen stay on the **right**
 
-### 3. `src/routes/_authenticated/admin/films.tsx` — admin labels
-Make the intent crystal clear for future films:
-- Rename "Upload Desktop Cover (16:9)" → **"Upload Rail / Hero Image (16:9) — required"** with description noting it's used on homepage rails, browse grid, and desktop hero. Recommend 1920×1080.
-- Rename "Upload Cover Poster (Portrait)" → **"Upload Poster (2:3, optional)"** with description noting it's used for share previews / poster views only, and that the 16:9 image will be used everywhere else.
-- Reorder so 16:9 comes first in the Media section.
+2. **Scrubber progress fills** (lines ~867–881): remove the RTL branches — always fill from `left: 0` with `width: pct%`, and position the thumb with `left: calc(pct% - 7px)`. Timelines should always flow left→right.
 
-No schema changes, no data migration. Existing films that only have a portrait `cover_url` keep working via the fallback; admins can upload the 16:9 version whenever.
+3. **Speed / CC dropdowns** (lines ~1004, ~1045): they use `end-0` which resolves to `left-0` in RTL and would open off-screen once the parent is forced to LTR. Change to `right-0` so menus anchor to their button on the right side.
 
-## Files touched
-- `src/components/films-row.tsx`
-- `src/lib/home.functions.ts`
-- `src/routes/_authenticated/admin/films.tsx`
+4. **Top overlay bar** (line ~813): leave as-is. The back arrow correctly points in the reading direction (already handled via `scaleX(-1)` in RTL), and the title should follow the language direction — that behavior is fine.
+
+### Out of scope
+
+No changes to the rest of the page (film info, comments, related rail) — those are content and should follow page direction as they currently do.
