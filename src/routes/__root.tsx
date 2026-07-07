@@ -167,6 +167,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // the <link> tag.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
       { rel: "stylesheet", href: appCss },
+      // IranSansX Pro — self-hosted Persian display face. Static file,
+      // same-origin, cached by the browser and Cloudflare edge.
+      { rel: "stylesheet", href: "/fonts/iransansx.css" },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
