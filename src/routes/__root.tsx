@@ -10,11 +10,10 @@ import {
 import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-// Self-hosted Vazirmatn (Arabic subset only). The Latin glyphs come from
-// Space Grotesk / DM Sans / system fallbacks, so we skip the Latin and
-// Latin-Ext subsets entirely. This drops the Persian font payload from
-// ~80 KB (arabic + latin via Google Fonts) to ~46 KB (arabic only).
-import vazirArabicUrl from "@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2?url";
+// Persian display face: self-hosted IranSansX Pro webfonts under
+// /public/fonts, referenced from a static CSS file so the browser can
+// cache both stylesheet and font files at our own origin.
+
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { LocaleProvider, useLocale } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -168,6 +167,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // the <link> tag.
       { rel: "preload", as: "style", href: appCss, fetchPriority: "high" as const },
       { rel: "stylesheet", href: appCss },
+      // IranSansX Pro — self-hosted Persian display face. Static file,
+      // same-origin, cached by the browser and Cloudflare edge.
+      { rel: "stylesheet", href: "/fonts/iransansx.css" },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
@@ -203,37 +205,12 @@ function RootShell({ children }: { children: ReactNode }) {
           stays inline so it runs before first paint.
 
           Fonts:
-          - fa: self-hosted Vazirmatn (Arabic subset only, ~46 KB woff2).
-            Inlined @font-face + preload so the Arabic glyphs are on the
-            critical path with one same-origin request, no Google Fonts
-            CSS round-trip.
+          - fa: self-hosted IranSansX Pro via /fonts/iransansx.css (linked
+            in the route head above). Cached at the browser and edge with
+            a swap policy so Tahoma/Arial paints instantly on slow links.
           - en: Space Grotesk + DM Sans from Google Fonts, lazy-applied
             via media=print swap to keep them off the critical path.
         */}
-        {locale === "fa" ? (
-          <>
-            <link
-              rel="preload"
-              as="font"
-              type="font/woff2"
-              href={vazirArabicUrl}
-              crossOrigin="anonymous"
-            />
-            <style
-              dangerouslySetInnerHTML={{
-                __html:
-                  // font-display: optional — browser uses the fallback
-                  // (Tahoma/Arial) immediately and only swaps in Vazirmatn
-                  // if it arrives within the first ~100ms. Iranian users
-                  // on slow links to the Cloudflare edge never wait on
-                  // this font, and the page renders instantly.
-                  `@font-face{font-family:'Vazirmatn';font-style:normal;font-display:optional;font-weight:100 900;` +
-                  `src:url(${vazirArabicUrl}) format('woff2-variations');` +
-                  `unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC;}`,
-              }}
-            />
-          </>
-        ) : null}
         <script
           dangerouslySetInnerHTML={{
             __html:
