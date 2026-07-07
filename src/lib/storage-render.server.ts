@@ -22,7 +22,7 @@ export async function renderResizedUrl(
   cache: Map<string, Promise<string | null>>,
   original: string | null | undefined,
   width: number,
-  quality = 90,
+  quality = 85,
 ): Promise<string | null> {
   if (!original) return null;
   const parsed = parseSignedObjectUrl(original);
@@ -34,8 +34,8 @@ export async function renderResizedUrl(
     try {
       const { data, error } = await client.storage
         .from(parsed.bucket)
-        .createSignedUrl(parsed.path, ONE_YEAR, {
-          transform: { width, quality, resize: "cover" as const },
+        .createSignedUrl(parsed.path, 60 * 60 * 24 * 365, {
+          transform: { width, quality, resize: "contain" as const },
         });
       if (error || !data?.signedUrl) return original;
       return data.signedUrl as string;
@@ -46,3 +46,4 @@ export async function renderResizedUrl(
   cache.set(key, promise);
   return promise;
 }
+
