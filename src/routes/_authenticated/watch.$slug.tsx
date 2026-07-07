@@ -1000,7 +1000,7 @@ function WatchPage() {
                         {ccOpen && (
                           <div
                             role="menu"
-                            className="absolute bottom-12 end-0 min-w-[160px] rounded-md border border-cream/15 bg-bg-0/95 p-1 text-[12px] shadow-2xl backdrop-blur"
+                            className="absolute bottom-12 right-0 min-w-[160px] rounded-md border border-cream/15 bg-bg-0/95 p-1 text-[12px] shadow-2xl backdrop-blur"
                           >
                             <button
                               type="button"
