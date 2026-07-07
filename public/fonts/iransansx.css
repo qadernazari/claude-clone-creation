@@ -1,31 +1,12 @@
 /* IranSansX Pro — self-hosted webfont pack.
+   Only weights actually used by the UI are loaded (300–700).
    Each @font-face is restricted to Persian/Arabic Unicode ranges so Latin
    characters and Western numerals fall back to the English typeface
-   (Space Grotesk / DM Sans) automatically. */
-@font-face {
-  font-family: "IranSansX";
-  src: url("/fonts/IRANSansX-Thin.woff2") format("woff2"),
-       url("/fonts/IRANSansX-Thin.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
-                 U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
-                 U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC,
-                 U+06F0-06F9;
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IranSansX";
-  src: url("/fonts/IRANSansX-UltraLight.woff2") format("woff2"),
-       url("/fonts/IRANSansX-UltraLight.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
-                 U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
-                 U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC,
-                 U+06F0-06F9;
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
+   (Space Grotesk / DM Sans) automatically.
+
+   font-display: optional — the browser uses the system fallback (Tahoma)
+   immediately on first load and only swaps to IranSansX once it's cached,
+   eliminating FOUT/CLS on slow connections. */
 @font-face {
   font-family: "IranSansX";
   src: url("/fonts/IRANSansX-Light.woff2") format("woff2"),
@@ -36,7 +17,7 @@
                  U+06F0-06F9;
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "IranSansX";
@@ -48,7 +29,7 @@
                  U+06F0-06F9;
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "IranSansX";
@@ -60,7 +41,7 @@
                  U+06F0-06F9;
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "IranSansX";
@@ -72,7 +53,7 @@
                  U+06F0-06F9;
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "IranSansX";
@@ -84,53 +65,5 @@
                  U+06F0-06F9;
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IranSansX";
-  src: url("/fonts/IRANSansX-ExtraBold.woff2") format("woff2"),
-       url("/fonts/IRANSansX-ExtraBold.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
-                 U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
-                 U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC,
-                 U+06F0-06F9;
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IranSansX";
-  src: url("/fonts/IRANSansX-Heavy.woff2") format("woff2"),
-       url("/fonts/IRANSansX-Heavy.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
-                 U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
-                 U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC,
-                 U+06F0-06F9;
-  font-weight: 850;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IranSansX";
-  src: url("/fonts/IRANSansX-Black.woff2") format("woff2"),
-       url("/fonts/IRANSansX-Black.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
-                 U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
-                 U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC,
-                 U+06F0-06F9;
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "IranSansX";
-  src: url("/fonts/IRANSansX-ExtraBlack.woff2") format("woff2"),
-       url("/fonts/IRANSansX-ExtraBlack.woff") format("woff");
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
-                 U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011,
-                 U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC,
-                 U+06F0-06F9;
-  font-weight: 950;
-  font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
