@@ -100,20 +100,22 @@
   --input: var(--line);
   --ring: var(--amber);
 
-  /* Persian fallback stack: Tahoma ships on Windows/Android and renders
-     Persian perfectly, so users in Iran on slow connections see readable
-     text instantly while IranSansX loads in the background. */
-  --font-display: "Space Grotesk", "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "DM Sans", "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-fa: "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-vazir: "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
-  --font-editorial: "Fraunces", "IranSansX", "Tahoma", ui-serif, Georgia, serif;
+  /* English fonts — IranSansX is intentionally omitted here. Because every
+     IranSansX @font-face declares a Persian/Arabic unicode-range, it will
+     still render Persian glyphs automatically when mixed with Latin text.
+     Latin characters and Western numerals fall back to the English fonts. */
+  --font-display: "Space Grotesk", system-ui, ui-sans-serif, sans-serif;
+  --font-body: "DM Sans", system-ui, ui-sans-serif, sans-serif;
+  --font-fa: "IranSansX", "Tahoma", "Arial", ui-sans-serif, sans-serif;
+  --font-vazir: "IranSansX", "Tahoma", "Arial", ui-sans-serif, sans-serif;
+  --font-editorial: "Fraunces", ui-serif, Georgia, serif;
 }
 
-/* Persian: swap to IranSansX for both display and body */
+/* Persian mode — IranSansX first. Space Grotesk/DM Sans handle Latin characters
+   and Western numerals because IranSansX is limited to its unicode-range. */
 [lang="fa"], [dir="rtl"] {
-  --font-display: "IranSansX", "Tahoma", "Arial", ui-sans-serif, sans-serif;
-  --font-body: "IranSansX", "Tahoma", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "IranSansX", "Space Grotesk", "Tahoma", ui-sans-serif, sans-serif;
+  --font-body: "IranSansX", "DM Sans", "Tahoma", ui-sans-serif, sans-serif;
 }
 
 @layer base {
