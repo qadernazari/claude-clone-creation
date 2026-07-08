@@ -182,10 +182,15 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       <div className="relative z-10 flex h-full items-end">
         <div className="mx-auto w-full max-w-7xl px-5 pb-14 sm:px-6 md:px-12 md:pb-16">
           <div className="max-w-xl">
-            <span className="mb-2.5 inline-block text-[10px] font-semibold uppercase tracking-[0.32em] text-amber md:mb-3">
-              {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-            </span>
-            <h2 className="font-display text-[2rem] font-medium leading-[1] tracking-[-0.03em] text-cream-bright sm:text-4xl md:text-5xl lg:text-6xl">
+            <div className="mb-3 flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center rounded bg-amber px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink shadow-md shadow-amber/20">
+                {locale === "fa" ? "اختصاصی" : "Original"}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/60">
+                {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+              </span>
+            </div>
+            <h2 className="font-display text-[2rem] font-medium leading-[1] tracking-[-0.03em] text-cream-bright drop-shadow-2xl sm:text-4xl md:text-5xl lg:text-6xl">
               {title}
             </h2>
             <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-medium uppercase tracking-[0.24em] text-cream/60 md:mt-3 md:text-[11px]">
@@ -206,16 +211,23 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                 {synopsis}
               </p>
             ) : null}
-            <div className="mt-5 flex flex-wrap items-center gap-2.5 md:mt-6">
+            <div className="mt-6 flex flex-wrap items-center gap-3 md:mt-7">
               <Link
                 to="/films/$slug"
                 params={{ slug: film.slug }}
-                className="inline-flex min-h-10 items-center gap-2 rounded-md bg-cream-bright px-5 py-2.5 text-[12px] font-semibold text-ink transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] md:px-6 md:py-3 md:text-[13px]"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-amber px-7 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/10 transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] md:px-8 md:py-3.5"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="M8 5v14l11-7z" />
                 </svg>
                 <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+              </Link>
+              <Link
+                to="/films/$slug"
+                params={{ slug: film.slug }}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-6 py-3 text-[13px] font-semibold text-cream-bright backdrop-blur-md transition-all duration-200 hover:bg-cream/20 active:scale-[0.98] md:px-7 md:py-3.5"
+              >
+                {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
               </Link>
               <WatchlistCta slug={film.slug} locale={locale} />
             </div>
