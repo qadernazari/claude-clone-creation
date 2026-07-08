@@ -97,32 +97,32 @@ function Rail({
   const prevLabel = rtl ? "قبلی" : "Previous";
   const nextLabel = rtl ? "بعدی" : "Next";
 
+  const headline = title || eyebrow || "";
+  const seeAllLabel = rtl ? "مشاهده همه" : "See all";
+
   return (
     <section
       className="relative mx-auto max-w-[1400px] px-5 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_520px]"
     >
-      <div className="mb-6 flex items-end justify-between gap-6">
-        <div className="max-w-2xl">
-          {eyebrow && (
-            <span className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.32em] text-amber/90">
-              {eyebrow}
-            </span>
-          )}
-          {title && (
-            <h2 className="font-display text-[22px] font-medium tracking-[-0.02em] text-cream-bright md:text-[28px]">
-              {title}
-            </h2>
-          )}
-          {subtitle && (
-            <p className="mt-2 text-[13px] text-cream/45">{subtitle}</p>
-          )}
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3 md:gap-4">
+          <span className="h-6 w-[3px] shrink-0 rounded-full bg-amber" aria-hidden />
+          <h2 className="truncate font-display text-[18px] font-semibold tracking-[-0.01em] text-cream-bright md:text-[22px]">
+            {headline}
+          </h2>
+          <Link
+            to="/browse"
+            className="hidden shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] text-amber transition-opacity hover:opacity-75 sm:inline"
+          >
+            {seeAllLabel}
+          </Link>
         </div>
         <div className="hidden gap-1.5 md:flex">
           <button
             type="button"
             onClick={() => scroll(-1)}
             aria-label={prevLabel}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-cream/10 text-cream/50 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/60 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={prevPath} /></svg>
           </button>
@@ -130,12 +130,15 @@ function Rail({
             type="button"
             onClick={() => scroll(1)}
             aria-label={nextLabel}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-cream/10 text-cream/50 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/10 text-cream/60 transition-all hover:border-amber/40 hover:text-amber hover:bg-amber/5"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={nextPath} /></svg>
           </button>
         </div>
       </div>
+      {subtitle && (
+        <p className="mb-4 -mt-2 text-[13px] text-cream/45">{subtitle}</p>
+      )}
       {/* Edge-fade mask: posters dissolve into background instead of hard-clipping */}
       <div
         ref={ref}
