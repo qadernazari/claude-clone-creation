@@ -99,15 +99,15 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
         </button>
 
         {/* Dots */}
-        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center gap-2 md:bottom-6">
+        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center gap-2.5 md:bottom-6">
           {slides.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => go(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                i === index ? "w-8 bg-cream-bright" : "w-1.5 bg-cream/40 hover:bg-cream/70"
+              className={`h-2 rounded-full transition-all duration-500 ${
+                i === index ? "w-8 bg-amber ring-4 ring-amber/20" : "w-2 bg-cream/25 hover:bg-cream/50"
               }`}
             />
           ))}
