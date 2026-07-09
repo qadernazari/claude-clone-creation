@@ -76,6 +76,7 @@ export type LibraryFilm = {
   year: number | null;
   access_type: string;
   is_premium: boolean;
+  category: string | null;
 };
 
 export type LibraryData = {
