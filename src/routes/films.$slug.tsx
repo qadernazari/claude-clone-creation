@@ -198,7 +198,7 @@ function PosterRail({
         <ul className="flex gap-4 min-w-max md:gap-5">
           {films.map((r) => {
             const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
-            const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
+            const rDirector = r.category === "walking-tour" ? null : (fa ? r.director_fa || r.director_en : r.director_en);
             const bg = (r.poster_gradient as string) || fallbackGradient;
             return (
               <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
