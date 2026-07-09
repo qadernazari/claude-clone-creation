@@ -348,8 +348,12 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
 
   return (
     <>
-      <header
-        className="site-header fixed top-0 z-30 w-full border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl transition-all duration-500"
+    <header
+        className={`site-header fixed top-0 z-30 w-full transition-all duration-500 ${
+          isHome && !scrolled
+            ? "border-b border-transparent bg-transparent backdrop-blur-none"
+            : "border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl"
+        }`}
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
           paddingLeft: "env(safe-area-inset-left, 0px)",
