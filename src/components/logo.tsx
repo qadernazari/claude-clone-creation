@@ -23,7 +23,7 @@ export function Logo({ className = "", size = 40, withTagline = false }: Props) 
     <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
       <img
         src={logoAsset.url}
-        alt={locale === "fa" ? "ایران — سینمای ایران" : "IRAN — Iranian cinema"}
+        alt="IRAN — Iranian cinema"
         width={intrinsic}
         height={intrinsic}
         className="block select-none"

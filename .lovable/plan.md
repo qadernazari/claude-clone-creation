@@ -1,13 +1,12 @@
-## Problem
+Plan: Make the site header always opaque so the hero image cannot bleed behind the navigation bar.
 
-The featured hero section starts at the very top of the page and sits behind the transparent/sticky site header, so the film image blends into the menubar — the title art appears to touch the logo/nav.
+## What to change
+1. Read `src/components/site-header.tsx` to confirm the current header wrapper className (currently a transparent/gradient style that becomes solid only on scroll).
+2. Replace the dynamic background with a single, always-opaque style: `bg-bg-0/90 backdrop-blur-xl border-b border-cream/8` on the fixed header.
+3. Keep the existing `mt-16 md:mt-20` offset on the hero in `src/components/featured-film.tsx` so content starts below the header.
 
-## Fix
+## Verification
+- Run a typecheck / build to ensure no syntax error.
+- Capture screenshots of the homepage at desktop, tablet, and mobile to confirm the header is a solid dark bar and the hero image starts below it without overlap.
 
-In `src/components/featured-film.tsx`, offset the hero below the header so the image no longer visually mixes with the navigation:
-
-- Add top padding to the hero `<section>` wrapper for both `FeaturedSlider` and `SingleSlide` (roughly `pt-16 md:pt-20` = header height) so the image starts under the menubar.
-- Alternatively, reduce hero height slightly (`h-[58svh] md:h-[68dvh]`) to compensate so the overall block doesn't grow.
-- Strengthen the top gradient overlay (bump the top stop from `rgba(13,13,13,0.55)` to `~0.75`) so if any overlap remains, the header area reads as dark chrome, not film content.
-
-No changes to data, layout structure, or other components.
+No other UI or data changes are needed.
