@@ -38,6 +38,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
           <img
             src={railImg}
             srcSet={railSrcSet || undefined}
+            sizes="(min-width: 1280px) 384px, (min-width: 768px) 352px, 82vw"
             alt=""
             width={680}
             height={383}
