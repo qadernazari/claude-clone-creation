@@ -20,6 +20,11 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
   const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
   const director = film.category === "walking-tour" ? "" : (locale === "fa" ? film.director_fa || film.director_en : film.director_en);
   const railImg = film.thumbnail_url || film.cover_url;
+  const railSrcSet = [
+    film.thumbnail_url_520 ? `${film.thumbnail_url_520} 520w` : null,
+    film.thumbnail_url ? `${film.thumbnail_url} 760w` : null,
+    film.thumbnail_url_1040 ? `${film.thumbnail_url_1040} 1040w` : null,
+  ].filter(Boolean).join(", ");
 
   return (
     <Link
@@ -32,6 +37,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
         {railImg ? (
           <img
             src={railImg}
+            srcSet={railSrcSet || undefined}
             alt=""
             width={680}
             height={383}
