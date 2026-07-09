@@ -164,6 +164,7 @@ type RelatedFilm = {
   year: number | null;
   cover_url: string | null;
   poster_gradient: string | null;
+  category?: string | null;
 };
 
 const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.18 0.03 240))";
