@@ -147,10 +147,10 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
       if (!featuredRaw) return null;
       const cache = makeRenderCache();
       const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1200, 88),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1200, 88),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 800, 85),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1920, 86),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 86),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1080, 82),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 1080, 82, 1620, "cover"),
       ]);
 
       return {
@@ -199,8 +199,8 @@ export const getHomeRails = createServerFn({ method: "GET" }).handler(
       const films = await Promise.all(
         filmsRaw.map(async (f) => {
           const [cover, thumbnail] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 400, 80),
-            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 680, 78, 383, "cover"),
+            renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 520, 80),
+            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 760, 82, 428, "cover"),
           ]);
           return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
         }),
@@ -247,10 +247,10 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
       return Promise.all(
         rows.map(async (raw) => {
           const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1200, 88),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1200, 88),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 800, 85),
-            renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 85, 1350, "cover"),
+            renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1920, 86),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1920, 86),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1080, 82),
+            renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 1080, 82, 1620, "cover"),
           ]);
           return {
             ...raw,
