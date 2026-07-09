@@ -42,6 +42,7 @@ import { Route as AuthenticatedAdminTicketsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin/support'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminRevenueRouteImport } from './routes/_authenticated/admin/revenue'
+import { Route as AuthenticatedAdminRegenThumbnailsRouteImport } from './routes/_authenticated/admin/regen-thumbnails'
 import { Route as AuthenticatedAdminPagesRouteImport } from './routes/_authenticated/admin/pages'
 import { Route as AuthenticatedAdminNotifyListRouteImport } from './routes/_authenticated/admin/notify-list'
 import { Route as AuthenticatedAdminMenuRouteImport } from './routes/_authenticated/admin/menu'
@@ -236,6 +237,12 @@ const AuthenticatedAdminRevenueRoute =
     path: '/revenue',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminRegenThumbnailsRoute =
+  AuthenticatedAdminRegenThumbnailsRouteImport.update({
+    id: '/regen-thumbnails',
+    path: '/regen-thumbnails',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminPagesRoute = AuthenticatedAdminPagesRouteImport.update({
   id: '/pages',
   path: '/pages',
@@ -413,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
   '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/regen-thumbnails': typeof AuthenticatedAdminRegenThumbnailsRoute
   '/admin/revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
@@ -470,6 +478,7 @@ export interface FileRoutesByTo {
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
   '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/regen-thumbnails': typeof AuthenticatedAdminRegenThumbnailsRoute
   '/admin/revenue': typeof AuthenticatedAdminRevenueRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
@@ -530,6 +539,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/_authenticated/admin/notify-list': typeof AuthenticatedAdminNotifyListRoute
   '/_authenticated/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/_authenticated/admin/regen-thumbnails': typeof AuthenticatedAdminRegenThumbnailsRoute
   '/_authenticated/admin/revenue': typeof AuthenticatedAdminRevenueRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
@@ -590,6 +600,7 @@ export interface FileRouteTypes {
     | '/admin/menu'
     | '/admin/notify-list'
     | '/admin/pages'
+    | '/admin/regen-thumbnails'
     | '/admin/revenue'
     | '/admin/settings'
     | '/admin/support'
@@ -647,6 +658,7 @@ export interface FileRouteTypes {
     | '/admin/menu'
     | '/admin/notify-list'
     | '/admin/pages'
+    | '/admin/regen-thumbnails'
     | '/admin/revenue'
     | '/admin/settings'
     | '/admin/support'
@@ -706,6 +718,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/menu'
     | '/_authenticated/admin/notify-list'
     | '/_authenticated/admin/pages'
+    | '/_authenticated/admin/regen-thumbnails'
     | '/_authenticated/admin/revenue'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/support'
@@ -992,6 +1005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRevenueRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/regen-thumbnails': {
+      id: '/_authenticated/admin/regen-thumbnails'
+      path: '/regen-thumbnails'
+      fullPath: '/admin/regen-thumbnails'
+      preLoaderRoute: typeof AuthenticatedAdminRegenThumbnailsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/pages': {
       id: '/_authenticated/admin/pages'
       path: '/pages'
@@ -1196,6 +1216,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminMenuRoute: typeof AuthenticatedAdminMenuRoute
   AuthenticatedAdminNotifyListRoute: typeof AuthenticatedAdminNotifyListRoute
   AuthenticatedAdminPagesRoute: typeof AuthenticatedAdminPagesRoute
+  AuthenticatedAdminRegenThumbnailsRoute: typeof AuthenticatedAdminRegenThumbnailsRoute
   AuthenticatedAdminRevenueRoute: typeof AuthenticatedAdminRevenueRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
@@ -1221,6 +1242,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminMenuRoute: AuthenticatedAdminMenuRoute,
     AuthenticatedAdminNotifyListRoute: AuthenticatedAdminNotifyListRoute,
     AuthenticatedAdminPagesRoute: AuthenticatedAdminPagesRoute,
+    AuthenticatedAdminRegenThumbnailsRoute:
+      AuthenticatedAdminRegenThumbnailsRoute,
     AuthenticatedAdminRevenueRoute: AuthenticatedAdminRevenueRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
