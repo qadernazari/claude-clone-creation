@@ -382,7 +382,8 @@ function FilmPage() {
   const moreFromCollection = useMemo(() => related.slice(6), [related]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
-  const director = fa ? film.director_fa || film.director_en : film.director_en;
+  const isWalkingTour = film.category === "walking-tour";
+  const director = isWalkingTour ? null : (fa ? film.director_fa || film.director_en : film.director_en);
   const synopsis = fa ? film.synopsis_fa || film.synopsis_en : film.synopsis_en;
 
   const priceLabel =
