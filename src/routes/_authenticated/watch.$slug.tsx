@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/watch/$slug")({
     const { data: film, error } = await supabase
       .from("films")
       .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year, access_type, is_premium"
+        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year, access_type, is_premium"
       )
       .eq("slug", params.slug)
       .maybeSingle();
