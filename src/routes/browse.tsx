@@ -425,7 +425,7 @@ function BrowsePage() {
                     </h3>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1 md:mt-1.5 md:text-[11px]">
                       {director}
-                      {film.year ? <> {" · "} {year(film.year)}</> : null}
+                      {director && film.year ? <> {" · "} {year(film.year)}</> : !director && film.year ? year(film.year) : null}
                     </p>
                   </div>
                 </Link>
