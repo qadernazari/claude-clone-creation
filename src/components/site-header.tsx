@@ -349,11 +349,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   return (
     <>
       <header
-        className={`site-header fixed top-0 z-30 w-full transition-all duration-500 ${
-          scrolled
-            ? "border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl"
-            : "border-b border-cream/5 bg-bg-0/70 backdrop-blur-md md:border-transparent md:bg-gradient-to-b md:from-bg-0/60 md:to-transparent md:backdrop-blur-none"
-        }`}
+        className="site-header fixed top-0 z-30 w-full border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl transition-all duration-500"
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
           paddingLeft: "env(safe-area-inset-left, 0px)",
