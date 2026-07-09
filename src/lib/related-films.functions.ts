@@ -14,6 +14,7 @@ export type RelatedFilm = {
   year: number | null;
   cover_url: string | null;
   poster_gradient: string | null;
+  category: string | null;
 };
 
 export const getRelatedFilms = createServerFn({ method: "GET" })
