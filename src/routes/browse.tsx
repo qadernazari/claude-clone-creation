@@ -386,8 +386,9 @@ function BrowsePage() {
             {filtered.map((film) => {
               const ftitle =
                 locale === "fa" ? film.title_fa || film.title_en : film.title_en;
-              const director =
-                locale === "fa" ? film.director_fa || film.director_en : film.director_en;
+              const director = film.category === "walking-tour"
+                ? ""
+                : locale === "fa" ? film.director_fa || film.director_en : film.director_en;
               return (
                 <Link
                   key={film.id}
