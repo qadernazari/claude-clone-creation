@@ -125,7 +125,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
     film.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
-  const director = t({ en: film.director_en || "", fa: film.director_fa || film.director_en || "" });
+  const director = film.category === "walking-tour" ? "" : t({ en: film.director_en || "", fa: film.director_fa || film.director_en || "" });
   const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
   return (
