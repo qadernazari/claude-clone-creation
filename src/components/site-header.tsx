@@ -379,17 +379,8 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
                 {fa ? "خانه" : "Home"}
               </Link>
-              <Link to="/browse" className={linkCls("browse")}>
-                {fa ? "فیلم" : "Films"}
-              </Link>
-              <Link to="/browse" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full">
-                {fa ? "سریال" : "Series"}
-              </Link>
               <Link to="/originals" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full">
                 {fa ? "اختصاصی" : "Originals"}
-              </Link>
-              <Link to="/browse" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full">
-                {fa ? "مجموعه‌ها" : "Collections"}
               </Link>
             </nav>
           </div>
