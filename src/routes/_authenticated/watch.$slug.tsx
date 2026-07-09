@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/watch/$slug")({
     const { data: film, error } = await supabase
       .from("films")
       .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year, access_type, is_premium"
+        "id, slug, title_en, title_fa, director_en, director_fa, synopsis_en, synopsis_fa, category, visibility, ticket_hours, poster_gradient, cover_url, duration_min, year, access_type, is_premium"
       )
       .eq("slug", params.slug)
       .maybeSingle();
@@ -628,7 +628,7 @@ function WatchPage() {
 
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
-  const director = fa ? film.director_fa || film.director_en : film.director_en;
+  const director = film.category === "walking-tour" ? null : (fa ? film.director_fa || film.director_en : film.director_en);
   const synopsis = fa ? film.synopsis_fa || film.synopsis_en : film.synopsis_en;
 
   const posterStyle = useMemo(

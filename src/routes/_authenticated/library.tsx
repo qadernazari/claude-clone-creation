@@ -310,7 +310,7 @@ function FilmCard({ film }: { film: LibraryFilm }) {
         <p className={`line-clamp-1 text-sm text-cream-bright group-hover:text-amber transition-colors ${fa ? "font-vazir" : "font-display"}`}>
           {fa ? film.title_fa || film.title_en : film.title_en}
         </p>
-        {(fa ? film.director_fa || film.director_en : film.director_en) && (
+        {film.category !== "walking-tour" && (fa ? film.director_fa || film.director_en : film.director_en) && (
           <p className="mt-0.5 line-clamp-1 text-[11px] text-cream/50">
             {fa ? film.director_fa || film.director_en : film.director_en}
           </p>

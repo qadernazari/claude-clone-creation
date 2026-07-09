@@ -14,6 +14,7 @@ export type RelatedFilm = {
   year: number | null;
   cover_url: string | null;
   poster_gradient: string | null;
+  category: string | null;
 };
 
 export const getRelatedFilms = createServerFn({ method: "GET" })
@@ -30,7 +31,7 @@ export const getRelatedFilms = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("films")
       .select(
-        "id, slug, title_en, title_fa, director_en, director_fa, duration_min, year, cover_url, poster_gradient",
+        "id, slug, title_en, title_fa, director_en, director_fa, duration_min, year, cover_url, poster_gradient, category",
       )
       .eq("visibility", "published")
       .neq("id", data.filmId)

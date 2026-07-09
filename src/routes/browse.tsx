@@ -386,8 +386,9 @@ function BrowsePage() {
             {filtered.map((film) => {
               const ftitle =
                 locale === "fa" ? film.title_fa || film.title_en : film.title_en;
-              const director =
-                locale === "fa" ? film.director_fa || film.director_en : film.director_en;
+              const director = film.category === "walking-tour"
+                ? ""
+                : locale === "fa" ? film.director_fa || film.director_en : film.director_en;
               return (
                 <Link
                   key={film.id}
@@ -424,7 +425,7 @@ function BrowsePage() {
                     </h3>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1 md:mt-1.5 md:text-[11px]">
                       {director}
-                      {film.year ? <> {" · "} {year(film.year)}</> : null}
+                      {director && film.year ? <> {" · "} {year(film.year)}</> : !director && film.year ? year(film.year) : null}
                     </p>
                   </div>
                 </Link>

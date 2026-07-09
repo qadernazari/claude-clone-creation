@@ -95,7 +95,7 @@ export const Route = createFileRoute("/films/$slug")({
             "@type": "Movie",
             name: f.title_en,
             ...(f.title_fa ? { alternateName: f.title_fa } : {}),
-            ...(f.director_en ? { director: { "@type": "Person", name: f.director_en } } : {}),
+            ...(f.director_en && f.category !== "walking-tour" ? { director: { "@type": "Person", name: f.director_en } } : {}),
             ...(f.year ? { datePublished: String(f.year) } : {}),
             ...(f.cover_url ? { image: f.cover_url } : {}),
             ...(f.synopsis_en ? { description: f.synopsis_en } : {}),
@@ -164,6 +164,7 @@ type RelatedFilm = {
   year: number | null;
   cover_url: string | null;
   poster_gradient: string | null;
+  category?: string | null;
 };
 
 const fallbackGradient = "linear-gradient(135deg, oklch(0.25 0.05 270), oklch(0.18 0.03 240))";
@@ -197,7 +198,7 @@ function PosterRail({
         <ul className="flex gap-4 min-w-max md:gap-5">
           {films.map((r) => {
             const rTitle = fa ? r.title_fa || r.title_en : r.title_en;
-            const rDirector = fa ? r.director_fa || r.director_en : r.director_en;
+            const rDirector = r.category === "walking-tour" ? null : (fa ? r.director_fa || r.director_en : r.director_en);
             const bg = (r.poster_gradient as string) || fallbackGradient;
             return (
               <li key={r.id} className="w-[150px] sm:w-[170px] md:w-[190px] shrink-0">
@@ -382,7 +383,8 @@ function FilmPage() {
   const moreFromCollection = useMemo(() => related.slice(6), [related]);
 
   const title = fa ? film.title_fa || film.title_en : film.title_en;
-  const director = fa ? film.director_fa || film.director_en : film.director_en;
+  const isWalkingTour = film.category === "walking-tour";
+  const director = isWalkingTour ? null : (fa ? film.director_fa || film.director_en : film.director_en);
   const synopsis = fa ? film.synopsis_fa || film.synopsis_en : film.synopsis_en;
 
   const priceLabel =

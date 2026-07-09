@@ -575,7 +575,9 @@ function FilmEditorModal({
           </Section>
 
           <Section title="Details">
-            <BilingualField label="Director" value={{ en: d.director_en ?? "", fa: d.director_fa ?? "" }} onChange={(v) => { set("director_en", v.en); set("director_fa", v.fa); }} />
+            {d.category !== "walking-tour" && (
+              <BilingualField label="Director" value={{ en: d.director_en ?? "", fa: d.director_fa ?? "" }} onChange={(v) => { set("director_en", v.en); set("director_fa", v.fa); }} />
+            )}
             <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
               <label className="block">
                 <span className="block text-xs font-medium text-muted-foreground mb-1.5">Category</span>

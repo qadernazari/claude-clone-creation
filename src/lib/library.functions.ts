@@ -76,6 +76,7 @@ export type LibraryFilm = {
   year: number | null;
   access_type: string;
   is_premium: boolean;
+  category: string | null;
 };
 
 export type LibraryData = {
@@ -110,7 +111,7 @@ export type LibraryData = {
 };
 
 const FILM_COLS =
-  "id, slug, title_en, title_fa, director_en, director_fa, cover_url, thumbnail_url, poster_gradient, duration_min, year, access_type, is_premium";
+  "id, slug, title_en, title_fa, director_en, director_fa, cover_url, thumbnail_url, poster_gradient, duration_min, year, access_type, is_premium, category";
 
 
 export const getLibrary = createServerFn({ method: "GET" })
