@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { requireAdmin } from "@/lib/admin.functions";
 import {
-  LayoutDashboard, Film, LogOut, Home, Users, Receipt, Settings, Globe, CreditCard, TrendingUp,
+  LayoutDashboard, Film, LogOut, Home, Users, Receipt, Settings, Globe, CreditCard, TrendingUp, RefreshCw,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 
@@ -74,6 +74,7 @@ const NAV: ReadonlyArray<NavItem> = [
   { to: "/admin/revenue", label: "Revenue", icon: TrendingUp },
   { to: "/admin/users", label: "Members", icon: Users },
   { to: "/admin/homepage", label: "Site content", icon: Globe },
+  { to: "/admin/regen-thumbnails", label: "Regen thumbnails", icon: RefreshCw },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
