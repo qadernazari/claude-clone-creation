@@ -76,9 +76,9 @@ export type HomeFeaturedFilm = {
   poster_gradient: string | null;
   cover_url: string | null;
   thumbnail_url: string | null;
-  /** Mobile-sized version of thumbnail_url (760w q55), used when no
-   *  dedicated mobile_cover_url exists. Prevents serving the full 1400w
-   *  desktop hero to a 375px viewport. */
+  thumbnail_url_1280: string | null;
+  thumbnail_url_2400: string | null;
+  /** Mobile-sized version of thumbnail_url, used when no dedicated mobile_cover_url exists. */
   thumbnail_url_mobile: string | null;
   mobile_cover_url: string | null;
   is_premium: boolean | null;
@@ -97,6 +97,8 @@ export type HomeRailFilm = {
   poster_gradient: string | null;
   cover_url: string | null;
   thumbnail_url: string | null;
+  thumbnail_url_520: string | null;
+  thumbnail_url_1040: string | null;
   access_type: string;
   is_premium: boolean | null;
   sort_order: number | null;
@@ -146,10 +148,12 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
       const featuredRaw = res.data as RawFilm | null;
       if (!featuredRaw) return null;
       const cache = makeRenderCache();
-      const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
+      const [cover, thumbnail, thumbnail1280, thumbnail2400, thumbnailMobile, mobile] = await Promise.all([
         renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1920, 86),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 86),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1080, 82),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 90),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1280, 88),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 2400, 90),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1080, 86),
         renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 1080, 82, 1620, "cover"),
       ]);
 
@@ -157,6 +161,8 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
         ...featuredRaw,
         cover_url: cover,
         thumbnail_url: thumbnail,
+        thumbnail_url_1280: thumbnail1280,
+        thumbnail_url_2400: thumbnail2400,
         thumbnail_url_mobile: thumbnailMobile,
         mobile_cover_url: mobile,
       } as HomeFeaturedFilm;
@@ -198,11 +204,13 @@ export const getHomeRails = createServerFn({ method: "GET" }).handler(
       const filmsRaw = (filmsRes.data as RawFilm[] | null) ?? [];
       const films = await Promise.all(
         filmsRaw.map(async (f) => {
-          const [cover, thumbnail] = await Promise.all([
+          const [cover, thumbnail, thumbnail520, thumbnail1040] = await Promise.all([
             renderResizedUrl(supabaseAdmin, cache, f.cover_url as string | null, 520, 80),
-            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 760, 82, 428, "cover"),
+            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 760, 86, 428, "cover"),
+            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 520, 84, 293, "cover"),
+            renderResizedUrl(supabaseAdmin, cache, f.thumbnail_url as string | null, 1040, 86, 585, "cover"),
           ]);
-          return { ...f, cover_url: cover, thumbnail_url: thumbnail } as HomeRailFilm;
+          return { ...f, cover_url: cover, thumbnail_url: thumbnail, thumbnail_url_520: thumbnail520, thumbnail_url_1040: thumbnail1040 } as HomeRailFilm;
         }),
       );
       return {
@@ -246,16 +254,20 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
       const cache = makeRenderCache();
       return Promise.all(
         rows.map(async (raw) => {
-          const [cover, thumbnail, thumbnailMobile, mobile] = await Promise.all([
+          const [cover, thumbnail, thumbnail1280, thumbnail2400, thumbnailMobile, mobile] = await Promise.all([
             renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1920, 86),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1920, 86),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1080, 82),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1920, 90),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 88),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 2400, 90),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1080, 86),
             renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 1080, 82, 1620, "cover"),
           ]);
           return {
             ...raw,
             cover_url: cover,
             thumbnail_url: thumbnail,
+            thumbnail_url_1280: thumbnail1280,
+            thumbnail_url_2400: thumbnail2400,
             thumbnail_url_mobile: thumbnailMobile,
             mobile_cover_url: mobile,
           } as HomeFeaturedFilm;

@@ -120,7 +120,16 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   const { locale, num, year, t } = useLocale();
   const desktopImage = film.thumbnail_url || film.cover_url;
-  const mobileImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url_mobile || film.thumbnail_url;
+  const desktopSrcSet = [
+    film.thumbnail_url_1280 ? `${film.thumbnail_url_1280} 1280w` : null,
+    film.thumbnail_url ? `${film.thumbnail_url} 1920w` : null,
+    film.thumbnail_url_2400 ? `${film.thumbnail_url_2400} 2400w` : null,
+  ].filter(Boolean).join(", ");
+  const mobileImage = film.mobile_cover_url || film.thumbnail_url_mobile || film.thumbnail_url || film.cover_url;
+  const mobileSrcSet = [
+    film.thumbnail_url_mobile ? `${film.thumbnail_url_mobile} 1080w` : null,
+    film.thumbnail_url_1280 ? `${film.thumbnail_url_1280} 1280w` : null,
+  ].filter(Boolean).join(", ");
   const fallbackBg =
     film.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
@@ -139,6 +148,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       {mobileImage ? (
         <img
           src={mobileImage}
+          srcSet={mobileSrcSet || undefined}
           alt={title}
           width={720}
           height={1280}
@@ -153,6 +163,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       {desktopImage ? (
         <img
           src={desktopImage}
+          srcSet={desktopSrcSet || undefined}
           alt={title}
           width={1600}
           height={900}
@@ -161,6 +172,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           }`}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
+          sizes="100vw"
         />
       ) : null}
 
