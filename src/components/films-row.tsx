@@ -18,7 +18,7 @@ function fallbackGradient(seed: string) {
 /* ---------- Card ---------- */
 function PosterCard({ film, locale, year }: { film: Film; locale: string; year: (n: number) => string }) {
   const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
-  const director = locale === "fa" ? film.director_fa || film.director_en : film.director_en;
+  const director = film.category === "walking-tour" ? "" : (locale === "fa" ? film.director_fa || film.director_en : film.director_en);
   const railImg = film.thumbnail_url || film.cover_url;
 
   return (
