@@ -47,8 +47,8 @@ function accepts(file: File, accept: string) {
 
 /**
  * Re-encode an image to WebP at a sensible max width before upload.
- * Cuts a typical 2-5 MB JPEG cover down to 100-250 KB and lets every
- * mobile client paint the poster in a single TCP window.
+ * Keeps enough pixels for retina hero/rail displays while avoiding huge
+ * original camera files in storage.
  */
 async function compressImage(file: File, maxWidth = 2400, quality = 0.92): Promise<File> {
   if (!file.type.startsWith("image/") || file.type === "image/svg+xml") return file;
@@ -91,7 +91,7 @@ export function FileUpload({
       if (bucket === "film-covers") {
         file = await compressImage(rawFile, 1920, 0.92);
       } else if (bucket === "film-thumbnails") {
-        file = await compressImage(rawFile, 600, 0.88);
+        file = await compressImage(rawFile, 2400, 0.94);
       } else if (bucket === "film-trailers") {
         file = await compressImage(rawFile, 1280, 0.88);
       } else {
