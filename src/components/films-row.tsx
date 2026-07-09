@@ -173,12 +173,8 @@ export function FilmsRow() {
     if (all.length === 0) return [] as Array<{ key: string; eyebrow?: string; title: string; subtitle?: string; films: Film[] }>;
 
     const newReleases = all.slice(0, 12);
-    const premium = all.filter((f) => f.is_premium || f.access_type === "ppv_only").slice(0, 12);
-    const editors = [...all]
-      .sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999))
-      .slice(0, 12);
 
-    // Category rails (only categories with ≥3 published films)
+    // Category rails — one per category that has ≥1 published film
     const byCat = new Map<string, Film[]>();
     for (const f of all) {
       if (!f.category) continue;
@@ -187,8 +183,7 @@ export function FilmsRow() {
       byCat.set(f.category, arr);
     }
     const catRails = (categories ?? [])
-      .filter((c) => (byCat.get(c.id)?.length ?? 0) >= 3)
-      .slice(0, 2)
+      .filter((c) => (byCat.get(c.id)?.length ?? 0) >= 1)
       .map((c) => ({
         key: `cat-${c.id}`,
         eyebrow: locale === "fa" ? "مجموعه" : "Collection",
@@ -199,19 +194,11 @@ export function FilmsRow() {
     const out: Array<{ key: string; eyebrow?: string; title: string; subtitle?: string; films: Film[] }> = [];
 
     out.push({
-      key: "originals",
-      eyebrow: locale === "fa" ? "آثار اختصاصی ایران" : "Iranian Originals",
-      title: "",
-      films: editors,
-    });
-
-    out.push({
       key: "new",
       eyebrow: locale === "fa" ? "آثار تازه" : "New Releases",
       title: "",
       films: newReleases,
     });
-
 
     out.push(...catRails);
     return out;
