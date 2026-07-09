@@ -95,7 +95,7 @@ export const Route = createFileRoute("/films/$slug")({
             "@type": "Movie",
             name: f.title_en,
             ...(f.title_fa ? { alternateName: f.title_fa } : {}),
-            ...(f.director_en ? { director: { "@type": "Person", name: f.director_en } } : {}),
+            ...(f.director_en && f.category !== "walking-tour" ? { director: { "@type": "Person", name: f.director_en } } : {}),
             ...(f.year ? { datePublished: String(f.year) } : {}),
             ...(f.cover_url ? { image: f.cover_url } : {}),
             ...(f.synopsis_en ? { description: f.synopsis_en } : {}),
