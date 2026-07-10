@@ -634,26 +634,28 @@ function FilmPage() {
           className="absolute inset-0 -z-20 bg-black/10"
           aria-hidden
         />
-        {/* Bottom fade for text readability + blend into page background */}
+        {/* Cinematic bottom-up gradient stack — anchors the text column in solid
+            darkness so the title never fights the image behind it. */}
         <div
           className="absolute inset-0 -z-10"
           aria-hidden
           style={{
             background:
-              "linear-gradient(180deg, rgba(8,8,10,0) 0%, rgba(8,8,10,0) 55%, rgba(8,8,10,0.65) 85%, var(--background) 100%)",
+              "linear-gradient(180deg, rgba(8,8,10,0) 0%, rgba(8,8,10,0) 35%, rgba(8,8,10,0.55) 62%, rgba(8,8,10,0.88) 82%, var(--background) 100%)",
           }}
         />
-        {/* Side fade behind the title column only */}
+        {/* Side fade behind the title column — heavier at the anchored edge */}
         <div
           className="absolute inset-0 -z-10"
           aria-hidden
           style={{
             background:
               dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.16) 45%, rgba(8,8,10,0) 75%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.16) 45%, rgba(8,8,10,0) 75%)",
+                ? "linear-gradient(270deg, rgba(8,8,10,0.72) 0%, rgba(8,8,10,0.28) 42%, rgba(8,8,10,0) 72%)"
+                : "linear-gradient(90deg, rgba(8,8,10,0.72) 0%, rgba(8,8,10,0.28) 42%, rgba(8,8,10,0) 72%)",
           }}
         />
+
 
 
         {/* Hero content — anchored bottom-start. Top padding clears the fixed header. */}
@@ -669,19 +671,23 @@ function FilmPage() {
 
           <div className="max-w-2xl">
             {film.category && (
-              <span className="inline-flex rounded-md bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-cream/80 backdrop-blur-sm ring-1 ring-cream/10">
-                {fa
-                  ? (categoryName?.name_fa || categoryName?.name_en || film.category)
-                  : (categoryName?.name_en || (film.category.charAt(0).toUpperCase() + film.category.slice(1)))}
-              </span>
+              <div className="flex items-center gap-2.5">
+                <span className="block h-4 w-[2px] bg-amber" aria-hidden />
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.28em] text-cream/90">
+                  {fa
+                    ? (categoryName?.name_fa || categoryName?.name_en || film.category)
+                    : (categoryName?.name_en || (film.category.charAt(0).toUpperCase() + film.category.slice(1)))}
+                </span>
+              </div>
             )}
 
             <h1
-              className={`mt-5 break-words text-4xl font-medium leading-[0.98] tracking-[-0.045em] text-cream-bright drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)] sm:text-5xl md:text-7xl ${fa ? "font-vazir" : "font-display"}`}
+              className={`mt-4 break-words text-4xl font-black leading-[0.98] tracking-[-0.045em] text-cream-bright drop-shadow-[0_6px_28px_rgba(0,0,0,0.75)] sm:text-5xl md:text-7xl ${fa ? "font-vazir" : "font-display"}`}
             >
 
               {title}
             </h1>
+
 
             {/* Meta row + quality badges */}
             <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-cream/75">
