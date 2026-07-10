@@ -133,6 +133,27 @@
   font-family: var(--font-display);
 }
 
+/* IranSansX ships weights 300–700 only. Cap every heavier weight so the
+   browser never synthesizes bold (which looks blurry and inconsistent). */
+[lang="fa"] .font-black,
+[lang="fa"] .font-extrabold,
+[dir="rtl"] .font-black,
+[dir="rtl"] .font-extrabold {
+  font-weight: 700 !important;
+}
+/* Semibold (600) exists as DemiBold — keep as-is. Anything using inline
+   font-weight ≥ 800 also collapses to 700 via the attribute selectors. */
+[lang="fa"] [style*="font-weight: 800"],
+[lang="fa"] [style*="font-weight: 900"],
+[lang="fa"] [style*="font-weight:800"],
+[lang="fa"] [style*="font-weight:900"],
+[dir="rtl"] [style*="font-weight: 800"],
+[dir="rtl"] [style*="font-weight: 900"],
+[dir="rtl"] [style*="font-weight:800"],
+[dir="rtl"] [style*="font-weight:900"] {
+  font-weight: 700 !important;
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
