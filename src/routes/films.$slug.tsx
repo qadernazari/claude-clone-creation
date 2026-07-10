@@ -38,14 +38,10 @@ export const Route = createFileRoute("/films/$slug")({
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) throw notFound();
-    // Resize the hero image for the og:image / twitter:image tag —
-    // matches the homepage pattern (width 1200, quality 75). Crawlers
-    // get a fast, uniformly sized share preview instead of the raw
-    // full-resolution signed URL.
-    const { getResizedOgImage } = await import("@/lib/og-image.functions");
-    const ogImage = await getResizedOgImage({
-      data: { url: data.thumbnail_url || data.cover_url || null },
-    });
+    // OG/Twitter share image: use the raw signed thumbnail URL. Skipping
+    // the resize round-trip avoids an extra server-fn RPC on every client
+    // navigation (which was 500ing) — crawlers still get a valid image.
+    const ogImage = data.thumbnail_url || data.cover_url || null;
 
     // Hero images: serve the raw signed URL directly (no transform).
     // The Supabase render endpoint re-encodes as WebP, which double-
