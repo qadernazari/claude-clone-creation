@@ -186,7 +186,7 @@ function TabItem({
         <span className="relative flex h-[26px] w-[44px] items-center justify-center">
           <span className="relative h-[20px] w-[20px]">{icon}</span>
         </span>
-        <span className="leading-none">{label}</span>
+        <span className="leading-none" suppressHydrationWarning>{label}</span>
       </Link>
     </li>
   );
