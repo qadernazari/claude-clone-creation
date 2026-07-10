@@ -60,7 +60,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
 
   return (
     <section
-      className="group/hero relative isolate overflow-hidden"
+      className="group/hero relative isolate overflow-hidden -mt-16 md:-mt-20"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onPointerDown={onPointerDown}
@@ -71,7 +71,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="relative mt-16 h-[58svh] min-h-[420px] w-full overflow-hidden bg-bg-1 md:mt-20 md:h-[68dvh] md:min-h-[500px] md:max-h-[700px]">
+      <div className="relative h-[85svh] min-h-[560px] w-full overflow-hidden bg-bg-1 md:h-[95dvh] md:min-h-[640px]">
 
         {slides.map((film, i) => (
           <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
@@ -253,8 +253,8 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
 
 function SingleSlide({ film }: { film: HomeFeaturedFilm }) {
   return (
-    <section className="relative isolate overflow-hidden">
-      <div className="relative mt-16 h-[58svh] min-h-[420px] w-full overflow-hidden bg-bg-1 md:mt-20 md:h-[68dvh] md:min-h-[500px] md:max-h-[700px]">
+    <section className="relative isolate overflow-hidden -mt-16 md:-mt-20">
+      <div className="relative h-[85svh] min-h-[560px] w-full overflow-hidden bg-bg-1 md:h-[95dvh] md:min-h-[640px]">
         <Slide film={film} active eager />
       </div>
     </section>
