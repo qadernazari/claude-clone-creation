@@ -412,6 +412,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               <Link
                 to="/auth"
                 className="hidden h-10 shrink-0 items-center whitespace-nowrap px-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-cream-bright md:inline-flex"
+                suppressHydrationWarning
               >
                 {fa ? "ورود" : "Sign in"}
               </Link>
@@ -419,6 +420,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Link
               to="/membership"
               className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase leading-none tracking-[0.08em] text-ink shadow-sm transition-colors duration-200 hover:bg-amber/90 active:scale-95 sm:inline-flex"
+              suppressHydrationWarning
             >
               {fa ? "عضویت" : "Membership"}
             </Link>
