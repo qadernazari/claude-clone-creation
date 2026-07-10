@@ -38,6 +38,8 @@ type Film = {
   cover_url: string | null;
   thumbnail_url: string | null;
   mobile_cover_url: string | null;
+  cover_fit?: string | null;
+  cover_position?: string | null;
   poster_gradient: string | null;
   video_url?: string | null;
   preview_url: string | null;
