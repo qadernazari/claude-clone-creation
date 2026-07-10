@@ -378,10 +378,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               <Logo size={28} />
             </Link>
             <nav className="hidden gap-6 text-[11px] font-semibold uppercase tracking-[0.18em] lg:flex xl:gap-7">
-              <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
+              <Link to="/" onClick={handleHomeClick} className={linkCls("home")} suppressHydrationWarning>
                 {fa ? "خانه" : "Home"}
               </Link>
-              <Link to="/originals" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full">
+              <Link to="/originals" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full" suppressHydrationWarning>
                 {fa ? "اختصاصی" : "Originals"}
               </Link>
             </nav>
