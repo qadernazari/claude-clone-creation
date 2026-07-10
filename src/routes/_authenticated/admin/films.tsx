@@ -518,6 +518,59 @@ function FilmEditorModal({
                 maxBytes={25 * 1024 * 1024}
               />
 
+              {/* Cover display style */}
+              <div className="space-y-2 pt-2">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Cover display style
+                </label>
+                <div className="flex gap-3">
+                  {[
+                    { value: "cover", label: "Fill (crop to fit)", desc: "Image fills the hero, may be cropped" },
+                    { value: "contain", label: "Full image (no crop)", desc: "Entire image shown, blurred backdrop fills sides" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => set("cover_fit", opt.value)}
+                      className={`flex-1 rounded-lg border p-3 text-left transition-all ${
+                        (d.cover_fit || "cover") === opt.value
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-transparent hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{opt.label}</div>
+                      <div className="mt-0.5 text-[11px] opacity-70">{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {(d.cover_fit || "cover") !== "contain" && (
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Cover focus point
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["center", "top", "bottom", "left", "right"].map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => set("cover_position", pos)}
+                        className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-all ${
+                          (d.cover_position || "center") === pos
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        {pos}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+
+
               <FileUpload
                 bucket="film-trailers"
                 kind="video"
