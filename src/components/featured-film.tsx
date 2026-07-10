@@ -71,7 +71,8 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="relative h-[85svh] min-h-[560px] w-full overflow-hidden bg-bg-1 md:h-[95dvh] md:min-h-[640px]">
+      <div className="relative h-[72svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[78dvh] md:min-h-[600px] md:max-h-[900px]">
+
 
         {slides.map((film, i) => (
           <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
