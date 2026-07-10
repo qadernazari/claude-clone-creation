@@ -459,6 +459,8 @@ export type Database = {
           access_type: Database["public"]["Enums"]["film_access_type"]
           age_rating: string | null
           category: string | null
+          cover_fit: string | null
+          cover_position: string | null
           cover_url: string | null
           created_at: string
           director_en: string | null
@@ -497,6 +499,8 @@ export type Database = {
           access_type?: Database["public"]["Enums"]["film_access_type"]
           age_rating?: string | null
           category?: string | null
+          cover_fit?: string | null
+          cover_position?: string | null
           cover_url?: string | null
           created_at?: string
           director_en?: string | null
@@ -535,6 +539,8 @@ export type Database = {
           access_type?: Database["public"]["Enums"]["film_access_type"]
           age_rating?: string | null
           category?: string | null
+          cover_fit?: string | null
+          cover_position?: string | null
           cover_url?: string | null
           created_at?: string
           director_en?: string | null
