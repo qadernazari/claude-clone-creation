@@ -256,7 +256,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
 function SingleSlide({ film }: { film: HomeFeaturedFilm }) {
   return (
     <section className="relative isolate overflow-hidden -mt-16 md:-mt-20">
-      <div className="relative h-[85svh] min-h-[560px] w-full overflow-hidden bg-bg-1 md:h-[95dvh] md:min-h-[640px]">
+      <div className="relative h-[72svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[78dvh] md:min-h-[600px] md:max-h-[900px]">
         <Slide film={film} active eager />
       </div>
     </section>
