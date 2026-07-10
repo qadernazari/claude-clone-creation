@@ -71,7 +71,8 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="relative h-[85svh] min-h-[560px] w-full overflow-hidden bg-bg-1 md:h-[95dvh] md:min-h-[640px]">
+      <div className="relative h-[72svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[78dvh] md:min-h-[600px] md:max-h-[900px]">
+
 
         {slides.map((film, i) => (
           <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
@@ -153,7 +154,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           alt={title}
           width={720}
           height={1280}
-          className={`absolute inset-0 block h-full w-full object-cover object-center md:hidden ${
+          className={`absolute inset-0 block h-full w-full object-contain object-top md:hidden ${
             active ? "cine-img-in" : ""
           }`}
           loading={eager ? "eager" : "lazy"}
@@ -176,6 +177,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           sizes="100vw"
         />
       ) : null}
+
 
       <div
         className="pointer-events-none absolute inset-0"
@@ -254,7 +256,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
 function SingleSlide({ film }: { film: HomeFeaturedFilm }) {
   return (
     <section className="relative isolate overflow-hidden -mt-16 md:-mt-20">
-      <div className="relative h-[85svh] min-h-[560px] w-full overflow-hidden bg-bg-1 md:h-[95dvh] md:min-h-[640px]">
+      <div className="relative h-[72svh] min-h-[520px] w-full overflow-hidden bg-bg-1 md:h-[78dvh] md:min-h-[600px] md:max-h-[900px]">
         <Slide film={film} active eager />
       </div>
     </section>
