@@ -1,20 +1,16 @@
+## Problem
 
-## Goal
+On the film page, the Persian title (`h1`) uses `font-black` (Tailwind 900) while everything else in Persian — section headings, meta labels, the synopsis paragraph — uses weights that map to a real IranSansX face (400/500/700). Only weights 300–700 of IranSansX are self-hosted, so 900 gets **faux-bolded** by the browser: thicker, blurrier, optically different from every other Persian heading and paragraph. That's the "font looks different" you're seeing between the title and the paragraph below it.
 
-Make the film detail hero feel cinematic and readable on both desktop and mobile. The photo stays full-bleed, but the text column gets anchored in solid darkness so the title never fights the busy image behind it — matching the selected "Cinematic vertical focus" direction.
+## Fix
 
-## What changes (only the hero band in `src/routes/films.$slug.tsx`)
+Single-line change in `src/routes/films.$slug.tsx` (film-page hero title, ~line 681):
 
-1. **Stronger bottom-up gradient stack.** Replace the current soft bottom fade with a two-layer stack: a vertical gradient that goes from transparent at the top to ~88% dark at 82% height and fully solid at the bottom, plus a heavier side fade on the anchored edge. This gives the title/synopsis/CTAs a clean dark plate to sit on instead of floating over the tile pattern.
+- Replace `font-black` with `font-bold` so the Persian title renders in the real IranSansX Bold (700) — the same weight `styles.css` already forces on every other Persian `h1–h4`. Latin fallback (Space Grotesk) also has a real 700, so English titles stay crisp too.
 
-2. **New category chip.** Drop the pill with blurred background. Replace with a thin 2px amber vertical bar + small uppercase tracked label (10px, `tracking-[0.28em]`). Cleaner, more editorial, matches the amber accents already used on rails.
+No other file needs changes: the global rule in `src/styles.css` (`[lang="fa"] h1…h4 { font-weight: 700 }`) already keeps every other Persian heading at the same weight, and body text stays at 400 via `--font-body`. After this edit, the hero title, section headings ("درباره این فیلم", "بازیگران و عوامل"), and the synopsis paragraph all render with the same IranSansX family and consistent, actually-loaded weights.
 
-3. **Title weight + shadow bump.** Move from `font-medium` to `font-black` and increase drop shadow (`drop-shadow-[0_6px_28px_rgba(0,0,0,0.75)]`) so the Persian title reads crisply against any cover.
+## Verification
 
-4. Nothing else moves — meta row, synopsis, CTAs, watchlist, share, preview button, and the 90-days-free note all stay exactly where they are. No changes to the image itself, no changes to the info grid below.
-
-## Notes
-
-- Palette, fonts, and layout structure stay locked (amber `#d4a24c`, cream on near-black, IranSansX for Persian, Space Grotesk for Latin).
-- Applies to both mobile and desktop — the same gradient stack helps most on mobile where the image previously ran edge-to-edge under the text.
-- No new dependencies, no schema changes.
+- Reload `/films/sheikh-lotfollah-monar-jonban` in Persian and confirm the hero title matches the visual weight of the section headings below it (no synthetic bold, no blurring).
+- Latin numerals/words inside the Persian title still fall back to Space Grotesk via `unicode-range` — unchanged.
