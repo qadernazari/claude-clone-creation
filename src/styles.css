@@ -117,6 +117,20 @@
 [lang="fa"], [dir="rtl"] {
   --font-display: "IranSansX", "Space Grotesk", "Tahoma", ui-sans-serif, sans-serif;
   --font-body: "IranSansX", "DM Sans", "Tahoma", ui-sans-serif, sans-serif;
+  --font-editorial: "IranSansX", "Tahoma", ui-sans-serif, sans-serif;
+  --font-vazir: "IranSansX", "Tahoma", "Arial", ui-sans-serif, sans-serif;
+}
+
+/* Persian mode: force every element to inherit IranSansX so no legacy
+   font-family declaration (Fraunces, Space Grotesk, DM Sans, etc.) leaks
+   through. IranSansX's unicode-range still lets Latin characters fall back
+   to the next family in the stack, so numbers/English words render cleanly. */
+[lang="fa"] *, [dir="rtl"] * {
+  font-family: var(--font-body);
+}
+[lang="fa"] h1, [lang="fa"] h2, [lang="fa"] h3, [lang="fa"] h4, [lang="fa"] h5, [lang="fa"] h6,
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+  font-family: var(--font-display);
 }
 
 @layer base {
