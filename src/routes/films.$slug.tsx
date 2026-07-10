@@ -446,13 +446,15 @@ function FilmPage() {
   const isContain = (film as { cover_fit?: string | null }).cover_fit === "contain";
   const coverPosition = (film as { cover_position?: string | null }).cover_position || "center";
   const POS_CLASS_MAP: Record<string, string> = {
-    center: "object-center",
+    // Bias slightly toward the top so tall subjects (domes, skylines) are
+    // preserved instead of getting clipped by the wide hero crop.
+    center: "object-[center_30%]",
     top: "object-top",
     bottom: "object-bottom",
     left: "object-left",
     right: "object-right",
   };
-  const heroFitClass = isContain ? "object-contain object-center" : `object-cover ${POS_CLASS_MAP[coverPosition] || "object-center"}`;
+  const heroFitClass = isContain ? "object-contain object-center" : `object-cover ${POS_CLASS_MAP[coverPosition] || "object-[center_30%]"}`;
   const posterStyle = heroArt
     ? { backgroundImage: `url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
