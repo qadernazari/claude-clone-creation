@@ -82,6 +82,8 @@ export type HomeFeaturedFilm = {
   thumbnail_url_mobile: string | null;
   mobile_cover_url: string | null;
   is_premium: boolean | null;
+  cover_fit: string | null;
+  cover_position: string | null;
 };
 
 export type HomeRailFilm = {
