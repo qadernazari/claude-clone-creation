@@ -216,7 +216,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         }}
       >
         <RegionGlobeIcon size={15} className="region-trigger-icon" />
-        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
+        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"} suppressHydrationWarning>
           {activeLabel}
         </span>
         <RegionChevronIcon />
