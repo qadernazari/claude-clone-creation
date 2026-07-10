@@ -419,6 +419,8 @@ function FilmEditorModal({
         cover_url: d.cover_url?.trim() || null,
         thumbnail_url: d.thumbnail_url?.trim() || null,
         mobile_cover_url: d.mobile_cover_url?.trim() || null,
+        cover_fit: d.cover_fit || "cover",
+        cover_position: d.cover_position || "center",
         poster_gradient: d.poster_gradient || null,
         preview_url: d.preview_url?.trim() || null,
         film_type: d.film_type ?? "movie",
