@@ -1,0 +1,3 @@
+GRANT SELECT ON public.films TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.films TO authenticated;
+GRANT ALL ON public.films TO service_role;
