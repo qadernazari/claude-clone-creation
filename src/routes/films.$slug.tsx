@@ -443,6 +443,16 @@ function FilmPage() {
   const heroArtDesktop = film.thumbnail_url || film.cover_url;
   const heroArtMobile = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const heroArt = heroArtDesktop || heroArtMobile;
+  const isContain = (film as { cover_fit?: string | null }).cover_fit === "contain";
+  const coverPosition = (film as { cover_position?: string | null }).cover_position || "center";
+  const POS_CLASS_MAP: Record<string, string> = {
+    center: "object-center",
+    top: "object-top",
+    bottom: "object-bottom",
+    left: "object-left",
+    right: "object-right",
+  };
+  const heroFitClass = isContain ? "object-contain object-center" : `object-cover ${POS_CLASS_MAP[coverPosition] || "object-center"}`;
   const posterStyle = heroArt
     ? { backgroundImage: `url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
