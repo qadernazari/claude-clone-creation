@@ -119,7 +119,9 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
 }
 
 const POS_CLASS: Record<string, string> = {
-  center: "object-center",
+  // Bias slightly toward the top so tall subjects (domes, skylines) don't get
+  // cropped out of the frame on wide hero crops.
+  center: "object-[center_30%]",
   top: "object-top",
   bottom: "object-bottom",
   left: "object-left",
