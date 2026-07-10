@@ -321,6 +321,8 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   const { user, isLoading: authLoading } = useAuthState();
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isFilmPage = location.pathname.startsWith("/films/");
+  const hasHero = isHome || isFilmPage;
   const fa = locale === "fa";
   const [scrolled, setScrolled] = useState(false);
 
@@ -350,7 +352,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
     <>
     <header
         className={`site-header fixed top-0 z-30 w-full transition-all duration-500 ${
-          isHome && !scrolled
+          hasHero && !scrolled
             ? "border-b border-transparent bg-transparent backdrop-blur-none"
             : "border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl"
         }`}
