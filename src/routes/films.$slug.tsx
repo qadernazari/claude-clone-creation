@@ -32,7 +32,7 @@ export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("films")
-      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
+      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
       .eq("slug", params.slug)
       .eq("visibility", "published")
       .maybeSingle();
