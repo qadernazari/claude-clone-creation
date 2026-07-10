@@ -177,6 +177,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("global")}
           aria-pressed={!isIran}
+          suppressHydrationWarning
           className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
             lg ? "h-8 px-4" : "h-7 px-3"
           } ${!isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
@@ -187,6 +188,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("iran")}
           aria-pressed={isIran}
+          suppressHydrationWarning
           className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
             lg ? "h-8 px-4" : "h-7 px-3"
           } ${isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
