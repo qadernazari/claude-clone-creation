@@ -177,7 +177,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("global")}
           aria-pressed={!isIran}
-          suppressHydrationWarning
           className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
             lg ? "h-8 px-4" : "h-7 px-3"
           } ${!isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
@@ -188,7 +187,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
           type="button"
           onClick={() => choose("iran")}
           aria-pressed={isIran}
-          suppressHydrationWarning
           className={`btn-seg-item transition-all duration-200 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber/60 ${
             lg ? "h-8 px-4" : "h-7 px-3"
           } ${isIran ? "bg-cream text-ink shadow-sm" : "text-cream/55 hover:text-cream"}`}
@@ -204,7 +202,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        suppressHydrationWarning
         className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
         style={{
           WebkitAppearance: "none",
@@ -216,7 +213,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         }}
       >
         <RegionGlobeIcon size={15} className="region-trigger-icon" />
-        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"} suppressHydrationWarning>
+        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
           {activeLabel}
         </span>
         <RegionChevronIcon />
@@ -381,10 +378,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               <Logo size={28} />
             </Link>
             <nav className="hidden gap-6 text-[11px] font-semibold uppercase tracking-[0.18em] lg:flex xl:gap-7">
-              <Link to="/" onClick={handleHomeClick} className={linkCls("home")} suppressHydrationWarning>
+              <Link to="/" onClick={handleHomeClick} className={linkCls("home")}>
                 {fa ? "خانه" : "Home"}
               </Link>
-              <Link to="/originals" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full" suppressHydrationWarning>
+              <Link to="/originals" className="relative py-1 text-cream/55 transition-colors duration-300 hover:text-cream after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-amber after:transition-all after:duration-500 hover:after:w-full">
                 {fa ? "اختصاصی" : "Originals"}
               </Link>
             </nav>
@@ -393,7 +390,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              suppressHydrationWarning
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
             >
               <svg
@@ -416,7 +412,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               <Link
                 to="/auth"
                 className="hidden h-10 shrink-0 items-center whitespace-nowrap px-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-cream-bright md:inline-flex"
-                suppressHydrationWarning
               >
                 {fa ? "ورود" : "Sign in"}
               </Link>
@@ -424,7 +419,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
             <Link
               to="/membership"
               className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-md bg-amber px-5 text-[12px] font-bold uppercase leading-none tracking-[0.08em] text-ink shadow-sm transition-colors duration-200 hover:bg-amber/90 active:scale-95 sm:inline-flex"
-              suppressHydrationWarning
             >
               {fa ? "عضویت" : "Membership"}
             </Link>
@@ -433,7 +427,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 <Link
                   to="/account"
                   aria-label={fa ? "حساب کاربری" : "Account"}
-                  suppressHydrationWarning
                   className="mobile-signin-trigger hidden h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:inline-flex"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -445,7 +438,6 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 <Link
                   to="/auth"
                   aria-label={fa ? "ورود" : "Sign in"}
-                  suppressHydrationWarning
                   className="mobile-signin-trigger inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:hidden"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
