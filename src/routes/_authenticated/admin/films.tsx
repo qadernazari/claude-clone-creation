@@ -38,6 +38,8 @@ type Film = {
   cover_url: string | null;
   thumbnail_url: string | null;
   mobile_cover_url: string | null;
+  cover_fit?: string | null;
+  cover_position?: string | null;
   poster_gradient: string | null;
   video_url?: string | null;
   preview_url: string | null;
@@ -73,14 +75,14 @@ const EMPTY: FilmDraft = {
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
-  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", poster_gradient: GRADIENTS[0],
+  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", cover_fit: "cover", cover_position: "center", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
   film_type: "movie", parent_film_id: null, season_number: null, episode_number: null,
 };
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
@@ -417,6 +419,8 @@ function FilmEditorModal({
         cover_url: d.cover_url?.trim() || null,
         thumbnail_url: d.thumbnail_url?.trim() || null,
         mobile_cover_url: d.mobile_cover_url?.trim() || null,
+        cover_fit: d.cover_fit || "cover",
+        cover_position: d.cover_position || "center",
         poster_gradient: d.poster_gradient || null,
         preview_url: d.preview_url?.trim() || null,
         film_type: d.film_type ?? "movie",
@@ -513,6 +517,59 @@ function FilmEditorModal({
                 description="Portrait mobile hero — recommended 800×1422px or larger (9:16 ratio). Falls back to the portrait poster if unset."
                 maxBytes={25 * 1024 * 1024}
               />
+
+              {/* Cover display style */}
+              <div className="space-y-2 pt-2">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Cover display style
+                </label>
+                <div className="flex gap-3">
+                  {[
+                    { value: "cover", label: "Fill (crop to fit)", desc: "Image fills the hero, may be cropped" },
+                    { value: "contain", label: "Full image (no crop)", desc: "Entire image shown, blurred backdrop fills sides" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => set("cover_fit", opt.value)}
+                      className={`flex-1 rounded-lg border p-3 text-left transition-all ${
+                        (d.cover_fit || "cover") === opt.value
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-transparent hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{opt.label}</div>
+                      <div className="mt-0.5 text-[11px] opacity-70">{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {(d.cover_fit || "cover") !== "contain" && (
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Cover focus point
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["center", "top", "bottom", "left", "right"].map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => set("cover_position", pos)}
+                        className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-all ${
+                          (d.cover_position || "center") === pos
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        {pos}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+
 
               <FileUpload
                 bucket="film-trailers"

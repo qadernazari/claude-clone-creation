@@ -118,6 +118,14 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   );
 }
 
+const POS_CLASS: Record<string, string> = {
+  center: "object-center",
+  top: "object-top",
+  bottom: "object-bottom",
+  left: "object-left",
+  right: "object-right",
+};
+
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   const { locale, num, year, t } = useLocale();
   const desktopImage = film.thumbnail_url || film.cover_url;
@@ -138,6 +146,10 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   const director = film.category === "walking-tour" ? "" : t({ en: film.director_en || "", fa: film.director_fa || film.director_en || "" });
   const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
+  const isContain = film.cover_fit === "contain";
+  const posClass = POS_CLASS[film.cover_position || "center"] || "object-center";
+  const fitClass = isContain ? "object-contain object-center" : `object-cover ${posClass}`;
+
   return (
     <div
       className={`absolute inset-0 transition-opacity duration-[900ms] ease-out ${
@@ -146,6 +158,14 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       aria-hidden={!active}
       style={{ background: fallbackBg }}
     >
+      {isContain && desktopImage ? (
+        <img
+          src={desktopImage}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover blur-2xl scale-110 opacity-40"
+        />
+      ) : null}
       {mobileImage ? (
         <img
           src={mobileImage}
@@ -153,7 +173,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           alt={title}
           width={720}
           height={1280}
-          className={`absolute inset-0 block h-full w-full object-cover object-center md:hidden ${
+          className={`absolute inset-0 block h-full w-full md:hidden ${fitClass} ${
             active ? "cine-img-in" : ""
           }`}
           loading={eager ? "eager" : "lazy"}
@@ -168,7 +188,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           alt={title}
           width={1600}
           height={900}
-          className={`absolute inset-0 hidden h-full w-full object-cover object-center md:block ${
+          className={`absolute inset-0 hidden h-full w-full md:block ${fitClass} ${
             active ? "cine-img-in" : ""
           }`}
           loading={eager ? "eager" : "lazy"}

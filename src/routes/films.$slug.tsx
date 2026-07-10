@@ -32,7 +32,7 @@ export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("films")
-      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
+      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
       .eq("slug", params.slug)
       .eq("visibility", "published")
       .maybeSingle();
@@ -443,6 +443,16 @@ function FilmPage() {
   const heroArtDesktop = film.thumbnail_url || film.cover_url;
   const heroArtMobile = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const heroArt = heroArtDesktop || heroArtMobile;
+  const isContain = (film as { cover_fit?: string | null }).cover_fit === "contain";
+  const coverPosition = (film as { cover_position?: string | null }).cover_position || "center";
+  const POS_CLASS_MAP: Record<string, string> = {
+    center: "object-center",
+    top: "object-top",
+    bottom: "object-bottom",
+    left: "object-left",
+    right: "object-right",
+  };
+  const heroFitClass = isContain ? "object-contain object-center" : `object-cover ${POS_CLASS_MAP[coverPosition] || "object-center"}`;
   const posterStyle = heroArt
     ? { backgroundImage: `url(${heroArt})` }
     : { background: (film.poster_gradient as string) || fallbackGradient };
@@ -584,27 +594,32 @@ function FilmPage() {
         {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
         {heroArt ? (
           <>
+            {/* Blurred backdrop when contain, so no black bars */}
+            {isContain ? (
+              <img
+                src={heroDesktop || heroArtDesktop || heroMobile || heroArtMobile || ""}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 -z-40 h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none"
+              />
+            ) : null}
             {/* Mobile: 9:16 vertical poster */}
             {heroArtMobile ? (
               <img
                 src={heroMobile || heroArtMobile}
                 alt=""
                 decoding="async"
-                className="film-hero-kenburns absolute inset-0 -z-30 h-full w-full object-cover object-center select-none md:hidden"
+                className={`film-hero-kenburns absolute inset-0 -z-30 h-full w-full ${heroFitClass} select-none md:hidden`}
                 aria-hidden
               />
             ) : null}
-            {/* Desktop / tablet: 16:9 cinematic art with slow Ken Burns drift.
-                Note: NOT fetchPriority="high" — that would make React 19 emit
-                an unconditional <link rel="preload"> for this 1920w landscape
-                image, which mobile would then download too. The route head()
-                already preloads the right image. */}
+            {/* Desktop / tablet: 16:9 cinematic art with slow Ken Burns drift. */}
             {heroArtDesktop ? (
               <img
                 src={heroDesktop || heroArtDesktop}
                 alt=""
                 decoding="async"
-                className="film-hero-kenburns absolute inset-x-0 -top-[10%] -z-30 hidden h-[112%] w-full max-w-none object-cover object-center translate-y-[7%] select-none md:block"
+                className={`film-hero-kenburns absolute ${isContain ? "inset-0 h-full" : "inset-x-0 -top-[10%] h-[112%] translate-y-[7%]"} -z-30 hidden w-full max-w-none ${heroFitClass} select-none md:block`}
                 aria-hidden
               />
             ) : null}

@@ -82,6 +82,8 @@ export type HomeFeaturedFilm = {
   thumbnail_url_mobile: string | null;
   mobile_cover_url: string | null;
   is_premium: boolean | null;
+  cover_fit: string | null;
+  cover_position: string | null;
 };
 
 export type HomeRailFilm = {
@@ -137,7 +139,7 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
       const res = await supabaseAdmin
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium, cover_fit, cover_position",
         )
         .eq("visibility", "published")
         .neq("film_type", "episode")
@@ -242,7 +244,7 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
       const res = await supabaseAdmin
         .from("films")
         .select(
-          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium",
+          "id, slug, title_en, title_fa, director_en, director_fa, category, year, duration_min, synopsis_en, synopsis_fa, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, is_premium, cover_fit, cover_position",
         )
         .eq("visibility", "published")
         .neq("film_type", "episode")
