@@ -204,6 +204,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
+        suppressHydrationWarning
         className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
         style={{
           WebkitAppearance: "none",
