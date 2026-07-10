@@ -229,7 +229,7 @@ export const getHomeRails = createServerFn({ method: "GET" }).handler(
 export const homeFeaturedQueryOptions = queryOptions({
   queryKey: ["home", "featured"],
   queryFn: () => getHomeFeatured(),
-  staleTime: 5 * 60_000,
+  staleTime: 30_000,
   gcTime: 30 * 60_000,
 });
 
@@ -285,14 +285,14 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
 export const homeFeaturedSlidesQueryOptions = queryOptions({
   queryKey: ["home", "featured-slides"],
   queryFn: () => getHomeFeaturedSlides(),
-  staleTime: 5 * 60_000,
+  staleTime: 30_000,
   gcTime: 30 * 60_000,
 });
 
 export const homeRailsQueryOptions = queryOptions({
   queryKey: ["home", "rails"],
   queryFn: () => getHomeRails(),
-  staleTime: 5 * 60_000,
+  staleTime: 30_000,
   gcTime: 30 * 60_000,
 });
 
@@ -304,6 +304,6 @@ export const homePageQueryOptions = queryOptions({
     const [featured, rails] = await Promise.all([getHomeFeatured(), getHomeRails()]);
     return { featured, films: rails.films, categories: rails.categories };
   },
-  staleTime: 5 * 60_000,
+  staleTime: 30_000,
   gcTime: 30 * 60_000,
 });
