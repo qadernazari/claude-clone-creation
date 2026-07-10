@@ -75,7 +75,7 @@ const EMPTY: FilmDraft = {
   synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
   price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
-  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", poster_gradient: GRADIENTS[0],
+  visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", cover_fit: "cover", cover_position: "center", poster_gradient: GRADIENTS[0],
   video_url: "", preview_url: "",
   film_type: "movie", parent_film_id: null, season_number: null, episode_number: null,
 };
