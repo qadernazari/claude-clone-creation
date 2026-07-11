@@ -22,6 +22,8 @@
  * Exits 0 on pass, 1 on any failed assertion (across all viewports).
  */
 import { chromium } from "playwright";
+import { mkdir, unlink } from "node:fs/promises";
+import { join as joinPath } from "node:path";
 
 // ---------- Optional config file ----------
 // Load a JSON config from PERF_HERO_CONFIG (or ./perf-hero.config.json if it
@@ -209,9 +211,12 @@ const selection = (process.env.VIEWPORTS || "mobile,tablet,laptop,desktop")
 
 const REPORT_DIR = process.env.REPORT_DIR || "/mnt/documents";
 const REPORT_STAMP = new Date().toISOString().replace(/[:.]/g, "-");
+const FAILURE_DIR = joinPath(REPORT_DIR, "failures", REPORT_STAMP);
+await mkdir(FAILURE_DIR, { recursive: true });
 
 const totalFailures = [];
 const reportRuns = [];
+const failureArtifacts = [];
 
 await warmProcessOnce();
 
@@ -253,10 +258,14 @@ for (const key of selection) {
     const beaconPromise = new Promise((r) => (beaconResolve = r));
 
     const browser = await chromium.launch({ headless: true });
+    const artifactBase = `${key}-attempt${attempt}`;
+    const harPath = joinPath(FAILURE_DIR, `${artifactBase}.har`);
+    const screenshotPath = joinPath(FAILURE_DIR, `${artifactBase}.png`);
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: vp.deviceScaleFactor,
       userAgent: vp.userAgent,
+      recordHar: { path: harPath, mode: "full", content: "embed" },
     });
     const page = await context.newPage();
 
@@ -491,7 +500,43 @@ for (const key of selection) {
       result.beacon = localBeacon;
       result.renderedSrc = localRenderedSrc;
       result.cacheProbe = cacheProbe;
+
+      // Attempts that failed to capture the beacon or hit the LCP budget get a
+      // full HAR + a screenshot of the page state at the point of failure.
+      // Successful attempts throw the HAR away to keep the report dir small.
+      const capturedBeaconOk =
+        localBeacon && typeof localBeacon.lcp_ms === "number";
+      const shouldKeepArtifacts = !result.ok || !capturedBeaconOk;
+      if (shouldKeepArtifacts) {
+        try {
+          await page
+            .screenshot({ path: screenshotPath, fullPage: false })
+            .catch(() => {});
+          result.screenshotPath = screenshotPath;
+        } catch {}
+      }
+      // Closing the context flushes the HAR file to disk.
+      await context.close().catch(() => {});
       await browser.close().catch(() => {});
+      if (shouldKeepArtifacts) {
+        result.harPath = harPath;
+        failureArtifacts.push({
+          viewport_key: key,
+          viewport_label: vp.label,
+          attempt,
+          reason: result.reason || null,
+          beacon_captured: !!localBeacon,
+          lcp_captured: capturedBeaconOk,
+          har_path: harPath,
+          screenshot_path: screenshotPath,
+        });
+        console.log(
+          `    · saved failure artifacts → ${harPath} , ${screenshotPath}`,
+        );
+      } else {
+        // Successful attempt: drop the HAR (screenshot was never taken).
+        await unlink(harPath).catch(() => {});
+      }
     }
     return result;
   };
@@ -507,6 +552,8 @@ for (const key of selection) {
       ok: r.ok,
       reason: r.reason || null,
       lcp_ms: r.beacon?.lcp_ms ?? null,
+      har_path: r.harPath || null,
+      screenshot_path: r.screenshotPath || null,
     });
     if (r.ok) {
       attemptResult = r;
@@ -833,11 +880,17 @@ const report = {
     failed: reportRuns.filter((r) => !r.passed).length,
   },
   runs: reportRuns,
+  failure_artifacts_dir: failureArtifacts.length ? FAILURE_DIR : null,
+  failure_artifacts: failureArtifacts,
 };
 
 const jsonPath = path.join(REPORT_DIR, `perf-hero-${REPORT_STAMP}.json`);
 const htmlPath = path.join(REPORT_DIR, `perf-hero-${REPORT_STAMP}.html`);
 await fs.writeFile(jsonPath, JSON.stringify(report, null, 2));
+if (failureArtifacts.length === 0) {
+  // Nothing failed — remove the empty failures dir to keep the report tidy.
+  await fs.rm(FAILURE_DIR, { recursive: true, force: true }).catch(() => {});
+}
 
 const esc = (s) =>
   String(s ?? "")
@@ -982,6 +1035,22 @@ const html = `<!doctype html>
   — ${report.summary.passed}/${report.summary.runs} viewports passed
   (${report.summary.failed} failed).
 </div>
+${failureArtifacts.length ? `<h2 style="margin-top:2rem">Failure artifacts</h2>
+<p class="dim" style="margin-top:-.5rem">HAR + screenshot saved for every attempt that failed to capture the beacon or the LCP budget. Directory: <code>${esc(FAILURE_DIR)}</code></p>
+<table class="summary-table">
+  <thead><tr><th>Viewport</th><th>Attempt</th><th>Reason</th><th>Beacon</th><th>LCP</th><th>HAR</th><th>Screenshot</th></tr></thead>
+  <tbody>
+    ${failureArtifacts.map((a) => `<tr>
+      <td>${esc(a.viewport_label)}</td>
+      <td>${a.attempt}</td>
+      <td>${esc(a.reason || "—")}</td>
+      <td>${a.beacon_captured ? "captured" : "<strong>missing</strong>"}</td>
+      <td>${a.lcp_captured ? "captured" : "<strong>missing</strong>"}</td>
+      <td><a href="file://${esc(a.har_path)}"><code>${esc(a.har_path.split("/").pop())}</code></a></td>
+      <td><a href="file://${esc(a.screenshot_path)}"><code>${esc(a.screenshot_path.split("/").pop())}</code></a></td>
+    </tr>`).join("")}
+  </tbody>
+</table>` : ""}
 ${(() => {
   const pathOf = (u) => {
     if (!u) return null;
