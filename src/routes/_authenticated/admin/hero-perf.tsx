@@ -222,6 +222,52 @@ function HeroPerfPage() {
 
   const buckets = useMemo(() => bucketize(rows, hours), [rows, hours]);
 
+  const byViewport = useMemo(() => {
+    return VP_BUCKETS.map((vp) => {
+      const subset = rows.filter((r) => vpBucketOf(r.viewport_w) === vp.key);
+      const lcp = subset.map((r) => r.lcp_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
+      const bytes = subset.map((r) => r.transfer_bytes).filter((v): v is number => v != null).sort((a, b) => a - b);
+      const known = subset.filter((r) => r.preload_cache_hit != null);
+      const hits = known.filter((r) => r.preload_cache_hit === true).length;
+      return {
+        ...vp,
+        count: subset.length,
+        lcpP75: percentile(lcp, 75),
+        bytesP75: bytes.length ? percentile(bytes, 75)! / 1024 : null,
+        cacheRate: known.length ? (hits / known.length) * 100 : null,
+        cacheHits: hits,
+        cacheTotal: known.length,
+      };
+    });
+  }, [rows]);
+
+  const vpCacheSeries = useMemo(() => {
+    // For each bucket, compute cache hit % per viewport bucket.
+    const perVp: Record<VpKey, Array<{ hits: number; total: number }>> = {
+      mobile: [], tablet: [], laptop: [], desktop: [],
+    };
+    for (const _ of buckets) {
+      for (const k of Object.keys(perVp) as VpKey[]) perVp[k].push({ hits: 0, total: 0 });
+    }
+    // Rebuild per-bucket per-viewport tallies
+    const totalMs = hours * 3600_000;
+    const target = 40;
+    const bucketMs = Math.max(60_000, Math.round(totalMs / target / 60_000) * 60_000);
+    const firstT = buckets[0]?.t ?? 0;
+    for (const r of rows) {
+      const vp = vpBucketOf(r.viewport_w);
+      if (!vp || r.preload_cache_hit == null) continue;
+      const t = new Date(r.created_at).getTime();
+      const idx = Math.floor((Math.floor(t / bucketMs) * bucketMs - firstT) / bucketMs);
+      const slot = perVp[vp][idx];
+      if (!slot) continue;
+      slot.total += 1;
+      if (r.preload_cache_hit) slot.hits += 1;
+    }
+    return perVp;
+  }, [rows, buckets, hours]);
+
+
   return (
     <div dir="ltr" className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
