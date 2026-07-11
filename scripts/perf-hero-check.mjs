@@ -123,12 +123,13 @@ for (const key of selection) {
   let attemptsMeta = [];
   const runStart = Date.now();
 
-  // A single navigation + observation. Returns { ok, reason, transfers, beacon, renderedSrc }.
+  // A single navigation + observation. Returns { ok, reason, transfers, beacon, renderedSrc, cacheProbe }.
   const singleAttempt = async (attempt) => {
     const localThumb = [];
     const localCover = [];
     let localBeacon = null;
     let localRenderedSrc = null;
+    let cacheProbe = null;
     let beaconResolve;
     const beaconPromise = new Promise((r) => (beaconResolve = r));
 
@@ -139,6 +140,29 @@ for (const key of selection) {
       userAgent: vp.userAgent,
     });
     const page = await context.newPage();
+
+    // CDP session gives us `fromDiskCache` / `fromMemoryCache` / `fromPrefetchCache`
+    // flags that Playwright's response events don't expose.
+    const cdp = await context.newCDPSession(page);
+    await cdp.send("Network.enable");
+    const cdpByReq = new Map();
+    const cdpByUrl = new Map(); // url -> latest response record
+    cdp.on("Network.requestWillBeSent", (e) => {
+      cdpByReq.set(e.requestId, { url: e.request.url });
+    });
+    cdp.on("Network.responseReceived", (e) => {
+      const rec = {
+        requestId: e.requestId,
+        url: e.response.url,
+        status: e.response.status,
+        fromDiskCache: !!e.response.fromDiskCache,
+        fromServiceWorker: !!e.response.fromServiceWorker,
+        fromPrefetchCache: !!e.response.fromPrefetchCache,
+        encodedDataLength: e.response.encodedDataLength ?? null,
+      };
+      cdpByReq.set(e.requestId, rec);
+      cdpByUrl.set(e.response.url, rec);
+    });
 
     const captureTransfer = async (resp, bucket) => {
       let bytes = null;
@@ -177,10 +201,17 @@ for (const key of selection) {
       }
     });
 
-    const result = { ok: false, reason: "", thumb: localThumb, cover: localCover, beacon: null, renderedSrc: null, attempt };
+    const result = {
+      ok: false,
+      reason: "",
+      thumb: localThumb,
+      cover: localCover,
+      beacon: null,
+      renderedSrc: null,
+      cacheProbe: null,
+      attempt,
+    };
     try {
-      // On first attempt, do a warm-up prefetch to prime dev-server modules
-      // (Vite cold-start is the primary source of long LCPs / connect timeouts).
       if (attempt === 1 && WARMUP) {
         try {
           await page.goto(`${BASE_URL}/?warmup=1`, {
@@ -196,11 +227,10 @@ for (const key of selection) {
         waitUntil: "domcontentloaded",
         timeout: GOTO_TIMEOUT_MS,
       });
-      // Give the LCP observer + beacon time to fire under load.
       try {
         await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
       } catch {
-        // networkidle may not settle under noisy dev-server HMR; that's fine — beacon race below still holds.
+        // dev-server HMR keeps network alive; beacon race below is authoritative.
       }
       await Promise.race([
         beaconPromise,
@@ -208,8 +238,6 @@ for (const key of selection) {
           setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
         ),
       ]);
-
-      // Wait a beat so any tail response events land before we read state.
       await sleep(250);
 
       localRenderedSrc = await page.evaluate(() => {
@@ -223,6 +251,76 @@ for (const key of selection) {
           : null;
       });
 
+      // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
+      const lcpUrl = localRenderedSrc || localBeacon?.url || null;
+      if (lcpUrl) {
+        const reloadCdpHits = [];
+        const captureReload = (e) => {
+          if (e.response?.url === lcpUrl) {
+            reloadCdpHits.push({
+              status: e.response.status,
+              fromDiskCache: !!e.response.fromDiskCache,
+              fromMemoryCache: false, // reported via `fromDiskCache` for both mem+disk in modern CDP
+              fromPrefetchCache: !!e.response.fromPrefetchCache,
+              fromServiceWorker: !!e.response.fromServiceWorker,
+              encodedDataLength: e.response.encodedDataLength ?? null,
+            });
+          }
+        };
+        cdp.on("Network.responseReceived", captureReload);
+
+        // Snapshot pre-reload transfer counts so we can diff for the reload phase.
+        const preReloadThumb = localThumb.length;
+        const preReloadCover = localCover.length;
+
+        try {
+          await page.reload({ waitUntil: "domcontentloaded", timeout: GOTO_TIMEOUT_MS });
+          try {
+            await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
+          } catch {}
+          await sleep(400);
+        } catch (err) {
+          console.log(
+            `    · reload cache probe skipped: ${err instanceof Error ? err.message : err}`,
+          );
+        }
+
+        const perfEntry = await page.evaluate((url) => {
+          const e = performance.getEntriesByType("resource").find((r) => r.name === url);
+          return e
+            ? {
+                transferSize: e.transferSize,
+                encodedBodySize: e.encodedBodySize,
+                decodedBodySize: e.decodedBodySize,
+                duration: e.duration,
+              }
+            : null;
+        }, lcpUrl);
+
+        // A cache hit shows in CDP as fromDiskCache=true (memory cache is bucketed in there too),
+        // OR the Resource Timing API reports transferSize===0 with decodedBodySize>0 for
+        // same-origin / Timing-Allow-Origin responses. For cross-origin without TAO we fall back
+        // to duration<50ms as a soft signal.
+        const cdpHit = reloadCdpHits.some(
+          (h) => h.fromDiskCache || h.fromPrefetchCache || h.fromServiceWorker,
+        );
+        const rtHit =
+          perfEntry &&
+          perfEntry.transferSize === 0 &&
+          (perfEntry.decodedBodySize || 0) > 0;
+        const fastHit = perfEntry && perfEntry.duration < 50;
+
+        cacheProbe = {
+          lcpUrl,
+          reloadCdpHits,
+          perfEntry,
+          reloadThumbTransfers: localThumb.length - preReloadThumb,
+          reloadCoverTransfers: localCover.length - preReloadCover,
+          cacheHit: !!(cdpHit || rtHit || fastHit),
+          signals: { cdpHit, rtHit, fastHit },
+        };
+      }
+
       if (!localBeacon || typeof localBeacon.lcp_ms !== "number") {
         result.reason = "beacon missing lcp_ms";
       } else {
@@ -233,10 +331,12 @@ for (const key of selection) {
     } finally {
       result.beacon = localBeacon;
       result.renderedSrc = localRenderedSrc;
+      result.cacheProbe = cacheProbe;
       await browser.close().catch(() => {});
     }
     return result;
   };
+
 
   // Retry loop.
   let attemptResult = null;
