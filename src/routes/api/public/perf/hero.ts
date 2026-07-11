@@ -116,41 +116,69 @@ export const Route = createFileRoute("/api/public/perf/hero")({
           if (raw.length > 2048) {
             return new Response("payload too large", { status: 413 });
           }
-          let p: Payload = {};
+          let parsed: unknown;
           try {
-            p = JSON.parse(raw) as Payload;
+            parsed = JSON.parse(raw);
           } catch {
             return new Response("bad json", { status: 400 });
           }
+
+          const result = beaconSchema.safeParse(parsed);
+          if (!result.success) {
+            // Log a compact rejection line so schema drift is visible in
+            // worker logs without leaking the full payload.
+            const issues = result.error.issues.slice(0, 5).map((i) => ({
+              path: i.path.join("."),
+              code: i.code,
+              message: i.message.slice(0, 120),
+            }));
+            console.warn(
+              JSON.stringify({ tag: "hero_perf_reject", reason: "schema", issues }),
+            );
+            return new Response(
+              JSON.stringify({ error: "invalid payload", issues }),
+              {
+                status: 422,
+                headers: {
+                  "Content-Type": "application/json",
+                  "Cache-Control": "no-store",
+                },
+              },
+            );
+          }
+          const p: Beacon = result.data;
 
           const country =
             request.headers.get("cf-ipcountry") ??
             request.headers.get("x-vercel-ip-country") ??
             null;
 
+          const nn = <T,>(v: T | null | undefined): T | null =>
+            v === undefined ? null : v;
+
           const line = {
             tag: "hero_perf",
-            url: s(p.url, 300),
-            correlation_id: s(p.correlation_id, 64),
-            preload_url: s(p.preload_url, 300),
-            lcp_ms: n(p.lcp_ms),
-            lcp_size: n(p.lcp_size),
-            req_start_ms: n(p.req_start_ms),
-            ttfb_ms: n(p.ttfb_ms),
-            resp_end_ms: n(p.resp_end_ms),
-            transfer_bytes: n(p.transfer_bytes),
-            encoded_bytes: n(p.encoded_bytes),
-            protocol: s(p.protocol, 32),
-            decode_ms: n(p.decode_ms),
-            viewport_w: n(p.viewport_w),
-            dpr: n(p.dpr),
-            effective_type: s(p.effective_type, 16),
-            downlink: n(p.downlink),
-            ua_mobile: b(p.ua_mobile),
-            delivery_type: s(p.delivery_type, 32),
-            preload_cache_hit: b(p.preload_cache_hit),
-            resource_initiator: s(p.resource_initiator, 32),
-            resource_count: n(p.resource_count),
+            url: p.url,
+            correlation_id: p.correlation_id,
+            preload_url: nn(p.preload_url),
+            lcp_ms: p.lcp_ms,
+            lcp_size: nn(p.lcp_size),
+            req_start_ms: nn(p.req_start_ms),
+            ttfb_ms: nn(p.ttfb_ms),
+            resp_end_ms: nn(p.resp_end_ms),
+            transfer_bytes: nn(p.transfer_bytes),
+            encoded_bytes: nn(p.encoded_bytes),
+            protocol: nn(p.protocol),
+            decode_ms: nn(p.decode_ms),
+            viewport_w: nn(p.viewport_w),
+            dpr: nn(p.dpr),
+            effective_type: nn(p.effective_type),
+            downlink: nn(p.downlink),
+            ua_mobile: nn(p.ua_mobile),
+            delivery_type: nn(p.delivery_type),
+            preload_cache_hit: nn(p.preload_cache_hit),
+            resource_initiator: nn(p.resource_initiator),
+            resource_count: nn(p.resource_count),
             country,
           };
           // Single-line log so it aggregates cleanly in worker logs.
