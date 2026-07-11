@@ -84,6 +84,26 @@ const PER_VIEWPORT_BUDGET_MS = {
   laptop: budgetFor("laptop", LCP_BUDGET_MS),
   desktop: budgetFor("desktop", LCP_BUDGET_MS),
 };
+
+// Per-viewport transfer_bytes budgets (bytes downloaded from the LCP asset
+// bucket on initial load). Env var > config file > default. The forbidden
+// bucket is already asserted to zero elsewhere, so this is effectively the
+// hero image transfer ceiling.
+const transferBudgetFor = (key, fallback) =>
+  Number(
+    process.env[`TRANSFER_BUDGET_BYTES_${key.toUpperCase()}`] ||
+      vpCfg(key).transfer_budget_bytes ||
+      fallback,
+  );
+const DEFAULT_TRANSFER_BUDGET_BYTES = Number(
+  process.env.TRANSFER_BUDGET_BYTES || fileConfig.transfer_budget_bytes || 500_000,
+);
+const PER_VIEWPORT_TRANSFER_BUDGET_BYTES = {
+  mobile: transferBudgetFor("mobile", 250_000),
+  tablet: transferBudgetFor("tablet", 350_000),
+  laptop: transferBudgetFor("laptop", 400_000),
+  desktop: transferBudgetFor("desktop", DEFAULT_TRANSFER_BUDGET_BYTES),
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // One-time process warmup: hit the homepage a few times to compile Vite
