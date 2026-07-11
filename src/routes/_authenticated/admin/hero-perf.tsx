@@ -184,6 +184,9 @@ function HeroPerfPage() {
     const lcp = rows.map((r) => r.lcp_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
     const dec = rows.map((r) => r.decode_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
     const bytes = rows.map((r) => r.transfer_bytes).filter((v): v is number => v != null).sort((a, b) => a - b);
+    const cacheKnown = rows.filter((r) => r.preload_cache_hit != null);
+    const cacheHits = cacheKnown.filter((r) => r.preload_cache_hit === true).length;
+    const cacheRate = cacheKnown.length ? (cacheHits / cacheKnown.length) * 100 : null;
     return {
       lcp: { p50: percentile(lcp, 50), p75: percentile(lcp, 75), p95: percentile(lcp, 95) },
       dec: { p50: percentile(dec, 50), p75: percentile(dec, 75), p95: percentile(dec, 95) },
@@ -192,6 +195,9 @@ function HeroPerfPage() {
         p75: percentile(bytes, 75),
         p95: percentile(bytes, 95),
       },
+      cacheRate,
+      cacheHits,
+      cacheTotal: cacheKnown.length,
     };
   }, [rows]);
 
