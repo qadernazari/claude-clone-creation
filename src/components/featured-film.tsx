@@ -177,7 +177,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
     };
   }, [eager]);
   // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
-  const portraitImage = film.cover_url || film.mobile_cover_url || film.thumbnail_url;
+  const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const landscapeImage = film.thumbnail_url || film.cover_url;
   const landscapeSrcSet = [
     film.thumbnail_url_1280 ? `${film.thumbnail_url_1280} 1280w` : null,
