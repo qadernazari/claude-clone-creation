@@ -131,7 +131,7 @@ function SliderControls({
             type="button"
             onClick={onPrev}
             aria-label="Previous"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-cream/15 bg-bg-1/40 text-cream/70 backdrop-blur-sm transition-all hover:border-amber/40 hover:bg-amber/10 hover:text-amber-bright rtl:rotate-180"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/50 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright hover:shadow-amber/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 active:bg-amber/20 rtl:rotate-180"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <polyline points="15 18 9 12 15 6" />
@@ -141,7 +141,7 @@ function SliderControls({
             type="button"
             onClick={onNext}
             aria-label="Next"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-cream/15 bg-bg-1/40 text-cream/70 backdrop-blur-sm transition-all hover:border-amber/40 hover:bg-amber/10 hover:text-amber-bright rtl:rotate-180"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/50 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright hover:shadow-amber/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 active:bg-amber/20 rtl:rotate-180"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <polyline points="9 18 15 12 9 6" />
@@ -155,13 +155,15 @@ function SliderControls({
               type="button"
               onClick={() => onGo(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`flex h-6 items-center justify-center rounded-full transition-colors hover:bg-cream/10 ${
-                i === index ? "w-12" : "w-6"
+              className={`flex h-8 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-cream/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-90 ${
+                i === index ? "w-14" : "w-8"
               }`}
             >
               <span
                 className={`block h-2 rounded-full transition-all duration-500 ${
-                  i === index ? "w-10 bg-amber" : "w-4 bg-cream/30 hover:bg-cream/50"
+                  i === index
+                    ? "w-11 bg-amber shadow-[0_0_10px_rgba(251,191,36,0.45)] hover:bg-amber-bright hover:shadow-[0_0_14px_rgba(251,191,36,0.6)]"
+                    : "w-4 bg-cream/40 hover:w-5 hover:bg-cream/70"
                 }`}
               />
             </button>
