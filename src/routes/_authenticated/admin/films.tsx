@@ -687,6 +687,17 @@ function FilmEditorModal({
                   {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </label>
+              {d.category !== "walking-tour" && (
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Language</span>
+                  <select value={d.language ?? "fa"} onChange={(e) => set("language", e.target.value)} className={inp}>
+                    <option value="fa">Persian (Farsi)</option>
+                    <option value="en">English</option>
+                    <option value="ar">Arabic</option>
+                    <option value="other">Other</option>
+                  </select>
+                </label>
+              )}
               <label className="block">
                 <span className="block text-xs font-medium text-muted-foreground mb-1.5">Year</span>
                 <input type="number" value={d.year ?? ""} onChange={(e) => set("year", e.target.value ? Number(e.target.value) : null)} className={inp} placeholder="2025" />
