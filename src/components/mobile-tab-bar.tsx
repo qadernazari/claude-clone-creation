@@ -97,7 +97,6 @@ export function MobileTabBar() {
       style={{
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
         transform: "translateY(calc(-1 * var(--vv-chrome-bottom, 0px)))",
-        willChange: "transform",
       }}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-1.5">

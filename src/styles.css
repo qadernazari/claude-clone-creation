@@ -192,6 +192,11 @@
     }
   }
 
+  /* Remove the 300ms tap delay on mobile for all interactive elements */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
+
   /* Persian typography: slightly larger, more open leading for IranSansX */
   [lang="fa"] body,
   [dir="rtl"] body {
