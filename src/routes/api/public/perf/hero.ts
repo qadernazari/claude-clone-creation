@@ -113,6 +113,8 @@ export const Route = createFileRoute("/api/public/perf/hero")({
           const line = {
             tag: "hero_perf",
             url: s(p.url, 300),
+            correlation_id: s(p.correlation_id, 64),
+            preload_url: s(p.preload_url, 300),
             lcp_ms: n(p.lcp_ms),
             lcp_size: n(p.lcp_size),
             req_start_ms: n(p.req_start_ms),
