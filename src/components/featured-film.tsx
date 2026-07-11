@@ -342,7 +342,7 @@ function SlideImageFrame({
 
                 <div className="flex items-end justify-between gap-4">
                   <div className="pointer-events-auto flex min-w-0 flex-col items-start gap-3">
-                    <h2 className="font-display max-w-[16rem] text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright line-clamp-2 sm:max-w-[20rem] sm:text-3xl lg:max-w-[26rem] lg:text-4xl">
+                    <h2 className="font-display max-w-[18rem] text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright line-clamp-2 sm:max-w-[24rem] sm:text-3xl lg:max-w-[32rem] lg:text-4xl">
                       {title}
                     </h2>
                     <Link
