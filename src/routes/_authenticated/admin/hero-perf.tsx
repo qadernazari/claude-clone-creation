@@ -280,13 +280,23 @@ function HeroPerfPage() {
             Real-user LCP, decode time, and transfer size from the hero beacon.
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="text-sm rounded-md border border-border px-3 py-1.5 hover:bg-accent"
-          disabled={isFetching}
-        >
-          {isFetching ? "Refreshing…" : "Refresh"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => exportRowsToCsv(rows, hours)}
+            className="text-sm rounded-md border border-border px-3 py-1.5 hover:bg-accent disabled:opacity-50"
+            disabled={rows.length === 0}
+            title="Download the currently filtered samples as CSV"
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => refetch()}
+            className="text-sm rounded-md border border-border px-3 py-1.5 hover:bg-accent"
+            disabled={isFetching}
+          >
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-3">
