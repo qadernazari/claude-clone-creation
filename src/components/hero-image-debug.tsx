@@ -59,7 +59,7 @@ export function HeroImageDebug({ candidates }: { candidates: Candidate[] }) {
       /* PerformanceObserver unsupported — fall back to final scan */
     }
 
-    const finalize = () => {
+    const finalize = async () => {
       try {
         po?.disconnect();
       } catch {
@@ -84,15 +84,37 @@ export function HeroImageDebug({ candidates }: { candidates: Candidate[] }) {
         };
       });
       setEntries(rows);
-      console.groupCollapsed(`[hero-debug] ${rows.filter((r) => r.loaded).length}/${rows.length} candidates fetched`);
+
+      // Cross-origin timings often hide transfer/encoded sizes. Fall back to a
+      // lightweight HEAD request so the debug panel still shows real payloads.
+      const sizedRows = await Promise.all(
+        rows.map(async (r) => {
+          if (!r.loaded || (r.transferSize > 0 && r.encodedBodySize > 0)) return r;
+          try {
+            const ctrl = new AbortController();
+            const t = setTimeout(() => ctrl.abort(), 5000);
+            const res = await fetch(r.url, { method: "HEAD", mode: "cors", signal: ctrl.signal });
+            clearTimeout(t);
+            const cl = res.headers.get("content-length");
+            const size = cl ? parseInt(cl, 10) : 0;
+            if (size > 0) return { ...r, transferSize: size, encodedBodySize: size };
+          } catch {
+            /* noop */
+          }
+          return r;
+        }),
+      );
+      setEntries(sizedRows);
+
+      console.groupCollapsed(`[hero-debug] ${sizedRows.filter((r) => r.loaded).length}/${sizedRows.length} candidates fetched`);
       console.table(
-        rows.map((r) => ({
+        sizedRows.map((r) => ({
           candidate: r.name,
           loaded: r.loaded ? "yes" : "no",
           transferSize: formatBytes(r.transferSize),
           encodedBodySize: formatBytes(r.encodedBodySize),
           durationMs: r.durationMs,
-        })),
+        }),
       );
       console.groupEnd();
     };
