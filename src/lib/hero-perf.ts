@@ -31,19 +31,32 @@ interface LcpEntry extends PerformanceEntry {
   url?: string;
 }
 
+declare global {
+  interface Window {
+    __heroPerfLast?: {
+      payload: PerfPayload;
+      ok: boolean;
+      ts: number;
+    };
+  }
+}
+
+
 const DEFAULT_SAMPLE_RATE = 0.1;
 
 export function measureHeroLCP(sampleRate: number = DEFAULT_SAMPLE_RATE) {
   if (typeof window === "undefined") return;
-  if (!import.meta.env.PROD) return;
+  const forced =
+    typeof window.location !== "undefined" &&
+    (window.location.search.includes("heroperf=1") ||
+      window.location.search.includes("hero-debug=1"));
+  if (!import.meta.env.PROD && !forced) return;
   const w = window as Window & { __heroPerfSent?: boolean };
   if (w.__heroPerfSent) return;
 
-  const forced =
-    typeof window.location !== "undefined" &&
-    window.location.search.includes("heroperf=1");
   if (!forced && Math.random() > sampleRate) return;
   w.__heroPerfSent = true;
+
 
   let lcp: LcpEntry | null = null;
   let po: PerformanceObserver | null = null;
@@ -98,21 +111,42 @@ export function measureHeroLCP(sampleRate: number = DEFAULT_SAMPLE_RATE) {
 
     const send = (payload: PerfPayload) => {
       const body = JSON.stringify(payload);
+      const record = (ok: boolean) => {
+        try {
+          window.__heroPerfLast = { payload, ok, ts: Date.now() };
+        } catch {
+          /* noop */
+        }
+      };
       try {
         if (navigator.sendBeacon) {
-          navigator.sendBeacon("/api/public/perf/hero", body);
+          const ok = navigator.sendBeacon("/api/public/perf/hero", body);
+          record(ok);
+          if (!ok) {
+            void fetch("/api/public/perf/hero", {
+              method: "POST",
+              body,
+              keepalive: true,
+              headers: { "content-type": "application/json" },
+            })
+              .then(() => record(true))
+              .catch(() => record(false));
+          }
         } else {
           void fetch("/api/public/perf/hero", {
             method: "POST",
             body,
             keepalive: true,
             headers: { "content-type": "application/json" },
-          });
+          })
+            .then(() => record(true))
+            .catch(() => record(false));
         }
       } catch {
-        /* noop */
+        record(false);
       }
     };
+
 
     // Second-decode timing (cache hit). Not identical to first-paint decode
     // but a stable proxy for CPU cost of decoding this render at this DPR.
