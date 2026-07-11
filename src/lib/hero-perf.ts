@@ -119,11 +119,24 @@ export function measureHeroLCP(
     const deliveryType =
       (res as PerformanceResourceTiming & { deliveryType?: string })
         ?.deliveryType ?? null;
-    // Cache hit: no bytes on the wire, but the resource still delivered a body.
-    // Covers memory cache, disk cache, and preload cache reuse.
-    const preloadCacheHit = res
+    // Cache hit signals — layered because cross-origin resources without
+    // Timing-Allow-Origin report transferSize/encodedBodySize as 0 even on a
+    // real network fetch. Any ONE of the following implies reuse:
+    //   1. transferSize === 0 AND body-size fields are populated (same-origin
+    //      or TAO-enabled cache/preload hit — clearest signal).
+    //   2. Only one resource entry exists AND its initiator is "link"
+    //      (preload). No separate <img> fetch means the render reused it.
+    //   3. deliveryType is "cache" or "navigational-prefetch" (Chromium).
+    const explicitCacheHit = res
       ? res.transferSize === 0 &&
         ((res.encodedBodySize ?? 0) > 0 || (res.decodedBodySize ?? 0) > 0)
+      : false;
+    const soloPreloadReuse =
+      allEntries.length === 1 && res?.initiatorType === "link";
+    const deliveryCacheHit =
+      deliveryType === "cache" || deliveryType === "navigational-prefetch";
+    const preloadCacheHit = res
+      ? explicitCacheHit || soloPreloadReuse || deliveryCacheHit
       : null;
 
     const nav = navigator as Navigator & {
