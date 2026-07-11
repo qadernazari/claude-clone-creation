@@ -500,7 +500,43 @@ for (const key of selection) {
       result.beacon = localBeacon;
       result.renderedSrc = localRenderedSrc;
       result.cacheProbe = cacheProbe;
+
+      // Attempts that failed to capture the beacon or hit the LCP budget get a
+      // full HAR + a screenshot of the page state at the point of failure.
+      // Successful attempts throw the HAR away to keep the report dir small.
+      const capturedBeaconOk =
+        localBeacon && typeof localBeacon.lcp_ms === "number";
+      const shouldKeepArtifacts = !result.ok || !capturedBeaconOk;
+      if (shouldKeepArtifacts) {
+        try {
+          await page
+            .screenshot({ path: screenshotPath, fullPage: false })
+            .catch(() => {});
+          result.screenshotPath = screenshotPath;
+        } catch {}
+      }
+      // Closing the context flushes the HAR file to disk.
+      await context.close().catch(() => {});
       await browser.close().catch(() => {});
+      if (shouldKeepArtifacts) {
+        result.harPath = harPath;
+        failureArtifacts.push({
+          viewport_key: key,
+          viewport_label: vp.label,
+          attempt,
+          reason: result.reason || null,
+          beacon_captured: !!localBeacon,
+          lcp_captured: capturedBeaconOk,
+          har_path: harPath,
+          screenshot_path: screenshotPath,
+        });
+        console.log(
+          `    · saved failure artifacts → ${harPath} , ${screenshotPath}`,
+        );
+      } else {
+        // Successful attempt: drop the HAR (screenshot was never taken).
+        await unlink(harPath).catch(() => {});
+      }
     }
     return result;
   };
