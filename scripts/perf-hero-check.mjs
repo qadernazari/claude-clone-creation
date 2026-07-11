@@ -199,6 +199,8 @@ const PER_VIEWPORT_TRANSFER_BUDGET_BYTES = {
   desktop: transferBudgetFor("desktop", DEFAULT_TRANSFER_BUDGET_BYTES),
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 
 /**
  * Detect double-mount patterns from `window.__heroMounts` events.
