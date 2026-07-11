@@ -90,12 +90,6 @@ function DeferredHomeRails() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // Fire-and-forget: initialize perf logging (opt-in via ?perf=1).
-    void import("@/lib/perf-log").then((m) => {
-      m.initPerfLogs();
-      m.logEvent("DeferredHomeRails:effect");
-    });
-
     const w = window as Window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
     };
@@ -105,7 +99,6 @@ function DeferredHomeRails() {
     };
     idle(() => {
       prefetchRails(queryClient);
-      void import("@/lib/perf-log").then((m) => m.logEvent("rails:prefetch+show"));
       setShow(true);
     }, 800);
   }, [queryClient]);

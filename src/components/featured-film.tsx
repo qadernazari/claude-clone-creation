@@ -5,14 +5,12 @@ import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
-import { logMount } from "@/lib/perf-log";
 
 const AUTOPLAY_MS = 6500;
 
 export function FeaturedFilm() {
   const { data: slides } = useSuspenseQuery(homeFeaturedSlidesQueryOptions);
 
-  useEffect(() => { logMount("FeaturedFilm"); }, []);
 
   if (!slides || slides.length === 0) return <FeaturedFilmFallback />;
   if (slides.length === 1) return <HeroShell><Slide film={slides[0]} active eager /></HeroShell>;
