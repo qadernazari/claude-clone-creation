@@ -445,7 +445,53 @@ for (const key of selection) {
         fail(
           `beacon preload_url (${beacon.preload_url.slice(0, 80)}…) != LCP url (${beacon.url.slice(0, 80)}…)`,
         );
+    }
+
+    // DOM <link rel="preload" as="image"> whose media query matches the viewport
+    // MUST point to exactly the same object as the rendered hero <img> src.
+    // Compare by origin+pathname since Supabase signs query strings per SSR.
+    const pathOf = (u) => {
+      if (!u) return null;
+      try {
+        const p = new URL(u);
+        return p.origin + p.pathname;
+      } catch {
+        return u.split("?")[0];
       }
+    };
+    if (!activePreload) {
+      fail(
+        `no active <link rel="preload" as="image"> matches this viewport (found ${domPreloads.length} preload tag(s): ${domPreloads
+          .map((p) => p.media || "no-media")
+          .join(", ")})`,
+      );
+    } else if (!renderedSrc) {
+      fail("cannot compare preload href to rendered hero (rendered src missing)");
+    } else {
+      const preloadHrefPath = pathOf(activePreload.href);
+      const renderedPathForPreload = pathOf(renderedSrc);
+      if (preloadHrefPath === renderedPathForPreload) {
+        pass(
+          `active preload href matches rendered hero src (media=${activePreload.media || "none"})`,
+        );
+      } else {
+        fail(
+          `active preload href != rendered hero src — preload=${preloadHrefPath?.slice(-90)} rendered=${renderedPathForPreload?.slice(-90)}`,
+        );
+      }
+      // Also verify no OTHER preload tag matches (would double-preload).
+      const matchingCount = domPreloads.filter((p) => p.matches).length;
+      if (matchingCount === 1) {
+        pass("exactly one preload tag matches the viewport media query");
+      } else {
+        fail(
+          `expected exactly 1 matching preload tag, got ${matchingCount}: ${domPreloads
+            .filter((p) => p.matches)
+            .map((p) => `${p.media || "no-media"}→${pathOf(p.href)?.slice(-40)}`)
+            .join(" | ")}`,
+        );
+      }
+    }
     } else {
       fail("beacon missing preload_url or url");
     }
