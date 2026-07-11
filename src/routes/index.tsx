@@ -166,7 +166,7 @@ export const Route = createFileRoute("/")({
             {
               rel: "preload" as const,
               as: "image" as const,
-              href: loaderData.mobile_cover_url || loaderData.cover_url || loaderData.thumbnail_url_mobile || loaderData.thumbnail_url || "",
+              href: loaderData.cover_url || loaderData.mobile_cover_url || loaderData.thumbnail_url_mobile || loaderData.thumbnail_url || "",
               media: "(max-width: 767px)" as const,
               imageSizes: "100vw" as const,
               fetchPriority: "high" as const,
