@@ -243,6 +243,10 @@ function HeroPerfPage() {
   const [correlationInput, setCorrelationInput] = useState<string>("");
   const [correlationId, setCorrelationId] = useState<string>("");
   const [drawerRow, setDrawerRow] = useState<HeroPerfRow | null>(null);
+  const [dateFrom, setDateFrom] = useState<string>(""); // YYYY-MM-DD local
+  const [dateTo, setDateTo] = useState<string>("");
+  const [viewportBucket, setViewportBucket] = useState<"all" | VpKey>("all");
+  const [environment, setEnvironment] = useState<"all" | "production" | "preview" | "local" | "unknown">("all");
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -251,7 +255,22 @@ function HeroPerfPage() {
       fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType, correlationId: correlationId || undefined } }),
   });
 
-  const rows = data?.rows ?? [];
+  const allRows = data?.rows ?? [];
+
+  const rows = useMemo(() => {
+    const fromMs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
+    const toMs = dateTo ? new Date(`${dateTo}T23:59:59.999`).getTime() : null;
+    return allRows.filter((r) => {
+      if (fromMs != null || toMs != null) {
+        const t = new Date(r.created_at).getTime();
+        if (fromMs != null && t < fromMs) return false;
+        if (toMs != null && t > toMs) return false;
+      }
+      if (viewportBucket !== "all" && vpBucketOf(r.viewport_w) !== viewportBucket) return false;
+      if (environment !== "all" && environmentOf(r.url) !== environment) return false;
+      return true;
+    });
+  }, [allRows, dateFrom, dateTo, viewportBucket, environment]);
 
   const stats = useMemo(() => {
     const lcp = rows.map((r) => r.lcp_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
