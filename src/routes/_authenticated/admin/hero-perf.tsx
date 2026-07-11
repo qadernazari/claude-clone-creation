@@ -427,6 +427,82 @@ function HeroPerfPage() {
       </div>
 
       <div className="rounded-md border border-border bg-card">
+        <div className="px-4 py-2 border-b border-border text-sm font-medium">
+          By viewport width
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="text-muted-foreground">
+              <tr className="text-left">
+                <th className="px-3 py-2">Viewport</th>
+                <th className="px-3 py-2">Samples</th>
+                <th className="px-3 py-2">LCP p75</th>
+                <th className="px-3 py-2">Transfer p75</th>
+                <th className="px-3 py-2">Cache hit rate</th>
+                <th className="px-3 py-2 w-1/2">Cache hit rate distribution</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byViewport.map((vp) => (
+                <tr key={vp.key} className="border-t border-border/60">
+                  <td className="px-3 py-2">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full" style={{ background: vp.color }} />
+                      {vp.label}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 tabular-nums">{vp.count}</td>
+                  <td className="px-3 py-2 tabular-nums">{fmt(vp.lcpP75, " ms")}</td>
+                  <td className="px-3 py-2 tabular-nums">
+                    {vp.bytesP75 == null ? "—" : `${vp.bytesP75.toFixed(1)} KB`}
+                  </td>
+                  <td className="px-3 py-2 tabular-nums">
+                    {vp.cacheRate == null ? "—" : `${vp.cacheRate.toFixed(1)}%`}
+                    <span className="text-muted-foreground ml-1">({vp.cacheHits}/{vp.cacheTotal})</span>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="h-2 w-full rounded bg-muted overflow-hidden">
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${vp.cacheRate ?? 0}%`,
+                          background: vp.color,
+                        }}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border bg-card p-4">
+        <div className="text-sm font-medium mb-1">Preload cache hit % over time, by viewport</div>
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-2">
+          {VP_BUCKETS.map((vp) => (
+            <span key={vp.key} className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full" style={{ background: vp.color }} />
+              {vp.label}
+            </span>
+          ))}
+        </div>
+        <MultiLineChart
+          labels={buckets.map((b) => b.label)}
+          series={VP_BUCKETS.map((vp) => ({
+            color: vp.color,
+            values: vpCacheSeries[vp.key].map((s) => (s.total ? (s.hits / s.total) * 100 : null)),
+          }))}
+          unit="%"
+          maxY={100}
+          format={(v) => v.toFixed(0)}
+        />
+      </div>
+
+
+
+      <div className="rounded-md border border-border bg-card">
         <div className="px-4 py-2 border-b border-border text-sm font-medium">Recent samples</div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
