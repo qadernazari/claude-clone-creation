@@ -157,6 +157,63 @@ const PER_VIEWPORT_TRANSFER_BUDGET_BYTES = {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Detect double-mount patterns from `window.__heroMounts` events.
+ * Returns per-component counts and a boolean `suspected_strict_mode` when a
+ * component logs mount → unmount → mount inside `windowMs` (default 200ms)
+ * before any user interaction. That's the exact fingerprint React StrictMode
+ * leaves in development builds. On a production build, the same pattern
+ * indicates a real remount (Suspense retry, key change, parent re-mount).
+ */
+function analyzeMountEvents(events, windowMs = 200) {
+  const byInstance = new Map(); // `${component}::${key}` -> events[]
+  for (const e of events) {
+    const id = `${e.component}::${e.key ?? ""}`;
+    if (!byInstance.has(id)) byInstance.set(id, []);
+    byInstance.get(id).push(e);
+  }
+  const perComponent = {};
+  let doubleMountCount = 0;
+  const doubleMounts = [];
+  for (const [id, evts] of byInstance) {
+    evts.sort((a, b) => a.seq - b.seq);
+    const mounts = evts.filter((e) => e.phase === "mount");
+    const unmounts = evts.filter((e) => e.phase === "unmount");
+    const [component, key] = id.split("::");
+    perComponent[id] = {
+      component,
+      key: key || null,
+      mounts: mounts.length,
+      unmounts: unmounts.length,
+      first_mount_ts: mounts[0]?.ts ?? null,
+      last_mount_ts: mounts[mounts.length - 1]?.ts ?? null,
+    };
+    // Strict-mode fingerprint: mount → unmount → mount, tight window.
+    if (evts.length >= 3 &&
+        evts[0].phase === "mount" &&
+        evts[1].phase === "unmount" &&
+        evts[2].phase === "mount" &&
+        (evts[2].ts - evts[0].ts) < windowMs) {
+      doubleMountCount += 1;
+      doubleMounts.push({
+        component,
+        key: key || null,
+        mount1_ts: evts[0].ts,
+        unmount_ts: evts[1].ts,
+        mount2_ts: evts[2].ts,
+        gap_ms: Math.round(evts[2].ts - evts[0].ts),
+      });
+    }
+  }
+  return {
+    total_events: events.length,
+    instances: Object.keys(perComponent).length,
+    per_component: perComponent,
+    double_mounts: doubleMounts,
+    suspected_strict_mode: doubleMountCount > 0,
+  };
+}
+
 // One-time process warmup: hit the homepage a few times to compile Vite
 // modules and warm the CDN edge cache for hero assets. Failures here are
 // non-fatal — the retry loop handles genuine boot issues per viewport.
