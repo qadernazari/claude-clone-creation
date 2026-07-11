@@ -604,3 +604,69 @@ function ChartSection(props: {
     </div>
   );
 }
+
+function MultiLineChart({
+  labels,
+  series,
+  unit,
+  maxY,
+  height = 200,
+  format = (v: number) => v.toFixed(0),
+}: {
+  labels: string[];
+  series: Array<{ color: string; values: Array<number | null> }>;
+  unit: string;
+  maxY?: number;
+  height?: number;
+  format?: (v: number) => string;
+}) {
+  const w = 800;
+  const h = height;
+  const pad = { l: 44, r: 12, t: 10, b: 24 };
+  const innerW = w - pad.l - pad.r;
+  const innerH = h - pad.t - pad.b;
+  const n = labels.length;
+  const stepX = n > 1 ? innerW / (n - 1) : innerW;
+  const allY = series.flatMap((s) => s.values.filter((v): v is number => v != null));
+  const computedMax = allY.length ? Math.max(...allY) : 1;
+  const yMax = maxY ?? computedMax;
+  const gridLines = 4;
+
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto" role="img">
+      {Array.from({ length: gridLines + 1 }).map((_, i) => {
+        const y = pad.t + (innerH * i) / gridLines;
+        const v = yMax - (yMax * i) / gridLines;
+        return (
+          <g key={i}>
+            <line x1={pad.l} y1={y} x2={w - pad.r} y2={y} stroke="currentColor" strokeOpacity={0.08} />
+            <text x={pad.l - 6} y={y + 3} textAnchor="end" fontSize={10} fill="currentColor" opacity={0.6}>
+              {format(v)}{unit}
+            </text>
+          </g>
+        );
+      })}
+      {series.map((s, si) => {
+        const path = s.values
+          .map((v, i) => {
+            if (v == null) return null;
+            const x = pad.l + i * stepX;
+            const y = pad.t + innerH - (v / Math.max(1, yMax)) * innerH;
+            return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+          })
+          .filter(Boolean)
+          .join(" ");
+        return <path key={si} d={path} fill="none" stroke={s.color} strokeWidth={2} />;
+      })}
+      {labels.length > 0 && (
+        <>
+          <text x={pad.l} y={h - 6} fontSize={10} fill="currentColor" opacity={0.6}>{labels[0]}</text>
+          <text x={w - pad.r} y={h - 6} textAnchor="end" fontSize={10} fill="currentColor" opacity={0.6}>
+            {labels[labels.length - 1]}
+          </text>
+        </>
+      )}
+    </svg>
+  );
+}
+
