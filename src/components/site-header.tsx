@@ -101,7 +101,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     if (!open) return;
     const html = document.documentElement;
     const body = document.body;
-    const scrollY = window.scrollY || html.scrollTop || 0;
     const previousHtml = {
       overflow: html.style.overflow,
       overscrollBehavior: html.style.overscrollBehavior,
@@ -109,11 +108,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     };
     const previousBody = {
       overflow: body.style.overflow,
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -123,11 +117,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     html.style.overflow = "hidden";
     html.style.overscrollBehavior = "none";
     body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
+    body.style.touchAction = "none";
     document.addEventListener("keydown", onKey);
 
     return () => {
@@ -135,12 +125,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
       html.style.overflow = previousHtml.overflow;
       html.style.overscrollBehavior = previousHtml.overscrollBehavior;
       body.style.overflow = previousBody.overflow;
-      body.style.position = previousBody.position;
-      body.style.top = previousBody.top;
-      body.style.left = previousBody.left;
-      body.style.right = previousBody.right;
-      body.style.width = previousBody.width;
-      window.scrollTo(0, scrollY);
+      body.style.touchAction = "";
       requestAnimationFrame(() => {
         html.style.scrollBehavior = previousHtml.scrollBehavior;
       });
@@ -351,10 +336,10 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
   return (
     <>
     <header
-        className={`site-header fixed top-0 z-30 w-full transition-all duration-500 ${
+        className={`site-header fixed top-0 z-30 w-full transition-[background-color,border-color,backdrop-filter] duration-300 ${
           hasHero && !scrolled
             ? "border-b border-transparent bg-transparent backdrop-blur-none"
-            : "border-b border-cream/8 bg-bg-0/90 backdrop-blur-xl"
+            : "border-b border-cream/8 bg-bg-0/95 md:bg-bg-0/90 md:backdrop-blur-xl"
         }`}
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
@@ -364,7 +349,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       >
         <div
           dir="ltr"
-          className={`mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 md:px-10 transition-all duration-500 ${
+          className={`mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 md:px-10 transition-[padding] duration-300 ${
             scrolled ? "md:py-3" : "md:py-5"
           }`}
         >
