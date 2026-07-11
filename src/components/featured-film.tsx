@@ -167,16 +167,6 @@ const POS_CLASS: Record<string, string> = {
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   const { locale, num, year, t } = useLocale();
-  useEffect(() => {
-    if (!eager) return;
-    let cancelled = false;
-    void import("@/lib/hero-perf").then((m) => {
-      if (!cancelled) m.measureHeroLCP();
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [eager]);
   // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const landscapeImage = film.thumbnail_url || film.cover_url;
@@ -187,6 +177,27 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   ]
     .filter(Boolean)
     .join(", ");
+  useEffect(() => {
+    if (!eager) return;
+    let cancelled = false;
+    // Match the SSR preload media queries in src/routes/index.tsx so
+    // preload_url reflects what the browser actually fetched for this cycle.
+    const isMobile =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(max-width: 767px)").matches;
+    const preloadUrl = isMobile ? portraitImage : landscapeImage;
+    const correlationId =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    void import("@/lib/hero-perf").then((m) => {
+      if (!cancelled) m.measureHeroLCP({ correlationId, preloadUrl });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [eager, portraitImage, landscapeImage]);
   const fallbackBg =
     film.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
