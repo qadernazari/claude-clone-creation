@@ -133,6 +133,10 @@ export const Route = createFileRoute("/api/public/perf/hero")({
             effective_type: s(p.effective_type, 16),
             downlink: n(p.downlink),
             ua_mobile: b(p.ua_mobile),
+            delivery_type: s(p.delivery_type, 32),
+            preload_cache_hit: b(p.preload_cache_hit),
+            resource_initiator: s(p.resource_initiator, 32),
+            resource_count: n(p.resource_count),
             country,
           };
           // Single-line log so it aggregates cleanly in worker logs.
@@ -161,6 +165,10 @@ export const Route = createFileRoute("/api/public/perf/hero")({
               downlink: line.downlink,
               ua_mobile: line.ua_mobile,
               country: line.country,
+              delivery_type: line.delivery_type,
+              preload_cache_hit: line.preload_cache_hit,
+              resource_initiator: line.resource_initiator,
+              resource_count: toInt(line.resource_count),
             });
           } catch (dbErr) {
             console.error("hero_perf insert failed:", dbErr);
