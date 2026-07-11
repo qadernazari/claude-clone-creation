@@ -387,6 +387,9 @@ function HeroPerfPage() {
         </div>
       </div>
 
+      <PerfReportsList />
+
+
       <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-3">
         <div>
           <label className="text-xs text-muted-foreground block mb-1">Range</label>
