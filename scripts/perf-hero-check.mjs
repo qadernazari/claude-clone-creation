@@ -22,6 +22,8 @@
  * Exits 0 on pass, 1 on any failed assertion (across all viewports).
  */
 import { chromium } from "playwright";
+import { mkdir, unlink } from "node:fs/promises";
+import { join as joinPath } from "node:path";
 
 // ---------- Optional config file ----------
 // Load a JSON config from PERF_HERO_CONFIG (or ./perf-hero.config.json if it
