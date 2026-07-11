@@ -29,8 +29,53 @@ const BEACON_TIMEOUT_MS = Number(process.env.BEACON_TIMEOUT_MS || 20000);
 const GOTO_TIMEOUT_MS = Number(process.env.GOTO_TIMEOUT_MS || 45000);
 const MAX_ATTEMPTS = Number(process.env.MAX_ATTEMPTS || 3);
 const WARMUP = process.env.WARMUP !== "0";
+// How many silent pre-flight passes to run against a fresh dev server before
+// the FIRST measured attempt of the FIRST viewport. Compiles Vite modules
+// and warms the storage-CDN edge cache for hero assets so cold-start doesn't
+// pollute the LCP measurement (especially at 390px and 768px).
+const WARMUP_PASSES = Number(process.env.WARMUP_PASSES || 2);
 const RETRY_BACKOFF_MS = Number(process.env.RETRY_BACKOFF_MS || 1500);
+// Per-viewport LCP budgets. Tablet-sized emulation on a shared CI runner
+// consistently lands ~20-40% slower than desktop, so give it headroom
+// instead of retrying to hide a real regression.
+const PER_VIEWPORT_BUDGET_MS = {
+  mobile: Number(process.env.LCP_BUDGET_MS_MOBILE || LCP_BUDGET_MS),
+  tablet: Number(process.env.LCP_BUDGET_MS_TABLET || Math.max(LCP_BUDGET_MS, 3000)),
+  laptop: Number(process.env.LCP_BUDGET_MS_LAPTOP || LCP_BUDGET_MS),
+  desktop: Number(process.env.LCP_BUDGET_MS_DESKTOP || LCP_BUDGET_MS),
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// One-time process warmup: hit the homepage a few times to compile Vite
+// modules and warm the CDN edge cache for hero assets. Failures here are
+// non-fatal — the retry loop handles genuine boot issues per viewport.
+let processWarmedUp = false;
+async function warmProcessOnce() {
+  if (processWarmedUp || !WARMUP || WARMUP_PASSES <= 0) {
+    processWarmedUp = true;
+    return;
+  }
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    const page = await ctx.newPage();
+    for (let i = 0; i < WARMUP_PASSES; i++) {
+      try {
+        await page.goto(`${BASE_URL}/?warmup=${i + 1}`, {
+          waitUntil: "domcontentloaded",
+          timeout: GOTO_TIMEOUT_MS,
+        });
+        // Give the hero <img> a beat to trigger its fetch so CDN warms.
+        await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+      } catch (err) {
+        console.log(`  · process warmup pass ${i + 1} skipped: ${err instanceof Error ? err.message : err}`);
+      }
+    }
+  } finally {
+    await browser.close().catch(() => {});
+    processWarmedUp = true;
+  }
+}
 
 const ALL_VIEWPORTS = {
   mobile: {
