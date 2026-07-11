@@ -1,42 +1,56 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 
 // Compact beacon endpoint for hero LCP measurements. Logs a single line
-// per submission to worker logs (queryable via `hero_perf` keyword). No DB
-// write — keeps the endpoint dependency-free and cheap under bot traffic.
+// per submission to worker logs (queryable via `hero_perf` keyword). Also
+// persists to hero_perf_logs when the payload passes schema validation.
 
-type Payload = {
-  url?: unknown;
-  correlation_id?: unknown;
-  preload_url?: unknown;
-  lcp_ms?: unknown;
-  lcp_size?: unknown;
-  req_start_ms?: unknown;
-  ttfb_ms?: unknown;
-  resp_end_ms?: unknown;
-  transfer_bytes?: unknown;
-  encoded_bytes?: unknown;
-  protocol?: unknown;
-  decode_ms?: unknown;
-  viewport_w?: unknown;
-  dpr?: unknown;
-  effective_type?: unknown;
-  downlink?: unknown;
-  ua_mobile?: unknown;
-  delivery_type?: unknown;
-  preload_cache_hit?: unknown;
-  resource_initiator?: unknown;
-  resource_count?: unknown;
-};
+// Zod schema for the beacon body. Required fields must be present and
+// well-typed; optional fields are coerced/nullable so old client builds
+// keep working while we tighten the contract. Malformed payloads are
+// rejected with 422 and never touch the DB.
+const nonNegNumber = z.number().finite().min(0);
 
-function n(v: unknown): number | null {
-  return typeof v === "number" && Number.isFinite(v) ? v : null;
-}
-function s(v: unknown, max = 200): string | null {
-  return typeof v === "string" ? v.slice(0, max) : null;
-}
-function b(v: unknown): boolean | null {
-  return typeof v === "boolean" ? v : null;
-}
+const beaconSchema = z
+  .object({
+    // Required identifying / core measurement fields.
+    url: z.string().url().max(300),
+    correlation_id: z
+      .string()
+      .min(1)
+      .max(64)
+      .regex(/^[A-Za-z0-9._:-]+$/, "correlation_id has invalid characters"),
+    lcp_ms: nonNegNumber.max(120_000),
+
+    // Optional preload/render context.
+    preload_url: z.string().url().max(300).nullish(),
+    lcp_size: nonNegNumber.max(50_000_000).nullish(),
+    req_start_ms: z.number().finite().nullish(),
+    ttfb_ms: nonNegNumber.max(120_000).nullish(),
+    resp_end_ms: z.number().finite().nullish(),
+    transfer_bytes: nonNegNumber.max(50_000_000).nullish(),
+    encoded_bytes: nonNegNumber.max(50_000_000).nullish(),
+    protocol: z.string().max(32).nullish(),
+    decode_ms: nonNegNumber.max(120_000).nullish(),
+
+    // Optional device / network / viewport metadata.
+    viewport_w: z.number().int().min(0).max(10_000).nullish(),
+    dpr: z.number().finite().min(0).max(10).nullish(),
+    effective_type: z.string().max(16).nullish(),
+    downlink: z.number().finite().min(0).max(10_000).nullish(),
+    ua_mobile: z.boolean().nullish(),
+
+    // Optional preload-diagnostic fields.
+    delivery_type: z.string().max(32).nullish(),
+    preload_cache_hit: z.boolean().nullish(),
+    resource_initiator: z.string().max(32).nullish(),
+    resource_count: z.number().int().min(0).max(10_000).nullish(),
+  })
+  .strict();
+
+type Beacon = z.infer<typeof beaconSchema>;
+
+
 
 // Per-IP token bucket. Isolate-local (Workers keep the module scope alive
 // across requests within one isolate) — under heavy multi-region traffic
