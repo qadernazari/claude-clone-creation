@@ -74,6 +74,33 @@ export const Route = createFileRoute("/api/public/perf/hero")({
           };
           // Single-line log so it aggregates cleanly in worker logs.
           console.log(JSON.stringify(line));
+
+          // Persist for admin charts (service role — bypasses RLS).
+          try {
+            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+            const toInt = (v: number | null) =>
+              v === null ? null : Math.round(v);
+            await supabaseAdmin.from("hero_perf_logs").insert({
+              url: line.url,
+              lcp_ms: toInt(line.lcp_ms),
+              lcp_size: toInt(line.lcp_size),
+              ttfb_ms: toInt(line.ttfb_ms),
+              resp_end_ms: toInt(line.resp_end_ms),
+              transfer_bytes: toInt(line.transfer_bytes),
+              encoded_bytes: toInt(line.encoded_bytes),
+              protocol: line.protocol,
+              decode_ms: toInt(line.decode_ms),
+              viewport_w: toInt(line.viewport_w),
+              dpr: line.dpr,
+              effective_type: line.effective_type,
+              downlink: line.downlink,
+              ua_mobile: line.ua_mobile,
+              country: line.country,
+            });
+          } catch (dbErr) {
+            console.error("hero_perf insert failed:", dbErr);
+          }
+
           return new Response(null, { status: 204 });
         } catch (err) {
           console.error("hero_perf beacon error:", err);
