@@ -275,7 +275,7 @@ function HeroPerfPage() {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <StatCard title="LCP" p50={stats.lcp.p50} p75={stats.lcp.p75} p95={stats.lcp.p95} unit=" ms" />
         <StatCard title="Decode" p50={stats.dec.p50} p75={stats.dec.p75} p95={stats.dec.p95} unit=" ms" />
         <StatCard
@@ -286,6 +286,17 @@ function HeroPerfPage() {
           unit=" KB"
           digits={1}
         />
+        <div className="rounded-md border border-border bg-card p-4">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+            Preload cache hit
+          </div>
+          <div className="text-2xl font-semibold tabular-nums">
+            {stats.cacheRate == null ? "—" : `${stats.cacheRate.toFixed(1)}%`}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {stats.cacheHits}/{stats.cacheTotal} samples
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -294,13 +305,6 @@ function HeroPerfPage() {
           data={buckets}
           getY={(b) => percentile(b.lcp.slice().sort((a, b) => a - b), 75)}
           color="#60a5fa"
-          unit=" ms"
-        />
-        <ChartSection
-          title="Decode time (p75, ms)"
-          data={buckets}
-          getY={(b) => percentile(b.decode.slice().sort((a, b) => a - b), 75)}
-          color="#f59e0b"
           unit=" ms"
         />
         <ChartSection
@@ -313,6 +317,21 @@ function HeroPerfPage() {
           color="#34d399"
           unit=" KB"
           format={(v) => v.toFixed(1)}
+        />
+        <ChartSection
+          title="Preload cache hit (%)"
+          data={buckets}
+          getY={(b) => (b.cacheTotal ? (b.cacheHits / b.cacheTotal) * 100 : null)}
+          color="#a78bfa"
+          unit="%"
+          format={(v) => v.toFixed(0)}
+        />
+        <ChartSection
+          title="Decode time (p75, ms)"
+          data={buckets}
+          getY={(b) => percentile(b.decode.slice().sort((a, b) => a - b), 75)}
+          color="#f59e0b"
+          unit=" ms"
         />
       </div>
 
