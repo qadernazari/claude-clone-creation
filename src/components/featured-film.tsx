@@ -200,6 +200,17 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   const posClass = POS_CLASS[film.cover_position || "center"] || "object-center";
   const fitClass = isContain ? "object-contain object-center" : `object-cover ${posClass}`;
 
+  const debugEnabled = useHeroDebugEnabled();
+  const debugCandidates = [
+    { name: "portrait (rendered)", url: portraitImage },
+    { name: "mobile_cover_url", url: film.mobile_cover_url },
+    { name: "cover_url", url: film.cover_url },
+    { name: "landscape (rendered)", url: landscapeImage },
+    { name: "thumbnail 1280", url: film.thumbnail_url_1280 },
+    { name: "thumbnail 1920", url: film.thumbnail_url },
+    { name: "thumbnail 2400", url: film.thumbnail_url_2400 },
+  ];
+
   return (
     <div
       className={`flex flex-col gap-8 pb-16 transition-opacity duration-700 ease-out lg:gap-10 ${
