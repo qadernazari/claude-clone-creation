@@ -22,7 +22,7 @@ export function FeaturedFilm() {
 function HeroShell({ children, extra }: { children: React.ReactNode; extra?: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-20 w-full max-w-7xl px-5 sm:px-6 md:mt-24 md:px-12">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-6 md:mt-32 md:px-12">
         <div className="relative">{children}{extra}</div>
       </div>
     </section>
@@ -82,7 +82,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="mx-auto mt-20 w-full max-w-7xl px-5 sm:px-6 md:mt-24 md:px-12">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-6 md:mt-32 md:px-12">
         <div className="relative min-h-[620px] sm:min-h-[680px] lg:min-h-[720px]">
           {slides.map((film, i) => (
             <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
@@ -347,7 +347,7 @@ function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa"
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-16 w-full max-w-7xl px-5 sm:px-6 md:mt-20 md:px-12">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-6 md:mt-32 md:px-12">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="order-2 flex flex-col gap-6 lg:order-1">
             <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
