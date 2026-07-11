@@ -570,7 +570,11 @@ function HeroPerfPage() {
             </thead>
             <tbody>
               {rows.slice(0, 100).map((r, i) => (
-                <tr key={i} className="border-t border-border/60">
+                <tr
+                  key={i}
+                  className="border-t border-border/60 hover:bg-muted/40 cursor-pointer"
+                  onClick={() => setDrawerRow(r)}
+                >
                   <td className="px-3 py-1.5 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="px-3 py-1.5 tabular-nums">{fmt(r.lcp_ms, " ms")}</td>
                   <td className="px-3 py-1.5 tabular-nums">
@@ -597,7 +601,8 @@ function HeroPerfPage() {
                       <button
                         type="button"
                         title={`${r.correlation_id} — click to filter`}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const id = r.correlation_id ?? "";
                           setCorrelationInput(id);
                           setCorrelationId(id);
@@ -612,6 +617,18 @@ function HeroPerfPage() {
                     )}
                   </td>
                   <td className="px-3 py-1.5 max-w-[240px] truncate text-muted-foreground">{r.url ?? "—"}</td>
+                  <td className="px-3 py-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDrawerRow(r);
+                      }}
+                      className="text-xs px-2 py-0.5 rounded border border-border hover:bg-muted"
+                    >
+                      Details
+                    </button>
+                  </td>
                 </tr>
               ))}
               {rows.length === 0 && !isLoading ? (
