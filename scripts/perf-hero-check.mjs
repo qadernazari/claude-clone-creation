@@ -329,23 +329,61 @@ for (const key of selection) {
       }
     });
 
+    const attemptStart = Date.now();
+    const timing = {
+      attempt_start: new Date(attemptStart).toISOString(),
+      warmup_ms: null,
+      warmup_error: null,
+      nav_start_ms: null,       // ms since attemptStart when page.goto(?hero-debug) starts
+      nav_ms: null,             // duration of page.goto until domcontentloaded
+      networkidle_ms: null,     // duration from nav end until networkidle (or timeout)
+      beacon_wait_start_ms: null,
+      beacon_wait_ms: null,
+      dom_snapshot_ms: null,
+      cache_probe_ms: null,
+      total_ms: null,
+    };
+    const beaconWait = {
+      resolved: false,           // did the /api/public/perf/hero request fire?
+      reason: null,              // "resolved" | "timeout" | "nav_error" | "unknown"
+      timed_out: false,
+      timeout_ms: BEACON_TIMEOUT_MS,
+      elapsed_ms: null,          // wall-clock spent in the race
+      resolved_at_ms: null,      // ms since attemptStart when the beacon POST fired
+      first_seen_at_ms: null,    // same as resolved_at_ms; kept for symmetry
+    };
     const result = {
       ok: false,
       reason: "",
       thumb: localThumb,
       cover: localCover,
       beacon: null,
+      lastBeacon: null,   // populated even when the attempt fails (may be null, partial, or malformed)
       renderedSrc: null,
       cacheProbe: null,
       domPreloads: [],
       activePreload: null,
       attempt,
+      timing,
+      beaconWait,
+    };
+    // Record when the beacon request fires (from within the page.on("request") hook above,
+    // which mutates `localBeacon`). We piggyback on `beaconResolve` by wrapping it.
+    const originalBeaconResolve = beaconResolve;
+    beaconResolve = () => {
+      if (beaconWait.first_seen_at_ms == null) {
+        beaconWait.first_seen_at_ms = Date.now() - attemptStart;
+        beaconWait.resolved_at_ms = beaconWait.first_seen_at_ms;
+        beaconWait.resolved = true;
+      }
+      originalBeaconResolve();
     };
     try {
       if (WARMUP) {
         // Warm on every attempt: retries fire precisely when the previous
         // attempt was slow, so re-warming the module graph and CDN edge is
         // the whole point.
+        const warmupStart = Date.now();
         try {
           await page.goto(`${BASE_URL}/?warmup=1&attempt=${attempt}`, {
             waitUntil: "domcontentloaded",
@@ -353,27 +391,47 @@ for (const key of selection) {
           });
           await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
         } catch (err) {
-          console.log(`    · warmup skipped: ${err instanceof Error ? err.message : err}`);
+          timing.warmup_error = err instanceof Error ? err.message : String(err);
+          console.log(`    · warmup skipped: ${timing.warmup_error}`);
         }
+        timing.warmup_ms = Date.now() - warmupStart;
       }
 
+      timing.nav_start_ms = Date.now() - attemptStart;
+      const navStart = Date.now();
       await page.goto(`${BASE_URL}/?hero-debug=1`, {
         waitUntil: "domcontentloaded",
         timeout: GOTO_TIMEOUT_MS,
       });
+      timing.nav_ms = Date.now() - navStart;
+      const idleStart = Date.now();
       try {
         await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
       } catch {
         // dev-server HMR keeps network alive; beacon race below is authoritative.
       }
-      await Promise.race([
-        beaconPromise,
-        new Promise((_, r) =>
-          setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
-        ),
-      ]);
+      timing.networkidle_ms = Date.now() - idleStart;
+
+      timing.beacon_wait_start_ms = Date.now() - attemptStart;
+      const beaconStart = Date.now();
+      try {
+        await Promise.race([
+          beaconPromise,
+          new Promise((_, r) =>
+            setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
+          ),
+        ]);
+        beaconWait.reason = beaconWait.resolved ? "resolved" : "unknown";
+      } catch (err) {
+        beaconWait.timed_out = true;
+        beaconWait.reason = "timeout";
+        throw err;
+      } finally {
+        beaconWait.elapsed_ms = Date.now() - beaconStart;
+      }
       await sleep(250);
 
+      const domStart = Date.now();
       const domSnapshot = await page.evaluate(() => {
         const imgs = Array.from(document.querySelectorAll("main img"));
         const visible = imgs.find((i) => {
@@ -399,8 +457,10 @@ for (const key of selection) {
       localRenderedSrc = domSnapshot.rendered;
       result.domPreloads = domSnapshot.preloads;
       result.activePreload = domSnapshot.activePreload;
+      timing.dom_snapshot_ms = Date.now() - domStart;
 
       // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
+      const cacheProbeStart = Date.now();
       const lcpUrl = localRenderedSrc || localBeacon?.url || null;
       if (lcpUrl) {
         const reloadCdpHits = [];
@@ -469,6 +529,8 @@ for (const key of selection) {
           signals: { cdpHit, rtHit, fastHit },
         };
       }
+      timing.cache_probe_ms = Date.now() - cacheProbeStart;
+
 
       if (!localBeacon || typeof localBeacon.lcp_ms !== "number") {
         result.reason = "beacon missing lcp_ms";
@@ -496,10 +558,19 @@ for (const key of selection) {
       }
     } catch (err) {
       result.reason = err instanceof Error ? err.message : String(err);
+      // If we bailed before the beacon race even started, mark the wait explicitly.
+      if (!beaconWait.reason) {
+        beaconWait.reason = "nav_error";
+      }
     } finally {
       result.beacon = localBeacon;
+      // `lastBeacon` is always populated (may be null / partial / malformed) so
+      // failed attempts still surface whatever the page attempted to POST.
+      result.lastBeacon = localBeacon;
       result.renderedSrc = localRenderedSrc;
       result.cacheProbe = cacheProbe;
+      timing.total_ms = Date.now() - attemptStart;
+
 
       // Attempts that failed to capture the beacon or hit the LCP budget get a
       // full HAR + a screenshot of the page state at the point of failure.
@@ -547,14 +618,24 @@ for (const key of selection) {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     console.log(`  attempt ${attempt}/${MAX_ATTEMPTS}…`);
     const r = await singleAttempt(attempt);
-    attemptsMeta.push({
+    const meta = {
       attempt,
       ok: r.ok,
       reason: r.reason || null,
       lcp_ms: r.beacon?.lcp_ms ?? null,
       har_path: r.harPath || null,
       screenshot_path: r.screenshotPath || null,
-    });
+    };
+    // On failure, attach the wait outcome, the last-seen beacon payload
+    // (may be null / partial / malformed), and a phase timing breakdown so
+    // reviewers can tell nav-slow from beacon-slow without opening the HAR.
+    if (!r.ok) {
+      meta.beacon_wait = r.beaconWait;
+      meta.last_beacon = r.lastBeacon;
+      meta.timing = r.timing;
+    }
+    attemptsMeta.push(meta);
+
     if (r.ok) {
       attemptResult = r;
       if (attempt > 1) console.log(`  · recovered on attempt ${attempt}`);
