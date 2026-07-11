@@ -189,12 +189,14 @@ function HeroPerfPage() {
   const [country, setCountry] = useState<string>("all");
   const [preloadCacheHit, setPreloadCacheHit] = useState<CacheFilter>("all");
   const [deliveryType, setDeliveryType] = useState<string>("all");
+  const [correlationInput, setCorrelationInput] = useState<string>("");
+  const [correlationId, setCorrelationId] = useState<string>("");
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ["admin", "hero-perf", hours, effectiveType, country, preloadCacheHit, deliveryType],
+    queryKey: ["admin", "hero-perf", hours, effectiveType, country, preloadCacheHit, deliveryType, correlationId],
     queryFn: () =>
-      fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType } }),
+      fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType, correlationId: correlationId || undefined } }),
   });
 
   const rows = data?.rows ?? [];
