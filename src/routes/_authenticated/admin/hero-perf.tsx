@@ -357,6 +357,43 @@ function HeroPerfPage() {
             ))}
           </select>
         </div>
+        <div className="flex-1 min-w-[220px]">
+          <label className="text-xs text-muted-foreground block mb-1">Correlation ID</label>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setCorrelationId(correlationInput.trim());
+            }}
+            className="flex gap-1"
+          >
+            <input
+              type="text"
+              value={correlationInput}
+              onChange={(e) => setCorrelationInput(e.target.value)}
+              placeholder="Paste UUID or 8-char prefix"
+              spellCheck={false}
+              className="flex-1 text-xs font-mono rounded-md border border-border bg-background px-2 py-1.5"
+            />
+            <button
+              type="submit"
+              className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent"
+            >
+              Find
+            </button>
+            {correlationId ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setCorrelationInput("");
+                  setCorrelationId("");
+                }}
+                className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent"
+              >
+                Clear
+              </button>
+            ) : null}
+          </form>
+        </div>
         <div className="ml-auto text-xs text-muted-foreground">
           {isLoading ? "Loading…" : `${data?.total ?? 0} samples`}
         </div>
