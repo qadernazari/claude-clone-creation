@@ -167,15 +167,20 @@ function StatCard({ title, p50, p75, p95, unit, digits = 0 }: {
   );
 }
 
+type CacheFilter = "all" | "hit" | "miss" | "unknown";
+
 function HeroPerfPage() {
   const [hours, setHours] = useState(24);
   const [effectiveType, setEffectiveType] = useState<string>("all");
   const [country, setCountry] = useState<string>("all");
+  const [preloadCacheHit, setPreloadCacheHit] = useState<CacheFilter>("all");
+  const [deliveryType, setDeliveryType] = useState<string>("all");
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ["admin", "hero-perf", hours, effectiveType, country],
-    queryFn: () => fetchFn({ data: { hours, effectiveType, country } }),
+    queryKey: ["admin", "hero-perf", hours, effectiveType, country, preloadCacheHit, deliveryType],
+    queryFn: () =>
+      fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType } }),
   });
 
   const rows = data?.rows ?? [];
@@ -264,6 +269,32 @@ function HeroPerfPage() {
             ))}
           </select>
         </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Preload cache</label>
+          <select
+            value={preloadCacheHit}
+            onChange={(e) => setPreloadCacheHit(e.target.value as CacheFilter)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All</option>
+            <option value="hit">Hit</option>
+            <option value="miss">Miss</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Delivery type</label>
+          <select
+            value={deliveryType}
+            onChange={(e) => setDeliveryType(e.target.value)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All</option>
+            {(data?.deliveryTypes ?? []).map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
         <div className="ml-auto text-xs text-muted-foreground">
           {isLoading ? "Loading…" : `${data?.total ?? 0} samples`}
         </div>
@@ -345,6 +376,9 @@ function HeroPerfPage() {
                 <th className="px-3 py-2">LCP</th>
                 <th className="px-3 py-2">Bytes</th>
                 <th className="px-3 py-2">Cache</th>
+                <th className="px-3 py-2">Delivery</th>
+                <th className="px-3 py-2">Initiator</th>
+                <th className="px-3 py-2">Res.</th>
                 <th className="px-3 py-2">VP</th>
                 <th className="px-3 py-2">Type</th>
                 <th className="px-3 py-2">Country</th>
@@ -370,6 +404,9 @@ function HeroPerfPage() {
                       <span className="text-amber-500">miss</span>
                     )}
                   </td>
+                  <td className="px-3 py-1.5">{r.delivery_type ?? "—"}</td>
+                  <td className="px-3 py-1.5">{r.resource_initiator ?? "—"}</td>
+                  <td className="px-3 py-1.5 tabular-nums">{r.resource_count ?? "—"}</td>
                   <td className="px-3 py-1.5 tabular-nums">{r.viewport_w ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.effective_type ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.country ?? "—"}</td>
@@ -397,7 +434,7 @@ function HeroPerfPage() {
               ))}
               {rows.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={10} className="px-3 py-6 text-center text-muted-foreground">
+                  <td colSpan={13} className="px-3 py-6 text-center text-muted-foreground">
                     No samples in this window.
                   </td>
                 </tr>

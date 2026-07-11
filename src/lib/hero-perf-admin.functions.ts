@@ -6,6 +6,8 @@ const InputSchema = z.object({
   hours: z.number().int().min(1).max(24 * 30).default(24),
   effectiveType: z.string().max(16).optional(),
   country: z.string().max(8).optional(),
+  preloadCacheHit: z.enum(["all", "hit", "miss", "unknown"]).default("all"),
+  deliveryType: z.string().max(32).optional(),
 });
 
 export type HeroPerfRow = {
@@ -15,6 +17,9 @@ export type HeroPerfRow = {
   decode_ms: number | null;
   transfer_bytes: number | null;
   preload_cache_hit: boolean | null;
+  delivery_type: string | null;
+  resource_initiator: string | null;
+  resource_count: number | null;
   viewport_w: number | null;
   effective_type: string | null;
   country: string | null;
@@ -26,8 +31,12 @@ export type HeroPerfResponse = {
   rows: HeroPerfRow[];
   effectiveTypes: string[];
   countries: string[];
+  deliveryTypes: string[];
   total: number;
 };
+
+const SELECT_COLS =
+  "created_at, correlation_id, lcp_ms, decode_ms, transfer_bytes, preload_cache_hit, delivery_type, resource_initiator, resource_count, viewport_w, effective_type, country, ua_mobile, url";
 
 export const getHeroPerfLogs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -49,9 +58,7 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
 
     let q = supabaseAdmin
       .from("hero_perf_logs")
-      .select(
-        "created_at, correlation_id, lcp_ms, decode_ms, transfer_bytes, preload_cache_hit, viewport_w, effective_type, country, ua_mobile, url",
-      )
+      .select(SELECT_COLS)
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(5000);
@@ -62,6 +69,12 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
     if (data.country && data.country !== "all") {
       q = q.eq("country", data.country);
     }
+    if (data.deliveryType && data.deliveryType !== "all") {
+      q = q.eq("delivery_type", data.deliveryType);
+    }
+    if (data.preloadCacheHit === "hit") q = q.eq("preload_cache_hit", true);
+    else if (data.preloadCacheHit === "miss") q = q.eq("preload_cache_hit", false);
+    else if (data.preloadCacheHit === "unknown") q = q.is("preload_cache_hit", null);
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -70,7 +83,7 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
     // options don't collapse to a single value once a filter is applied).
     const { data: facets } = await supabaseAdmin
       .from("hero_perf_logs")
-      .select("effective_type, country")
+      .select("effective_type, country, delivery_type")
       .gte("created_at", since)
       .limit(5000);
 
@@ -80,11 +93,15 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
     const countries = Array.from(
       new Set((facets ?? []).map((r) => r.country).filter(Boolean) as string[])
     ).sort();
+    const deliveryTypes = Array.from(
+      new Set((facets ?? []).map((r) => r.delivery_type).filter(Boolean) as string[])
+    ).sort();
 
     return {
       rows: (rows ?? []) as HeroPerfRow[],
       effectiveTypes,
       countries,
+      deliveryTypes,
       total: rows?.length ?? 0,
     };
   });
