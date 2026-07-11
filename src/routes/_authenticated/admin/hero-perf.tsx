@@ -404,6 +404,9 @@ function HeroPerfPage() {
                       <span className="text-amber-500">miss</span>
                     )}
                   </td>
+                  <td className="px-3 py-1.5">{r.delivery_type ?? "—"}</td>
+                  <td className="px-3 py-1.5">{r.resource_initiator ?? "—"}</td>
+                  <td className="px-3 py-1.5 tabular-nums">{r.resource_count ?? "—"}</td>
                   <td className="px-3 py-1.5 tabular-nums">{r.viewport_w ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.effective_type ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.country ?? "—"}</td>
