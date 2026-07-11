@@ -1,7 +1,12 @@
 {
-  "$comment": "Copy to perf-hero.config.json (or point PERF_HERO_CONFIG at it) to override LCP + transfer budgets and preload gate expectations without editing scripts/perf-hero-check.mjs. Env vars still win: LCP_BUDGET_MS_<VP>, TRANSFER_BUDGET_BYTES_<VP>, EXPECT_BUCKET_<VP>, FORBID_BUCKET_<VP>, HERO_SELECTOR_<VP> (VP = MOBILE | TABLET | LAPTOP | DESKTOP).",
+  "$comment": "Copy to perf-hero.config.json (or point PERF_HERO_CONFIG at it) to override LCP + transfer budgets and preload gate expectations without editing scripts/perf-hero-check.mjs. `preload_buckets` maps orientation (portrait|landscape|…) to a Supabase storage bucket name; each viewport can then declare `preload_orientation` instead of hardcoding bucket names. Explicit `expect_bucket`/`forbid_bucket` still take precedence over orientation. Env vars still win over the file: LCP_BUDGET_MS_<VP>, TRANSFER_BUDGET_BYTES_<VP>, EXPECT_BUCKET_<VP>, FORBID_BUCKET_<VP>, HERO_SELECTOR_<VP> (VP = MOBILE | TABLET | LAPTOP | DESKTOP).",
   "lcp_budget_ms": 2000,
   "transfer_budget_bytes": 500000,
+  "preload_buckets": {
+    "portrait": "film-covers",
+    "landscape": "film-thumbnails"
+  },
+
   "viewports": {
     "mobile": {
       "lcp_budget_ms": 1800,
