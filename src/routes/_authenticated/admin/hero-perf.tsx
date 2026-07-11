@@ -191,6 +191,7 @@ function HeroPerfPage() {
   const [deliveryType, setDeliveryType] = useState<string>("all");
   const [correlationInput, setCorrelationInput] = useState<string>("");
   const [correlationId, setCorrelationId] = useState<string>("");
+  const [drawerRow, setDrawerRow] = useState<HeroPerfRow | null>(null);
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -566,11 +567,16 @@ function HeroPerfPage() {
                 <th className="px-3 py-2">Mobile</th>
                 <th className="px-3 py-2">Correlation</th>
                 <th className="px-3 py-2">URL</th>
+                <th className="px-3 py-2"></th>
               </tr>
             </thead>
             <tbody>
               {rows.slice(0, 100).map((r, i) => (
-                <tr key={i} className="border-t border-border/60">
+                <tr
+                  key={i}
+                  className="border-t border-border/60 hover:bg-muted/40 cursor-pointer"
+                  onClick={() => setDrawerRow(r)}
+                >
                   <td className="px-3 py-1.5 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="px-3 py-1.5 tabular-nums">{fmt(r.lcp_ms, " ms")}</td>
                   <td className="px-3 py-1.5 tabular-nums">
@@ -597,7 +603,8 @@ function HeroPerfPage() {
                       <button
                         type="button"
                         title={`${r.correlation_id} — click to filter`}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const id = r.correlation_id ?? "";
                           setCorrelationInput(id);
                           setCorrelationId(id);
@@ -612,11 +619,23 @@ function HeroPerfPage() {
                     )}
                   </td>
                   <td className="px-3 py-1.5 max-w-[240px] truncate text-muted-foreground">{r.url ?? "—"}</td>
+                  <td className="px-3 py-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDrawerRow(r);
+                      }}
+                      className="text-xs px-2 py-0.5 rounded border border-border hover:bg-muted"
+                    >
+                      Details
+                    </button>
+                  </td>
                 </tr>
               ))}
               {rows.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={13} className="px-3 py-6 text-center text-muted-foreground">
+                  <td colSpan={14} className="px-3 py-6 text-center text-muted-foreground">
                     No samples in this window.
                   </td>
                 </tr>
@@ -625,6 +644,7 @@ function HeroPerfPage() {
           </table>
         </div>
       </div>
+      <BeaconDrawer row={drawerRow} onClose={() => setDrawerRow(null)} />
     </div>
   );
 }
@@ -799,5 +819,120 @@ function Field({ label, value, mono = false }: { label: string; value: string; m
       <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className={`tabular-nums ${mono ? "font-mono text-xs break-all" : ""}`}>{value}</div>
     </div>
+  );
+}
+
+function BeaconDrawer({ row, onClose }: { row: HeroPerfRow | null; onClose: () => void }) {
+  const open = !!row;
+  const fields: Array<[string, unknown]> = row
+    ? [
+        ["created_at", row.created_at],
+        ["correlation_id", row.correlation_id],
+        ["url", row.url],
+        ["preload_url", row.preload_url],
+        ["lcp_ms", row.lcp_ms],
+        ["lcp_size", row.lcp_size],
+        ["ttfb_ms", row.ttfb_ms],
+        ["resp_end_ms", row.resp_end_ms],
+        ["decode_ms", row.decode_ms],
+        ["transfer_bytes", row.transfer_bytes],
+        ["encoded_bytes", row.encoded_bytes],
+        ["protocol", row.protocol],
+        ["delivery_type", row.delivery_type],
+        ["preload_cache_hit", row.preload_cache_hit],
+        ["resource_initiator", row.resource_initiator],
+        ["resource_count", row.resource_count],
+        ["viewport_w", row.viewport_w],
+        ["dpr", row.dpr],
+        ["effective_type", row.effective_type],
+        ["downlink", row.downlink],
+        ["country", row.country],
+        ["ua_mobile", row.ua_mobile],
+      ]
+    : [];
+
+  const preloadMatches =
+    row && row.preload_url && row.url ? row.preload_url === row.url : null;
+
+  return (
+    <>
+      <div
+        onClick={onClose}
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity ${
+          open ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      />
+      <aside
+        role="dialog"
+        aria-hidden={!open}
+        className={`fixed right-0 top-0 z-50 h-full w-full max-w-lg bg-background border-l border-border shadow-xl transition-transform duration-200 ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {row ? (
+          <div className="flex h-full flex-col">
+            <header className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <div>
+                <div className="text-sm font-medium">Beacon details</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {row.correlation_id ?? "(no correlation id)"}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-sm px-2 py-1 rounded border border-border hover:bg-muted"
+              >
+                Close
+              </button>
+            </header>
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm">
+              {preloadMatches != null ? (
+                <div
+                  className={`rounded border px-3 py-2 text-xs ${
+                    preloadMatches
+                      ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/5"
+                      : "border-amber-500/40 text-amber-500 bg-amber-500/5"
+                  }`}
+                >
+                  preload_url {preloadMatches ? "matches" : "does NOT match"} rendered url
+                </div>
+              ) : null}
+
+              <div className="grid grid-cols-1 gap-y-2">
+                {fields.map(([k, v]) => (
+                  <div
+                    key={k}
+                    className="grid grid-cols-[140px_1fr] gap-3 items-start border-b border-border/40 pb-1.5"
+                  >
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {k}
+                    </div>
+                    <div className="font-mono text-xs break-all">
+                      {v == null || v === "" ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : typeof v === "boolean" ? (
+                        String(v)
+                      ) : (
+                        String(v)
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                  Raw payload
+                </div>
+                <pre className="text-[11px] leading-relaxed font-mono bg-muted/40 border border-border rounded p-3 overflow-x-auto">
+                  {JSON.stringify(row, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </aside>
+    </>
   );
 }

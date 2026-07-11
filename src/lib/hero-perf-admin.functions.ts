@@ -15,14 +15,22 @@ export type HeroPerfRow = {
   created_at: string;
   correlation_id: string | null;
   lcp_ms: number | null;
+  lcp_size: number | null;
+  ttfb_ms: number | null;
+  resp_end_ms: number | null;
   decode_ms: number | null;
   transfer_bytes: number | null;
+  encoded_bytes: number | null;
+  protocol: string | null;
   preload_cache_hit: boolean | null;
+  preload_url: string | null;
   delivery_type: string | null;
   resource_initiator: string | null;
   resource_count: number | null;
   viewport_w: number | null;
+  dpr: number | null;
   effective_type: string | null;
+  downlink: number | null;
   country: string | null;
   ua_mobile: boolean | null;
   url: string | null;
@@ -37,7 +45,7 @@ export type HeroPerfResponse = {
 };
 
 const SELECT_COLS =
-  "created_at, correlation_id, lcp_ms, decode_ms, transfer_bytes, preload_cache_hit, delivery_type, resource_initiator, resource_count, viewport_w, effective_type, country, ua_mobile, url";
+  "created_at, correlation_id, lcp_ms, lcp_size, ttfb_ms, resp_end_ms, decode_ms, transfer_bytes, encoded_bytes, protocol, preload_cache_hit, preload_url, delivery_type, resource_initiator, resource_count, viewport_w, dpr, effective_type, downlink, country, ua_mobile, url";
 
 export const getHeroPerfLogs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
