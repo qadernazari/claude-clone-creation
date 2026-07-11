@@ -1023,6 +1023,38 @@ ${(() => {
     <tbody>${rows}</tbody>
   </table>`;
 })()}
+${(() => {
+  // Per-viewport budget chart: two side-by-side bars per viewport
+  // (LCP vs budget, transfer_bytes vs budget). Bar width scales relative to
+  // the budget so 100% == exactly at budget; anything past that is red.
+  if (reportRuns.length === 0) return "";
+  const bar = (actual, budget, unit) => {
+    if (actual == null || !budget) {
+      return `<div class="bar-wrap"><div class="bar none">—</div><div class="bar-label">— / ${budget ?? "—"} ${unit}</div></div>`;
+    }
+    const pct = Math.min(150, Math.round((actual / budget) * 100));
+    const over = actual > budget;
+    const label = unit === "B"
+      ? `${fmtBytes(actual)} / ${fmtBytes(budget)}`
+      : `${actual} / ${budget} ${unit}`;
+    return `<div class="bar-wrap">
+      <div class="bar-track"><div class="bar ${over ? "over" : "ok"}" style="width:${Math.min(100, pct)}%"></div>${over ? `<div class="bar-overflow" style="width:${Math.min(50, pct - 100)}%"></div>` : ""}</div>
+      <div class="bar-label ${over ? "over-budget" : ""}">${label}${over ? ` <strong>(${pct}%)</strong>` : ` (${pct}%)`}</div>
+    </div>`;
+  };
+  const rows = reportRuns.map((r) => `
+    <tr>
+      <td>${esc(r.viewport_label)}</td>
+      <td>${bar(r.lcp_ms, r.lcp_budget_ms, "ms")}</td>
+      <td>${bar(r.transfer_bytes_initial || null, r.transfer_budget_bytes, "B")}</td>
+    </tr>
+  `).join("");
+  return `<h2 style="margin-top:2rem">Per-viewport budgets</h2>
+    <table class="budget-table">
+      <thead><tr><th>Viewport</th><th>LCP vs budget</th><th>Initial transfer vs budget</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+})()}
 ${runCards}
 </body></html>`;
 
