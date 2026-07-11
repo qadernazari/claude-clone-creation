@@ -461,8 +461,10 @@ for (const key of selection) {
       localRenderedSrc = domSnapshot.rendered;
       result.domPreloads = domSnapshot.preloads;
       result.activePreload = domSnapshot.activePreload;
+      timing.dom_snapshot_ms = Date.now() - domStart;
 
       // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
+      const cacheProbeStart = Date.now();
       const lcpUrl = localRenderedSrc || localBeacon?.url || null;
       if (lcpUrl) {
         const reloadCdpHits = [];
