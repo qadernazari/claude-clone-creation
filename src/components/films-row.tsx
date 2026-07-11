@@ -292,8 +292,8 @@ export function FilmsRow() {
 
   return (
     <div className="space-y-14 md:space-y-16">
-      {rails.map((r) => (
-        <Rail
+      {rails.map((r, i) => (
+        <LazyRail
           key={r.key}
           eyebrow={r.eyebrow}
           title={r.title}
@@ -301,6 +301,8 @@ export function FilmsRow() {
           films={r.films}
           locale={locale}
           year={year}
+          // First rail is always in view — render immediately, no observer needed.
+          {...(i === 0 ? { } : {})}
         />
       ))}
     </div>
