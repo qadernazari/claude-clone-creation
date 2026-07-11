@@ -8,13 +8,19 @@ on:
   workflow_dispatch:
     inputs:
       lcp_budget_ms:
-        description: "LCP budget in ms"
+        description: "Global LCP budget in ms (per-viewport overrides via repo vars)"
         required: false
         default: "2500"
       viewports:
         description: "Comma-separated viewport keys"
         required: false
         default: "mobile,tablet,laptop,desktop"
+      require_preload_cache_hit:
+        description: "Require preload_cache_hit=true. 'default' = mobile only; 'true'/'false' apply to all viewports."
+        required: false
+        default: "default"
+        type: choice
+        options: ["default", "true", "false"]
 
 concurrency:
   group: perf-hero-${{ github.ref }}
