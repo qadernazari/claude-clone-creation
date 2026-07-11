@@ -14,6 +14,7 @@ import { template as membershipActivated } from './membership-activated'
 import { template as membershipRevoked } from './membership-revoked'
 import { template as membershipGranted } from './membership-granted'
 import { template as membershipRestored } from './membership-restored'
+import { template as heroPerfAlert } from './hero-perf-alert'
 
 
 
@@ -42,6 +43,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'membership-revoked': membershipRevoked,
   'membership-granted': membershipGranted,
   'membership-restored': membershipRestored,
+  'hero-perf-alert': heroPerfAlert,
 }
 
 

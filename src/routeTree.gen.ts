@@ -67,6 +67,7 @@ import { Route as ApiPublicPerfHeroRouteImport } from './routes/api/public/perf/
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicIrPaymentsCallbackRouteImport } from './routes/api/public/ir-payments/callback'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
+import { Route as ApiPublicHooksHeroPerfAlertsRouteImport } from './routes/api/public/hooks/hero-perf-alerts'
 import { Route as AuthenticatedAdminFilmsFilmIdCreditsRouteImport } from './routes/_authenticated/admin/films.$filmId.credits'
 import { Route as AuthenticatedAdminFilmsFilmIdAnalyticsRouteImport } from './routes/_authenticated/admin/films.$filmId.analytics'
 
@@ -382,6 +383,12 @@ const ApiPublicHooksTrialRemindersRoute =
     path: '/api/public/hooks/trial-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksHeroPerfAlertsRoute =
+  ApiPublicHooksHeroPerfAlertsRouteImport.update({
+    id: '/api/public/hooks/hero-perf-alerts',
+    path: '/api/public/hooks/hero-perf-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminFilmsFilmIdCreditsRoute =
   AuthenticatedAdminFilmsFilmIdCreditsRouteImport.update({
     id: '/$filmId/credits',
@@ -444,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/hero-perf-alerts': typeof ApiPublicHooksHeroPerfAlertsRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/ir-payments/callback': typeof ApiPublicIrPaymentsCallbackRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -504,6 +512,7 @@ export interface FileRoutesByTo {
   '/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/hero-perf-alerts': typeof ApiPublicHooksHeroPerfAlertsRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/ir-payments/callback': typeof ApiPublicIrPaymentsCallbackRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -567,6 +576,7 @@ export interface FileRoutesById {
   '/_authenticated/watch/$slug': typeof AuthenticatedWatchSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/hero-perf-alerts': typeof ApiPublicHooksHeroPerfAlertsRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/ir-payments/callback': typeof ApiPublicIrPaymentsCallbackRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -630,6 +640,7 @@ export interface FileRouteTypes {
     | '/watch/$slug'
     | '/lovable/email/suppression'
     | '/admin/'
+    | '/api/public/hooks/hero-perf-alerts'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/ir-payments/callback'
     | '/api/public/payments/webhook'
@@ -690,6 +701,7 @@ export interface FileRouteTypes {
     | '/watch/$slug'
     | '/lovable/email/suppression'
     | '/admin'
+    | '/api/public/hooks/hero-perf-alerts'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/ir-payments/callback'
     | '/api/public/payments/webhook'
@@ -752,6 +764,7 @@ export interface FileRouteTypes {
     | '/_authenticated/watch/$slug'
     | '/lovable/email/suppression'
     | '/_authenticated/admin/'
+    | '/api/public/hooks/hero-perf-alerts'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/ir-payments/callback'
     | '/api/public/payments/webhook'
@@ -787,6 +800,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FilmsSlugRoute: typeof FilmsSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicHooksHeroPerfAlertsRoute: typeof ApiPublicHooksHeroPerfAlertsRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicIrPaymentsCallbackRoute: typeof ApiPublicIrPaymentsCallbackRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -1206,6 +1220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTrialRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/hero-perf-alerts': {
+      id: '/api/public/hooks/hero-perf-alerts'
+      path: '/api/public/hooks/hero-perf-alerts'
+      fullPath: '/api/public/hooks/hero-perf-alerts'
+      preLoaderRoute: typeof ApiPublicHooksHeroPerfAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/films/$filmId/credits': {
       id: '/_authenticated/admin/films/$filmId/credits'
       path: '/$filmId/credits'
@@ -1341,6 +1362,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FilmsSlugRoute: FilmsSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicHooksHeroPerfAlertsRoute: ApiPublicHooksHeroPerfAlertsRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicIrPaymentsCallbackRoute: ApiPublicIrPaymentsCallbackRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
