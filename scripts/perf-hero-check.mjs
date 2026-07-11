@@ -654,6 +654,48 @@ for (const key of selection) {
       result.activePreload = domSnapshot.activePreload;
       timing.dom_snapshot_ms = Date.now() - domStart;
 
+      // ----- Preload-link mutation assertion -----
+      // The document-start init script (see addInitScript above) records every
+      // `<link rel="preload" as="image">` mutation on <head>. A well-behaved
+      // SSR should emit each film-covers preload EXACTLY once ("initial") and
+      // never add/remove/duplicate it during hydration or re-render.
+      const preloadMutations = await page.evaluate(() =>
+        Array.isArray(window.__preloadMutations)
+          ? window.__preloadMutations.slice()
+          : [],
+      );
+      const byHref = new Map();
+      for (const m of preloadMutations) {
+        if (!m.href) continue;
+        const rec = byHref.get(m.href) || {
+          href: m.href,
+          initial: 0,
+          added: 0,
+          removed: 0,
+          attr: 0,
+          firstTs: m.ts,
+          lastTs: m.ts,
+        };
+        rec[m.op] = (rec[m.op] || 0) + 1;
+        rec.lastTs = m.ts;
+        byHref.set(m.href, rec);
+      }
+      const preloadStats = Array.from(byHref.values());
+      const filmCoverPreloads = preloadStats.filter((r) =>
+        /film-covers/.test(r.href),
+      );
+      const preloadViolations = filmCoverPreloads.filter(
+        (r) => r.added > 0 || r.removed > 0 || r.initial + r.added > 1,
+      );
+      result.preloadMutations = preloadMutations;
+      result.preloadStats = preloadStats;
+      result.preloadAssertion = {
+        film_cover_urls: filmCoverPreloads.length,
+        violations: preloadViolations,
+        ok: preloadViolations.length === 0,
+      };
+
+
       // ----- Mount tracker: detect StrictMode / double-mount patterns -----
       // The page exposes `window.__heroMounts` when ?hero-debug=1 is set
       // (see src/lib/hero-mount-tracker.ts). We correlate mount events
