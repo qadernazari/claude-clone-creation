@@ -769,3 +769,24 @@ label[class*=rounded-]:has(> input),
 label[class*=rounded-]:has(> textarea) {
   border-radius: 6px !important;
 }
+
+/* Hero image shimmer skeleton — visible until the LCP image decodes */
+.hero-shimmer {
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0) 20%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0) 80%
+    );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: hero-shimmer 1.6s ease-in-out infinite;
+}
+@keyframes hero-shimmer {
+  0% { background-position: 220% 0; }
+  100% { background-position: -20% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-shimmer { animation: none; }
+}
