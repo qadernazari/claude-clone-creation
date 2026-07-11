@@ -76,7 +76,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
     >
-      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-3">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-12 sm:px-6 md:mt-32 md:px-12 md:pb-10">
         <div className="relative">
           {slides.map((film, i) => (
             <SlideImageFrame
@@ -104,7 +104,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
             />
           ))}
         </div>
-        <div className="mt-5 md:hidden">
+        <div className="mt-8 md:hidden">
           <SlideDetails film={slides[index]} />
         </div>
       </div>
@@ -126,7 +126,7 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 rounded-full border border-cream/10 bg-black/50 px-3.5 py-2 shadow-xl backdrop-blur-md md:px-4 md:py-2.5">
+    <div className="flex items-center justify-center gap-3 rounded-full border border-cream/10 bg-black/50 px-4 py-2.5 shadow-xl backdrop-blur-md md:gap-4 md:px-5 md:py-3">
       <button
         type="button"
         onClick={onPrev}
@@ -138,7 +138,7 @@ function SliderControls({
         </svg>
       </button>
 
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-center gap-3 px-1 md:gap-4">
         {Array.from({ length: count }).map((_, i) => {
           const active = i === index;
           return (
@@ -280,7 +280,7 @@ function SlideImageFrame({
         />
 
         {/* The frame — drop backdrop-blur on mobile to avoid compositor stalls */}
-        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-3">
+        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-3 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-4">
           <div
             ref={frameRef}
             className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
@@ -327,7 +327,7 @@ function SlideImageFrame({
             />
             {active ? (
               <div
-                className="pointer-events-none absolute inset-0 z-30 hidden flex-col justify-between p-5 md:flex lg:p-7"
+                className="pointer-events-none absolute inset-0 z-30 hidden flex-col justify-between p-6 md:flex lg:p-8"
                 aria-hidden={!active}
               >
                 <div className="pointer-events-auto flex flex-wrap items-center gap-3">
@@ -370,12 +370,12 @@ function SlideImageFrame({
           </div>
         </div>
         {active && controls ? (
-          <div className="mt-4 flex justify-center md:hidden">{controls}</div>
+          <div className="mt-6 flex justify-center md:hidden">{controls}</div>
         ) : null}
 
         {/* Corner accents */}
-        <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-3 -left-3 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
+        <div className="pointer-events-none absolute -right-4 -top-4 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-5 lg:-top-5 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
+        <div className="pointer-events-none absolute -bottom-4 -left-4 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-5 lg:-left-5 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
       </div>
     </div>
   );
