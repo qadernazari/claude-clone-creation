@@ -533,6 +533,8 @@ for (const key of selection) {
           signals: { cdpHit, rtHit, fastHit },
         };
       }
+      timing.cache_probe_ms = Date.now() - cacheProbeStart;
+
 
       if (!localBeacon || typeof localBeacon.lcp_ms !== "number") {
         result.reason = "beacon missing lcp_ms";
