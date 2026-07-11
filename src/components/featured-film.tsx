@@ -165,9 +165,10 @@ const POS_CLASS: Record<string, string> = {
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   const { locale, num, year, t } = useLocale();
-  // Prefer portrait/cover image for the framed 2:3 presentation
-  const portraitImage = film.cover_url || film.thumbnail_url;
-  const srcSet = [
+  // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
+  const portraitImage = film.cover_url || film.mobile_cover_url || film.thumbnail_url;
+  const landscapeImage = film.thumbnail_url || film.cover_url;
+  const landscapeSrcSet = [
     film.thumbnail_url_1280 ? `${film.thumbnail_url_1280} 1280w` : null,
     film.thumbnail_url ? `${film.thumbnail_url} 1920w` : null,
     film.thumbnail_url_2400 ? `${film.thumbnail_url_2400} 2400w` : null,
@@ -190,15 +191,73 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
 
   return (
     <div
-      className={`grid grid-cols-1 items-center gap-10 pb-16 transition-opacity duration-700 ease-out lg:grid-cols-2 lg:gap-16 ${
+      className={`flex flex-col gap-8 pb-16 transition-opacity duration-700 ease-out lg:gap-10 ${
         active
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
       aria-hidden={!active}
     >
+      {/* Framed image — 2:3 on mobile, 16:9 on desktop */}
+      <div className="relative flex justify-center">
+        <div className="group relative w-full max-w-[380px] lg:max-w-none">
+          {/* Ambient amber glow */}
+          <div
+            className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]"
+            aria-hidden
+          />
+
+          {/* The frame */}
+          <div
+            className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl backdrop-blur-sm transition-transform duration-500 group-hover:scale-[1.01] lg:rounded-[2rem] lg:p-3"
+          >
+            <div
+              className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] lg:aspect-video lg:rounded-[1.4rem]"
+              style={{ background: fallbackBg }}
+            >
+              {portraitImage ? (
+                <img
+                  src={portraitImage}
+                  alt={title}
+                  width={800}
+                  height={1200}
+                  className={`absolute inset-0 block h-full w-full lg:hidden ${fitClass} ${active ? "cine-img-in" : ""}`}
+                  loading={eager ? "eager" : "lazy"}
+                  decoding="async"
+                  sizes="(max-width: 1023px) 90vw, 0px"
+                />
+              ) : null}
+              {landscapeImage ? (
+                <img
+                  src={landscapeImage}
+                  srcSet={landscapeSrcSet || undefined}
+                  alt={title}
+                  width={1920}
+                  height={1080}
+                  className={`absolute inset-0 hidden h-full w-full lg:block ${fitClass} ${active ? "cine-img-in" : ""}`}
+                  loading={eager ? "eager" : "lazy"}
+                  decoding="async"
+                  sizes="(min-width: 1024px) 1200px, 0px"
+                />
+              ) : null}
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Corner accents */}
+          <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
+          <div className="pointer-events-none absolute -bottom-3 -left-3 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
+        </div>
+      </div>
+
       {/* Text column */}
-      <div className="order-2 flex flex-col gap-6 lg:order-1">
+      <div className="flex flex-col gap-5 lg:gap-6">
         <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
             {locale === "fa" ? "اختصاصی" : "Original"}
@@ -209,7 +268,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           </span>
         </div>
 
-        <h2 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-5xl lg:text-6xl xl:text-7xl">
+        <h2 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-4xl lg:text-5xl xl:text-6xl">
           {title}
         </h2>
 
@@ -228,7 +287,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
         </div>
 
         {synopsis ? (
-          <p className="max-w-lg text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
+          <p className="max-w-3xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
             {synopsis}
           </p>
         ) : null}
@@ -252,50 +311,6 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
             {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
           </Link>
           <WatchlistCta slug={film.slug} locale={locale} />
-        </div>
-      </div>
-
-      {/* Framed image column */}
-      <div className="relative order-1 flex justify-center lg:order-2 lg:justify-end">
-        <div className="group relative w-full max-w-[420px]">
-          {/* Ambient amber glow */}
-          <div
-            className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]"
-            aria-hidden
-          />
-
-          {/* The frame */}
-          <div
-            className="relative z-10 rounded-[2rem] border border-cream/10 bg-cream/5 p-3 shadow-2xl backdrop-blur-sm transition-transform duration-500 group-hover:scale-[1.02]"
-            style={{ background: portraitImage ? undefined : fallbackBg }}
-          >
-            <div className="relative aspect-[2/3] overflow-hidden rounded-[1.4rem]" style={{ background: fallbackBg }}>
-              {portraitImage ? (
-                <img
-                  src={portraitImage}
-                  srcSet={srcSet || undefined}
-                  alt={title}
-                  width={800}
-                  height={1200}
-                  className={`absolute inset-0 h-full w-full ${fitClass} ${active ? "cine-img-in" : ""}`}
-                  loading={eager ? "eager" : "lazy"}
-                  decoding="async"
-                  sizes="(min-width: 1024px) 420px, 90vw"
-                />
-              ) : null}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Corner accents */}
-          <div className="pointer-events-none absolute -right-4 -top-4 h-16 w-16 rounded-tr-[1.5rem] border-r-2 border-t-2 border-amber/30" aria-hidden />
-          <div className="pointer-events-none absolute -bottom-4 -left-4 h-16 w-16 rounded-bl-[1.5rem] border-b-2 border-l-2 border-amber/30" aria-hidden />
         </div>
       </div>
     </div>
