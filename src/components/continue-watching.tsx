@@ -45,7 +45,7 @@ export function ContinueWatching() {
         )
         .eq("user_id", user!.id)
         .eq("completed", false)
-        .gt("position_seconds", 15)
+        .gt("position_seconds", 5)
         .order("last_watched_at", { ascending: false })
         .limit(8);
       if (error) throw error;

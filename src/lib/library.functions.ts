@@ -151,7 +151,7 @@ export const getLibrary = createServerFn({ method: "GET" })
     const ticketRows = (ticketsRes.data ?? []) as any[];
 
     const continueWatching = progressRows
-      .filter((r) => r.film && !r.completed && r.position_seconds > 10)
+      .filter((r) => r.film && !r.completed && r.position_seconds > 5)
       .slice(0, 20)
       .map((r) => ({
         film: r.film as LibraryFilm,
