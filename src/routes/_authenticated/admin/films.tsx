@@ -407,6 +407,7 @@ function FilmEditorModal({
         synopsis_en: d.synopsis_en?.trim() || null,
         synopsis_fa: d.synopsis_fa?.trim() || null,
         category: d.category || null,
+        language: d.category === "walking-tour" ? null : (d.language?.trim() || "fa"),
         year: d.year ?? null,
         duration_min: d.duration_min ?? null,
         price_cents: Number(d.price_cents) || 0,
