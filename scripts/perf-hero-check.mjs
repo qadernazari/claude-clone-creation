@@ -1764,8 +1764,58 @@ if (SUPABASE_URL && SERVICE_ROLE && process.env.PERF_UPLOAD !== "0") {
 }
 
 if (totalFailures.length) {
+  // Compact per-breakpoint mismatch table so CI logs surface which viewport
+  // broke its preload contract without paging through the full JSON.
+  const failedRuns = reportRuns.filter((r) => !r.passed);
+  if (failedRuns.length) {
+    const bucketFromUrl = (url, run) => {
+      if (!url) return "—";
+      if (url.includes(run.expect_bucket)) return run.expect_bucket;
+      if (url.includes(run.forbid_bucket)) return `${run.forbid_bucket} (FORBIDDEN)`;
+      const seg = url.match(/\/storage\/v1\/object\/(?:public\/)?([^/]+)\//);
+      return seg ? seg[1] : "unknown";
+    };
+    const rows = failedRuns.map((r) => {
+      const actual = bucketFromUrl(r.rendered_src, r);
+      const leaked =
+        r.transfer_bytes_covers > 0 && r.forbid_bucket === "film-covers"
+          ? "film-covers"
+          : r.transfer_bytes_thumbnails > 0 &&
+              r.forbid_bucket === "film-thumbnails"
+            ? "film-thumbnails"
+            : null;
+      return {
+        vp: `${r.viewport_key} (${r.viewport.width}px)`,
+        expect: r.expect_bucket,
+        actual: leaked ? `${actual} + leaked ${leaked}` : actual,
+        first_fail: r.failures[0] || "(no message)",
+        more: Math.max(0, r.failures.length - 1),
+      };
+    });
+    const w = (arr, key) => Math.max(key.length, ...arr.map((r) => r[key].length));
+    const cols = {
+      vp: Math.min(24, w(rows, "vp")),
+      expect: Math.min(22, w(rows, "expect")),
+      actual: Math.min(32, w(rows, "actual")),
+    };
+    const pad = (s, n) => (s.length > n ? s.slice(0, n - 1) + "…" : s.padEnd(n));
+    console.error("\nPer-breakpoint mismatch report:");
+    console.error(
+      `  ${pad("viewport", cols.vp)}  ${pad("expected", cols.expect)}  ${pad("actual", cols.actual)}  failing assertion`,
+    );
+    console.error(
+      `  ${"-".repeat(cols.vp)}  ${"-".repeat(cols.expect)}  ${"-".repeat(cols.actual)}  ${"-".repeat(40)}`,
+    );
+    for (const row of rows) {
+      const suffix = row.more > 0 ? ` (+${row.more} more)` : "";
+      console.error(
+        `  ${pad(row.vp, cols.vp)}  ${pad(row.expect, cols.expect)}  ${pad(row.actual, cols.actual)}  ${row.first_fail}${suffix}`,
+      );
+    }
+  }
   console.error(`\n${totalFailures.length} assertion(s) failed across viewports:`);
   for (const f of totalFailures) console.error(`  - ${f}`);
   process.exit(1);
 }
 console.log("\nAll hero perf regression checks passed across all viewports.");
+
