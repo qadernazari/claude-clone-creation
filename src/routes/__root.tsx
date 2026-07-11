@@ -222,8 +222,8 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html:
               `window.__IRAN_REGION__=${JSON.stringify({ region, locale })};` +
-              `try{var vv=window.visualViewport;var r=document.documentElement;var u=function(){if(!vv)return;var g=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);r.style.setProperty('--vv-chrome-bottom',Math.round(g)+'px');};u();if(vv){vv.addEventListener('resize',function(){requestAnimationFrame(u);},{passive:true});}}catch(e){}` +
               `try{var p=location.pathname;if(p.indexOf('/watch/')===0||p.indexOf('/auth')===0||p.indexOf('/reset-password')===0||p.indexOf('/checkout')===0||p.indexOf('/admin')===0){document.documentElement.dataset.tabbar='hidden';}}catch(e){}` +
+
               (locale === "fa"
                 ? ""
                  : `try{var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(
