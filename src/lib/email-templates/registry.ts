@@ -43,6 +43,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'membership-revoked': membershipRevoked,
   'membership-granted': membershipGranted,
   'membership-restored': membershipRestored,
+  'hero-perf-alert': heroPerfAlert,
 }
 
 
