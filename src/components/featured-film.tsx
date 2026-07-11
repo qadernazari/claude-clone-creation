@@ -327,7 +327,7 @@ function SlideImageFrame({
             />
             {active ? (
               <div
-                className="pointer-events-none absolute inset-0 z-30 hidden flex-col justify-between p-5 md:flex lg:p-7"
+                className="pointer-events-none absolute inset-0 z-30 hidden flex-col justify-between p-6 md:flex lg:p-8"
                 aria-hidden={!active}
               >
                 <div className="pointer-events-auto flex flex-wrap items-center gap-3">
