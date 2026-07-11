@@ -141,6 +141,8 @@ const REPORT_STAMP = new Date().toISOString().replace(/[:.]/g, "-");
 const totalFailures = [];
 const reportRuns = [];
 
+await warmProcessOnce();
+
 for (const key of selection) {
   const vp = ALL_VIEWPORTS[key];
   if (!vp) {
