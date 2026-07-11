@@ -103,8 +103,8 @@ for (const key of selection) {
     continue;
   }
   console.log(`\n=== ${vp.label} ===`);
-  const failures = [];
-  const checks = [];
+  let failures = [];
+  let checks = [];
   const pass = (msg) => {
     console.log(`  ✓ ${msg}`);
     checks.push({ ok: true, msg });
@@ -115,71 +115,162 @@ for (const key of selection) {
     checks.push({ ok: false, msg });
   };
 
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    viewport: { width: vp.width, height: vp.height },
-    deviceScaleFactor: vp.deviceScaleFactor,
-    userAgent: vp.userAgent,
-  });
-  const page = await context.newPage();
-
-  const thumbTransfers = [];
-  const coverTransfers = [];
+  // Attempt state (populated on the winning attempt).
+  let thumbTransfers = [];
+  let coverTransfers = [];
   let beacon = null;
-  let beaconResolve;
-  const beaconPromise = new Promise((r) => (beaconResolve = r));
-
-  const captureTransfer = async (resp, bucket) => {
-    let bytes = null;
-    const cl = resp.headers()["content-length"];
-    if (cl) bytes = Number(cl);
-    if (bytes == null || Number.isNaN(bytes)) {
-      try {
-        const buf = await resp.body();
-        bytes = buf.length;
-      } catch {
-        bytes = null;
-      }
-    }
-    const record = {
-      bucket,
-      url: resp.url(),
-      status: resp.status(),
-      bytes,
-      from_cache: resp.fromServiceWorker() || false,
-    };
-    (bucket === "film-thumbnails" ? thumbTransfers : coverTransfers).push(record);
-  };
-
-  page.on("response", (resp) => {
-    const u = resp.url();
-    if (u.includes("film-thumbnails")) captureTransfer(resp, "film-thumbnails");
-    else if (u.includes("film-covers")) captureTransfer(resp, "film-covers");
-  });
-
-  page.on("request", (req) => {
-    if (req.url().endsWith("/api/public/perf/hero")) {
-      try {
-        beacon = JSON.parse(req.postData() || "{}");
-      } catch {
-        beacon = { raw: req.postData() };
-      }
-      beaconResolve();
-    }
-  });
-
   let renderedSrc = null;
+  let attemptsMeta = [];
   const runStart = Date.now();
 
-  try {
-    await page.goto(`${BASE_URL}/?hero-debug=1`, { waitUntil: "networkidle" });
-    await Promise.race([
-      beaconPromise,
-      new Promise((_, r) =>
-        setTimeout(() => r(new Error("beacon timeout")), BEACON_TIMEOUT_MS),
-      ),
-    ]);
+  // A single navigation + observation. Returns { ok, reason, transfers, beacon, renderedSrc }.
+  const singleAttempt = async (attempt) => {
+    const localThumb = [];
+    const localCover = [];
+    let localBeacon = null;
+    let localRenderedSrc = null;
+    let beaconResolve;
+    const beaconPromise = new Promise((r) => (beaconResolve = r));
 
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+      viewport: { width: vp.width, height: vp.height },
+      deviceScaleFactor: vp.deviceScaleFactor,
+      userAgent: vp.userAgent,
+    });
+    const page = await context.newPage();
+
+    const captureTransfer = async (resp, bucket) => {
+      let bytes = null;
+      const cl = resp.headers()["content-length"];
+      if (cl) bytes = Number(cl);
+      if (bytes == null || Number.isNaN(bytes)) {
+        try {
+          const buf = await resp.body();
+          bytes = buf.length;
+        } catch {
+          bytes = null;
+        }
+      }
+      const record = {
+        bucket,
+        url: resp.url(),
+        status: resp.status(),
+        bytes,
+        from_cache: resp.fromServiceWorker() || false,
+      };
+      (bucket === "film-thumbnails" ? localThumb : localCover).push(record);
+    };
+    page.on("response", (resp) => {
+      const u = resp.url();
+      if (u.includes("film-thumbnails")) captureTransfer(resp, "film-thumbnails");
+      else if (u.includes("film-covers")) captureTransfer(resp, "film-covers");
+    });
+    page.on("request", (req) => {
+      if (req.url().endsWith("/api/public/perf/hero")) {
+        try {
+          localBeacon = JSON.parse(req.postData() || "{}");
+        } catch {
+          localBeacon = { raw: req.postData() };
+        }
+        beaconResolve();
+      }
+    });
+
+    const result = { ok: false, reason: "", thumb: localThumb, cover: localCover, beacon: null, renderedSrc: null, attempt };
+    try {
+      // On first attempt, do a warm-up prefetch to prime dev-server modules
+      // (Vite cold-start is the primary source of long LCPs / connect timeouts).
+      if (attempt === 1 && WARMUP) {
+        try {
+          await page.goto(`${BASE_URL}/?warmup=1`, {
+            waitUntil: "domcontentloaded",
+            timeout: GOTO_TIMEOUT_MS,
+          });
+        } catch (err) {
+          console.log(`    · warmup skipped: ${err instanceof Error ? err.message : err}`);
+        }
+      }
+
+      await page.goto(`${BASE_URL}/?hero-debug=1`, {
+        waitUntil: "domcontentloaded",
+        timeout: GOTO_TIMEOUT_MS,
+      });
+      // Give the LCP observer + beacon time to fire under load.
+      try {
+        await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
+      } catch {
+        // networkidle may not settle under noisy dev-server HMR; that's fine — beacon race below still holds.
+      }
+      await Promise.race([
+        beaconPromise,
+        new Promise((_, r) =>
+          setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
+        ),
+      ]);
+
+      // Wait a beat so any tail response events land before we read state.
+      await sleep(250);
+
+      localRenderedSrc = await page.evaluate(() => {
+        const imgs = Array.from(document.querySelectorAll("main img"));
+        const visible = imgs.find((i) => {
+          const r = i.getBoundingClientRect();
+          return r.width > 200 && r.height > 200;
+        });
+        return visible instanceof HTMLImageElement
+          ? visible.currentSrc || visible.src
+          : null;
+      });
+
+      if (!localBeacon || typeof localBeacon.lcp_ms !== "number") {
+        result.reason = "beacon missing lcp_ms";
+      } else {
+        result.ok = true;
+      }
+    } catch (err) {
+      result.reason = err instanceof Error ? err.message : String(err);
+    } finally {
+      result.beacon = localBeacon;
+      result.renderedSrc = localRenderedSrc;
+      await browser.close().catch(() => {});
+    }
+    return result;
+  };
+
+  // Retry loop.
+  let attemptResult = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    console.log(`  attempt ${attempt}/${MAX_ATTEMPTS}…`);
+    const r = await singleAttempt(attempt);
+    attemptsMeta.push({
+      attempt,
+      ok: r.ok,
+      reason: r.reason || null,
+      lcp_ms: r.beacon?.lcp_ms ?? null,
+    });
+    if (r.ok) {
+      attemptResult = r;
+      if (attempt > 1) console.log(`  · recovered on attempt ${attempt}`);
+      break;
+    }
+    console.log(`  · attempt ${attempt} failed: ${r.reason || "unknown"}`);
+    if (attempt < MAX_ATTEMPTS) {
+      await sleep(RETRY_BACKOFF_MS * attempt);
+    } else {
+      attemptResult = r; // keep last failed attempt state for the report
+    }
+  }
+
+  thumbTransfers = attemptResult?.thumb || [];
+  coverTransfers = attemptResult?.cover || [];
+  beacon = attemptResult?.beacon || null;
+  renderedSrc = attemptResult?.renderedSrc || null;
+
+  if (!attemptResult?.ok) {
+    fail(`all ${MAX_ATTEMPTS} attempts failed: ${attemptResult?.reason || "unknown"}`);
+  } else {
+    // Assertions on the winning attempt.
     const forbidTransfers =
       vp.forbidBucket === "film-thumbnails" ? thumbTransfers : coverTransfers;
     const expectTransfers =
@@ -194,7 +285,7 @@ for (const key of selection) {
       );
     }
 
-    if (!beacon || typeof beacon.lcp_ms !== "number") {
+    if (typeof beacon?.lcp_ms !== "number") {
       fail("beacon missing or malformed (no lcp_ms)");
     } else if (beacon.lcp_ms <= LCP_BUDGET_MS) {
       pass(`hero LCP ${beacon.lcp_ms}ms <= budget ${LCP_BUDGET_MS}ms`);
@@ -213,7 +304,7 @@ for (const key of selection) {
       fail(`expected 1 unique ${vp.expectBucket}, got ${uniqueExpected}`);
     }
 
-    if (beacon && beacon.preload_url && beacon.url) {
+    if (beacon?.preload_url && beacon?.url) {
       if (beacon.preload_url === beacon.url) {
         pass("beacon preload_url matches LCP entry url");
       } else {
@@ -225,16 +316,6 @@ for (const key of selection) {
       fail("beacon missing preload_url or url");
     }
 
-    renderedSrc = await page.evaluate(() => {
-      const imgs = Array.from(document.querySelectorAll("main img"));
-      const visible = imgs.find((i) => {
-        const r = i.getBoundingClientRect();
-        return r.width > 200 && r.height > 200;
-      });
-      return visible instanceof HTMLImageElement
-        ? visible.currentSrc || visible.src
-        : null;
-    });
     if (!renderedSrc) {
       fail("could not locate rendered hero <img>");
     } else if (renderedSrc.includes(vp.expectBucket)) {
@@ -242,11 +323,8 @@ for (const key of selection) {
     } else {
       fail(`rendered hero src is NOT in ${vp.expectBucket}: ${renderedSrc.slice(0, 120)}…`);
     }
-  } catch (err) {
-    fail(`run failed: ${err instanceof Error ? err.message : String(err)}`);
-  } finally {
-    await browser.close();
   }
+
 
   const sumBytes = (arr) =>
     arr.reduce((s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0), 0);
