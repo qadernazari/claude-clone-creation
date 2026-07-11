@@ -10,6 +10,8 @@
 
 export type PerfPayload = {
   url: string;
+  correlation_id: string | null;
+  preload_url: string | null;
   lcp_ms: number;
   lcp_size: number;
   req_start_ms: number | null;
@@ -24,6 +26,12 @@ export type PerfPayload = {
   effective_type: string | null;
   downlink: number | null;
   ua_mobile: boolean;
+};
+
+export type MeasureHeroLCPOptions = {
+  sampleRate?: number;
+  correlationId?: string;
+  preloadUrl?: string | null;
 };
 
 interface LcpEntry extends PerformanceEntry {
@@ -44,7 +52,19 @@ declare global {
 
 const DEFAULT_SAMPLE_RATE = 0.1;
 
-export function measureHeroLCP(sampleRate: number = DEFAULT_SAMPLE_RATE) {
+export function measureHeroLCP(
+  optsOrRate: MeasureHeroLCPOptions | number = {},
+) {
+  const opts: MeasureHeroLCPOptions =
+    typeof optsOrRate === "number" ? { sampleRate: optsOrRate } : optsOrRate;
+  const sampleRate = opts.sampleRate ?? DEFAULT_SAMPLE_RATE;
+  const correlationId =
+    opts.correlationId ??
+    (typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+  const preloadUrl = opts.preloadUrl ?? null;
+
   if (typeof window === "undefined") return;
   const forced =
     typeof window.location !== "undefined" &&
@@ -93,6 +113,8 @@ export function measureHeroLCP(sampleRate: number = DEFAULT_SAMPLE_RATE) {
 
     const build = (decode_ms: number | null): PerfPayload => ({
       url: url.split("?")[0],
+      correlation_id: correlationId,
+      preload_url: preloadUrl ? preloadUrl.split("?")[0] : null,
       lcp_ms: Math.round(lcp!.startTime),
       lcp_size: lcp!.size,
       req_start_ms: res ? Math.round(res.startTime) : null,
