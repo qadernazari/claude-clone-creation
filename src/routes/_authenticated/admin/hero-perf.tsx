@@ -191,6 +191,7 @@ function HeroPerfPage() {
   const [deliveryType, setDeliveryType] = useState<string>("all");
   const [correlationInput, setCorrelationInput] = useState<string>("");
   const [correlationId, setCorrelationId] = useState<string>("");
+  const [drawerRow, setDrawerRow] = useState<HeroPerfRow | null>(null);
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
