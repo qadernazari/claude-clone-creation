@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { getHeroPerfLogs, listPerfReports, type HeroPerfRow, type PerfReportFile } from "@/lib/hero-perf-admin.functions";
+import { getHeroPerfLogs, listPerfReports, getPerfReportsSummary, type HeroPerfRow, type PerfReportFile, type PerfSummaryResponse } from "@/lib/hero-perf-admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/hero-perf")({
   component: HeroPerfPage,
