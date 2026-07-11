@@ -118,7 +118,7 @@ function SliderControls({
   return (
     <div className="flex justify-center lg:justify-start">
 
-      <div className="pointer-events-auto flex items-center gap-6 lg:gap-8">
+      <div className="flex items-center gap-6 lg:gap-8">
         <div className="flex items-center gap-2">
           <button
             type="button"
