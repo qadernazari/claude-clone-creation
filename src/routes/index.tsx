@@ -102,9 +102,6 @@ function DeferredHomeRails() {
       setShow(true);
     }, 800);
   }, [queryClient]);
-
-
-
   if (!show) {
     return <RailsSkeleton />;
   }
@@ -113,51 +110,38 @@ function DeferredHomeRails() {
     <>
       <Suspense
         fallback={
-          <div className="pt-6 md:pt-10">
-            <RailSkeleton
-              aspect="video"
-              cardWidthMobile="78vw"
-              cardWidthDesktop="400px"
-              headingWidth="12rem"
-            />
-          </div>
+          <RailSkeleton
+            aspect="video"
+            cardWidthMobile="78vw"
+            cardWidthDesktop="400px"
+            headingWidth="12rem"
+          />
         }
       >
-        <div className="pt-6 md:pt-10">
-          <ContinueWatching />
-        </div>
+        <ContinueWatching />
       </Suspense>
       <Suspense
         fallback={
-          <div className="pt-6 md:pt-10">
-            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
-          </div>
+          <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
         }
       >
-        <div className="pt-6 md:pt-10">
-          <NewReleaseRow />
-        </div>
+        <NewReleaseRow />
       </Suspense>
       <Suspense
         fallback={
-          <div className="pt-6 md:pt-10">
-            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
-          </div>
+          <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
         }
       >
-        <div className="pt-6 md:pt-10">
-          <WalkingTourRow />
-        </div>
+        <WalkingTourRow />
       </Suspense>
       <Suspense
         fallback={
-          <div className="space-y-10 pb-16 pt-6 md:space-y-14 md:pb-24 md:pt-10">
-            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
+          <div className="pb-16 md:pb-24">
             <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
           </div>
         }
       >
-        <div className="space-y-10 pb-16 pt-6 md:space-y-14 md:pb-24 md:pt-10">
+        <div className="pb-16 md:pb-24">
           <FilmsRow />
         </div>
       </Suspense>
