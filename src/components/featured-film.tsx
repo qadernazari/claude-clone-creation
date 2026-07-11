@@ -185,15 +185,19 @@ const POS_CLASS: Record<string, string> = {
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   return (
     <div
-      className={`flex flex-col gap-5 pb-5 transition-opacity duration-700 ease-out lg:gap-6 ${
+      className={`grid grid-cols-1 items-center gap-5 transition-opacity duration-700 ease-out md:grid-cols-2 md:gap-8 lg:gap-10 ${
         active
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
       aria-hidden={!active}
     >
-      <SlideImageFrame film={film} active={active} eager={eager} />
-      <SlideDetails film={film} />
+      <div className="order-2 flex flex-col justify-center md:order-1">
+        <SlideDetails film={film} />
+      </div>
+      <div className="order-1 md:order-2">
+        <SlideImageFrame film={film} active={active} eager={eager} />
+      </div>
     </div>
   );
 }
