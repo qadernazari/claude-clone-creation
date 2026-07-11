@@ -376,6 +376,9 @@ function HeroPerfPage() {
                 <th className="px-3 py-2">LCP</th>
                 <th className="px-3 py-2">Bytes</th>
                 <th className="px-3 py-2">Cache</th>
+                <th className="px-3 py-2">Delivery</th>
+                <th className="px-3 py-2">Initiator</th>
+                <th className="px-3 py-2">Res.</th>
                 <th className="px-3 py-2">VP</th>
                 <th className="px-3 py-2">Type</th>
                 <th className="px-3 py-2">Country</th>
