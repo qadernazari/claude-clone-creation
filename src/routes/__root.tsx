@@ -169,23 +169,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       // IranSansX Pro — self-hosted Persian display face. Static file,
       // same-origin, cached by the browser and Cloudflare edge.
+      // NOTE: Do NOT preload the WOFF2 files. The @font-face uses
+      // `font-display: optional` (fallback paints immediately) and the
+      // unicode-range is Arabic-only, so English visitors never need it.
+      // Preloading steals bandwidth from the hero LCP image on mobile
+      // and drops PSI-mobile by 5–10 points for no visible gain.
       { rel: "stylesheet", href: "/fonts/iransansx.css" },
-      // Preload only the two weights used above the fold, WOFF2 only.
-      // Prevents a blank text flash for Persian users on cold cache.
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/IRANSansX-Regular.woff2",
-        crossOrigin: "anonymous" as const,
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/IRANSansX-Medium.woff2",
-        crossOrigin: "anonymous" as const,
-      },
       // Supabase storage is the origin for the hero LCP image.
       {
         rel: "preconnect",
