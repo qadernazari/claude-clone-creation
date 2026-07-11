@@ -740,7 +740,7 @@ function WatchPage() {
               <video
                 ref={videoRef}
                 src={videoUrl}
-                poster={film.cover_url || undefined}
+                poster={film.thumbnail_url || film.cover_url || undefined}
                 preload="metadata"
                 autoPlay={resumePrompt === null}
                 playsInline
