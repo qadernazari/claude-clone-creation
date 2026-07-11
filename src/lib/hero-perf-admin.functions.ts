@@ -120,3 +120,67 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
       total: rows?.length ?? 0,
     };
   });
+
+// ---------- perf-hero report listing ----------
+
+export type PerfReportFile = {
+  name: string;
+  path: string;
+  size: number | null;
+  updated_at: string | null;
+  content_type: string | null;
+  signed_url: string;
+};
+
+export const listPerfReports = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(200).default(50) }).parse(data),
+  )
+  .handler(async ({ data, context }): Promise<{ files: PerfReportFile[] }> => {
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Reports are stored under YYYY-MM-DD/perf-hero-<stamp>.{json,html}
+    // Walk the top-level day folders and merge their contents.
+    const { data: days, error: daysErr } = await supabaseAdmin.storage
+      .from("perf-reports")
+      .list("", { limit: 60, sortBy: { column: "name", order: "desc" } });
+    if (daysErr) throw new Error(daysErr.message);
+
+    const files: PerfReportFile[] = [];
+    for (const day of days ?? []) {
+      if (!day.name || day.name.startsWith(".")) continue;
+      const { data: entries } = await supabaseAdmin.storage
+        .from("perf-reports")
+        .list(day.name, { limit: 500, sortBy: { column: "name", order: "desc" } });
+      for (const f of entries ?? []) {
+        const p = `${day.name}/${f.name}`;
+        const { data: signed } = await supabaseAdmin.storage
+          .from("perf-reports")
+          .createSignedUrl(p, 60 * 30); // 30 min
+        if (!signed?.signedUrl) continue;
+        files.push({
+          name: f.name,
+          path: p,
+          size: (f.metadata as { size?: number } | null)?.size ?? null,
+          updated_at: f.updated_at ?? f.created_at ?? null,
+          content_type: (f.metadata as { mimetype?: string } | null)?.mimetype ?? null,
+          signed_url: signed.signedUrl,
+        });
+        if (files.length >= data.limit) break;
+      }
+      if (files.length >= data.limit) break;
+    }
+
+    files.sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""));
+    return { files };
+  });

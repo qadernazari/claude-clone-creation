@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { getHeroPerfLogs, type HeroPerfRow } from "@/lib/hero-perf-admin.functions";
+import { getHeroPerfLogs, listPerfReports, type HeroPerfRow, type PerfReportFile } from "@/lib/hero-perf-admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/hero-perf")({
   component: HeroPerfPage,
@@ -386,6 +386,9 @@ function HeroPerfPage() {
           </button>
         </div>
       </div>
+
+      <PerfReportsList />
+
 
       <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-3">
         <div>
@@ -1081,5 +1084,84 @@ function BeaconDrawer({ row, onClose }: { row: HeroPerfRow | null; onClose: () =
         ) : null}
       </aside>
     </>
+  );
+}
+
+function fmtReportBytes(n: number | null): string {
+  if (n == null) return "—";
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function PerfReportsList() {
+  const fetchFn = useServerFn(listPerfReports);
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
+    queryKey: ["admin", "perf-reports"],
+    queryFn: () => fetchFn({ data: { limit: 50 } }),
+    staleTime: 60_000,
+  });
+  const files: PerfReportFile[] = data?.files ?? [];
+
+  return (
+    <section className="rounded-md border border-border bg-card">
+      <header className="flex items-center justify-between p-3 border-b border-border">
+        <div>
+          <h2 className="font-medium">Perf-hero reports</h2>
+          <p className="text-xs text-muted-foreground">
+            JSON + HTML uploads from <code>npm run perf:hero</code> (bucket <code>perf-reports</code>). Signed links expire in 30 min.
+          </p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent"
+          disabled={isFetching}
+        >
+          {isFetching ? "Refreshing…" : "Refresh"}
+        </button>
+      </header>
+      <div className="p-3">
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading reports…</p>
+        ) : error ? (
+          <p className="text-sm text-destructive">Failed to load: {(error as Error).message}</p>
+        ) : files.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No reports uploaded yet. Run <code>npm run perf:hero</code> with <code>SUPABASE_URL</code> and
+            <code> SUPABASE_SERVICE_ROLE_KEY</code> set to publish reports here.
+          </p>
+        ) : (
+          <ul className="divide-y divide-border text-sm">
+            {files.map((f) => (
+              <li key={f.path} className="flex items-center justify-between gap-3 py-2">
+                <div className="min-w-0">
+                  <div className="truncate font-mono text-xs">{f.path}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {f.updated_at ? new Date(f.updated_at).toLocaleString() : "—"} · {fmtReportBytes(f.size)}
+                  </div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <a
+                    href={f.signed_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs rounded-md border border-border px-2.5 py-1 hover:bg-accent"
+                  >
+                    {f.name.endsWith(".html") ? "Open" : "View"}
+                  </a>
+                  <a
+                    href={f.signed_url}
+                    download={f.name}
+                    className="text-xs rounded-md border border-border px-2.5 py-1 hover:bg-accent"
+                  >
+                    Download
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }
