@@ -22,6 +22,10 @@ type Payload = {
   effective_type?: unknown;
   downlink?: unknown;
   ua_mobile?: unknown;
+  delivery_type?: unknown;
+  preload_cache_hit?: unknown;
+  resource_initiator?: unknown;
+  resource_count?: unknown;
 };
 
 function n(v: unknown): number | null {
