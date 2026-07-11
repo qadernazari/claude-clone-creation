@@ -47,7 +47,7 @@ async function renderResizedUrl(
   if (!original) return null;
   const parsed = parseSignedObjectUrl(original);
   if (!parsed) return original;
-  const key = `${parsed.bucket}|${parsed.path}|${width}|${height ?? 0}|${resize}|${quality}`;
+  const key = buildSignedUrlCacheKey(parsed.bucket, parsed.path, width, height, resize, quality);
   const cached = GLOBAL_URL_CACHE.get(key);
   if (cached) return cached;
   const existing = cache.get(key);
