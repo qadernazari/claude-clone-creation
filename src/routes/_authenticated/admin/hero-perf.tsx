@@ -189,12 +189,14 @@ function HeroPerfPage() {
   const [country, setCountry] = useState<string>("all");
   const [preloadCacheHit, setPreloadCacheHit] = useState<CacheFilter>("all");
   const [deliveryType, setDeliveryType] = useState<string>("all");
+  const [correlationInput, setCorrelationInput] = useState<string>("");
+  const [correlationId, setCorrelationId] = useState<string>("");
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ["admin", "hero-perf", hours, effectiveType, country, preloadCacheHit, deliveryType],
+    queryKey: ["admin", "hero-perf", hours, effectiveType, country, preloadCacheHit, deliveryType, correlationId],
     queryFn: () =>
-      fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType } }),
+      fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType, correlationId: correlationId || undefined } }),
   });
 
   const rows = data?.rows ?? [];
@@ -355,6 +357,43 @@ function HeroPerfPage() {
             ))}
           </select>
         </div>
+        <div className="flex-1 min-w-[220px]">
+          <label className="text-xs text-muted-foreground block mb-1">Correlation ID</label>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setCorrelationId(correlationInput.trim());
+            }}
+            className="flex gap-1"
+          >
+            <input
+              type="text"
+              value={correlationInput}
+              onChange={(e) => setCorrelationInput(e.target.value)}
+              placeholder="Paste UUID or 8-char prefix"
+              spellCheck={false}
+              className="flex-1 text-xs font-mono rounded-md border border-border bg-background px-2 py-1.5"
+            />
+            <button
+              type="submit"
+              className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent"
+            >
+              Find
+            </button>
+            {correlationId ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setCorrelationInput("");
+                  setCorrelationId("");
+                }}
+                className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent"
+              >
+                Clear
+              </button>
+            ) : null}
+          </form>
+        </div>
         <div className="ml-auto text-xs text-muted-foreground">
           {isLoading ? "Loading…" : `${data?.total ?? 0} samples`}
         </div>
@@ -365,6 +404,12 @@ function HeroPerfPage() {
           {(error as Error).message}
         </div>
       ) : null}
+
+      {correlationId ? (
+        <BeaconDetail correlationId={correlationId} rows={rows} loading={isFetching} />
+      ) : null}
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <StatCard title="LCP" p50={stats.lcp.p50} p75={stats.lcp.p75} p95={stats.lcp.p95} unit=" ms" />
@@ -551,13 +596,14 @@ function HeroPerfPage() {
                     {r.correlation_id ? (
                       <button
                         type="button"
-                        title={`${r.correlation_id} — click to copy`}
+                        title={`${r.correlation_id} — click to filter`}
                         onClick={() => {
-                          if (typeof navigator !== "undefined" && navigator.clipboard) {
-                            void navigator.clipboard.writeText(r.correlation_id ?? "");
-                          }
+                          const id = r.correlation_id ?? "";
+                          setCorrelationInput(id);
+                          setCorrelationId(id);
+                          if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="hover:text-foreground text-muted-foreground"
+                        className="hover:text-foreground text-muted-foreground underline decoration-dotted"
                       >
                         {r.correlation_id.slice(0, 8)}
                       </button>
@@ -670,3 +716,88 @@ function MultiLineChart({
   );
 }
 
+
+function BeaconDetail({
+  correlationId,
+  rows,
+  loading,
+}: {
+  correlationId: string;
+  rows: HeroPerfRow[];
+  loading: boolean;
+}) {
+  const q = correlationId.toLowerCase();
+  const matches = rows.filter((r) => (r.correlation_id ?? "").toLowerCase().startsWith(q));
+  const match = matches[0];
+
+  return (
+    <div className="rounded-md border border-primary/40 bg-primary/5 p-4">
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="text-sm font-medium">
+          Beacon detail
+          <span className="ml-2 font-mono text-xs text-muted-foreground">{correlationId}</span>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {loading ? "Searching…" : `${matches.length} match${matches.length === 1 ? "" : "es"}`}
+        </div>
+      </div>
+      {!match ? (
+        <div className="text-sm text-muted-foreground">
+          No beacon with that correlation ID in this time window. Widen the range or verify the ID.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+          <Field label="Time" value={new Date(match.created_at).toLocaleString()} />
+          <Field label="Correlation" value={match.correlation_id ?? "—"} mono />
+          <Field label="LCP" value={fmt(match.lcp_ms, " ms")} />
+          <Field label="Decode" value={fmt(match.decode_ms, " ms")} />
+          <Field
+            label="Transfer"
+            value={match.transfer_bytes == null ? "—" : `${(match.transfer_bytes / 1024).toFixed(1)} KB`}
+          />
+          <Field
+            label="Preload cache"
+            value={
+              match.preload_cache_hit == null
+                ? "—"
+                : match.preload_cache_hit
+                ? "hit"
+                : "miss"
+            }
+          />
+          <Field label="Delivery" value={match.delivery_type ?? "—"} />
+          <Field label="Initiator" value={match.resource_initiator ?? "—"} />
+          <Field label="Resource count" value={match.resource_count?.toString() ?? "—"} />
+          <Field label="Viewport" value={match.viewport_w?.toString() ?? "—"} />
+          <Field label="Effective type" value={match.effective_type ?? "—"} />
+          <Field label="Country" value={match.country ?? "—"} />
+          <Field
+            label="Mobile"
+            value={match.ua_mobile == null ? "—" : match.ua_mobile ? "yes" : "no"}
+          />
+          <div className="col-span-2 md:col-span-4">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">URL</div>
+            <div className="text-xs font-mono break-all text-muted-foreground">
+              {match.url ?? "—"}
+            </div>
+          </div>
+        </div>
+      )}
+      {matches.length > 1 ? (
+        <div className="mt-3 text-xs text-muted-foreground">
+          Showing the most recent match. {matches.length - 1} older beacon
+          {matches.length - 1 === 1 ? "" : "s"} share this prefix — paste the full UUID to disambiguate.
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function Field({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`tabular-nums ${mono ? "font-mono text-xs break-all" : ""}`}>{value}</div>
+    </div>
+  );
+}
