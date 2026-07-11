@@ -562,10 +562,19 @@ for (const key of selection) {
       }
     } catch (err) {
       result.reason = err instanceof Error ? err.message : String(err);
+      // If we bailed before the beacon race even started, mark the wait explicitly.
+      if (!beaconWait.reason) {
+        beaconWait.reason = "nav_error";
+      }
     } finally {
       result.beacon = localBeacon;
+      // `lastBeacon` is always populated (may be null / partial / malformed) so
+      // failed attempts still surface whatever the page attempted to POST.
+      result.lastBeacon = localBeacon;
       result.renderedSrc = localRenderedSrc;
       result.cacheProbe = cacheProbe;
+      timing.total_ms = Date.now() - attemptStart;
+
 
       // Attempts that failed to capture the beacon or hit the LCP budget get a
       // full HAR + a screenshot of the page state at the point of failure.
