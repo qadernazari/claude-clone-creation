@@ -474,12 +474,13 @@ for (const key of selection) {
       );
     }
 
+    const vpBudget = PER_VIEWPORT_BUDGET_MS[key] ?? LCP_BUDGET_MS;
     if (typeof beacon?.lcp_ms !== "number") {
       fail("beacon missing or malformed (no lcp_ms)");
-    } else if (beacon.lcp_ms <= LCP_BUDGET_MS) {
-      pass(`hero LCP ${beacon.lcp_ms}ms <= budget ${LCP_BUDGET_MS}ms`);
+    } else if (beacon.lcp_ms <= vpBudget) {
+      pass(`hero LCP ${beacon.lcp_ms}ms <= budget ${vpBudget}ms`);
     } else {
-      fail(`hero LCP ${beacon.lcp_ms}ms exceeds budget ${LCP_BUDGET_MS}ms`);
+      fail(`hero LCP ${beacon.lcp_ms}ms exceeds budget ${vpBudget}ms`);
     }
 
     // Mobile (390px) must serve the LCP hero from the preload cache.
