@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
@@ -82,20 +82,28 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-8 sm:px-6 md:mt-32 md:px-12 md:pb-12">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
         <div className="relative">
           {slides.map((film, i) => (
-            <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
+            <SlideImageFrame
+              key={film.id}
+              film={film}
+              active={i === index}
+              eager={i === 0}
+              controls={
+                <SliderControls
+                  count={slides.length}
+                  index={index}
+                  onPrev={prev}
+                  onNext={next}
+                  onGo={go}
+                />
+              }
+            />
           ))}
         </div>
-        <div className="mt-6 md:mt-8">
-          <SliderControls
-            count={slides.length}
-            index={index}
-            onPrev={prev}
-            onNext={next}
-            onGo={go}
-          />
+        <div className="mt-5 md:mt-6">
+          <SlideDetails film={slides[index]} />
         </div>
       </div>
     </section>
@@ -173,11 +181,34 @@ const POS_CLASS: Record<string, string> = {
 };
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
+  return (
+    <div
+      className={`flex flex-col gap-5 pb-5 transition-opacity duration-700 ease-out lg:gap-6 ${
+        active
+          ? "relative z-10 opacity-100"
+          : "pointer-events-none absolute inset-0 z-0 opacity-0"
+      }`}
+      aria-hidden={!active}
+    >
+      <SlideImageFrame film={film} active={active} eager={eager} />
+      <SlideDetails film={film} />
+    </div>
+  );
+}
+
+function SlideImageFrame({
+  film,
+  active,
+  eager,
+  controls,
+}: {
+  film: HomeFeaturedFilm;
+  active: boolean;
+  eager: boolean;
+  controls?: ReactNode;
+}) {
   const [loaded, setLoaded] = useState(false);
 
-  
-  const { locale, num, year, t } = useLocale();
-  // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const landscapeImage = film.thumbnail_url || film.cover_url;
   const landscapeSrcSet = [
@@ -190,6 +221,95 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   const fallbackBg =
     film.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
+
+  const isContain = film.cover_fit === "contain";
+  const posClass = POS_CLASS[film.cover_position || "center"] || "object-center";
+  const fitClass = isContain ? "object-contain object-center" : `object-cover ${posClass}`;
+
+  return (
+    <div
+      className={`flex justify-center transition-opacity duration-700 ease-out ${
+        active
+          ? "relative z-10 opacity-100"
+          : "pointer-events-none absolute inset-0 z-0 opacity-0"
+      }`}
+      aria-hidden={!active}
+    >
+      <div className="group relative w-full max-w-[380px] lg:max-w-none">
+        {/* Ambient amber glow — desktop only; blur(100px) is a mobile perf killer */}
+        <div
+          className="pointer-events-none absolute -inset-10 hidden rounded-full bg-amber/10 opacity-60 blur-[100px] md:block"
+          aria-hidden
+        />
+
+        {/* The frame — drop backdrop-blur on mobile to avoid compositor stalls */}
+        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-3">
+          <div
+            className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
+            style={{ background: fallbackBg }}
+          >
+            {/* Shimmer skeleton — visible until the image loads */}
+            <div
+              className={`hero-shimmer pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+                loaded ? "opacity-0" : "opacity-100"
+              }`}
+              aria-hidden
+            />
+            {(portraitImage || landscapeImage) && (eager || active) ? (
+              <picture>
+                {landscapeImage ? (
+                  <source
+                    media="(min-width: 768px)"
+                    srcSet={landscapeSrcSet || landscapeImage}
+                    sizes="(min-width: 1200px) 1200px, 80vw"
+                  />
+                ) : null}
+                <img
+                  src={portraitImage || landscapeImage!}
+                  alt={film.title_fa || film.title_en}
+                  width={1920}
+                  height={1080}
+                  className={`absolute inset-0 block h-full w-full ${fitClass} ${active ? "cine-img-in" : ""}`}
+                  loading={eager ? "eager" : "lazy"}
+                  decoding={eager ? "sync" : "async"}
+                  fetchPriority={eager ? "high" : undefined}
+                  sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
+                  onLoad={() => setLoaded(true)}
+                  onError={() => setLoaded(true)}
+                />
+              </picture>
+            ) : null}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
+              }}
+            />
+            {active && controls ? (
+              <>
+                <div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-20 bg-gradient-to-t from-black/75 via-black/35 to-transparent md:h-28"
+                  aria-hidden
+                />
+                <div className="absolute bottom-0 left-0 right-0 z-30 flex justify-center pb-3 md:pb-4">
+                  {controls}
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Corner accents */}
+        <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
+        <div className="pointer-events-none absolute -bottom-3 -left-3 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
+      </div>
+    </div>
+  );
+}
+
+function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
+  const { locale, num, year, t } = useLocale();
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
   const director =
     film.category === "walking-tour"
@@ -197,142 +317,61 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       : t({ en: film.director_en || "", fa: film.director_fa || film.director_en || "" });
   const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
-  const isContain = film.cover_fit === "contain";
-  const posClass = POS_CLASS[film.cover_position || "center"] || "object-center";
-  const fitClass = isContain ? "object-contain object-center" : `object-cover ${posClass}`;
-
-
   return (
-    <div
-      className={`flex flex-col gap-6 pb-10 transition-opacity duration-700 ease-out lg:gap-10 ${
-        active
-          ? "relative z-10 opacity-100"
-          : "pointer-events-none absolute inset-0 z-0 opacity-0"
-      }`}
-      aria-hidden={!active}
-    >
-      {/* Framed image — 2:3 on mobile, 16:9 on desktop */}
-      <div className="relative flex justify-center">
-        <div className="group relative w-full max-w-[380px] lg:max-w-none">
-          {/* Ambient amber glow — desktop only; blur(100px) is a mobile perf killer */}
-          <div
-            className="pointer-events-none absolute -inset-10 hidden rounded-full bg-amber/10 opacity-60 blur-[100px] md:block"
-            aria-hidden
-          />
-
-          {/* The frame — drop backdrop-blur on mobile to avoid compositor stalls */}
-          <div
-            className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-3"
-          >
-
-            <div
-              className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
-              style={{ background: fallbackBg }}
-            >
-              {/* Shimmer skeleton — visible until the image loads */}
-              <div
-                className={`hero-shimmer pointer-events-none absolute inset-0 transition-opacity duration-500 ${
-                  loaded ? "opacity-0" : "opacity-100"
-                }`}
-                aria-hidden
-              />
-              {(portraitImage || landscapeImage) && (eager || active) ? (
-                <picture>
-                  {landscapeImage ? (
-                    <source
-                      media="(min-width: 768px)"
-                      srcSet={landscapeSrcSet || landscapeImage}
-                      sizes="(min-width: 1200px) 1200px, 80vw"
-                    />
-                  ) : null}
-                  <img
-                    src={portraitImage || landscapeImage!}
-                    alt={title}
-                    width={1920}
-                    height={1080}
-                    className={`absolute inset-0 block h-full w-full ${fitClass} ${active ? "cine-img-in" : ""}`}
-                    loading={eager ? "eager" : "lazy"}
-                    decoding={eager ? "sync" : "async"}
-                    fetchPriority={eager ? "high" : undefined}
-                    sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
-                    onLoad={() => setLoaded(true)}
-                    onError={() => setLoaded(true)}
-                  />
-                </picture>
-              ) : null}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
-                }}
-              />
-            </div>
-
-          </div>
-
-          {/* Corner accents */}
-          <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
-          <div className="pointer-events-none absolute -bottom-3 -left-3 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
-        </div>
+    <div className="flex flex-col gap-5 lg:gap-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
+          {locale === "fa" ? "اختصاصی" : "Original"}
+        </span>
+        <span className="h-px w-8 bg-cream/20" />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
+          {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+        </span>
       </div>
 
-      {/* Text column */}
-      <div className="flex flex-col gap-5 lg:gap-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
-            {locale === "fa" ? "اختصاصی" : "Original"}
-          </span>
-          <span className="h-px w-8 bg-cream/20" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
-            {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-          </span>
-        </div>
+      <h2 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-4xl lg:text-5xl xl:text-6xl">
+        {title}
+      </h2>
 
-        <h2 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-4xl lg:text-5xl xl:text-6xl">
-          {title}
-        </h2>
-
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium uppercase tracking-[0.24em] text-cream/60">
-          {director && <span>{director}</span>}
-          {director && film.year ? <span className="text-amber/60">·</span> : null}
-          {film.year ? <span>{year(film.year)}</span> : null}
-          {film.duration_min ? (
-            <>
-              <span className="text-amber/60">·</span>
-              <span>
-                {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
-              </span>
-            </>
-          ) : null}
-        </div>
-
-        {synopsis ? (
-          <p className="max-w-3xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
-            {synopsis}
-          </p>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium uppercase tracking-[0.24em] text-cream/60">
+        {director && <span>{director}</span>}
+        {director && film.year ? <span className="text-amber/60">·</span> : null}
+        {film.year ? <span>{year(film.year)}</span> : null}
+        {film.duration_min ? (
+          <>
+            <span className="text-amber/60">·</span>
+            <span>
+              {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
+            </span>
+          </>
         ) : null}
+      </div>
 
-        <div className="flex flex-wrap items-center gap-3 pt-1">
-          <Link
-            to="/films/$slug"
-            params={{ slug: film.slug }}
-            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-amber px-7 py-3.5 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
-          </Link>
-          <Link
-            to="/films/$slug"
-            params={{ slug: film.slug }}
-            className="inline-flex min-h-11 items-center gap-2 rounded-md border border-cream/15 bg-cream/5 px-7 py-3.5 text-[13px] font-semibold text-cream-bright backdrop-blur-md transition-colors duration-200 hover:border-cream/25 hover:bg-cream/10"
-          >
-            {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
-          </Link>
-          <WatchlistCta slug={film.slug} locale={locale} />
-        </div>
+      {synopsis ? (
+        <p className="max-w-3xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
+          {synopsis}
+        </p>
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-3 pt-1">
+        <Link
+          to="/films/$slug"
+          params={{ slug: film.slug }}
+          className="inline-flex min-h-11 items-center gap-2 rounded-md bg-amber px-7 py-3.5 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+        </Link>
+        <Link
+          to="/films/$slug"
+          params={{ slug: film.slug }}
+          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-cream/15 bg-cream/5 px-7 py-3.5 text-[13px] font-semibold text-cream-bright backdrop-blur-md transition-colors duration-200 hover:border-cream/25 hover:bg-cream/10"
+        >
+          {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
+        </Link>
+        <WatchlistCta slug={film.slug} locale={locale} />
       </div>
     </div>
   );
