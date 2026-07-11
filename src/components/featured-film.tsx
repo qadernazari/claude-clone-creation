@@ -229,9 +229,11 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   width={800}
                   height={1200}
                   className={`absolute inset-0 block h-full w-full md:hidden ${fitClass} ${active ? "cine-img-in" : ""}`}
-                  loading="lazy"
+                  loading={eager ? "eager" : "lazy"}
                   decoding={eager ? "sync" : "async"}
+                  fetchPriority={eager ? "high" : undefined}
                   sizes="(max-width: 768px) 90vw, (max-width: 1023px) 380px, 1px"
+
                 />
               ) : null}
               {landscapeImage ? (
