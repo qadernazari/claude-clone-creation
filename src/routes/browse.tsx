@@ -170,7 +170,7 @@ function BrowsePage() {
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader current="browse" />
-      <main className="mx-auto max-w-7xl px-5 pb-16 pt-20 sm:px-6 md:pb-28 md:pt-40">
+      <main className="mx-auto max-w-7xl px-5 pb-16 pt-24 sm:px-6 md:pb-28 md:pt-32">
 
         <header className="mb-4 max-w-3xl fade-up md:mb-14">
           <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
