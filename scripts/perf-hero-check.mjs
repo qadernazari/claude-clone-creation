@@ -94,21 +94,39 @@ const cliNum = (name, envName, fallback) => {
 if (CLI_FLAGS.help || CLI_FLAGS.h) {
   console.log(`Usage: node scripts/perf-hero-check.mjs [flags]
 
-Flags (CLI > env > default):
-  --max-attempts=<n>          MAX_ATTEMPTS (default 3)
-  --beacon-timeout-ms=<ms>    BEACON_TIMEOUT_MS (default 20000)
-  --goto-timeout-ms=<ms>      GOTO_TIMEOUT_MS (default 45000)
-  --retry-backoff-ms=<ms>     RETRY_BACKOFF_MS (default 1500, multiplied by attempt #)
-  --help                      show this message
+Flags (CLI > env > config file > default):
+  --max-attempts=<n>              MAX_ATTEMPTS (default 3)
+  --beacon-timeout-ms=<ms>        BEACON_TIMEOUT_MS (default 20000)
+  --goto-timeout-ms=<ms>          GOTO_TIMEOUT_MS (default 45000)
+  --retry-backoff-ms=<ms>         RETRY_BACKOFF_MS (default 1500, ×attempt #)
+  --lcp-budget-ms=<ms>            LCP_BUDGET_MS (default 2000; per-viewport
+                                  override: LCP_BUDGET_MS_MOBILE, _TABLET, ...)
+  --require-preload-cache-hit=<bool>
+                                  REQUIRE_PRELOAD_CACHE_HIT (default: on for
+                                  mobile only; per-viewport override:
+                                  REQUIRE_PRELOAD_CACHE_HIT_MOBILE, _TABLET, ...
+                                  or 'viewports.<key>.require_preload_cache_hit'
+                                  in the config file)
+  --help                          show this message
 
-Other knobs remain env-only: BASE_URL, LCP_BUDGET_MS, VIEWPORTS, WARMUP, WARMUP_PASSES, PERF_HERO_CONFIG.
+Other knobs remain env-only: BASE_URL, VIEWPORTS, WARMUP, WARMUP_PASSES, PERF_HERO_CONFIG.
 `);
   process.exit(0);
 }
 
+const parseBool = (v, fallback) => {
+  if (v === undefined || v === null || v === "") return fallback;
+  const s = String(v).trim().toLowerCase();
+  if (["1", "true", "yes", "on", "required"].includes(s)) return true;
+  if (["0", "false", "no", "off", "skip"].includes(s)) return false;
+  return fallback;
+};
+
 const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
-const LCP_BUDGET_MS = Number(
-  process.env.LCP_BUDGET_MS || fileConfig.lcp_budget_ms || 2000,
+const LCP_BUDGET_MS = cliNum(
+  "lcp-budget-ms",
+  "LCP_BUDGET_MS",
+  fileConfig.lcp_budget_ms || 2000,
 );
 const BEACON_TIMEOUT_MS = cliNum("beacon-timeout-ms", "BEACON_TIMEOUT_MS", 20000);
 const GOTO_TIMEOUT_MS = cliNum("goto-timeout-ms", "GOTO_TIMEOUT_MS", 45000);
@@ -120,6 +138,31 @@ const WARMUP = process.env.WARMUP !== "0";
 // pollute the LCP measurement (especially at 390px and 768px).
 const WARMUP_PASSES = Number(process.env.WARMUP_PASSES || 2);
 const RETRY_BACKOFF_MS = cliNum("retry-backoff-ms", "RETRY_BACKOFF_MS", 1500);
+
+// preload_cache_hit assertion — configurable per viewport.
+// Precedence: CLI flag (global) > env var (per-viewport) > env var (global) >
+//   config file (per-viewport) > default (true for mobile only).
+const REQUIRE_PRELOAD_CACHE_HIT_GLOBAL = parseBool(
+  CLI_FLAGS["require-preload-cache-hit"] ?? process.env.REQUIRE_PRELOAD_CACHE_HIT,
+  undefined,
+);
+const requirePreloadCacheHitFor = (key, defaultVal) => {
+  const envVp = process.env[`REQUIRE_PRELOAD_CACHE_HIT_${key.toUpperCase()}`];
+  if (envVp !== undefined && envVp !== "") return parseBool(envVp, defaultVal);
+  if (REQUIRE_PRELOAD_CACHE_HIT_GLOBAL !== undefined) {
+    return REQUIRE_PRELOAD_CACHE_HIT_GLOBAL;
+  }
+  const cfg = vpCfg(key).require_preload_cache_hit;
+  if (cfg !== undefined) return parseBool(cfg, defaultVal);
+  return defaultVal;
+};
+const REQUIRE_PRELOAD_CACHE_HIT = {
+  mobile: requirePreloadCacheHitFor("mobile", true),
+  tablet: requirePreloadCacheHitFor("tablet", false),
+  laptop: requirePreloadCacheHitFor("laptop", false),
+  desktop: requirePreloadCacheHitFor("desktop", false),
+};
+
 // Per-viewport LCP budgets. Env var > config file > default.
 // Tablet emulation on shared CI runners consistently lands 20–40% slower
 // than desktop, so its default gets headroom.
