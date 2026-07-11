@@ -1,0 +1,116 @@
+name: Hero perf regression
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      lcp_budget_ms:
+        description: "LCP budget in ms"
+        required: false
+        default: "2500"
+      viewports:
+        description: "Comma-separated viewport keys"
+        required: false
+        default: "mobile,tablet,laptop,desktop"
+
+concurrency:
+  group: perf-hero-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  perf-hero:
+    name: perf:hero (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      LCP_BUDGET_MS: ${{ github.event.inputs.lcp_budget_ms || '2500' }}
+      VIEWPORTS: ${{ github.event.inputs.viewports || 'mobile,tablet,laptop,desktop' }}
+      BASE_URL: http://localhost:8080
+      REPORT_DIR: ${{ github.workspace }}/perf-reports
+      # Public envs the app needs to boot. Secrets that must stay private are
+      # provided via repo secrets and mapped below.
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_PROJECT_ID: ${{ vars.VITE_SUPABASE_PROJECT_ID }}
+      SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: bunx playwright install --with-deps chromium
+
+      - name: Install Playwright OS deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: bunx playwright install-deps chromium
+
+      - name: Start dev server
+        run: |
+          mkdir -p perf-reports
+          bun run dev > perf-reports/dev-server.log 2>&1 &
+          echo $! > perf-reports/dev.pid
+
+      - name: Wait for dev server on :8080
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sSf -o /dev/null http://localhost:8080/; then
+              echo "dev server is up after ${i}s"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "dev server never became ready"
+          echo "--- dev-server.log tail ---"
+          tail -n 200 perf-reports/dev-server.log || true
+          exit 1
+
+      - name: Run perf:hero
+        id: perf
+        run: npm run perf:hero
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f perf-reports/dev.pid ]; then
+            kill "$(cat perf-reports/dev.pid)" 2>/dev/null || true
+          fi
+
+      - name: Upload perf reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-hero-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            perf-reports/**
+          if-no-files-found: warn
+          retention-days: 14
