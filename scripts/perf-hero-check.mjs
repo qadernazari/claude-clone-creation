@@ -22,7 +22,7 @@
  * Exits 0 on pass, 1 on any failed assertion (across all viewports).
  */
 import { chromium } from "playwright";
-import { mkdir, unlink } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { join as joinPath } from "node:path";
 
 // ---------- Optional config file ----------
