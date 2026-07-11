@@ -880,6 +880,8 @@ const report = {
     failed: reportRuns.filter((r) => !r.passed).length,
   },
   runs: reportRuns,
+  failure_artifacts_dir: failureArtifacts.length ? FAILURE_DIR : null,
+  failure_artifacts: failureArtifacts,
 };
 
 const jsonPath = path.join(REPORT_DIR, `perf-hero-${REPORT_STAMP}.json`);
