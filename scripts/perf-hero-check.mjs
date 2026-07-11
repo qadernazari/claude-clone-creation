@@ -965,6 +965,40 @@ console.log(`\nReports written:`);
 console.log(`  JSON: ${jsonPath}`);
 console.log(`  HTML: ${htmlPath}`);
 
+// ------- Upload reports to Supabase Storage (perf-reports bucket) -------
+// Skipped silently when service-role creds aren't available (e.g. plain
+// local dev). CI provides SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (SUPABASE_URL && SERVICE_ROLE && process.env.PERF_UPLOAD !== "0") {
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const day = REPORT_STAMP.slice(0, 10); // YYYY-MM-DD
+    const uploads = [
+      { local: jsonPath, remote: `${day}/perf-hero-${REPORT_STAMP}.json`, ct: "application/json" },
+      { local: htmlPath, remote: `${day}/perf-hero-${REPORT_STAMP}.html`, ct: "text/html" },
+    ];
+    for (const u of uploads) {
+      const buf = await fs.readFile(u.local);
+      const { error } = await admin.storage
+        .from("perf-reports")
+        .upload(u.remote, buf, { contentType: u.ct, upsert: true });
+      if (error) {
+        console.error(`  · upload failed for ${u.remote}: ${error.message}`);
+      } else {
+        console.log(`  · uploaded perf-reports/${u.remote}`);
+      }
+    }
+  } catch (err) {
+    console.error(`  · report upload skipped: ${err instanceof Error ? err.message : err}`);
+  }
+} else {
+  console.log("  · report upload skipped (no SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)");
+}
+
 if (totalFailures.length) {
   console.error(`\n${totalFailures.length} assertion(s) failed across viewports:`);
   for (const f of totalFailures) console.error(`  - ${f}`);
