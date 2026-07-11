@@ -8,13 +8,19 @@ on:
   workflow_dispatch:
     inputs:
       lcp_budget_ms:
-        description: "LCP budget in ms"
+        description: "Global LCP budget in ms (per-viewport overrides via repo vars)"
         required: false
         default: "2500"
       viewports:
         description: "Comma-separated viewport keys"
         required: false
         default: "mobile,tablet,laptop,desktop"
+      require_preload_cache_hit:
+        description: "Require preload_cache_hit=true. 'default' = mobile only; 'true'/'false' apply to all viewports."
+        required: false
+        default: "default"
+        type: choice
+        options: ["default", "true", "false"]
 
 concurrency:
   group: perf-hero-${{ github.ref }}
@@ -27,7 +33,20 @@ jobs:
     timeout-minutes: 20
 
     env:
-      LCP_BUDGET_MS: ${{ github.event.inputs.lcp_budget_ms || '2500' }}
+      LCP_BUDGET_MS: ${{ github.event.inputs.lcp_budget_ms || vars.LCP_BUDGET_MS || '2500' }}
+      # Per-viewport LCP budgets (empty string = fall back to LCP_BUDGET_MS).
+      LCP_BUDGET_MS_MOBILE: ${{ vars.LCP_BUDGET_MS_MOBILE }}
+      LCP_BUDGET_MS_TABLET: ${{ vars.LCP_BUDGET_MS_TABLET }}
+      LCP_BUDGET_MS_LAPTOP: ${{ vars.LCP_BUDGET_MS_LAPTOP }}
+      LCP_BUDGET_MS_DESKTOP: ${{ vars.LCP_BUDGET_MS_DESKTOP }}
+      # preload_cache_hit requirement. 'default' leaves per-viewport defaults
+      # (mobile only). 'true'/'false' apply globally. Per-viewport repo vars
+      # override the global setting.
+      REQUIRE_PRELOAD_CACHE_HIT: ${{ github.event.inputs.require_preload_cache_hit == 'default' && '' || github.event.inputs.require_preload_cache_hit || vars.REQUIRE_PRELOAD_CACHE_HIT }}
+      REQUIRE_PRELOAD_CACHE_HIT_MOBILE: ${{ vars.REQUIRE_PRELOAD_CACHE_HIT_MOBILE }}
+      REQUIRE_PRELOAD_CACHE_HIT_TABLET: ${{ vars.REQUIRE_PRELOAD_CACHE_HIT_TABLET }}
+      REQUIRE_PRELOAD_CACHE_HIT_LAPTOP: ${{ vars.REQUIRE_PRELOAD_CACHE_HIT_LAPTOP }}
+      REQUIRE_PRELOAD_CACHE_HIT_DESKTOP: ${{ vars.REQUIRE_PRELOAD_CACHE_HIT_DESKTOP }}
       VIEWPORTS: ${{ github.event.inputs.viewports || 'mobile,tablet,laptop,desktop' }}
       BASE_URL: http://localhost:8080
       REPORT_DIR: ${{ github.workspace }}/perf-reports
