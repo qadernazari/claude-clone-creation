@@ -25,6 +25,7 @@ type Film = {
   synopsis_en: string | null;
   synopsis_fa: string | null;
   category: string | null;
+  language: string | null;
   year: number | null;
   duration_min: number | null;
   price_cents: number;
