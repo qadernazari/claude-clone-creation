@@ -196,7 +196,17 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   );
 }
 
-function SlideImageFrame({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
+function SlideImageFrame({
+  film,
+  active,
+  eager,
+  controls,
+}: {
+  film: HomeFeaturedFilm;
+  active: boolean;
+  eager: boolean;
+  controls?: ReactNode;
+}) {
   const [loaded, setLoaded] = useState(false);
 
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
