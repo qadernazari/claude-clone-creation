@@ -383,6 +383,8 @@ for (const key of selection) {
   coverTransfers = attemptResult?.cover || [];
   beacon = attemptResult?.beacon || null;
   renderedSrc = attemptResult?.renderedSrc || null;
+  const domPreloads = attemptResult?.domPreloads || [];
+  const activePreload = attemptResult?.activePreload || null;
 
   if (!attemptResult?.ok) {
     fail(`all ${MAX_ATTEMPTS} attempts failed: ${attemptResult?.reason || "unknown"}`);
