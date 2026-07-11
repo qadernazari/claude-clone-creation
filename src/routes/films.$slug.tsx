@@ -638,6 +638,7 @@ function FilmPage() {
                     <img
                       src={heroMobile || heroArtMobile}
                       alt={title}
+                      loading="lazy"
                       decoding="async"
                       className={`film-hero-kenburns absolute inset-0 block h-full w-full lg:hidden ${heroFitClass} select-none`}
                     />
@@ -646,6 +647,7 @@ function FilmPage() {
                     <img
                       src={heroDesktop || heroArtDesktop}
                       alt={title}
+                      loading="lazy"
                       decoding="async"
                       className={`film-hero-kenburns absolute inset-0 hidden h-full w-full lg:block ${heroFitClass} select-none`}
                     />
