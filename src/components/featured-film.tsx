@@ -362,7 +362,7 @@ function FeaturedFilmFallback() {
               <div className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]" />
               <div className="relative z-10 rounded-[2rem] border border-cream/10 bg-cream/5 p-3 shadow-2xl backdrop-blur-sm">
                 <div
-                  className="aspect-[2/3] rounded-[1.4rem]"
+                  className="aspect-[2/3] rounded-[1.4rem] lg:aspect-video"
                   style={{
                     background:
                       "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
