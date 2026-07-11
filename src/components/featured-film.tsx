@@ -104,7 +104,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
             />
           ))}
         </div>
-        <div className="mt-5 md:mt-6">
+        <div className="mt-5 md:hidden">
           <SlideDetails film={slides[index]} />
         </div>
       </div>
