@@ -184,3 +184,166 @@ export const listPerfReports = createServerFn({ method: "POST" })
     files.sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""));
     return { files };
   });
+
+// ---------- perf-hero summary (aggregate latest JSON reports) ----------
+
+export type PerfRunViewportSummary = {
+  viewport_label: string;
+  passed: boolean;
+  lcp_ms: number | null;
+  budget_ms: number | null;
+  over_budget_ms: number | null;
+  correlation_id: string | null;
+  failures: string[];
+};
+
+export type PerfRunSummary = {
+  generated_at: string | null;
+  path: string;
+  passed: boolean;
+  runs: number;
+  passed_runs: number;
+  failed_runs: number;
+  viewports: PerfRunViewportSummary[];
+};
+
+export type PerfSummaryResponse = {
+  latest: PerfRunSummary | null;
+  runs: PerfRunSummary[];
+  totals: {
+    runs_considered: number;
+    total_viewports: number;
+    passed_viewports: number;
+    failed_viewports: number;
+  };
+  top_regressions: Array<{
+    generated_at: string | null;
+    path: string;
+    viewport_label: string;
+    lcp_ms: number | null;
+    budget_ms: number | null;
+    over_budget_ms: number;
+    correlation_id: string | null;
+  }>;
+};
+
+export const getPerfReportsSummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ runs: z.number().int().min(1).max(50).default(10) }).parse(data),
+  )
+  .handler(async ({ data, context }): Promise<PerfSummaryResponse> => {
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Collect JSON report paths across day folders, newest first.
+    const { data: days } = await supabaseAdmin.storage
+      .from("perf-reports")
+      .list("", { limit: 60, sortBy: { column: "name", order: "desc" } });
+
+    const jsonPaths: string[] = [];
+    for (const day of days ?? []) {
+      if (!day.name || day.name.startsWith(".")) continue;
+      const { data: entries } = await supabaseAdmin.storage
+        .from("perf-reports")
+        .list(day.name, { limit: 500, sortBy: { column: "name", order: "desc" } });
+      for (const f of entries ?? []) {
+        if (!f.name.endsWith(".json")) continue;
+        jsonPaths.push(`${day.name}/${f.name}`);
+        if (jsonPaths.length >= data.runs) break;
+      }
+      if (jsonPaths.length >= data.runs) break;
+    }
+
+    const runs: PerfRunSummary[] = [];
+    for (const p of jsonPaths) {
+      const { data: signed } = await supabaseAdmin.storage
+        .from("perf-reports")
+        .createSignedUrl(p, 60);
+      if (!signed?.signedUrl) continue;
+      try {
+        const res = await fetch(signed.signedUrl);
+        if (!res.ok) continue;
+        const doc = (await res.json()) as {
+          generated_at?: string;
+          lcp_budget_ms_per_viewport?: Record<string, number>;
+          runs?: Array<{
+            viewport_label?: string;
+            viewport_key?: string;
+            passed?: boolean;
+            beacon?: { lcp_ms?: number; correlation_id?: string } | null;
+            checks?: Array<{ ok?: boolean; label?: string; detail?: string }>;
+          }>;
+        };
+        const budgets = doc.lcp_budget_ms_per_viewport ?? {};
+        const vps: PerfRunViewportSummary[] = (doc.runs ?? []).map((r) => {
+          const lcp = r.beacon?.lcp_ms ?? null;
+          const key = (r.viewport_key ?? "").toLowerCase();
+          const budget = budgets[key] ?? null;
+          const over = lcp != null && budget != null && lcp > budget ? lcp - budget : null;
+          const failures = (r.checks ?? [])
+            .filter((c) => c.ok === false)
+            .map((c) => `${c.label ?? "check"}: ${c.detail ?? ""}`.trim());
+          return {
+            viewport_label: r.viewport_label ?? key ?? "?",
+            passed: !!r.passed,
+            lcp_ms: lcp,
+            budget_ms: budget,
+            over_budget_ms: over,
+            correlation_id: r.beacon?.correlation_id ?? null,
+            failures,
+          };
+        });
+        runs.push({
+          generated_at: doc.generated_at ?? null,
+          path: p,
+          passed: vps.every((v) => v.passed),
+          runs: vps.length,
+          passed_runs: vps.filter((v) => v.passed).length,
+          failed_runs: vps.filter((v) => !v.passed).length,
+          viewports: vps,
+        });
+      } catch {
+        // ignore malformed reports
+      }
+    }
+
+    const totals = {
+      runs_considered: runs.length,
+      total_viewports: runs.reduce((n, r) => n + r.runs, 0),
+      passed_viewports: runs.reduce((n, r) => n + r.passed_runs, 0),
+      failed_viewports: runs.reduce((n, r) => n + r.failed_runs, 0),
+    };
+
+    // Top regressions = viewport failures across the window, sorted by
+    // over-budget ms first, then non-LCP failures (over_budget_ms = 0).
+    const regressions = runs.flatMap((r) =>
+      r.viewports
+        .filter((v) => !v.passed)
+        .map((v) => ({
+          generated_at: r.generated_at,
+          path: r.path,
+          viewport_label: v.viewport_label,
+          lcp_ms: v.lcp_ms,
+          budget_ms: v.budget_ms,
+          over_budget_ms: v.over_budget_ms ?? 0,
+          correlation_id: v.correlation_id,
+        })),
+    );
+    regressions.sort((a, b) => b.over_budget_ms - a.over_budget_ms);
+
+    return {
+      latest: runs[0] ?? null,
+      runs,
+      totals,
+      top_regressions: regressions.slice(0, 10),
+    };
+  });
