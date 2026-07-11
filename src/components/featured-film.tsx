@@ -220,34 +220,27 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
               className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
               style={{ background: fallbackBg }}
             >
-              {portraitImage ? (
-                <img
-                  src={portraitImage}
-                  alt={title}
-                  width={800}
-                  height={1200}
-                  className={`absolute inset-0 block h-full w-full md:hidden ${fitClass} ${active ? "cine-img-in" : ""}`}
-                  loading={eager ? "eager" : "lazy"}
-                  decoding={eager ? "sync" : "async"}
-                  fetchPriority={eager ? "high" : undefined}
-                  sizes="(max-width: 768px) 90vw, (max-width: 1023px) 380px, 1px"
-
-                />
-              ) : null}
-              {landscapeImage ? (
-                <img
-                  src={landscapeImage}
-                  srcSet={landscapeSrcSet || undefined}
-                  alt={title}
-                  width={1920}
-                  height={1080}
-                  className={`absolute inset-0 hidden h-full w-full md:block ${fitClass} ${active ? "cine-img-in" : ""}`}
-                  loading={eager ? "eager" : "lazy"}
-                  decoding={eager ? "sync" : "async"}
-                  fetchPriority={eager ? "high" : undefined}
-                  sizes="(min-width: 1200px) 1200px, (min-width: 768px) 80vw, 1px"
-
-                />
+              {(portraitImage || landscapeImage) ? (
+                <picture>
+                  {landscapeImage ? (
+                    <source
+                      media="(min-width: 768px)"
+                      srcSet={landscapeSrcSet || landscapeImage}
+                      sizes="(min-width: 1200px) 1200px, 80vw"
+                    />
+                  ) : null}
+                  <img
+                    src={portraitImage || landscapeImage!}
+                    alt={title}
+                    width={1920}
+                    height={1080}
+                    className={`absolute inset-0 block h-full w-full ${fitClass} ${active ? "cine-img-in" : ""}`}
+                    loading={eager ? "eager" : "lazy"}
+                    decoding={eager ? "sync" : "async"}
+                    fetchPriority={eager ? "high" : undefined}
+                    sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
+                  />
+                </picture>
               ) : null}
               <div
                 className="pointer-events-none absolute inset-0"
