@@ -1093,6 +1093,8 @@ for (const key of selection) {
     },
     rendered_src: renderedSrc,
     cache_probe: attemptResult?.cacheProbe || null,
+    mount_events: attemptResult?.mountEvents || [],
+    mount_analysis: attemptResult?.mountAnalysis || null,
     beacon,
     checks,
     failures,
