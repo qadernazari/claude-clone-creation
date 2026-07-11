@@ -45,7 +45,7 @@ export function MobileTabBar() {
     path.startsWith("/checkout") ||
     path.startsWith("/admin");
 
-  useVisualViewportChromeOffset();
+  
 
   if (hidden) return null;
 
