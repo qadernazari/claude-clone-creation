@@ -1,24 +1,29 @@
 {
-  "$comment": "Copy to perf-hero.config.json (or point PERF_HERO_CONFIG at it) to override LCP budgets and preload gate expectations without editing scripts/perf-hero-check.mjs. Env vars still win (LCP_BUDGET_MS_DESKTOP, EXPECT_BUCKET_DESKTOP, FORBID_BUCKET_DESKTOP, HERO_SELECTOR_DESKTOP, and matching *_MOBILE / *_TABLET / *_LAPTOP variants).",
+  "$comment": "Copy to perf-hero.config.json (or point PERF_HERO_CONFIG at it) to override LCP + transfer budgets and preload gate expectations without editing scripts/perf-hero-check.mjs. Env vars still win: LCP_BUDGET_MS_<VP>, TRANSFER_BUDGET_BYTES_<VP>, EXPECT_BUCKET_<VP>, FORBID_BUCKET_<VP>, HERO_SELECTOR_<VP> (VP = MOBILE | TABLET | LAPTOP | DESKTOP).",
   "lcp_budget_ms": 2000,
+  "transfer_budget_bytes": 500000,
   "viewports": {
     "mobile": {
       "lcp_budget_ms": 1800,
+      "transfer_budget_bytes": 250000,
       "expect_bucket": "film-covers",
       "forbid_bucket": "film-thumbnails"
     },
     "tablet": {
       "lcp_budget_ms": 2800,
+      "transfer_budget_bytes": 350000,
       "expect_bucket": "film-thumbnails",
       "forbid_bucket": "film-covers"
     },
     "laptop": {
       "lcp_budget_ms": 1600,
+      "transfer_budget_bytes": 400000,
       "expect_bucket": "film-thumbnails",
       "forbid_bucket": "film-covers"
     },
     "desktop": {
       "lcp_budget_ms": 1400,
+      "transfer_budget_bytes": 500000,
       "expect_bucket": "film-thumbnails",
       "forbid_bucket": "film-covers"
     }
