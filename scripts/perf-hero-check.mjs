@@ -555,6 +555,32 @@ for (const key of selection) {
       fail(`hero LCP ${beacon.lcp_ms}ms exceeds budget ${vpBudget}ms`);
     }
 
+    // Per-viewport transfer_bytes budget. Sum bytes across expectTransfers
+    // for the initial page load only (cache probe reload is excluded).
+    const vpTransferBudget = PER_VIEWPORT_TRANSFER_BUDGET_BYTES[key] ?? DEFAULT_TRANSFER_BUDGET_BYTES;
+    const initialExpectForBudget = expectTransfers.slice(
+      0,
+      expectTransfers.length -
+        (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+        (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
+    );
+    const initialTransferBytes = initialExpectForBudget.reduce(
+      (s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0),
+      0,
+    );
+    if (initialTransferBytes === 0) {
+      // Nothing measured — skip to avoid false pass. Warn only.
+      pass(`no ${vp.expectBucket} bytes recorded (budget ${vpTransferBudget})`);
+    } else if (initialTransferBytes <= vpTransferBudget) {
+      pass(
+        `${vp.expectBucket} transfer ${initialTransferBytes} B <= budget ${vpTransferBudget} B`,
+      );
+    } else {
+      fail(
+        `${vp.expectBucket} transfer ${initialTransferBytes} B exceeds budget ${vpTransferBudget} B`,
+      );
+    }
+
     // Mobile (390px) must serve the LCP hero from the preload cache.
     // CI fails if `preload_cache_hit` is anything other than strictly `true`.
     if (key === "mobile") {
