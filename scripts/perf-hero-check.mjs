@@ -844,12 +844,15 @@ for (const key of selection) {
       timing.total_ms = Date.now() - attemptStart;
 
 
-      // Attempts that failed to capture the beacon or hit the LCP budget get a
-      // full HAR + a screenshot of the page state at the point of failure.
-      // Successful attempts throw the HAR away to keep the report dir small.
+      // Attempts that failed to capture the beacon, hit the LCP budget, or
+      // observed more than one film-covers response get a full HAR + trace +
+      // screenshot for post-mortem inspection. Clean attempts discard them.
       const capturedBeaconOk =
         localBeacon && typeof localBeacon.lcp_ms === "number";
-      const shouldKeepArtifacts = !result.ok || !capturedBeaconOk;
+      const coverCount = localCover.length;
+      const coverExcess = coverCount > 1;
+      const shouldKeepArtifacts =
+        !result.ok || !capturedBeaconOk || coverExcess;
       if (shouldKeepArtifacts) {
         try {
           await page
@@ -858,29 +861,45 @@ for (const key of selection) {
           result.screenshotPath = screenshotPath;
         } catch {}
       }
+      // Stop tracing before closing the context so the zip is flushed.
+      if (shouldKeepArtifacts) {
+        await context.tracing.stop({ path: tracePath }).catch(() => {});
+      } else {
+        await context.tracing.stop().catch(() => {});
+      }
       // Closing the context flushes the HAR file to disk.
       await context.close().catch(() => {});
       await browser.close().catch(() => {});
       if (shouldKeepArtifacts) {
         result.harPath = harPath;
+        result.tracePath = tracePath;
+        const reasonTag = coverExcess
+          ? `film-covers count=${coverCount} > 1`
+          : result.reason || (capturedBeaconOk ? null : "beacon missing");
         failureArtifacts.push({
           viewport_key: key,
           viewport_label: vp.label,
           attempt,
-          reason: result.reason || null,
+          reason: reasonTag,
           beacon_captured: !!localBeacon,
           lcp_captured: capturedBeaconOk,
+          cover_count: coverCount,
           har_path: harPath,
+          trace_path: tracePath,
           screenshot_path: screenshotPath,
         });
         console.log(
-          `    · saved failure artifacts → ${harPath} , ${screenshotPath}`,
+          `    · saved artifacts (${reasonTag}) → ${harPath} , ${tracePath} , ${screenshotPath}`,
+        );
+        console.log(
+          `      view trace: npx playwright show-trace ${tracePath}`,
         );
       } else {
-        // Successful attempt: drop the HAR (screenshot was never taken).
+        // Clean attempt: drop the HAR (screenshot + trace were never saved).
         await unlink(harPath).catch(() => {});
       }
     }
+
     return result;
   };
 
