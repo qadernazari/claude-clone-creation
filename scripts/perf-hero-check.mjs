@@ -424,48 +424,64 @@ for (const key of selection) {
       fail(`rendered hero src is NOT in ${vp.expectBucket}: ${renderedSrc.slice(0, 120)}…`);
     }
 
-    // ----- Exact-source triangulation: beacon.url === beacon.preload_url === renderedSrc === (single expectTransfer URL) -----
+    // ----- Exact-source triangulation -----
+    // The app signs storage URLs (query string rotates per SSR), so compare by the
+    // pathname (bucket + object key), not the full URL.
+    const stripQ = (u) => {
+      if (!u) return null;
+      try {
+        const p = new URL(u);
+        return p.origin + p.pathname;
+      } catch {
+        return u.split("?")[0];
+      }
+    };
     const initialExpect = expectTransfers.slice(
       0,
-      // Exclude reload-phase transfers from the exact-source check (probe adds ≥1 event).
-      expectTransfers.length - (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+      expectTransfers.length -
+        (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
         (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
     );
-    const initialUrls = new Set(initialExpect.map((t) => t.url));
-    if (renderedSrc && beacon?.url && beacon?.preload_url) {
+    const initialPaths = new Set(initialExpect.map((t) => stripQ(t.url)));
+    const renderedPath = stripQ(renderedSrc);
+    const beaconUrlPath = stripQ(beacon?.url);
+    const preloadPath = stripQ(beacon?.preload_url);
+
+    if (renderedPath && beaconUrlPath && preloadPath) {
       const allMatch =
-        renderedSrc === beacon.url &&
-        beacon.url === beacon.preload_url &&
-        initialUrls.size === 1 &&
-        initialUrls.has(renderedSrc);
+        renderedPath === beaconUrlPath &&
+        beaconUrlPath === preloadPath &&
+        initialPaths.size === 1 &&
+        initialPaths.has(renderedPath);
       if (allMatch) {
         pass(
-          `exact ${vp.expectBucket} source triangulated ` +
-            `(rendered = beacon.url = preload_url = network URL)`,
+          `exact ${vp.expectBucket} source triangulated (rendered = beacon.url = preload_url = network path)`,
         );
       } else {
         fail(
           "exact source mismatch — " +
-            `rendered=${renderedSrc?.slice(-60)} beacon.url=${beacon.url?.slice(-60)} ` +
-            `preload=${beacon.preload_url?.slice(-60)} network=[${[...initialUrls].map((u) => u.slice(-60)).join(" | ")}]`,
+            `rendered=${renderedPath?.slice(-70)} beacon=${beaconUrlPath?.slice(-70)} ` +
+            `preload=${preloadPath?.slice(-70)} network=[${[...initialPaths].map((u) => u.slice(-70)).join(" | ")}]`,
         );
       }
     }
 
-    // Exact request count on initial load: exactly ONE HTTP response for the LCP URL.
-    const initialCountForLcp = initialExpect.filter(
-      (t) => renderedSrc && t.url === renderedSrc,
-    ).length;
-    if (renderedSrc) {
+    // Exactly ONE HTTP response for the LCP object on initial load
+    // (preload should be reused by <img>, not double-fetched).
+    const initialCountForLcp = renderedPath
+      ? initialExpect.filter((t) => stripQ(t.url) === renderedPath).length
+      : 0;
+    if (renderedPath) {
       if (initialCountForLcp === 1) {
-        pass(`exactly 1 network request for LCP ${vp.expectBucket} URL on initial load`);
+        pass(`exactly 1 network request for LCP ${vp.expectBucket} object on initial load`);
       } else {
         fail(
-          `expected exactly 1 network request for LCP URL, got ${initialCountForLcp} ` +
+          `expected exactly 1 network request for LCP object, got ${initialCountForLcp} ` +
             `(preload should be reused by <img>, not double-fetched)`,
         );
       }
     }
+
 
     // ----- Cache probe assertion (reload) -----
     const cp = attemptResult?.cacheProbe;
