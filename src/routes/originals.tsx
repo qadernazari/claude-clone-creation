@@ -88,21 +88,25 @@ function OriginalsPage() {
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {films.map((film) => {
               const displayTitle = fa ? film.title_fa || film.title_en : film.title_en;
-              const img = film.thumbnail_url || film.cover_url;
+              const desktopImg = film.thumbnail_url || film.cover_url;
+              const mobileImg = film.cover_url || film.thumbnail_url;
               return (
                 <Link
                   key={film.id}
                   to="/films/$slug"
                   params={{ slug: film.slug }}
-                  className="group relative aspect-[2/3] overflow-hidden rounded-lg bg-bg-1"
+                  className="group relative aspect-[2/3] overflow-hidden rounded-lg bg-bg-1 lg:aspect-video"
                 >
-                  {img ? (
-                    <img
-                      src={img}
-                      alt={displayTitle}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
+                  {desktopImg || mobileImg ? (
+                    <picture>
+                      <source media="(min-width: 1024px)" srcSet={desktopImg || undefined} />
+                      <img
+                        src={mobileImg || desktopImg || undefined}
+                        alt={displayTitle}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    </picture>
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-bg-1 to-bg-0" />
                   )}
