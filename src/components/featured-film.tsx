@@ -136,25 +136,32 @@ function SliderControls({
         </svg>
       </button>
 
-      <div className="flex items-center gap-2.5">
-        {Array.from({ length: count }).map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => onGo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            aria-current={i === index ? "true" : undefined}
-            className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-90`}
-          >
-            <span
-              className={`block rounded-full transition-all duration-300 ${
-                i === index
-                  ? "h-2.5 w-2.5 bg-amber shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                  : "h-2 w-2 bg-cream/35 hover:h-2.5 hover:w-2.5 hover:bg-cream/65"
+      <div className="flex items-center gap-2">
+        {Array.from({ length: count }).map((_, i) => {
+          const active = i === index;
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onGo(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              aria-current={active ? "true" : undefined}
+              className={`flex cursor-pointer items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-90 ${
+                active
+                  ? "h-8 w-8 border border-amber/60 bg-amber/15 text-amber shadow-[0_0_12px_rgba(251,191,36,0.35)] hover:bg-amber/25"
+                  : "h-8 w-8 hover:bg-cream/10"
               }`}
-            />
-          </button>
-        ))}
+            >
+              <span
+                className={`block rounded-full transition-all duration-300 ${
+                  active
+                    ? "h-2.5 w-2.5 bg-amber shadow-[0_0_6px_rgba(251,191,36,0.6)]"
+                    : "h-2 w-2 bg-cream/40 hover:h-2.5 hover:w-2.5 hover:bg-cream/70"
+                }`}
+              />
+            </button>
+          );
+        })}
       </div>
 
       <button
