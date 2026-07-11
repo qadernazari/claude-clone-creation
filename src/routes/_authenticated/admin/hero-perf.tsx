@@ -167,15 +167,20 @@ function StatCard({ title, p50, p75, p95, unit, digits = 0 }: {
   );
 }
 
+type CacheFilter = "all" | "hit" | "miss" | "unknown";
+
 function HeroPerfPage() {
   const [hours, setHours] = useState(24);
   const [effectiveType, setEffectiveType] = useState<string>("all");
   const [country, setCountry] = useState<string>("all");
+  const [preloadCacheHit, setPreloadCacheHit] = useState<CacheFilter>("all");
+  const [deliveryType, setDeliveryType] = useState<string>("all");
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ["admin", "hero-perf", hours, effectiveType, country],
-    queryFn: () => fetchFn({ data: { hours, effectiveType, country } }),
+    queryKey: ["admin", "hero-perf", hours, effectiveType, country, preloadCacheHit, deliveryType],
+    queryFn: () =>
+      fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType } }),
   });
 
   const rows = data?.rows ?? [];
