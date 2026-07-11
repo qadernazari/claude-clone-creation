@@ -113,6 +113,8 @@ export function measureHeroLCP(
 
     const build = (decode_ms: number | null): PerfPayload => ({
       url: url.split("?")[0],
+      correlation_id: correlationId,
+      preload_url: preloadUrl ? preloadUrl.split("?")[0] : null,
       lcp_ms: Math.round(lcp!.startTime),
       lcp_size: lcp!.size,
       req_start_ms: res ? Math.round(res.startTime) : null,
