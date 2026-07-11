@@ -14,7 +14,58 @@ const RANGES = [
   { label: "24h", hours: 24 },
   { label: "7d", hours: 24 * 7 },
   { label: "30d", hours: 24 * 30 },
+] as const;
+
+const CSV_COLUMNS: (keyof HeroPerfRow)[] = [
+  "created_at",
+  "correlation_id",
+  "lcp_ms",
+  "lcp_size",
+  "ttfb_ms",
+  "resp_end_ms",
+  "decode_ms",
+  "transfer_bytes",
+  "encoded_bytes",
+  "protocol",
+  "preload_cache_hit",
+  "preload_url",
+  "delivery_type",
+  "resource_initiator",
+  "resource_count",
+  "viewport_w",
+  "dpr",
+  "effective_type",
+  "downlink",
+  "country",
+  "ua_mobile",
+  "url",
 ];
+
+function csvEscape(v: unknown): string {
+  if (v == null) return "";
+  const s = typeof v === "string" ? v : typeof v === "boolean" ? (v ? "true" : "false") : String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function exportRowsToCsv(rows: HeroPerfRow[], hours: number) {
+  if (!rows.length) return;
+  const header = CSV_COLUMNS.join(",");
+  const body = rows
+    .map((r) => CSV_COLUMNS.map((c) => csvEscape(r[c])).join(","))
+    .join("\n");
+  const csv = `${header}\n${body}\n`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  a.href = url;
+  a.download = `hero-perf-${hours}h-${stamp}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 
 function percentile(sorted: number[], p: number): number | null {
   if (!sorted.length) return null;
@@ -280,13 +331,23 @@ function HeroPerfPage() {
             Real-user LCP, decode time, and transfer size from the hero beacon.
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="text-sm rounded-md border border-border px-3 py-1.5 hover:bg-accent"
-          disabled={isFetching}
-        >
-          {isFetching ? "Refreshing…" : "Refresh"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => exportRowsToCsv(rows, hours)}
+            className="text-sm rounded-md border border-border px-3 py-1.5 hover:bg-accent disabled:opacity-50"
+            disabled={rows.length === 0}
+            title="Download the currently filtered samples as CSV"
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => refetch()}
+            className="text-sm rounded-md border border-border px-3 py-1.5 hover:bg-accent"
+            disabled={isFetching}
+          >
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-3">
