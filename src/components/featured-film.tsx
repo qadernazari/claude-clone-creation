@@ -82,20 +82,27 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-8 sm:px-6 md:mt-32 md:px-12 md:pb-12">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
         <div className="relative">
           {slides.map((film, i) => (
-            <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
+            <SlideImageFrame key={film.id} film={film} active={i === index} eager={i === 0} />
           ))}
-        </div>
-        <div className="mt-6 md:mt-8">
-          <SliderControls
-            count={slides.length}
-            index={index}
-            onPrev={prev}
-            onNext={next}
-            onGo={go}
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-20 rounded-b-[1.25rem] bg-gradient-to-t from-black/75 via-black/35 to-transparent md:h-28 md:rounded-b-[1.4rem]"
+            aria-hidden
           />
+          <div className="absolute bottom-0 left-0 right-0 z-30 flex justify-center pb-3 md:pb-4">
+            <SliderControls
+              count={slides.length}
+              index={index}
+              onPrev={prev}
+              onNext={next}
+              onGo={go}
+            />
+          </div>
+        </div>
+        <div className="mt-5 md:mt-6">
+          <SlideDetails film={slides[index]} />
         </div>
       </div>
     </section>
