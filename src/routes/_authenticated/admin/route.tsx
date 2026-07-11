@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { requireAdmin } from "@/lib/admin.functions";
 import {
-  LayoutDashboard, Film, LogOut, Home, Users, Receipt, Settings, Globe, CreditCard, TrendingUp, RefreshCw, Activity,
+  LayoutDashboard, Film, LogOut, Home, Users, Receipt, Settings, Globe, CreditCard, TrendingUp, RefreshCw,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 
