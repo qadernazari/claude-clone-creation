@@ -124,19 +124,19 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-5">
+    <div className="flex items-center justify-center gap-2 rounded-full border border-cream/10 bg-black/50 px-3.5 py-2 shadow-xl backdrop-blur-md md:px-4 md:py-2.5">
       <button
         type="button"
         onClick={onPrev}
         aria-label="Previous"
-        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-cream/20 bg-black/40 text-cream/90 backdrop-blur-sm transition-all duration-200 hover:border-amber/60 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
+        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-cream/5 text-cream/80 transition-all duration-200 hover:border-amber/60 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <polyline points="15 18 9 12 15 6" />
         </svg>
       </button>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 px-1">
         {Array.from({ length: count }).map((_, i) => {
           const active = i === index;
           return (
@@ -148,15 +148,15 @@ function SliderControls({
               aria-current={active ? "true" : undefined}
               className={`flex cursor-pointer items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-90 ${
                 active
-                  ? "h-8 w-8 border border-amber/60 bg-amber/15 text-amber shadow-[0_0_12px_rgba(251,191,36,0.35)] hover:bg-amber/25"
-                  : "h-8 w-8 hover:bg-cream/10"
+                  ? "h-7 w-7 border border-amber/60 bg-amber/15 text-amber shadow-[0_0_12px_rgba(251,191,36,0.35)] hover:bg-amber/25"
+                  : "h-7 w-7 hover:bg-cream/10"
               }`}
             >
               <span
                 className={`block rounded-full transition-all duration-300 ${
                   active
-                    ? "h-2.5 w-2.5 bg-amber shadow-[0_0_6px_rgba(251,191,36,0.6)]"
-                    : "h-2 w-2 bg-cream/40 hover:h-2.5 hover:w-2.5 hover:bg-cream/70"
+                    ? "h-2 w-2 bg-amber shadow-[0_0_6px_rgba(251,191,36,0.6)]"
+                    : "h-1.5 w-1.5 bg-cream/40 hover:h-2 hover:w-2 hover:bg-cream/70"
                 }`}
               />
             </button>
@@ -168,7 +168,7 @@ function SliderControls({
         type="button"
         onClick={onNext}
         aria-label="Next"
-        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-cream/20 bg-black/40 text-cream/90 backdrop-blur-sm transition-all duration-200 hover:border-amber/60 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
+        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-cream/5 text-cream/80 transition-all duration-200 hover:border-amber/60 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <polyline points="9 18 15 12 9 6" />
@@ -295,10 +295,10 @@ function SlideImageFrame({
             {active && controls ? (
               <>
                 <div
-                  className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-20 bg-gradient-to-t from-black/75 via-black/35 to-transparent md:h-28"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:h-32"
                   aria-hidden
                 />
-                <div className="absolute bottom-0 left-0 right-0 z-30 flex justify-center pb-3 md:pb-4">
+                <div className="absolute bottom-5 left-0 right-0 z-30 flex justify-center md:bottom-6">
                   {controls}
                 </div>
               </>
