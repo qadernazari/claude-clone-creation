@@ -681,7 +681,7 @@ for (const key of selection) {
     attempts: attemptsMeta,
     attempts_used: attemptsMeta.length,
     lcp_ms: beacon?.lcp_ms ?? null,
-    lcp_budget_ms: LCP_BUDGET_MS,
+    lcp_budget_ms: PER_VIEWPORT_BUDGET_MS[key] ?? LCP_BUDGET_MS,
     transfer_bytes_total:
       sumBytes(thumbTransfers) + sumBytes(coverTransfers),
     transfer_bytes_thumbnails: sumBytes(thumbTransfers),
