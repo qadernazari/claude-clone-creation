@@ -20,6 +20,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
   const ftitle = locale === "fa" ? film.title_fa || film.title_en : film.title_en;
   const director = film.category === "walking-tour" ? "" : (locale === "fa" ? film.director_fa || film.director_en : film.director_en);
   const railImg = film.thumbnail_url || film.cover_url;
+  const mobileImg = film.cover_url || film.thumbnail_url;
   const railSrcSet = [
     film.thumbnail_url_520 ? `${film.thumbnail_url_520} 520w` : null,
     film.thumbnail_url ? `${film.thumbnail_url} 760w` : null,
@@ -31,22 +32,21 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
       to="/films/$slug"
       params={{ slug: film.slug }}
       preload="intent"
-      className="group block w-[56vw] shrink-0 snap-start sm:w-[260px] md:w-[300px] lg:w-[340px]"
+      className="group block w-[46vw] shrink-0 snap-start sm:w-[220px] md:w-[300px] lg:w-[340px]"
     >
-      <div className="relative aspect-video overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/8 transition-transform duration-300 md:group-hover:scale-[1.02]">
-        {railImg ? (
-          <img
-            src={railImg}
-            srcSet={railSrcSet || undefined}
-            alt=""
-            width={680}
-            height={383}
-            loading="lazy"
-            decoding="async"
-            fetchPriority="low"
-            sizes="(min-width: 1024px) 340px, (min-width: 768px) 300px, (min-width: 640px) 260px, 56vw"
-            className="cine-img absolute inset-0 h-full w-full object-cover"
-          />
+      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-bg-1 ring-1 ring-cream/8 transition-transform duration-300 md:group-hover:scale-[1.02] lg:aspect-video">
+        {railImg || mobileImg ? (
+          <picture>
+            <source media="(min-width: 1024px)" srcSet={railSrcSet || railImg || undefined} sizes="(min-width: 1024px) 340px, 300px" />
+            <img
+              src={mobileImg || railImg || undefined}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              fetchPriority="low"
+              className="cine-img absolute inset-0 h-full w-full object-cover"
+            />
+          </picture>
         ) : (
           <div
             className="absolute inset-0"
