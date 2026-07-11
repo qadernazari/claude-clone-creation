@@ -83,8 +83,8 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       aria-roledescription="carousel"
     >
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
-        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8 lg:gap-12">
-          <div className="order-2 flex flex-col justify-center md:order-1">
+        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8 lg:gap-12" dir="ltr">
+          <div className="order-2 flex flex-col justify-center md:order-1" dir={locale === "fa" ? "rtl" : "ltr"}>
             <SlideDetails film={slides[index]} />
           </div>
           <div className="order-1 md:order-2">
