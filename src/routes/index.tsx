@@ -163,14 +163,15 @@ export const Route = createFileRoute("/")({
       { rel: "canonical", href: "https://ir.show/" },
       ...(loaderData?.thumbnail_url || loaderData?.cover_url || loaderData?.mobile_cover_url
         ? [
+            // Portrait cover for small viewports (matches FeaturedFilm md: breakpoint).
             {
               rel: "preload" as const,
               as: "image" as const,
-              href: loaderData.mobile_cover_url || loaderData.cover_url || loaderData.thumbnail_url_mobile || loaderData.thumbnail_url || "",
+              href: loaderData.mobile_cover_url || loaderData.cover_url || loaderData.thumbnail_url || "",
               media: "(max-width: 767px)" as const,
-              imageSizes: "100vw" as const,
               fetchPriority: "high" as const,
             },
+            // Landscape thumbnail for desktop viewports.
             {
               rel: "preload" as const,
               as: "image" as const,

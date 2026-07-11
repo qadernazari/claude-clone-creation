@@ -79,8 +79,25 @@ export const Route = createFileRoute("/films/$slug")({
       ],
       links: [
         { rel: "canonical", href: url },
-        ...(f.thumbnail_url || f.cover_url
-          ? [{ rel: "preload" as const, as: "image" as const, href: (f.thumbnail_url || f.cover_url) as string, fetchpriority: "high" as const }]
+        // Portrait cover for small viewports; landscape thumbnail for desktop.
+        // Breakpoints match the film hero (lg: = 1024px).
+        ...(loaderData?.heroMobile
+          ? [{
+              rel: "preload" as const,
+              as: "image" as const,
+              href: loaderData.heroMobile as string,
+              media: "(max-width: 1023px)" as const,
+              fetchpriority: "high" as const,
+            }]
+          : []),
+        ...(loaderData?.heroDesktop
+          ? [{
+              rel: "preload" as const,
+              as: "image" as const,
+              href: loaderData.heroDesktop as string,
+              media: "(min-width: 1024px)" as const,
+              fetchpriority: "high" as const,
+            }]
           : []),
       ],
       scripts: [
