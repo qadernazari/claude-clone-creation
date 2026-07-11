@@ -79,8 +79,25 @@ export const Route = createFileRoute("/films/$slug")({
       ],
       links: [
         { rel: "canonical", href: url },
-        ...(f.thumbnail_url || f.cover_url
-          ? [{ rel: "preload" as const, as: "image" as const, href: (f.thumbnail_url || f.cover_url) as string, fetchpriority: "high" as const }]
+        // Portrait cover for small viewports; landscape thumbnail for desktop.
+        // Breakpoints match the film hero (lg: = 1024px).
+        ...(loaderData?.heroMobile
+          ? [{
+              rel: "preload" as const,
+              as: "image" as const,
+              href: loaderData.heroMobile as string,
+              media: "(max-width: 1023px)" as const,
+              fetchpriority: "high" as const,
+            }]
+          : []),
+        ...(loaderData?.heroDesktop
+          ? [{
+              rel: "preload" as const,
+              as: "image" as const,
+              href: loaderData.heroDesktop as string,
+              media: "(min-width: 1024px)" as const,
+              fetchpriority: "high" as const,
+            }]
           : []),
       ],
       scripts: [
@@ -610,17 +627,28 @@ function FilmPage() {
                   style={posterStyle}
                 >
                   {isContain && heroArt ? (
-                    <img
-                      src={heroDesktop || heroArtDesktop || heroMobile || heroArtMobile || ""}
-                      alt=""
-                      aria-hidden
-                      className="absolute inset-0 h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none"
-                    />
+                    <>
+                      <img
+                        src={heroMobile || heroArtMobile || ""}
+                        alt=""
+                        aria-hidden
+                        loading="lazy"
+                        className="absolute inset-0 block h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none lg:hidden"
+                      />
+                      <img
+                        src={heroDesktop || heroArtDesktop || ""}
+                        alt=""
+                        aria-hidden
+                        loading="lazy"
+                        className="absolute inset-0 hidden h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none lg:block"
+                      />
+                    </>
                   ) : null}
                   {heroArtMobile ? (
                     <img
                       src={heroMobile || heroArtMobile}
                       alt={title}
+                      loading="lazy"
                       decoding="async"
                       className={`film-hero-kenburns absolute inset-0 block h-full w-full lg:hidden ${heroFitClass} select-none`}
                     />
@@ -629,6 +657,7 @@ function FilmPage() {
                     <img
                       src={heroDesktop || heroArtDesktop}
                       alt={title}
+                      loading="lazy"
                       decoding="async"
                       className={`film-hero-kenburns absolute inset-0 hidden h-full w-full lg:block ${heroFitClass} select-none`}
                     />
