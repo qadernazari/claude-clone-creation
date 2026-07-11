@@ -587,82 +587,71 @@ function FilmPage() {
         </div>
       </div>
 
-      {/* Cinematic full-bleed hero */}
-      <section className="relative isolate min-h-[78vh] w-full overflow-hidden bg-background md:min-h-[88vh]">
-        {/* Backdrop — isolated full-bleed art, nudged down without adding a top bar */}
-        {heroArt ? (
-          <>
-            {/* Blurred backdrop when contain, so no black bars */}
-            {isContain ? (
-              <img
-                src={heroDesktop || heroArtDesktop || heroMobile || heroArtMobile || ""}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 -z-40 h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none"
-              />
-            ) : null}
-            {/* Mobile: 9:16 vertical poster */}
-            {heroArtMobile ? (
-              <img
-                src={heroMobile || heroArtMobile}
-                alt=""
-                decoding="async"
-                className={`film-hero-kenburns absolute inset-0 -z-30 h-full w-full ${heroFitClass} select-none md:hidden`}
-                aria-hidden
-              />
-            ) : null}
-            {/* Desktop / tablet: 16:9 cinematic art with slow Ken Burns drift. */}
-            {heroArtDesktop ? (
-              <img
-                src={heroDesktop || heroArtDesktop}
-                alt=""
-                decoding="async"
-                className={`film-hero-kenburns absolute ${isContain ? "inset-0 h-full" : "inset-x-0 -top-[10%] h-[112%] translate-y-[7%]"} -z-30 hidden w-full max-w-none ${heroFitClass} select-none md:block`}
-                aria-hidden
-              />
-            ) : null}
-          </>
-        ) : (
-          <div className="absolute inset-0 -z-30" style={posterStyle} aria-hidden />
-        )}
-        {/* Very light base tint — keep the image bright and cinematic */}
-        <div
-          className="absolute inset-0 -z-20 bg-black/10"
-          aria-hidden
-        />
-        {/* Cinematic bottom-up gradient stack — anchors the text column in solid
-            darkness so the title never fights the image behind it. */}
-        <div
-          className="absolute inset-0 -z-10"
-          aria-hidden
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(8,8,10,0) 0%, rgba(8,8,10,0) 35%, rgba(8,8,10,0.55) 62%, rgba(8,8,10,0.88) 82%, var(--background) 100%)",
-          }}
-        />
-        {/* Side fade behind the title column — heavier at the anchored edge */}
-        <div
-          className="absolute inset-0 -z-10"
-          aria-hidden
-          style={{
-            background:
-              dir === "rtl"
-                ? "linear-gradient(270deg, rgba(8,8,10,0.72) 0%, rgba(8,8,10,0.28) 42%, rgba(8,8,10,0) 72%)"
-                : "linear-gradient(90deg, rgba(8,8,10,0.72) 0%, rgba(8,8,10,0.28) 42%, rgba(8,8,10,0) 72%)",
-          }}
-        />
-
-
-
-        {/* Hero content — anchored bottom-start. Top padding clears the fixed header. */}
-        <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-5 pb-10 pt-24 sm:px-6 md:min-h-[88vh] md:px-10 md:pb-20 md:pt-44">
+      {/* Framed cinematic hero — 2:3 on mobile, 16:9 on desktop */}
+      <section className="relative isolate w-full overflow-hidden bg-background">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 pb-6 pt-24 sm:px-6 md:gap-10 md:px-10 md:pt-32">
           <Link
             to="/"
-            className="absolute hidden md:inline-flex items-center text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright top-[104px]"
-            style={dir === "rtl" ? { right: "1.5rem" } : { left: "1.5rem" }}
+            className="hidden self-start text-[11px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream-bright md:inline-flex"
           >
             ← {t.back}
           </Link>
+
+          {/* Framed art */}
+          <div className="relative flex justify-center">
+            <div className="group relative w-full max-w-[380px] lg:max-w-none">
+              <div
+                className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]"
+                aria-hidden
+              />
+              <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl backdrop-blur-sm transition-transform duration-500 group-hover:scale-[1.01] lg:rounded-[2rem] lg:p-3">
+                <div
+                  className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] lg:aspect-video lg:rounded-[1.4rem]"
+                  style={posterStyle}
+                >
+                  {isContain && heroArt ? (
+                    <img
+                      src={heroDesktop || heroArtDesktop || heroMobile || heroArtMobile || ""}
+                      alt=""
+                      aria-hidden
+                      className="absolute inset-0 h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none"
+                    />
+                  ) : null}
+                  {heroArtMobile ? (
+                    <img
+                      src={heroMobile || heroArtMobile}
+                      alt={title}
+                      decoding="async"
+                      className={`film-hero-kenburns absolute inset-0 block h-full w-full lg:hidden ${heroFitClass} select-none`}
+                    />
+                  ) : null}
+                  {heroArtDesktop ? (
+                    <img
+                      src={heroDesktop || heroArtDesktop}
+                      alt={title}
+                      decoding="async"
+                      className={`film-hero-kenburns absolute inset-0 hidden h-full w-full lg:block ${heroFitClass} select-none`}
+                    />
+                  ) : null}
+                  <div
+                    className="pointer-events-none absolute inset-0"
+                    aria-hidden
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
+              <div className="pointer-events-none absolute -bottom-3 -left-3 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
+            </div>
+          </div>
+        </div>
+
+        {/* Text content below the frame */}
+        <div className="relative mx-auto max-w-7xl px-5 pb-10 sm:px-6 md:px-10 md:pb-20">
+
 
 
           <div className="max-w-2xl">
