@@ -539,7 +539,11 @@ function HeroPerfPage() {
           </form>
         </div>
         <div className="ml-auto text-xs text-muted-foreground">
-          {isLoading ? "Loading…" : `${data?.total ?? 0} samples`}
+          {isLoading
+            ? "Loading…"
+            : rows.length === allRows.length
+              ? `${allRows.length} samples`
+              : `${rows.length} of ${allRows.length} samples`}
         </div>
       </div>
 
