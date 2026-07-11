@@ -10,6 +10,8 @@
 
 export type PerfPayload = {
   url: string;
+  correlation_id: string | null;
+  preload_url: string | null;
   lcp_ms: number;
   lcp_size: number;
   req_start_ms: number | null;
@@ -24,6 +26,12 @@ export type PerfPayload = {
   effective_type: string | null;
   downlink: number | null;
   ua_mobile: boolean;
+};
+
+export type MeasureHeroLCPOptions = {
+  sampleRate?: number;
+  correlationId?: string;
+  preloadUrl?: string | null;
 };
 
 interface LcpEntry extends PerformanceEntry {
