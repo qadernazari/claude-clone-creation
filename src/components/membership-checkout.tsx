@@ -1,15 +1,25 @@
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createMembershipCheckout } from "@/lib/membership.functions";
 import { CouponField } from "@/components/coupon-field";
-import { IrPayPanel } from "@/components/ir-pay-panel";
 import { useIrMode } from "@/hooks/use-ir-mode";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useLocale } from "@/lib/i18n";
 import { getPlan, tomanPriceForPlan, type MembershipPlanId } from "@/lib/membership-plans";
+
+// Lazy chunks — @stripe/react-stripe-js and IranianPay UI never load
+// unless the user actually enters the corresponding checkout branch.
+const EmbeddedCheckoutProvider = lazy(() =>
+  import("@stripe/react-stripe-js").then((m) => ({ default: m.EmbeddedCheckoutProvider })),
+);
+const EmbeddedCheckout = lazy(() =>
+  import("@stripe/react-stripe-js").then((m) => ({ default: m.EmbeddedCheckout })),
+);
+const IrPayPanel = lazy(() =>
+  import("@/components/ir-pay-panel").then((m) => ({ default: m.IrPayPanel })),
+);
 
 
 interface MembershipCheckoutProps {
@@ -116,13 +126,15 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
         </button>
 
         {irMode ? (
-          <IrPayPanel
-            kind="membership"
-            itemId={planId}
-            amountToman={planAmountToman}
-            couponCode={applied?.code}
-            onClose={onClose}
-          />
+          <Suspense fallback={null}>
+            <IrPayPanel
+              kind="membership"
+              itemId={planId}
+              amountToman={planAmountToman}
+              couponCode={applied?.code}
+              onClose={onClose}
+            />
+          </Suspense>
         ) : !started ? (
           <div className="p-6 sm:p-8">
             <div className="text-[11px] uppercase tracking-[0.18em] text-amber/90">
@@ -159,9 +171,11 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl bg-white">
-            <EmbeddedCheckoutProvider stripe={getStripe()} options={options}>
-              <EmbeddedCheckout />
-            </EmbeddedCheckoutProvider>
+            <Suspense fallback={null}>
+              <EmbeddedCheckoutProvider stripe={getStripe()} options={options}>
+                <EmbeddedCheckout />
+              </EmbeddedCheckoutProvider>
+            </Suspense>
           </div>
         )}
       </div>

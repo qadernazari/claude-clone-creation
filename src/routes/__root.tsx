@@ -193,6 +193,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         crossOrigin: "anonymous",
       },
       { rel: "dns-prefetch", href: "https://yasfnvftzwyuxdhpysof.supabase.co" },
+      { rel: "dns-prefetch", href: "https://payment.zarinpal.com" },
+      { rel: "dns-prefetch", href: "https://www.zarinpal.com" },
     ],
 
   }),
