@@ -73,7 +73,7 @@ const GRADIENTS = [
 
 const EMPTY: FilmDraft = {
   slug: "", title_en: "", title_fa: "", director_en: "", director_fa: "",
-  synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
+  synopsis_en: "", synopsis_fa: "", category: "", language: "fa", year: null, duration_min: null,
   price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", cover_fit: "cover", cover_position: "center", poster_gradient: GRADIENTS[0],
