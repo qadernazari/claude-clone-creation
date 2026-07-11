@@ -222,6 +222,13 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
               className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
               style={{ background: fallbackBg }}
             >
+              {/* Shimmer skeleton — visible until the image loads */}
+              <div
+                className={`hero-shimmer pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+                  loaded ? "opacity-0" : "opacity-100"
+                }`}
+                aria-hidden
+              />
               {(portraitImage || landscapeImage) && (eager || active) ? (
                 <picture>
                   {landscapeImage ? (
@@ -241,6 +248,8 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                     decoding={eager ? "sync" : "async"}
                     fetchPriority={eager ? "high" : undefined}
                     sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
+                    onLoad={() => setLoaded(true)}
+                    onError={() => setLoaded(true)}
                   />
                 </picture>
               ) : null}
@@ -252,6 +261,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                 }}
               />
             </div>
+
           </div>
 
           {/* Corner accents */}
