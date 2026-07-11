@@ -324,8 +324,18 @@ for (const key of selection) {
     await cdp.send("Network.enable");
     const cdpByReq = new Map();
     const cdpByUrl = new Map(); // url -> latest response record
+    const cdpInitiatorByUrl = new Map(); // url -> initiator + referer + t0
     cdp.on("Network.requestWillBeSent", (e) => {
       cdpByReq.set(e.requestId, { url: e.request.url });
+      const topFrame = e.initiator?.stack?.callFrames?.[0] || null;
+      cdpInitiatorByUrl.set(e.request.url, {
+        initiator_type: e.initiator?.type ?? null,
+        initiator_url: topFrame?.url ?? e.initiator?.url ?? null,
+        initiator_line: topFrame?.lineNumber ?? null,
+        referer:
+          e.request.headers?.Referer || e.request.headers?.referer || null,
+        request_will_be_sent_ts: e.timestamp ?? null,
+      });
     });
     cdp.on("Network.responseReceived", (e) => {
       const rec = {
@@ -353,12 +363,44 @@ for (const key of selection) {
           bytes = null;
         }
       }
+      const req = resp.request();
+      const cdpMeta = cdpInitiatorByUrl.get(resp.url()) || null;
+      const cdpResp = cdpByUrl.get(resp.url()) || null;
+      let timing = null;
+      try {
+        timing = req.timing?.() || null;
+      } catch {
+        timing = null;
+      }
+      let method = null;
+      let resourceType = null;
+      let referer = null;
+      let frameUrl = null;
+      try { method = req.method(); } catch {}
+      try { resourceType = req.resourceType(); } catch {}
+      try { referer = req.headers()["referer"] ?? null; } catch {}
+      try { frameUrl = req.frame()?.url() ?? null; } catch {}
       const record = {
         bucket,
         url: resp.url(),
         status: resp.status(),
         bytes,
-        from_cache: resp.fromServiceWorker() || false,
+        from_cache:
+          resp.fromServiceWorker() ||
+          !!cdpResp?.fromDiskCache ||
+          !!cdpResp?.fromPrefetchCache,
+        // Additive attribution fields — existing consumers ignore them.
+        method,
+        resource_type: resourceType,
+        initiator_type: cdpMeta?.initiator_type ?? null,
+        initiator_url: cdpMeta?.initiator_url ?? null,
+        initiator_line: cdpMeta?.initiator_line ?? null,
+        referer: referer ?? cdpMeta?.referer ?? null,
+        frame_url: frameUrl,
+        from_disk_cache: !!cdpResp?.fromDiskCache,
+        from_prefetch_cache: !!cdpResp?.fromPrefetchCache,
+        t0_ms: timing ? Math.round(timing.requestStart) : null,
+        response_end_ms: timing ? Math.round(timing.responseEnd) : null,
       };
       (bucket === "film-thumbnails" ? localThumb : localCover).push(record);
     };
