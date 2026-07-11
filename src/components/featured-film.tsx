@@ -360,7 +360,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
   const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
   return (
-    <div className="flex flex-col gap-5 lg:gap-6">
+    <div className="flex flex-col gap-5 md:hidden">
       <div className="flex flex-wrap items-center gap-3">
         <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
           {locale === "fa" ? "اختصاصی" : "Original"}
