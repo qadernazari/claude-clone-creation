@@ -768,6 +768,17 @@ for (const key of selection) {
   const sumBytes = (arr) =>
     arr.reduce((s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0), 0);
 
+  const expectTransfersForBudget =
+    vp.expectBucket === "film-thumbnails" ? thumbTransfers : coverTransfers;
+  const initialExpectSlice = expectTransfersForBudget.slice(
+    0,
+    expectTransfersForBudget.length -
+      (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+      (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
+  );
+  const transferBytesInitial = sumBytes(initialExpectSlice);
+  const transferBudget = PER_VIEWPORT_TRANSFER_BUDGET_BYTES[key] ?? DEFAULT_TRANSFER_BUDGET_BYTES;
+
   reportRuns.push({
     viewport_key: key,
     viewport_label: vp.label,
@@ -784,6 +795,10 @@ for (const key of selection) {
       sumBytes(thumbTransfers) + sumBytes(coverTransfers),
     transfer_bytes_thumbnails: sumBytes(thumbTransfers),
     transfer_bytes_covers: sumBytes(coverTransfers),
+    transfer_bytes_initial: transferBytesInitial,
+    transfer_budget_bytes: transferBudget,
+    transfer_over_budget:
+      transferBytesInitial > 0 && transferBytesInitial > transferBudget,
     transfers: {
       "film-thumbnails": thumbTransfers,
       "film-covers": coverTransfers,
