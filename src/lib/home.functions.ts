@@ -20,6 +20,20 @@ function makeRenderCache() {
   return new Map<string, Promise<string | null>>();
 }
 
+// Exported for tests. Cache key must uniquely encode every parameter that
+// affects the resulting signed URL: bucket, path, width, height, resize mode,
+// and quality. Delimiter `|` cannot appear in bucket names or storage paths.
+export function buildSignedUrlCacheKey(
+  bucket: string,
+  path: string,
+  width: number,
+  height: number | undefined,
+  resize: "contain" | "cover" | "fill",
+  quality: number,
+): string {
+  return `${bucket}|${path}|${width}|${height ?? 0}|${resize}|${quality}`;
+}
+
 async function renderResizedUrl(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: any,
@@ -33,7 +47,7 @@ async function renderResizedUrl(
   if (!original) return null;
   const parsed = parseSignedObjectUrl(original);
   if (!parsed) return original;
-  const key = `${parsed.bucket}|${parsed.path}|${width}|${height ?? 0}|${resize}|${quality}`;
+  const key = buildSignedUrlCacheKey(parsed.bucket, parsed.path, width, height, resize, quality);
   const cached = GLOBAL_URL_CACHE.get(key);
   if (cached) return cached;
   const existing = cache.get(key);
