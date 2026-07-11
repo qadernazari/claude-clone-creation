@@ -151,12 +151,12 @@ export const getHomeFeatured = createServerFn({ method: "GET" }).handler(
       if (!featuredRaw) return null;
       const cache = makeRenderCache();
       const [cover, thumbnail, thumbnail1280, thumbnail2400, thumbnailMobile, mobile] = await Promise.all([
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 1920, 86),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.cover_url as string | null, 800, 75),
         renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1920, 90),
         renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1280, 88),
         renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 2400, 90),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 1080, 86),
-        renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 1080, 82, 1620, "cover"),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.thumbnail_url as string | null, 800, 75),
+        renderResizedUrl(supabaseAdmin, cache, featuredRaw.mobile_cover_url as string | null, 800, 75, 1200, "cover"),
       ]);
 
       return {
