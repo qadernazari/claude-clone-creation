@@ -30,7 +30,7 @@ function HeroShell({ children, extra }: { children: React.ReactNode; extra?: Rea
 }
 
 function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
-  
+  const { locale } = useLocale();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
