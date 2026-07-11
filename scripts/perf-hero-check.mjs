@@ -1328,6 +1328,7 @@ const report = {
   base_url: BASE_URL,
   lcp_budget_ms: LCP_BUDGET_MS,
   lcp_budget_ms_per_viewport: PER_VIEWPORT_BUDGET_MS,
+  require_preload_cache_hit: REQUIRE_PRELOAD_CACHE_HIT,
   transfer_budget_bytes_per_viewport: PER_VIEWPORT_TRANSFER_BUDGET_BYTES,
   viewports_selected: selection,
   overall_passed: totalFailures.length === 0,
