@@ -167,6 +167,76 @@ function Rail({
   );
 }
 
+/* ---------- Skeleton mirroring Rail dimensions ---------- */
+function RailSkeleton({ title }: { title?: string }) {
+  return (
+    <section
+      className="relative mx-auto max-w-[1400px] px-5 md:px-12"
+      style={{ containIntrinsicSize: "1px 520px" }}
+      aria-hidden
+    >
+      <div className="mb-5 flex items-center gap-3 md:gap-4">
+        <span className="h-6 w-[3px] shrink-0 rounded-full bg-amber/40" />
+        {title ? (
+          <h2 className="truncate font-display text-[18px] font-semibold tracking-[-0.01em] text-cream-bright/70 md:text-[22px]">
+            {title}
+          </h2>
+        ) : (
+          <div className="h-5 w-40 rounded bg-cream/10 md:h-6 md:w-52" />
+        )}
+      </div>
+      <div className="-mx-5 flex gap-3 overflow-hidden px-5 pt-2 pb-2 md:-mx-12 md:gap-6 md:px-12 md:pt-3">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className="w-[46vw] shrink-0 sm:w-[220px] md:w-[300px] lg:w-[340px]"
+          >
+            <div className="aspect-[2/3] w-full animate-pulse rounded-xl bg-cream/6 lg:aspect-video" />
+            <div className="mt-3 h-3.5 w-4/5 rounded bg-cream/8 md:mt-4" />
+            <div className="mt-2 h-3 w-2/5 rounded bg-cream/6" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- LazyRail: mounts real Rail only when near viewport ---------- */
+function LazyRail(props: React.ComponentProps<typeof Rail>) {
+  const holderRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (visible) return;
+    const el = holderRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setVisible(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: "600px 0px", threshold: 0.01 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visible]);
+
+  return (
+    <div ref={holderRef}>
+      {visible ? <Rail {...props} /> : <RailSkeleton title={props.title} />}
+    </div>
+  );
+}
+
 /* ---------- Multi-rail container ---------- */
 export function FilmsRow() {
   const { locale, num, year, t } = useLocale();
