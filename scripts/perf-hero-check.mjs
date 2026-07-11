@@ -769,19 +769,32 @@ for (const key of selection) {
         byHref.set(m.href, rec);
       }
       const preloadStats = Array.from(byHref.values());
-      const filmCoverPreloads = preloadStats.filter((r) =>
-        /film-covers/.test(r.href),
-      );
-      const preloadViolations = filmCoverPreloads.filter(
-        (r) => r.added > 0 || r.removed > 0 || r.initial + r.added > 1,
-      );
+      // Mutation check runs against the viewport's EXPECTED preload bucket
+      // (portrait/landscape → configured storage bucket), so the same rule
+      // enforces "emitted once, never mutated" whichever bucket the run targets.
+      const expectBucketRe = new RegExp(escapeRegExp(vp.expectBucket));
+      const forbidBucketRe = new RegExp(escapeRegExp(vp.forbidBucket));
+      const expectPreloads = preloadStats.filter((r) => expectBucketRe.test(r.href));
+      const forbidPreloads = preloadStats.filter((r) => forbidBucketRe.test(r.href));
+      const preloadViolations = [
+        ...expectPreloads.filter(
+          (r) => r.added > 0 || r.removed > 0 || r.initial + r.added > 1,
+        ),
+        // Any preload for the forbidden bucket is itself a violation — the
+        // gate is meant to keep those bytes off this viewport entirely.
+        ...forbidPreloads.map((r) => ({ ...r, forbidden_bucket: true })),
+      ];
       result.preloadMutations = preloadMutations;
       result.preloadStats = preloadStats;
       result.preloadAssertion = {
-        film_cover_urls: filmCoverPreloads.length,
+        expect_bucket: vp.expectBucket,
+        forbid_bucket: vp.forbidBucket,
+        expect_bucket_urls: expectPreloads.length,
+        forbid_bucket_urls: forbidPreloads.length,
         violations: preloadViolations,
         ok: preloadViolations.length === 0,
       };
+
 
 
       // ----- Mount tracker: detect StrictMode / double-mount patterns -----
