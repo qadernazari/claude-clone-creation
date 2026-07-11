@@ -240,16 +240,31 @@ for (const key of selection) {
       ]);
       await sleep(250);
 
-      localRenderedSrc = await page.evaluate(() => {
+      const domSnapshot = await page.evaluate(() => {
         const imgs = Array.from(document.querySelectorAll("main img"));
         const visible = imgs.find((i) => {
           const r = i.getBoundingClientRect();
           return r.width > 200 && r.height > 200;
         });
-        return visible instanceof HTMLImageElement
-          ? visible.currentSrc || visible.src
-          : null;
+        const rendered =
+          visible instanceof HTMLImageElement
+            ? visible.currentSrc || visible.src
+            : null;
+        const preloads = Array.from(
+          document.querySelectorAll('link[rel="preload"][as="image"]'),
+        ).map((l) => ({
+          href: l.href,
+          media: l.getAttribute("media"),
+          matches: l.getAttribute("media")
+            ? window.matchMedia(l.getAttribute("media")).matches
+            : true,
+        }));
+        const activePreload = preloads.find((p) => p.matches) || null;
+        return { rendered, preloads, activePreload };
       });
+      localRenderedSrc = domSnapshot.rendered;
+      result.domPreloads = domSnapshot.preloads;
+      result.activePreload = domSnapshot.activePreload;
 
       // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
       const lcpUrl = localRenderedSrc || localBeacon?.url || null;
