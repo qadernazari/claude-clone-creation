@@ -1130,7 +1130,6 @@ function PerfReportsList() {
           <p className="text-sm text-muted-foreground">
             No reports uploaded yet.
           </p>
-          </p>
         ) : (
           <ul className="divide-y divide-border text-sm">
             {files.map((f) => (
