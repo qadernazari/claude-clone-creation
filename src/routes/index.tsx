@@ -89,11 +89,13 @@ function DeferredHomeRails() {
   const [show, setShow] = useState(false);
   const queryClient = useQueryClient();
 
-  // Mount rails right after hydration so there's no big empty gap under the
-  // hero. On idle: warm the JS chunks AND prefetch the shared rails query so
-  // New Release and Walking Tour can hydrate instantly — no chunk fetch, no
-  // query wait when their <Suspense> boundaries mount.
   useEffect(() => {
+    // Fire-and-forget: initialize perf logging (opt-in via ?perf=1).
+    void import("@/lib/perf-log").then((m) => {
+      m.initPerfLogs();
+      m.logEvent("DeferredHomeRails:effect");
+    });
+
     const w = window as Window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
     };
@@ -103,9 +105,11 @@ function DeferredHomeRails() {
     };
     idle(() => {
       prefetchRails(queryClient);
+      void import("@/lib/perf-log").then((m) => m.logEvent("rails:prefetch+show"));
       setShow(true);
     }, 800);
   }, [queryClient]);
+
 
 
   if (!show) {
