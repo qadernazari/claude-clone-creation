@@ -37,7 +37,7 @@ export function HeroPerfDebug() {
   if (!enabled) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[100] max-w-[92vw] rounded-lg border border-amber/30 bg-bg-1/95 p-3 text-[11px] shadow-2xl backdrop-blur-md sm:max-w-sm">
+    <div className="fixed top-4 right-4 z-[100] max-w-[92vw] rounded-lg border border-amber/30 bg-bg-1/95 p-3 text-[11px] shadow-2xl backdrop-blur-md sm:max-w-sm">
       <div className="mb-2 flex items-center justify-between gap-4">
         <span className="font-semibold text-amber">Hero perf beacon</span>
         {last ? (
