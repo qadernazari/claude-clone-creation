@@ -622,14 +622,24 @@ for (const key of selection) {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     console.log(`  attempt ${attempt}/${MAX_ATTEMPTS}…`);
     const r = await singleAttempt(attempt);
-    attemptsMeta.push({
+    const meta = {
       attempt,
       ok: r.ok,
       reason: r.reason || null,
       lcp_ms: r.beacon?.lcp_ms ?? null,
       har_path: r.harPath || null,
       screenshot_path: r.screenshotPath || null,
-    });
+    };
+    // On failure, attach the wait outcome, the last-seen beacon payload
+    // (may be null / partial / malformed), and a phase timing breakdown so
+    // reviewers can tell nav-slow from beacon-slow without opening the HAR.
+    if (!r.ok) {
+      meta.beacon_wait = r.beaconWait;
+      meta.last_beacon = r.lastBeacon;
+      meta.timing = r.timing;
+    }
+    attemptsMeta.push(meta);
+
     if (r.ok) {
       attemptResult = r;
       if (attempt > 1) console.log(`  · recovered on attempt ${attempt}`);
