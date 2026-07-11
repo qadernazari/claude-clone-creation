@@ -31,6 +31,7 @@ export function useHeroDebugEnabled() {
 }
 
 export function HeroImageDebug({ candidates }: { candidates: Candidate[] }) {
+  useHeroMountTracker("HeroImageDebug");
   const [entries, setEntries] = useState<DiagEntry[]>([]);
   const [viewport, setViewport] = useState(0);
 
