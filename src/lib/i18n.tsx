@@ -73,13 +73,22 @@ function regionToLocale(r: Region): Locale {
   return r === "iran" ? "fa" : "en";
 }
 
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  // Initialize synchronously from SSR-injected value — same on server and
-  // first client render → no hydration mismatch, no flash.
+export function LocaleProvider({
+  children,
+  initialRegion: initialRegionProp,
+}: {
+  children: ReactNode;
+  initialRegion?: Region;
+}) {
+  // Initialize synchronously from SSR-resolved value (passed as prop from
+  // route context) — same on server and first client render → no hydration
+  // mismatch, no flash. Falls back to client-side detection for legacy paths.
   const initialRegion: Region =
-    typeof window === "undefined" ? "global" : readInitialRegion();
+    initialRegionProp ??
+    (typeof window === "undefined" ? "iran" : readInitialRegion());
   const [region, setRegionState] = useState<Region>(initialRegion);
   const [locale, setLocaleState] = useState<Locale>(regionToLocale(initialRegion));
+
 
   // Mirror to <html> on changes (initial SSR HTML already has correct attrs).
   useEffect(() => {
