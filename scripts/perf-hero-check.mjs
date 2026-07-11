@@ -962,6 +962,33 @@ for (const key of selection) {
             .catch(() => {});
           result.screenshotPath = screenshotPath;
         } catch {}
+        // Capture rendered HTML snapshot (post-hydration) for post-mortem.
+        try {
+          const html = await page.content();
+          await writeFile(htmlSnapshotPath, html, "utf8");
+          result.htmlSnapshotPath = htmlSnapshotPath;
+        } catch {}
+        // Persist the per-viewport beacon payload (may be null / partial).
+        try {
+          await writeFile(
+            beaconJsonPath,
+            JSON.stringify(
+              {
+                viewport_key: key,
+                viewport_label: vp.label,
+                attempt,
+                captured_at: new Date().toISOString(),
+                beacon: localBeacon,
+                rendered_src: localRenderedSrc,
+                cache_probe: cacheProbe,
+              },
+              null,
+              2,
+            ),
+            "utf8",
+          );
+          result.beaconJsonPath = beaconJsonPath;
+        } catch {}
       }
       // Stop tracing before closing the context so the zip is flushed.
       if (shouldKeepArtifacts) {
@@ -989,9 +1016,11 @@ for (const key of selection) {
           har_path: harPath,
           trace_path: tracePath,
           screenshot_path: screenshotPath,
+          beacon_json_path: beaconJsonPath,
+          html_snapshot_path: htmlSnapshotPath,
         });
         console.log(
-          `    · saved artifacts (${reasonTag}) → ${harPath} , ${tracePath} , ${screenshotPath}`,
+          `    · saved artifacts (${reasonTag}) → ${harPath} , ${tracePath} , ${screenshotPath} , ${beaconJsonPath} , ${htmlSnapshotPath}`,
         );
         console.log(
           `      view trace: npx playwright show-trace ${tracePath}`,
@@ -1000,6 +1029,8 @@ for (const key of selection) {
         // Clean attempt: drop the HAR (screenshot + trace were never saved).
         await unlink(harPath).catch(() => {});
       }
+    }
+
     }
 
     return result;
