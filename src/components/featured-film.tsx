@@ -76,7 +76,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
     >
-      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-3">
         <div className="relative">
           {slides.map((film, i) => (
             <SlideImageFrame
