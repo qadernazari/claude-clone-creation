@@ -234,14 +234,14 @@ function SlideImageFrame({
 
   return (
     <div
-      className={`flex justify-center transition-opacity duration-700 ease-out ${
+      className={`flex justify-center transition-opacity duration-700 ease-out md:justify-end ${
         active
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
       aria-hidden={!active}
     >
-      <div className="group relative w-full max-w-[380px] lg:max-w-none">
+      <div className="group relative w-full max-w-[380px] md:max-w-[420px] lg:max-w-[480px]">
         {/* Ambient amber glow — desktop only; blur(100px) is a mobile perf killer */}
         <div
           className="pointer-events-none absolute -inset-10 hidden rounded-full bg-amber/10 opacity-60 blur-[100px] md:block"
