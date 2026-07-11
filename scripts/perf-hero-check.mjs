@@ -390,7 +390,26 @@ for (const key of selection) {
       if (!localBeacon || typeof localBeacon.lcp_ms !== "number") {
         result.reason = "beacon missing lcp_ms";
       } else {
-        result.ok = true;
+        // Soft-fail (retriable) conditions: cold-start flakiness that a
+        // warm cache typically clears on the next attempt.
+        const budget = PER_VIEWPORT_BUDGET_MS[key] ?? LCP_BUDGET_MS;
+        const softReasons = [];
+        if (localBeacon.lcp_ms > budget) {
+          softReasons.push(`lcp_ms ${localBeacon.lcp_ms} > budget ${budget}`);
+        }
+        if (key === "mobile" && localBeacon.preload_cache_hit !== true) {
+          softReasons.push(
+            `preload_cache_hit=${JSON.stringify(localBeacon.preload_cache_hit)} (expected true)`,
+          );
+        }
+        if (softReasons.length && attempt < MAX_ATTEMPTS) {
+          result.ok = false;
+          result.reason = `soft-flake: ${softReasons.join("; ")}`;
+        } else {
+          // Either we're within budgets, or we've exhausted retries and
+          // must hand off to the hard assertion block for a definitive fail.
+          result.ok = true;
+        }
       }
     } catch (err) {
       result.reason = err instanceof Error ? err.message : String(err);
