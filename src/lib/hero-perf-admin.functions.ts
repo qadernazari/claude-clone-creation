@@ -77,6 +77,12 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
     else if (data.preloadCacheHit === "miss") q = q.eq("preload_cache_hit", false);
     else if (data.preloadCacheHit === "unknown") q = q.is("preload_cache_hit", null);
 
+    if (data.correlationId) {
+      // Prefix match — accepts both a short 8-char id from the table and a full UUID.
+      q = q.ilike("correlation_id", `${data.correlationId}%`);
+    }
+
+
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
