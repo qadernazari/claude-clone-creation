@@ -168,6 +168,7 @@ const POS_CLASS: Record<string, string> = {
 };
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
+  useHeroMountTracker("Slide", film.id);
   const { locale, num, year, t } = useLocale();
   // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
