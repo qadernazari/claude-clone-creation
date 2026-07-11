@@ -491,8 +491,8 @@ function FilmEditorModal({
                 value={d.thumbnail_url ?? null}
                 onChange={(u) => set("thumbnail_url", u ?? "")}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Rail / Hero Image (16:9) — required"
-                description="Landscape image used on homepage rails, browse grid, and the desktop hero. Recommended 1920×1080px (16:9). This is the primary artwork shown everywhere except the share preview."
+                label="Desktop Hero / Rail Image (16:9) — required"
+                description="Landscape image used on the desktop hero, homepage rails, and browse grid. Recommended 1920×1080px (16:9)."
                 maxBytes={15 * 1024 * 1024}
               />
               <FileUpload
@@ -502,8 +502,8 @@ function FilmEditorModal({
                 value={d.cover_url ?? null}
                 onChange={(u) => { set("cover_url", u ?? ""); if (u) set("poster_gradient", ""); }}
                 pathPrefix={d.id ?? `new-${d.slug || "film"}`}
-                label="Upload Poster (2:3, optional)"
-                description="Portrait poster used for share previews and poster-style views. Recommended 400×600px or larger (2:3). Falls back to the 16:9 image if unset."
+                label="Mobile Hero / Poster (2:3) — recommended"
+                description="Portrait poster shown as the mobile hero and share preview. Recommended 800×1200px (2:3). Falls back to the 16:9 image if unset."
                 maxBytes={25 * 1024 * 1024}
               />
               <FileUpload
