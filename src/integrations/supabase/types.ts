@@ -591,6 +591,45 @@ export type Database = {
           },
         ]
       }
+      hero_perf_alerts: {
+        Row: {
+          alert_kind: string
+          cache_hit_rate: number | null
+          created_at: string
+          detail: Json | null
+          id: number
+          lcp_p75_ms: number | null
+          recipients: string[]
+          sample_count: number
+          viewport_bucket: string
+          window_minutes: number
+        }
+        Insert: {
+          alert_kind: string
+          cache_hit_rate?: number | null
+          created_at?: string
+          detail?: Json | null
+          id?: number
+          lcp_p75_ms?: number | null
+          recipients?: string[]
+          sample_count: number
+          viewport_bucket: string
+          window_minutes: number
+        }
+        Update: {
+          alert_kind?: string
+          cache_hit_rate?: number | null
+          created_at?: string
+          detail?: Json | null
+          id?: number
+          lcp_p75_ms?: number | null
+          recipients?: string[]
+          sample_count?: number
+          viewport_bucket?: string
+          window_minutes?: number
+        }
+        Relationships: []
+      }
       hero_perf_logs: {
         Row: {
           correlation_id: string | null
