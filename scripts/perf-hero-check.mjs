@@ -211,9 +211,12 @@ const selection = (process.env.VIEWPORTS || "mobile,tablet,laptop,desktop")
 
 const REPORT_DIR = process.env.REPORT_DIR || "/mnt/documents";
 const REPORT_STAMP = new Date().toISOString().replace(/[:.]/g, "-");
+const FAILURE_DIR = joinPath(REPORT_DIR, "failures", REPORT_STAMP);
+await mkdir(FAILURE_DIR, { recursive: true });
 
 const totalFailures = [];
 const reportRuns = [];
+const failureArtifacts = [];
 
 await warmProcessOnce();
 
