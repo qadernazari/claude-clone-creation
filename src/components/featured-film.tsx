@@ -183,6 +183,7 @@ const POS_CLASS: Record<string, string> = {
 };
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
+  const { locale } = useLocale();
   return (
     <div
       className={`grid grid-cols-1 items-center gap-5 transition-opacity duration-700 ease-out md:grid-cols-2 md:gap-8 lg:gap-10 ${
@@ -190,9 +191,10 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
+      dir="ltr"
       aria-hidden={!active}
     >
-      <div className="order-2 flex flex-col justify-center md:order-1">
+      <div className="order-2 flex flex-col justify-center md:order-1" dir={locale === "fa" ? "rtl" : "ltr"}>
         <SlideDetails film={film} />
       </div>
       <div className="order-1 md:order-2">
