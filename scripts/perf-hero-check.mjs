@@ -550,6 +550,18 @@ for (const key of selection) {
       result.activePreload = domSnapshot.activePreload;
       timing.dom_snapshot_ms = Date.now() - domStart;
 
+      // ----- Mount tracker: detect StrictMode / double-mount patterns -----
+      // The page exposes `window.__heroMounts` when ?hero-debug=1 is set
+      // (see src/lib/hero-mount-tracker.ts). We correlate mount events
+      // with the film-covers fetch timeline so duplicate fetches caused by
+      // a component remount are unambiguous.
+      const mountEvents = await page.evaluate(() => {
+        return Array.isArray(window.__heroMounts) ? window.__heroMounts.slice() : [];
+      });
+      const mountAnalysis = analyzeMountEvents(mountEvents);
+      result.mountEvents = mountEvents;
+      result.mountAnalysis = mountAnalysis;
+
       // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
       const cacheProbeStart = Date.now();
       const lcpUrl = localRenderedSrc || localBeacon?.url || null;
