@@ -52,7 +52,19 @@ declare global {
 
 const DEFAULT_SAMPLE_RATE = 0.1;
 
-export function measureHeroLCP(sampleRate: number = DEFAULT_SAMPLE_RATE) {
+export function measureHeroLCP(
+  optsOrRate: MeasureHeroLCPOptions | number = {},
+) {
+  const opts: MeasureHeroLCPOptions =
+    typeof optsOrRate === "number" ? { sampleRate: optsOrRate } : optsOrRate;
+  const sampleRate = opts.sampleRate ?? DEFAULT_SAMPLE_RATE;
+  const correlationId =
+    opts.correlationId ??
+    (typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+  const preloadUrl = opts.preloadUrl ?? null;
+
   if (typeof window === "undefined") return;
   const forced =
     typeof window.location !== "undefined" &&
