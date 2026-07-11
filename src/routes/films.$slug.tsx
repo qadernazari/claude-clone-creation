@@ -26,7 +26,15 @@ import { relatedFilmsQueryOptions } from "@/lib/related-films.functions";
 const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
 // Membership purchases happen on the dedicated /membership page.
 
-
+const LANGUAGE_NAMES: Record<string, { en: string; fa: string }> = {
+  fa: { en: "Persian (Farsi)", fa: "فارسی" },
+  en: { en: "English", fa: "انگلیسی" },
+  ar: { en: "Arabic", fa: "عربی" },
+};
+function languageLabel(code: string | null | undefined, locale: "en" | "fa") {
+  if (!code) return locale === "fa" ? "فارسی" : "Persian (Farsi)";
+  return LANGUAGE_NAMES[code]?.[locale] ?? code.toUpperCase();
+}
 
 export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
