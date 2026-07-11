@@ -161,27 +161,44 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://ir.show/" },
-      ...(loaderData?.thumbnail_url || loaderData?.cover_url || loaderData?.mobile_cover_url
-        ? [
-            // Portrait cover for small viewports (matches FeaturedFilm md: breakpoint).
-            {
-              rel: "preload" as const,
-              as: "image" as const,
-              href: loaderData.mobile_cover_url || loaderData.cover_url || loaderData.thumbnail_url || "",
-              media: "(max-width: 767px)" as const,
-              fetchPriority: "high" as const,
-            },
-            // Landscape thumbnail for desktop viewports.
-            {
-              rel: "preload" as const,
-              as: "image" as const,
-              href: loaderData.thumbnail_url || loaderData.cover_url || loaderData.mobile_cover_url || "",
-              media: "(min-width: 768px)" as const,
-              fetchPriority: "high" as const,
-            },
-          ]
-        : []),
+      // Preload only URLs the matching viewport will ACTUALLY render.
+      // Mobile <img> src (portraitImage) = mobile_cover_url || cover_url || thumbnail_url
+      // Desktop <img> src (landscapeImage) = thumbnail_url || cover_url — never mobile_cover_url
+      ...(() => {
+        const mobileHref =
+          loaderData?.mobile_cover_url || loaderData?.cover_url || loaderData?.thumbnail_url || "";
+        const desktopHref =
+          loaderData?.thumbnail_url_1280 || loaderData?.thumbnail_url || loaderData?.cover_url || "";
+        const preloads: Array<{
+          rel: "preload";
+          as: "image";
+          href: string;
+          media: string;
+          fetchPriority: "high";
+        }> = [];
+        if (mobileHref) {
+          preloads.push({
+            rel: "preload",
+            as: "image",
+            href: mobileHref,
+            media: "(max-width: 767px)",
+            fetchPriority: "high",
+          });
+        }
+        // Skip desktop preload when it would duplicate the mobile one.
+        if (desktopHref && desktopHref !== mobileHref) {
+          preloads.push({
+            rel: "preload",
+            as: "image",
+            href: desktopHref,
+            media: "(min-width: 768px)",
+            fetchPriority: "high",
+          });
+        }
+        return preloads;
+      })(),
     ],
+
     scripts: [
       {
         type: "application/ld+json",
