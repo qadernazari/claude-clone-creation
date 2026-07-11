@@ -1128,8 +1128,8 @@ function PerfReportsList() {
           <p className="text-sm text-destructive">Failed to load: {(error as Error).message}</p>
         ) : files.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No reports uploaded yet. Run <code>npm run perf:hero</code> with <code>SUPABASE_URL</code> and
-            <code> SUPABASE_SERVICE_ROLE_KEY</code> set to publish reports here.
+            No reports uploaded yet.
+          </p>
           </p>
         ) : (
           <ul className="divide-y divide-border text-sm">
