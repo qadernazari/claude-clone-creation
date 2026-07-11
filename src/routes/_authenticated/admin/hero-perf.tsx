@@ -37,6 +37,20 @@ type BucketAgg = {
   cacheTotal: number;
 };
 
+const VP_BUCKETS = [
+  { key: "mobile", label: "Mobile (<768)", min: 0, max: 767, color: "#f472b6" },
+  { key: "tablet", label: "Tablet (768–1023)", min: 768, max: 1023, color: "#60a5fa" },
+  { key: "laptop", label: "Laptop (1024–1439)", min: 1024, max: 1439, color: "#34d399" },
+  { key: "desktop", label: "Desktop (≥1440)", min: 1440, max: Infinity, color: "#a78bfa" },
+] as const;
+type VpKey = (typeof VP_BUCKETS)[number]["key"];
+
+function vpBucketOf(w: number | null | undefined): VpKey | null {
+  if (w == null) return null;
+  for (const b of VP_BUCKETS) if (w >= b.min && w <= b.max) return b.key;
+  return null;
+}
+
 function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   // Choose a bucket size that yields ~30-60 buckets.
   const totalMs = hours * 3600_000;
