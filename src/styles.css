@@ -260,8 +260,6 @@
     }
   }
 
-  .hero-mobile-poster,
-  .hero-mobile-img,
   .hero-mobile-skeleton {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -270,14 +268,6 @@
     contain: paint;
   }
 
-  .hero-mobile-img {
-    opacity: 1;
-    will-change: auto;
-  }
-
-  .hero-mobile-poster {
-    background-color: var(--bg-1);
-  }
 
   /* Soft fade-in only for chrome that truly mounts after idle. The mobile tab
      bar is SSR-visible critical chrome, so it must not animate in late. */
@@ -327,20 +317,6 @@
     background: rgba(245, 244, 239, 0.04);
   }
 
-  .auth-menu-membership-amber {
-    border-color: rgba(201, 168, 76, 0.28);
-    background: rgba(201, 168, 76, 0.10);
-  }
-
-  .auth-menu-membership-green {
-    border-color: rgba(110, 231, 183, 0.24);
-    background: rgba(110, 231, 183, 0.08);
-  }
-
-  .auth-menu-membership-red {
-    border-color: rgba(252, 165, 165, 0.28);
-    background: rgba(252, 165, 165, 0.10);
-  }
 
   .auth-menu-row-icon {
     display: flex;
