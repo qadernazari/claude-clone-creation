@@ -593,6 +593,7 @@ export type Database = {
       }
       hero_perf_logs: {
         Row: {
+          correlation_id: string | null
           country: string | null
           created_at: string
           decode_ms: number | null
@@ -603,6 +604,7 @@ export type Database = {
           id: number
           lcp_ms: number | null
           lcp_size: number | null
+          preload_url: string | null
           protocol: string | null
           resp_end_ms: number | null
           transfer_bytes: number | null
@@ -612,6 +614,7 @@ export type Database = {
           viewport_w: number | null
         }
         Insert: {
+          correlation_id?: string | null
           country?: string | null
           created_at?: string
           decode_ms?: number | null
@@ -622,6 +625,7 @@ export type Database = {
           id?: number
           lcp_ms?: number | null
           lcp_size?: number | null
+          preload_url?: string | null
           protocol?: string | null
           resp_end_ms?: number | null
           transfer_bytes?: number | null
@@ -631,6 +635,7 @@ export type Database = {
           viewport_w?: number | null
         }
         Update: {
+          correlation_id?: string | null
           country?: string | null
           created_at?: string
           decode_ms?: number | null
@@ -641,6 +646,7 @@ export type Database = {
           id?: number
           lcp_ms?: number | null
           lcp_size?: number | null
+          preload_url?: string | null
           protocol?: string | null
           resp_end_ms?: number | null
           transfer_bytes?: number | null
