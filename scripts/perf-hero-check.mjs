@@ -123,12 +123,13 @@ for (const key of selection) {
   let attemptsMeta = [];
   const runStart = Date.now();
 
-  // A single navigation + observation. Returns { ok, reason, transfers, beacon, renderedSrc }.
+  // A single navigation + observation. Returns { ok, reason, transfers, beacon, renderedSrc, cacheProbe }.
   const singleAttempt = async (attempt) => {
     const localThumb = [];
     const localCover = [];
     let localBeacon = null;
     let localRenderedSrc = null;
+    let cacheProbe = null;
     let beaconResolve;
     const beaconPromise = new Promise((r) => (beaconResolve = r));
 
@@ -139,6 +140,29 @@ for (const key of selection) {
       userAgent: vp.userAgent,
     });
     const page = await context.newPage();
+
+    // CDP session gives us `fromDiskCache` / `fromMemoryCache` / `fromPrefetchCache`
+    // flags that Playwright's response events don't expose.
+    const cdp = await context.newCDPSession(page);
+    await cdp.send("Network.enable");
+    const cdpByReq = new Map();
+    const cdpByUrl = new Map(); // url -> latest response record
+    cdp.on("Network.requestWillBeSent", (e) => {
+      cdpByReq.set(e.requestId, { url: e.request.url });
+    });
+    cdp.on("Network.responseReceived", (e) => {
+      const rec = {
+        requestId: e.requestId,
+        url: e.response.url,
+        status: e.response.status,
+        fromDiskCache: !!e.response.fromDiskCache,
+        fromServiceWorker: !!e.response.fromServiceWorker,
+        fromPrefetchCache: !!e.response.fromPrefetchCache,
+        encodedDataLength: e.response.encodedDataLength ?? null,
+      };
+      cdpByReq.set(e.requestId, rec);
+      cdpByUrl.set(e.response.url, rec);
+    });
 
     const captureTransfer = async (resp, bucket) => {
       let bytes = null;
@@ -177,10 +201,17 @@ for (const key of selection) {
       }
     });
 
-    const result = { ok: false, reason: "", thumb: localThumb, cover: localCover, beacon: null, renderedSrc: null, attempt };
+    const result = {
+      ok: false,
+      reason: "",
+      thumb: localThumb,
+      cover: localCover,
+      beacon: null,
+      renderedSrc: null,
+      cacheProbe: null,
+      attempt,
+    };
     try {
-      // On first attempt, do a warm-up prefetch to prime dev-server modules
-      // (Vite cold-start is the primary source of long LCPs / connect timeouts).
       if (attempt === 1 && WARMUP) {
         try {
           await page.goto(`${BASE_URL}/?warmup=1`, {
@@ -196,11 +227,10 @@ for (const key of selection) {
         waitUntil: "domcontentloaded",
         timeout: GOTO_TIMEOUT_MS,
       });
-      // Give the LCP observer + beacon time to fire under load.
       try {
         await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
       } catch {
-        // networkidle may not settle under noisy dev-server HMR; that's fine — beacon race below still holds.
+        // dev-server HMR keeps network alive; beacon race below is authoritative.
       }
       await Promise.race([
         beaconPromise,
@@ -208,8 +238,6 @@ for (const key of selection) {
           setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
         ),
       ]);
-
-      // Wait a beat so any tail response events land before we read state.
       await sleep(250);
 
       localRenderedSrc = await page.evaluate(() => {
@@ -223,6 +251,76 @@ for (const key of selection) {
           : null;
       });
 
+      // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
+      const lcpUrl = localRenderedSrc || localBeacon?.url || null;
+      if (lcpUrl) {
+        const reloadCdpHits = [];
+        const captureReload = (e) => {
+          if (e.response?.url === lcpUrl) {
+            reloadCdpHits.push({
+              status: e.response.status,
+              fromDiskCache: !!e.response.fromDiskCache,
+              fromMemoryCache: false, // reported via `fromDiskCache` for both mem+disk in modern CDP
+              fromPrefetchCache: !!e.response.fromPrefetchCache,
+              fromServiceWorker: !!e.response.fromServiceWorker,
+              encodedDataLength: e.response.encodedDataLength ?? null,
+            });
+          }
+        };
+        cdp.on("Network.responseReceived", captureReload);
+
+        // Snapshot pre-reload transfer counts so we can diff for the reload phase.
+        const preReloadThumb = localThumb.length;
+        const preReloadCover = localCover.length;
+
+        try {
+          await page.reload({ waitUntil: "domcontentloaded", timeout: GOTO_TIMEOUT_MS });
+          try {
+            await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
+          } catch {}
+          await sleep(400);
+        } catch (err) {
+          console.log(
+            `    · reload cache probe skipped: ${err instanceof Error ? err.message : err}`,
+          );
+        }
+
+        const perfEntry = await page.evaluate((url) => {
+          const e = performance.getEntriesByType("resource").find((r) => r.name === url);
+          return e
+            ? {
+                transferSize: e.transferSize,
+                encodedBodySize: e.encodedBodySize,
+                decodedBodySize: e.decodedBodySize,
+                duration: e.duration,
+              }
+            : null;
+        }, lcpUrl);
+
+        // A cache hit shows in CDP as fromDiskCache=true (memory cache is bucketed in there too),
+        // OR the Resource Timing API reports transferSize===0 with decodedBodySize>0 for
+        // same-origin / Timing-Allow-Origin responses. For cross-origin without TAO we fall back
+        // to duration<50ms as a soft signal.
+        const cdpHit = reloadCdpHits.some(
+          (h) => h.fromDiskCache || h.fromPrefetchCache || h.fromServiceWorker,
+        );
+        const rtHit =
+          perfEntry &&
+          perfEntry.transferSize === 0 &&
+          (perfEntry.decodedBodySize || 0) > 0;
+        const fastHit = perfEntry && perfEntry.duration < 50;
+
+        cacheProbe = {
+          lcpUrl,
+          reloadCdpHits,
+          perfEntry,
+          reloadThumbTransfers: localThumb.length - preReloadThumb,
+          reloadCoverTransfers: localCover.length - preReloadCover,
+          cacheHit: !!(cdpHit || rtHit || fastHit),
+          signals: { cdpHit, rtHit, fastHit },
+        };
+      }
+
       if (!localBeacon || typeof localBeacon.lcp_ms !== "number") {
         result.reason = "beacon missing lcp_ms";
       } else {
@@ -233,10 +331,12 @@ for (const key of selection) {
     } finally {
       result.beacon = localBeacon;
       result.renderedSrc = localRenderedSrc;
+      result.cacheProbe = cacheProbe;
       await browser.close().catch(() => {});
     }
     return result;
   };
+
 
   // Retry loop.
   let attemptResult = null;
@@ -323,7 +423,97 @@ for (const key of selection) {
     } else {
       fail(`rendered hero src is NOT in ${vp.expectBucket}: ${renderedSrc.slice(0, 120)}…`);
     }
+
+    // ----- Exact-source triangulation -----
+    // The app signs storage URLs (query string rotates per SSR), so compare by the
+    // pathname (bucket + object key), not the full URL.
+    const stripQ = (u) => {
+      if (!u) return null;
+      try {
+        const p = new URL(u);
+        return p.origin + p.pathname;
+      } catch {
+        return u.split("?")[0];
+      }
+    };
+    const initialExpect = expectTransfers.slice(
+      0,
+      expectTransfers.length -
+        (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+        (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
+    );
+    const initialPaths = new Set(initialExpect.map((t) => stripQ(t.url)));
+    const renderedPath = stripQ(renderedSrc);
+    const beaconUrlPath = stripQ(beacon?.url);
+    const preloadPath = stripQ(beacon?.preload_url);
+
+    if (renderedPath && beaconUrlPath && preloadPath) {
+      const allMatch =
+        renderedPath === beaconUrlPath &&
+        beaconUrlPath === preloadPath &&
+        initialPaths.size === 1 &&
+        initialPaths.has(renderedPath);
+      if (allMatch) {
+        pass(
+          `exact ${vp.expectBucket} source triangulated (rendered = beacon.url = preload_url = network path)`,
+        );
+      } else {
+        fail(
+          "exact source mismatch — " +
+            `rendered=${renderedPath?.slice(-70)} beacon=${beaconUrlPath?.slice(-70)} ` +
+            `preload=${preloadPath?.slice(-70)} network=[${[...initialPaths].map((u) => u.slice(-70)).join(" | ")}]`,
+        );
+      }
+    }
+
+    // Exactly ONE HTTP response for the LCP object on initial load
+    // (preload should be reused by <img>, not double-fetched).
+    const initialCountForLcp = renderedPath
+      ? initialExpect.filter((t) => stripQ(t.url) === renderedPath).length
+      : 0;
+    if (renderedPath) {
+      if (initialCountForLcp === 1) {
+        pass(`exactly 1 network request for LCP ${vp.expectBucket} object on initial load`);
+      } else {
+        fail(
+          `expected exactly 1 network request for LCP object, got ${initialCountForLcp} ` +
+            `(preload should be reused by <img>, not double-fetched)`,
+        );
+      }
+    }
+
+
+    // ----- Cache probe assertion (reload) -----
+    const cp = attemptResult?.cacheProbe;
+    if (!cp) {
+      fail("cache probe did not run (missing LCP url)");
+    } else {
+      const forbidReloadCount =
+        vp.forbidBucket === "film-thumbnails"
+          ? cp.reloadThumbTransfers
+          : cp.reloadCoverTransfers;
+      if (forbidReloadCount === 0) {
+        pass(`reload: no ${vp.forbidBucket} transfers (gate still held after reload)`);
+      } else {
+        fail(
+          `reload: ${forbidReloadCount} ${vp.forbidBucket} transfer(s) leaked after reload`,
+        );
+      }
+      if (cp.cacheHit) {
+        const which = Object.entries(cp.signals)
+          .filter(([, v]) => v)
+          .map(([k]) => k)
+          .join("+");
+        pass(`LCP image served from cache on reload (${which})`);
+      } else {
+        fail(
+          `LCP image NOT served from cache on reload — signals=${JSON.stringify(cp.signals)} ` +
+            `perfEntry=${JSON.stringify(cp.perfEntry)}`,
+        );
+      }
+    }
   }
+
 
 
   const sumBytes = (arr) =>
@@ -350,6 +540,7 @@ for (const key of selection) {
       "film-covers": coverTransfers,
     },
     rendered_src: renderedSrc,
+    cache_probe: attemptResult?.cacheProbe || null,
     beacon,
     checks,
     failures,
