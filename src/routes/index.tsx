@@ -74,17 +74,6 @@ function RailSkeleton({
   );
 }
 
-function RailsSkeleton() {
-  return (
-    <div className="space-y-10 pb-16 pt-6 md:space-y-14 md:pb-24 md:pt-10">
-      <RailSkeleton aspect="video" cardWidthMobile="78vw" cardWidthDesktop="400px" headingWidth="12rem" />
-      <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
-      <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
-      <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
-    </div>
-  );
-}
-
 function DeferredHomeRails() {
   const [show, setShow] = useState(false);
   const queryClient = useQueryClient();
@@ -100,47 +89,24 @@ function DeferredHomeRails() {
     idle(() => {
       prefetchRails(queryClient);
       setShow(true);
-    }, 800);
+    }, 400);
   }, [queryClient]);
-  if (!show) {
-    return <RailsSkeleton />;
-  }
+  // Render nothing until rails are ready — avoids CLS from skeleton→null
+  // swaps when a rail (e.g. ContinueWatching with no data) returns null.
+  if (!show) return null;
 
   return (
     <>
-      <Suspense
-        fallback={
-          <RailSkeleton
-            aspect="video"
-            cardWidthMobile="78vw"
-            cardWidthDesktop="400px"
-            headingWidth="12rem"
-          />
-        }
-      >
+      <Suspense fallback={null}>
         <ContinueWatching />
       </Suspense>
-      <Suspense
-        fallback={
-          <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
-        }
-      >
+      <Suspense fallback={null}>
         <NewReleaseRow />
       </Suspense>
-      <Suspense
-        fallback={
-          <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
-        }
-      >
+      <Suspense fallback={null}>
         <WalkingTourRow />
       </Suspense>
-      <Suspense
-        fallback={
-          <div className="pb-16 md:pb-24">
-            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
-          </div>
-        }
-      >
+      <Suspense fallback={null}>
         <div className="pb-16 md:pb-24">
           <FilmsRow />
         </div>
