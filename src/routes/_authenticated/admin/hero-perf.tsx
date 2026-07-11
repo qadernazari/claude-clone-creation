@@ -434,7 +434,7 @@ function HeroPerfPage() {
               ))}
               {rows.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={10} className="px-3 py-6 text-center text-muted-foreground">
+                  <td colSpan={13} className="px-3 py-6 text-center text-muted-foreground">
                     No samples in this window.
                   </td>
                 </tr>
