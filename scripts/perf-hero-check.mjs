@@ -109,18 +109,20 @@ try {
     fail(`expected 1 unique film-cover, got ${uniqueCovers}`);
   }
 
-  // Assertion 4: beacon preload_url matches the rendered <img> src.
-  if (beacon && renderedSrc && beacon.preload_url) {
-    if (beacon.preload_url === renderedSrc) {
-      pass("beacon preload_url matches rendered <img> src");
+  // Assertion 4: beacon's preload_url matches the URL of the actual LCP entry
+  // (the browser reused the preload as the LCP image).
+  if (beacon && beacon.preload_url && beacon.url) {
+    if (beacon.preload_url === beacon.url) {
+      pass("beacon preload_url matches LCP entry url");
     } else {
       fail(
-        `beacon preload_url (${beacon.preload_url.slice(0, 80)}…) != rendered src (${renderedSrc.slice(0, 80)}…)`,
+        `beacon preload_url (${beacon.preload_url.slice(0, 80)}…) != LCP url (${beacon.url.slice(0, 80)}…)`,
       );
     }
   } else {
-    fail("could not compare preload_url to rendered src (missing data)");
+    fail("beacon missing preload_url or url");
   }
+
 
   console.log("\nBeacon:", JSON.stringify(beacon, null, 2));
 } catch (err) {
