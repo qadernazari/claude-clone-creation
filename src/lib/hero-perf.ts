@@ -26,6 +26,10 @@ export type PerfPayload = {
   effective_type: string | null;
   downlink: number | null;
   ua_mobile: boolean;
+  delivery_type: string | null;
+  preload_cache_hit: boolean | null;
+  resource_initiator: string | null;
+  resource_count: number | null;
 };
 
 export type MeasureHeroLCPOptions = {
