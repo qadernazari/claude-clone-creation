@@ -257,12 +257,12 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
       return Promise.all(
         rows.map(async (raw) => {
           const [cover, thumbnail, thumbnail1280, thumbnail2400, thumbnailMobile, mobile] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 1920, 86),
+            renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 800, 75),
             renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1920, 90),
             renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 88),
             renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 2400, 90),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1080, 86),
-            renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 1080, 82, 1620, "cover"),
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 800, 75),
+            renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 75, 1200, "cover"),
           ]);
           return {
             ...raw,
