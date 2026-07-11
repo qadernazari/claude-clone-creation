@@ -34,45 +34,6 @@ function prefetchRails(queryClient: ReturnType<typeof useQueryClient>) {
 }
 
 
-// Skeleton that mirrors a horizontal rail: heading + row of aspect-ratio
-// cards. Heights are derived from card widths so mobile and desktop match
-// the eventual rendered content and no reflow occurs when it swaps in.
-function RailSkeleton({
-  aspect,
-  cardWidthMobile,
-  cardWidthDesktop,
-  headingWidth = "10rem",
-}: {
-  aspect: "video" | "2/3";
-  cardWidthMobile: string;
-  cardWidthDesktop: string;
-  headingWidth?: string;
-}) {
-  const aspectClass = aspect === "video" ? "aspect-video" : "aspect-[2/3]";
-  return (
-    <section className="mx-auto w-full max-w-7xl px-5 sm:px-6 md:px-12" aria-hidden>
-      <div
-        className="mb-4 h-6 rounded-md bg-cream/8 md:mb-5 md:h-7"
-        style={{ width: headingWidth }}
-      />
-      <div className="flex gap-3 overflow-hidden md:gap-4">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <div key={i} className="shrink-0" style={{ width: `var(--rail-card-w)` }}>
-            <div className={`${aspectClass} w-full rounded-xl bg-cream/6`} />
-            <div className="mt-3 h-3.5 w-4/5 rounded bg-cream/8" />
-            <div className="mt-2 h-3 w-2/5 rounded bg-cream/6" />
-          </div>
-        ))}
-      </div>
-      <style>{`
-        :where(section[aria-hidden]) { --rail-card-w: ${cardWidthMobile}; }
-        @media (min-width: 768px) {
-          :where(section[aria-hidden]) { --rail-card-w: ${cardWidthDesktop}; }
-        }
-      `}</style>
-    </section>
-  );
-}
 
 function DeferredHomeRails() {
   const [show, setShow] = useState(false);
