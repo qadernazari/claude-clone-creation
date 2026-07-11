@@ -958,6 +958,19 @@ const html = `<!doctype html>
   table.summary-table td.pass, table.summary-table td.match { color: #1a7f37; font-weight: 600; }
   table.summary-table td.fail, table.summary-table td.mismatch { color: #cf222e; font-weight: 600; }
   table.summary-table td.over-budget { color: #cf222e; }
+  .stats span.over-budget { color: #cf222e; font-weight: 600; }
+  table.budget-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: .9rem; }
+  table.budget-table th, table.budget-table td { padding: .5rem .75rem; border-bottom: 1px solid #eee; vertical-align: middle; text-align: left; }
+  table.budget-table th { background: #f4f4f7; }
+  .bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .bar-track { position: relative; height: 10px; background: #eef0f3; border-radius: 5px; overflow: hidden; display: flex; }
+  .bar { height: 100%; border-radius: 5px 0 0 5px; }
+  .bar.ok { background: #2ea043; }
+  .bar.over { background: #d1242f; }
+  .bar-overflow { height: 100%; background: repeating-linear-gradient(45deg, #d1242f, #d1242f 4px, #a01822 4px, #a01822 8px); }
+  .bar.none { color: #999; padding: 0 .5em; }
+  .bar-label { font-size: .8rem; color: #555; font-family: ui-monospace, Menlo, monospace; }
+  .bar-label.over-budget { color: #cf222e; }
   table.summary-table code { font-size: .8em; }
 </style></head><body>
 <h1>Hero performance report</h1>
