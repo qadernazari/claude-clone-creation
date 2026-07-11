@@ -293,12 +293,25 @@ jobs:
           const stageDir = path.join(dir, "mobile-390-artifacts");
           fs.mkdirSync(stageDir, { recursive: true });
           for (const a of failed) {
-            for (const p of [a.harPath, a.tracePath, a.screenshotPath]) {
+            for (const p of [
+              a.harPath,
+              a.tracePath,
+              a.screenshotPath,
+              a.beaconJsonPath,
+              a.htmlSnapshotPath,
+              // Also honor snake_case keys from failureArtifacts entries.
+              a.har_path,
+              a.trace_path,
+              a.screenshot_path,
+              a.beacon_json_path,
+              a.html_snapshot_path,
+            ]) {
               if (p && fs.existsSync(p)) {
                 fs.copyFileSync(p, path.join(stageDir, path.basename(p)));
               }
             }
           }
+
           NODE
 
       - name: Upload perf reports

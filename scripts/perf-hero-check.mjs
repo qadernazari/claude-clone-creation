@@ -22,7 +22,7 @@
  * Exits 0 on pass, 1 on any failed assertion (across all viewports).
  */
 import { chromium } from "playwright";
-import { mkdir, unlink } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { join as joinPath } from "node:path";
 
 // ---------- Optional config file ----------
@@ -448,6 +448,9 @@ for (const key of selection) {
     const harPath = joinPath(FAILURE_DIR, `${artifactBase}.har`);
     const screenshotPath = joinPath(FAILURE_DIR, `${artifactBase}.png`);
     const tracePath = joinPath(FAILURE_DIR, `${artifactBase}.trace.zip`);
+    const beaconJsonPath = joinPath(FAILURE_DIR, `${artifactBase}.beacon.json`);
+    const htmlSnapshotPath = joinPath(FAILURE_DIR, `${artifactBase}.rendered.html`);
+
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: vp.deviceScaleFactor,
@@ -959,6 +962,33 @@ for (const key of selection) {
             .catch(() => {});
           result.screenshotPath = screenshotPath;
         } catch {}
+        // Capture rendered HTML snapshot (post-hydration) for post-mortem.
+        try {
+          const html = await page.content();
+          await writeFile(htmlSnapshotPath, html, "utf8");
+          result.htmlSnapshotPath = htmlSnapshotPath;
+        } catch {}
+        // Persist the per-viewport beacon payload (may be null / partial).
+        try {
+          await writeFile(
+            beaconJsonPath,
+            JSON.stringify(
+              {
+                viewport_key: key,
+                viewport_label: vp.label,
+                attempt,
+                captured_at: new Date().toISOString(),
+                beacon: localBeacon,
+                rendered_src: localRenderedSrc,
+                cache_probe: cacheProbe,
+              },
+              null,
+              2,
+            ),
+            "utf8",
+          );
+          result.beaconJsonPath = beaconJsonPath;
+        } catch {}
       }
       // Stop tracing before closing the context so the zip is flushed.
       if (shouldKeepArtifacts) {
@@ -986,9 +1016,11 @@ for (const key of selection) {
           har_path: harPath,
           trace_path: tracePath,
           screenshot_path: screenshotPath,
+          beacon_json_path: beaconJsonPath,
+          html_snapshot_path: htmlSnapshotPath,
         });
         console.log(
-          `    · saved artifacts (${reasonTag}) → ${harPath} , ${tracePath} , ${screenshotPath}`,
+          `    · saved artifacts (${reasonTag}) → ${harPath} , ${tracePath} , ${screenshotPath} , ${beaconJsonPath} , ${htmlSnapshotPath}`,
         );
         console.log(
           `      view trace: npx playwright show-trace ${tracePath}`,
@@ -997,6 +1029,8 @@ for (const key of selection) {
         // Clean attempt: drop the HAR (screenshot + trace were never saved).
         await unlink(harPath).catch(() => {});
       }
+    }
+
     }
 
     return result;
@@ -1619,9 +1653,9 @@ const html = `<!doctype html>
   (${report.summary.failed} failed).
 </div>
 ${failureArtifacts.length ? `<h2 style="margin-top:2rem">Failure artifacts</h2>
-<p class="dim" style="margin-top:-.5rem">HAR + screenshot saved for every attempt that failed to capture the beacon or the LCP budget. Directory: <code>${esc(FAILURE_DIR)}</code></p>
+<p class="dim" style="margin-top:-.5rem">HAR, trace, screenshot, rendered HTML snapshot, and per-viewport beacon JSON saved for every attempt that failed to capture the beacon or the LCP budget. Directory: <code>${esc(FAILURE_DIR)}</code></p>
 <table class="summary-table">
-  <thead><tr><th>Viewport</th><th>Attempt</th><th>Reason</th><th>Beacon</th><th>LCP</th><th>HAR</th><th>Screenshot</th></tr></thead>
+  <thead><tr><th>Viewport</th><th>Attempt</th><th>Reason</th><th>Beacon</th><th>LCP</th><th>HAR</th><th>Screenshot</th><th>Beacon JSON</th><th>HTML snapshot</th></tr></thead>
   <tbody>
     ${failureArtifacts.map((a) => `<tr>
       <td>${esc(a.viewport_label)}</td>
@@ -1631,6 +1665,8 @@ ${failureArtifacts.length ? `<h2 style="margin-top:2rem">Failure artifacts</h2>
       <td>${a.lcp_captured ? "captured" : "<strong>missing</strong>"}</td>
       <td><a href="file://${esc(a.har_path)}"><code>${esc(a.har_path.split("/").pop())}</code></a></td>
       <td><a href="file://${esc(a.screenshot_path)}"><code>${esc(a.screenshot_path.split("/").pop())}</code></a></td>
+      <td>${a.beacon_json_path ? `<a href="file://${esc(a.beacon_json_path)}"><code>${esc(a.beacon_json_path.split("/").pop())}</code></a>` : "—"}</td>
+      <td>${a.html_snapshot_path ? `<a href="file://${esc(a.html_snapshot_path)}"><code>${esc(a.html_snapshot_path.split("/").pop())}</code></a>` : "—"}</td>
     </tr>`).join("")}
   </tbody>
 </table>` : ""}
