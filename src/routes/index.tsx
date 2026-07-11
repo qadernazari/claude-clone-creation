@@ -28,51 +28,39 @@ function DeferredHomeRails() {
   const [show, setShow] = useState(false);
   const queryClient = useQueryClient();
 
-  // Idle prefetch — runs ~after hero paints, before user even scrolls.
+  // Mount rails right after hydration so there's no big empty gap under the
+  // hero. Prefetch chunks + data on idle so the render is instant.
   useEffect(() => {
+    prefetchRails(queryClient);
     const w = window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number };
-    const run = () => prefetchRails(queryClient);
+    const run = () => setShow(true);
     if (w.requestIdleCallback) {
-      w.requestIdleCallback(run, { timeout: 1500 });
+      w.requestIdleCallback(run, { timeout: 800 });
     } else {
-      setTimeout(run, 600);
+      setTimeout(run, 200);
     }
   }, [queryClient]);
 
-  useEffect(() => {
-    const reveal = () => {
-      if (window.scrollY > 60) setShow(true);
-    };
-    reveal();
-    window.addEventListener("scroll", reveal, { passive: true });
-    window.addEventListener("wheel", reveal, { passive: true });
-    window.addEventListener("touchmove", reveal, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", reveal);
-      window.removeEventListener("wheel", reveal);
-      window.removeEventListener("touchmove", reveal);
-    };
-  }, []);
-
   if (!show) {
-    return <div className="min-h-[640px]" aria-hidden />;
+    return <div className="min-h-[120px]" aria-hidden />;
   }
 
   return (
     <>
-      <Suspense fallback={<div className="min-h-[240px]" aria-hidden />}>
-        <div className="pt-10 md:pt-14">
+      <Suspense fallback={<div className="min-h-[120px]" aria-hidden />}>
+        <div className="pt-6 md:pt-10">
           <ContinueWatching />
         </div>
       </Suspense>
-      <Suspense fallback={<div className="min-h-[400px]" aria-hidden />}>
-        <div className="space-y-12 pb-20 pt-10 md:space-y-16 md:pb-28 md:pt-14">
+      <Suspense fallback={<div className="min-h-[240px]" aria-hidden />}>
+        <div className="space-y-10 pb-16 pt-6 md:space-y-14 md:pb-24 md:pt-10">
           <FilmsRow />
         </div>
       </Suspense>
     </>
   );
 }
+
 
 
 
