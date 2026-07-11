@@ -405,6 +405,51 @@ function HeroPerfPage() {
           </div>
         </div>
         <div>
+          <label className="text-xs text-muted-foreground block mb-1">From</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">To</label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Viewport</label>
+          <select
+            value={viewportBucket}
+            onChange={(e) => setViewportBucket(e.target.value as "all" | VpKey)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All widths</option>
+            {VP_BUCKETS.map((vp) => (
+              <option key={vp.key} value={vp.key}>{vp.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Environment</label>
+          <select
+            value={environment}
+            onChange={(e) => setEnvironment(e.target.value as typeof environment)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All</option>
+            <option value="production">Production</option>
+            <option value="preview">Preview</option>
+            <option value="local">Local</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
           <label className="text-xs text-muted-foreground block mb-1">Effective type</label>
           <select
             value={effectiveType}
