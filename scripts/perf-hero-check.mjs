@@ -209,6 +209,8 @@ for (const key of selection) {
       beacon: null,
       renderedSrc: null,
       cacheProbe: null,
+      domPreloads: [],
+      activePreload: null,
       attempt,
     };
     try {
