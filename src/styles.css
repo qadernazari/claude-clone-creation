@@ -260,8 +260,6 @@
     }
   }
 
-  .hero-mobile-poster,
-  .hero-mobile-img,
   .hero-mobile-skeleton {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -270,14 +268,6 @@
     contain: paint;
   }
 
-  .hero-mobile-img {
-    opacity: 1;
-    will-change: auto;
-  }
-
-  .hero-mobile-poster {
-    background-color: var(--bg-1);
-  }
 
   /* Soft fade-in only for chrome that truly mounts after idle. The mobile tab
      bar is SSR-visible critical chrome, so it must not animate in late. */
@@ -327,20 +317,6 @@
     background: rgba(245, 244, 239, 0.04);
   }
 
-  .auth-menu-membership-amber {
-    border-color: rgba(201, 168, 76, 0.28);
-    background: rgba(201, 168, 76, 0.10);
-  }
-
-  .auth-menu-membership-green {
-    border-color: rgba(110, 231, 183, 0.24);
-    background: rgba(110, 231, 183, 0.08);
-  }
-
-  .auth-menu-membership-red {
-    border-color: rgba(252, 165, 165, 0.28);
-    background: rgba(252, 165, 165, 0.10);
-  }
 
   .auth-menu-row-icon {
     display: flex;
@@ -525,14 +501,6 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-/* Bottom padding so page content clears the mobile tab bar.
-   Tab bar = 56px + safe-area-inset-bottom. Desktop: 0. */
-@utility pb-tabbar {
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  @media (min-width: 768px) {
-    padding-bottom: 0;
-  }
-}
 
 /* ---------------------------------------------------------------
  * Language switching: cinematic cross-fade between EN ⇄ FA (LTR ⇄ RTL).
@@ -656,23 +624,6 @@ html[data-tabbar="hidden"] body {
   .animate-fade-in { animation: none; }
 }
 
-/* Success pop for the auth confirmation icon */
-@keyframes success-pop {
-  0%   { opacity: 0; transform: scale(0.6); }
-  60%  { opacity: 1; transform: scale(1.08); }
-  100% { opacity: 1; transform: scale(1); }
-}
-@utility animate-success-pop {
-  animation: success-pop 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes soft-pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.55; }
-  70%  { transform: scale(1.5); opacity: 0; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-@utility animate-pulse-ring {
-  animation: soft-pulse-ring 2s ease-out infinite;
-}
 @keyframes slide-down-in {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -681,8 +632,6 @@ html[data-tabbar="hidden"] body {
   animation: slide-down-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .animate-success-pop,
-  .animate-pulse-ring,
   .animate-slide-down-in { animation: none; }
 }
 
