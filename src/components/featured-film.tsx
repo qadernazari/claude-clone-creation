@@ -116,8 +116,7 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="flex justify-center lg:justify-start">
-
+    <div className="flex justify-center">
       <div className="flex items-center gap-6 lg:gap-8">
         <div className="flex items-center gap-2">
           <button
@@ -148,10 +147,16 @@ function SliderControls({
               type="button"
               onClick={() => onGo(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`h-1 rounded-full transition-all duration-500 ${
-                i === index ? "w-10 bg-amber" : "w-4 bg-cream/20 hover:bg-cream/40"
+              className={`flex h-6 items-center justify-center rounded-full transition-all duration-500 ${
+                i === index ? "w-12 bg-amber" : "w-6 bg-cream/20 hover:bg-cream/40"
               }`}
-            />
+            >
+              <span
+                className={`block rounded-full transition-all duration-500 ${
+                  i === index ? "h-2 w-10 bg-amber" : "h-2 w-4 bg-current"
+                }`}
+              />
+            </button>
           ))}
         </div>
       </div>
