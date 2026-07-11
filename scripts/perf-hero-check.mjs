@@ -258,10 +258,14 @@ for (const key of selection) {
     const beaconPromise = new Promise((r) => (beaconResolve = r));
 
     const browser = await chromium.launch({ headless: true });
+    const artifactBase = `${key}-attempt${attempt}`;
+    const harPath = joinPath(FAILURE_DIR, `${artifactBase}.har`);
+    const screenshotPath = joinPath(FAILURE_DIR, `${artifactBase}.png`);
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: vp.deviceScaleFactor,
       userAgent: vp.userAgent,
+      recordHar: { path: harPath, mode: "full", content: "embed" },
     });
     const page = await context.newPage();
 
