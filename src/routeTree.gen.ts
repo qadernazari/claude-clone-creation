@@ -48,6 +48,7 @@ import { Route as AuthenticatedAdminNotifyListRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminMenuRouteImport } from './routes/_authenticated/admin/menu'
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin/memberships'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
+import { Route as AuthenticatedAdminHeroPerfRouteImport } from './routes/_authenticated/admin/hero-perf'
 import { Route as AuthenticatedAdminFooterRouteImport } from './routes/_authenticated/admin/footer'
 import { Route as AuthenticatedAdminFilmsRouteImport } from './routes/_authenticated/admin/films'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
@@ -272,6 +273,12 @@ const AuthenticatedAdminHomepageRoute =
     path: '/homepage',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminHeroPerfRoute =
+  AuthenticatedAdminHeroPerfRouteImport.update({
+    id: '/hero-perf',
+    path: '/hero-perf',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminFooterRoute =
   AuthenticatedAdminFooterRouteImport.update({
     id: '/footer',
@@ -421,6 +428,7 @@ export interface FileRoutesByFullPath {
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/footer': typeof AuthenticatedAdminFooterRoute
+  '/admin/hero-perf': typeof AuthenticatedAdminHeroPerfRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
@@ -480,6 +488,7 @@ export interface FileRoutesByTo {
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/admin/footer': typeof AuthenticatedAdminFooterRoute
+  '/admin/hero-perf': typeof AuthenticatedAdminHeroPerfRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
@@ -542,6 +551,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/films': typeof AuthenticatedAdminFilmsRouteWithChildren
   '/_authenticated/admin/footer': typeof AuthenticatedAdminFooterRoute
+  '/_authenticated/admin/hero-perf': typeof AuthenticatedAdminHeroPerfRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin/menu': typeof AuthenticatedAdminMenuRoute
@@ -604,6 +614,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/films'
     | '/admin/footer'
+    | '/admin/hero-perf'
     | '/admin/homepage'
     | '/admin/memberships'
     | '/admin/menu'
@@ -663,6 +674,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/films'
     | '/admin/footer'
+    | '/admin/hero-perf'
     | '/admin/homepage'
     | '/admin/memberships'
     | '/admin/menu'
@@ -724,6 +736,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/films'
     | '/_authenticated/admin/footer'
+    | '/_authenticated/admin/hero-perf'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/memberships'
     | '/_authenticated/admin/menu'
@@ -1060,6 +1073,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminHomepageRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/hero-perf': {
+      id: '/_authenticated/admin/hero-perf'
+      path: '/hero-perf'
+      fullPath: '/admin/hero-perf'
+      preLoaderRoute: typeof AuthenticatedAdminHeroPerfRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/footer': {
       id: '/_authenticated/admin/footer'
       path: '/footer'
@@ -1231,6 +1251,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminFilmsRoute: typeof AuthenticatedAdminFilmsRouteWithChildren
   AuthenticatedAdminFooterRoute: typeof AuthenticatedAdminFooterRoute
+  AuthenticatedAdminHeroPerfRoute: typeof AuthenticatedAdminHeroPerfRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminMenuRoute: typeof AuthenticatedAdminMenuRoute
@@ -1257,6 +1278,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
     AuthenticatedAdminFilmsRoute: AuthenticatedAdminFilmsRouteWithChildren,
     AuthenticatedAdminFooterRoute: AuthenticatedAdminFooterRoute,
+    AuthenticatedAdminHeroPerfRoute: AuthenticatedAdminHeroPerfRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
     AuthenticatedAdminMenuRoute: AuthenticatedAdminMenuRoute,
