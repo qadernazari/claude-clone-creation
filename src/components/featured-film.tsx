@@ -414,24 +414,24 @@ function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-6 md:mt-32 md:px-12">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="order-2 flex flex-col gap-6 lg:order-1">
+        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8 lg:gap-10" dir="ltr">
+          <div className="order-2 flex flex-col gap-4 md:order-1">
             <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
               Original Iranian Cinema
             </span>
-            <h2 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-5xl lg:text-6xl">
+            <h2 className="font-display text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright sm:text-3xl lg:text-4xl">
               ir.show
             </h2>
             <p className="max-w-lg text-[15px] leading-relaxed text-cream/70">
               A premium streaming home for Iranian films, documentaries, and curated stories.
             </p>
           </div>
-          <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
-            <div className="relative w-full max-w-[420px]">
+          <div className="order-1 flex justify-center md:order-2 md:justify-end">
+            <div className="relative w-full max-w-[380px] md:max-w-[420px] lg:max-w-[480px]">
               <div className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]" />
               <div className="relative z-10 rounded-[2rem] border border-cream/10 bg-cream/5 p-3 shadow-2xl backdrop-blur-sm">
                 <div
-                  className="aspect-[2/3] rounded-[1.4rem] lg:aspect-video"
+                  className="aspect-[2/3] rounded-[1.4rem] md:aspect-video"
                   style={{
                     background:
                       "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
