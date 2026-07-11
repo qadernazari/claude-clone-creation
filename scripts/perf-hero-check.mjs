@@ -552,6 +552,8 @@ for (const key of selection) {
       ok: r.ok,
       reason: r.reason || null,
       lcp_ms: r.beacon?.lcp_ms ?? null,
+      har_path: r.harPath || null,
+      screenshot_path: r.screenshotPath || null,
     });
     if (r.ok) {
       attemptResult = r;
