@@ -37,6 +37,20 @@ type BucketAgg = {
   cacheTotal: number;
 };
 
+const VP_BUCKETS = [
+  { key: "mobile", label: "Mobile (<768)", min: 0, max: 767, color: "#f472b6" },
+  { key: "tablet", label: "Tablet (768–1023)", min: 768, max: 1023, color: "#60a5fa" },
+  { key: "laptop", label: "Laptop (1024–1439)", min: 1024, max: 1439, color: "#34d399" },
+  { key: "desktop", label: "Desktop (≥1440)", min: 1440, max: Infinity, color: "#a78bfa" },
+] as const;
+type VpKey = (typeof VP_BUCKETS)[number]["key"];
+
+function vpBucketOf(w: number | null | undefined): VpKey | null {
+  if (w == null) return null;
+  for (const b of VP_BUCKETS) if (w >= b.min && w <= b.max) return b.key;
+  return null;
+}
+
 function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   // Choose a bucket size that yields ~30-60 buckets.
   const totalMs = hours * 3600_000;
@@ -208,6 +222,52 @@ function HeroPerfPage() {
 
   const buckets = useMemo(() => bucketize(rows, hours), [rows, hours]);
 
+  const byViewport = useMemo(() => {
+    return VP_BUCKETS.map((vp) => {
+      const subset = rows.filter((r) => vpBucketOf(r.viewport_w) === vp.key);
+      const lcp = subset.map((r) => r.lcp_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
+      const bytes = subset.map((r) => r.transfer_bytes).filter((v): v is number => v != null).sort((a, b) => a - b);
+      const known = subset.filter((r) => r.preload_cache_hit != null);
+      const hits = known.filter((r) => r.preload_cache_hit === true).length;
+      return {
+        ...vp,
+        count: subset.length,
+        lcpP75: percentile(lcp, 75),
+        bytesP75: bytes.length ? percentile(bytes, 75)! / 1024 : null,
+        cacheRate: known.length ? (hits / known.length) * 100 : null,
+        cacheHits: hits,
+        cacheTotal: known.length,
+      };
+    });
+  }, [rows]);
+
+  const vpCacheSeries = useMemo(() => {
+    // For each bucket, compute cache hit % per viewport bucket.
+    const perVp: Record<VpKey, Array<{ hits: number; total: number }>> = {
+      mobile: [], tablet: [], laptop: [], desktop: [],
+    };
+    for (const _ of buckets) {
+      for (const k of Object.keys(perVp) as VpKey[]) perVp[k].push({ hits: 0, total: 0 });
+    }
+    // Rebuild per-bucket per-viewport tallies
+    const totalMs = hours * 3600_000;
+    const target = 40;
+    const bucketMs = Math.max(60_000, Math.round(totalMs / target / 60_000) * 60_000);
+    const firstT = buckets[0]?.t ?? 0;
+    for (const r of rows) {
+      const vp = vpBucketOf(r.viewport_w);
+      if (!vp || r.preload_cache_hit == null) continue;
+      const t = new Date(r.created_at).getTime();
+      const idx = Math.floor((Math.floor(t / bucketMs) * bucketMs - firstT) / bucketMs);
+      const slot = perVp[vp][idx];
+      if (!slot) continue;
+      slot.total += 1;
+      if (r.preload_cache_hit) slot.hits += 1;
+    }
+    return perVp;
+  }, [rows, buckets, hours]);
+
+
   return (
     <div dir="ltr" className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -367,6 +427,82 @@ function HeroPerfPage() {
       </div>
 
       <div className="rounded-md border border-border bg-card">
+        <div className="px-4 py-2 border-b border-border text-sm font-medium">
+          By viewport width
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead className="text-muted-foreground">
+              <tr className="text-left">
+                <th className="px-3 py-2">Viewport</th>
+                <th className="px-3 py-2">Samples</th>
+                <th className="px-3 py-2">LCP p75</th>
+                <th className="px-3 py-2">Transfer p75</th>
+                <th className="px-3 py-2">Cache hit rate</th>
+                <th className="px-3 py-2 w-1/2">Cache hit rate distribution</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byViewport.map((vp) => (
+                <tr key={vp.key} className="border-t border-border/60">
+                  <td className="px-3 py-2">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full" style={{ background: vp.color }} />
+                      {vp.label}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 tabular-nums">{vp.count}</td>
+                  <td className="px-3 py-2 tabular-nums">{fmt(vp.lcpP75, " ms")}</td>
+                  <td className="px-3 py-2 tabular-nums">
+                    {vp.bytesP75 == null ? "—" : `${vp.bytesP75.toFixed(1)} KB`}
+                  </td>
+                  <td className="px-3 py-2 tabular-nums">
+                    {vp.cacheRate == null ? "—" : `${vp.cacheRate.toFixed(1)}%`}
+                    <span className="text-muted-foreground ml-1">({vp.cacheHits}/{vp.cacheTotal})</span>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="h-2 w-full rounded bg-muted overflow-hidden">
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${vp.cacheRate ?? 0}%`,
+                          background: vp.color,
+                        }}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border bg-card p-4">
+        <div className="text-sm font-medium mb-1">Preload cache hit % over time, by viewport</div>
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-2">
+          {VP_BUCKETS.map((vp) => (
+            <span key={vp.key} className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full" style={{ background: vp.color }} />
+              {vp.label}
+            </span>
+          ))}
+        </div>
+        <MultiLineChart
+          labels={buckets.map((b) => b.label)}
+          series={VP_BUCKETS.map((vp) => ({
+            color: vp.color,
+            values: vpCacheSeries[vp.key].map((s) => (s.total ? (s.hits / s.total) * 100 : null)),
+          }))}
+          unit="%"
+          maxY={100}
+          format={(v) => v.toFixed(0)}
+        />
+      </div>
+
+
+
+      <div className="rounded-md border border-border bg-card">
         <div className="px-4 py-2 border-b border-border text-sm font-medium">Recent samples</div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -468,3 +604,69 @@ function ChartSection(props: {
     </div>
   );
 }
+
+function MultiLineChart({
+  labels,
+  series,
+  unit,
+  maxY,
+  height = 200,
+  format = (v: number) => v.toFixed(0),
+}: {
+  labels: string[];
+  series: Array<{ color: string; values: Array<number | null> }>;
+  unit: string;
+  maxY?: number;
+  height?: number;
+  format?: (v: number) => string;
+}) {
+  const w = 800;
+  const h = height;
+  const pad = { l: 44, r: 12, t: 10, b: 24 };
+  const innerW = w - pad.l - pad.r;
+  const innerH = h - pad.t - pad.b;
+  const n = labels.length;
+  const stepX = n > 1 ? innerW / (n - 1) : innerW;
+  const allY = series.flatMap((s) => s.values.filter((v): v is number => v != null));
+  const computedMax = allY.length ? Math.max(...allY) : 1;
+  const yMax = maxY ?? computedMax;
+  const gridLines = 4;
+
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto" role="img">
+      {Array.from({ length: gridLines + 1 }).map((_, i) => {
+        const y = pad.t + (innerH * i) / gridLines;
+        const v = yMax - (yMax * i) / gridLines;
+        return (
+          <g key={i}>
+            <line x1={pad.l} y1={y} x2={w - pad.r} y2={y} stroke="currentColor" strokeOpacity={0.08} />
+            <text x={pad.l - 6} y={y + 3} textAnchor="end" fontSize={10} fill="currentColor" opacity={0.6}>
+              {format(v)}{unit}
+            </text>
+          </g>
+        );
+      })}
+      {series.map((s, si) => {
+        const path = s.values
+          .map((v, i) => {
+            if (v == null) return null;
+            const x = pad.l + i * stepX;
+            const y = pad.t + innerH - (v / Math.max(1, yMax)) * innerH;
+            return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+          })
+          .filter(Boolean)
+          .join(" ");
+        return <path key={si} d={path} fill="none" stroke={s.color} strokeWidth={2} />;
+      })}
+      {labels.length > 0 && (
+        <>
+          <text x={pad.l} y={h - 6} fontSize={10} fill="currentColor" opacity={0.6}>{labels[0]}</text>
+          <text x={w - pad.r} y={h - 6} textAnchor="end" fontSize={10} fill="currentColor" opacity={0.6}>
+            {labels[labels.length - 1]}
+          </text>
+        </>
+      )}
+    </svg>
+  );
+}
+
