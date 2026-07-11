@@ -524,6 +524,7 @@ for (const key of selection) {
       "film-covers": coverTransfers,
     },
     rendered_src: renderedSrc,
+    cache_probe: attemptResult?.cacheProbe || null,
     beacon,
     checks,
     failures,
