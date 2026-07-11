@@ -375,6 +375,53 @@ for (const key of selection) {
     });
     const page = await context.newPage();
 
+    // Install a document-start observer that records every mutation to
+    // `<link rel="preload" as="image">` nodes in <head>. We use this to
+    // assert that the film-covers preload is created ONCE by the SSR
+    // response and never re-added / removed / duplicated by client code.
+    // Runs before any app JS so hydration is fully covered.
+    await page.addInitScript(() => {
+      window.__preloadMutations = [];
+      const record = (op, node) => {
+        if (!(node instanceof HTMLLinkElement)) return;
+        if (node.rel !== "preload") return;
+        if (node.getAttribute("as") !== "image") return;
+        window.__preloadMutations.push({
+          op, // "initial" | "added" | "removed" | "attr"
+          href: node.href || node.getAttribute("href") || null,
+          media: node.getAttribute("media"),
+          imagesrcset: node.getAttribute("imagesrcset"),
+          ts: performance.now(),
+        });
+      };
+      const start = () => {
+        // Seed with any preload links already in the HTML (SSR emitted).
+        document
+          .querySelectorAll('link[rel="preload"][as="image"]')
+          .forEach((n) => record("initial", n));
+        const obs = new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            if (m.type === "childList") {
+              m.addedNodes.forEach((n) => record("added", n));
+              m.removedNodes.forEach((n) => record("removed", n));
+            } else if (m.type === "attributes" && m.target instanceof HTMLLinkElement) {
+              record("attr", m.target);
+            }
+          }
+        });
+        obs.observe(document.head, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["href", "rel", "as", "media", "imagesrcset"],
+        });
+      };
+      if (document.head) start();
+      else document.addEventListener("DOMContentLoaded", start, { once: true });
+    });
+
+
+
     // CDP session gives us `fromDiskCache` / `fromMemoryCache` / `fromPrefetchCache`
     // flags that Playwright's response events don't expose.
     const cdp = await context.newCDPSession(page);
@@ -607,6 +654,48 @@ for (const key of selection) {
       result.activePreload = domSnapshot.activePreload;
       timing.dom_snapshot_ms = Date.now() - domStart;
 
+      // ----- Preload-link mutation assertion -----
+      // The document-start init script (see addInitScript above) records every
+      // `<link rel="preload" as="image">` mutation on <head>. A well-behaved
+      // SSR should emit each film-covers preload EXACTLY once ("initial") and
+      // never add/remove/duplicate it during hydration or re-render.
+      const preloadMutations = await page.evaluate(() =>
+        Array.isArray(window.__preloadMutations)
+          ? window.__preloadMutations.slice()
+          : [],
+      );
+      const byHref = new Map();
+      for (const m of preloadMutations) {
+        if (!m.href) continue;
+        const rec = byHref.get(m.href) || {
+          href: m.href,
+          initial: 0,
+          added: 0,
+          removed: 0,
+          attr: 0,
+          firstTs: m.ts,
+          lastTs: m.ts,
+        };
+        rec[m.op] = (rec[m.op] || 0) + 1;
+        rec.lastTs = m.ts;
+        byHref.set(m.href, rec);
+      }
+      const preloadStats = Array.from(byHref.values());
+      const filmCoverPreloads = preloadStats.filter((r) =>
+        /film-covers/.test(r.href),
+      );
+      const preloadViolations = filmCoverPreloads.filter(
+        (r) => r.added > 0 || r.removed > 0 || r.initial + r.added > 1,
+      );
+      result.preloadMutations = preloadMutations;
+      result.preloadStats = preloadStats;
+      result.preloadAssertion = {
+        film_cover_urls: filmCoverPreloads.length,
+        violations: preloadViolations,
+        ok: preloadViolations.length === 0,
+      };
+
+
       // ----- Mount tracker: detect StrictMode / double-mount patterns -----
       // The page exposes `window.__heroMounts` when ?hero-debug=1 is set
       // (see src/lib/hero-mount-tracker.ts). We correlate mount events
@@ -707,6 +796,19 @@ for (const key of selection) {
             `preload_cache_hit=${JSON.stringify(localBeacon.preload_cache_hit)} (expected true)`,
           );
         }
+
+        if (!result.preloadAssertion.ok) {
+          // Hard-fail: duplicated / re-added preload tags aren't a warmup
+          // artifact and won't self-heal on retry.
+          const v = result.preloadAssertion.violations
+            .map(
+              (r) =>
+                `${r.href} initial=${r.initial} added=${r.added} removed=${r.removed}`,
+            )
+            .join(" | ");
+          softReasons.push(`preload film-covers mutated: ${v}`);
+        }
+
         if (softReasons.length && attempt < MAX_ATTEMPTS) {
           result.ok = false;
           result.reason = `soft-flake: ${softReasons.join("; ")}`;
