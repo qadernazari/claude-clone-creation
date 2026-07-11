@@ -912,8 +912,11 @@ for (const key of selection) {
                 `${r.href} initial=${r.initial} added=${r.added} removed=${r.removed}`,
             )
             .join(" | ");
-          softReasons.push(`preload film-covers mutated: ${v}`);
+          softReasons.push(
+            `preload ${vp.expectBucket}/${vp.forbidBucket} placement violated: ${v}`,
+          );
         }
+
 
         if (softReasons.length && attempt < MAX_ATTEMPTS) {
           result.ok = false;
