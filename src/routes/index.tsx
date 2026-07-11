@@ -7,8 +7,15 @@ import { SiteFooter } from "../components/site-footer";
 import { homeFeaturedQueryOptions, homeFeaturedSlidesQueryOptions, homeRailsQueryOptions } from "@/lib/home.functions";
 
 // Below-the-fold rails are lazy-loaded and only mounted when the user
-// approaches them. Cuts ~80–120 KB of JS off the homepage initial bundle
-// and removes their queries / image lists from the hydration critical path.
+// approaches them. Each rail ships in its own chunk so the initial
+// homepage bundle stays lean — New Release and Walking Tour are
+// separate chunks that only download when their section mounts.
+const NewReleaseRow = lazy(() =>
+  import("../components/new-release-row").then((m) => ({ default: m.NewReleaseRow })),
+);
+const WalkingTourRow = lazy(() =>
+  import("../components/walking-tour-row").then((m) => ({ default: m.WalkingTourRow })),
+);
 const FilmsRow = lazy(() =>
   import("../components/films-row").then((m) => ({ default: m.FilmsRow })),
 );
@@ -19,10 +26,13 @@ const ContinueWatching = lazy(() =>
 // Warm the lazy chunks + rails data on idle so the moment the user scrolls
 // the rails render instantly — no chunk fetch, no query wait.
 function prefetchRails(queryClient: ReturnType<typeof useQueryClient>) {
+  void import("../components/new-release-row");
+  void import("../components/walking-tour-row");
   void import("../components/films-row");
   void import("../components/continue-watching");
   void queryClient.prefetchQuery(homeRailsQueryOptions);
 }
+
 
 // Skeleton that mirrors a horizontal rail: heading + row of aspect-ratio
 // cards. Heights are derived from card widths so mobile and desktop match
@@ -116,8 +126,29 @@ function DeferredHomeRails() {
       </Suspense>
       <Suspense
         fallback={
+          <div className="pt-6 md:pt-10">
+            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
+          </div>
+        }
+      >
+        <div className="pt-6 md:pt-10">
+          <NewReleaseRow />
+        </div>
+      </Suspense>
+      <Suspense
+        fallback={
+          <div className="pt-6 md:pt-10">
+            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" headingWidth="10rem" />
+          </div>
+        }
+      >
+        <div className="pt-6 md:pt-10">
+          <WalkingTourRow />
+        </div>
+      </Suspense>
+      <Suspense
+        fallback={
           <div className="space-y-10 pb-16 pt-6 md:space-y-14 md:pb-24 md:pt-10">
-            <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
             <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
             <RailSkeleton aspect="2/3" cardWidthMobile="42vw" cardWidthDesktop="220px" />
           </div>
@@ -130,6 +161,7 @@ function DeferredHomeRails() {
     </>
   );
 }
+
 
 
 
