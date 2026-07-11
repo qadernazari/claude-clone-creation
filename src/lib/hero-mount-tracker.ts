@@ -2,10 +2,10 @@
  * Lightweight mount/unmount tracker for hero components.
  *
  * Emits records into `window.__heroMounts` when the URL has `?hero-debug=1`
- * (or `localStorage.heroDebug === "1"`). Consumed by
- * `scripts/perf-hero-check.mjs` to determine whether extra film-covers
- * fetches correlate with double-mount signatures (React StrictMode in dev,
- * key changes, Suspense retries, remounts on re-render, etc.).
+ * (or `localStorage.heroDebug === "1"`) to help determine whether extra
+ * film-covers fetches correlate with double-mount signatures (React
+ * StrictMode in dev, key changes, Suspense retries, remounts on re-render,
+ * etc.).
  *
  * StrictMode signature (dev only): the same component logs
  *   mount(t=0) → unmount(t=0..few ms) → mount(t=few ms)
