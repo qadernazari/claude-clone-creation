@@ -8,7 +8,7 @@
 // Sampling keeps the beacon volume tiny even at scale. Bumped via URL query
 // (?heroperf=1) for on-demand debugging without redeploying.
 
-type PerfPayload = {
+export type PerfPayload = {
   url: string;
   lcp_ms: number;
   lcp_size: number;
