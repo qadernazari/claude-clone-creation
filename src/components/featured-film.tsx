@@ -224,6 +224,8 @@ function SlideImageFrame({
 }) {
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
+  const { locale, t } = useLocale();
+  const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
 
   useEffect(() => {
     if (!frameRef.current || !swipeHandlers || !active) return;
