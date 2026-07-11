@@ -325,16 +325,47 @@ function SlideImageFrame({
                   "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
               }}
             />
-            {active && controls ? (
-              <>
+            {active ? (
+              <div
+                className="pointer-events-none absolute inset-0 z-30 hidden flex-col justify-between p-5 md:flex lg:p-7"
+                aria-hidden={!active}
+              >
+                <div className="pointer-events-auto flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
+                    {locale === "fa" ? "اختصاصی" : "Original"}
+                  </span>
+                  <span className="h-px w-8 bg-cream/20" />
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
+                    {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+                  </span>
+                </div>
+
+                <div className="flex items-end justify-between gap-4">
+                  <div className="pointer-events-auto flex min-w-0 flex-col items-start gap-3">
+                    <h2 className="font-display max-w-[16rem] text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright line-clamp-2 sm:max-w-[20rem] sm:text-3xl lg:max-w-[26rem] lg:text-4xl">
+                      {title}
+                    </h2>
+                    <Link
+                      to="/films/$slug"
+                      params={{ slug: film.slug }}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-md bg-amber px-5 py-2.5 text-[12px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                    </Link>
+                  </div>
+                  {controls ? (
+                    <div className="pointer-events-auto shrink-0">{controls}</div>
+                  ) : null}
+                </div>
+
                 <div
-                  className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:h-32"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[55%] bg-gradient-to-t from-black/90 via-black/55 to-transparent"
                   aria-hidden
                 />
-                <div className="absolute bottom-5 left-0 right-0 z-30 hidden justify-center md:bottom-6 md:flex">
-                  {controls}
-                </div>
-              </>
+              </div>
             ) : null}
           </div>
         </div>
