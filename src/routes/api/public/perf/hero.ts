@@ -6,6 +6,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 type Payload = {
   url?: unknown;
+  correlation_id?: unknown;
+  preload_url?: unknown;
   lcp_ms?: unknown;
   lcp_size?: unknown;
   req_start_ms?: unknown;
