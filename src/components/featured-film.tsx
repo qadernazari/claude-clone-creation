@@ -7,6 +7,7 @@ import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
 import { HeroImageDebug, useHeroDebugEnabled } from "./hero-image-debug";
 import { HeroPerfDebug } from "./hero-perf-debug";
+import { useHeroMountTracker } from "@/lib/hero-mount-tracker";
 
 const AUTOPLAY_MS = 6500;
 
@@ -30,6 +31,7 @@ function HeroShell({ children, extra }: { children: React.ReactNode; extra?: Rea
 }
 
 function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
+  useHeroMountTracker("FeaturedSlider");
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -166,6 +168,7 @@ const POS_CLASS: Record<string, string> = {
 };
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
+  useHeroMountTracker("Slide", film.id);
   const { locale, num, year, t } = useLocale();
   // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;

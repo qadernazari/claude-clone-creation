@@ -157,6 +157,63 @@ const PER_VIEWPORT_TRANSFER_BUDGET_BYTES = {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Detect double-mount patterns from `window.__heroMounts` events.
+ * Returns per-component counts and a boolean `suspected_strict_mode` when a
+ * component logs mount → unmount → mount inside `windowMs` (default 200ms)
+ * before any user interaction. That's the exact fingerprint React StrictMode
+ * leaves in development builds. On a production build, the same pattern
+ * indicates a real remount (Suspense retry, key change, parent re-mount).
+ */
+function analyzeMountEvents(events, windowMs = 200) {
+  const byInstance = new Map(); // `${component}::${key}` -> events[]
+  for (const e of events) {
+    const id = `${e.component}::${e.key ?? ""}`;
+    if (!byInstance.has(id)) byInstance.set(id, []);
+    byInstance.get(id).push(e);
+  }
+  const perComponent = {};
+  let doubleMountCount = 0;
+  const doubleMounts = [];
+  for (const [id, evts] of byInstance) {
+    evts.sort((a, b) => a.seq - b.seq);
+    const mounts = evts.filter((e) => e.phase === "mount");
+    const unmounts = evts.filter((e) => e.phase === "unmount");
+    const [component, key] = id.split("::");
+    perComponent[id] = {
+      component,
+      key: key || null,
+      mounts: mounts.length,
+      unmounts: unmounts.length,
+      first_mount_ts: mounts[0]?.ts ?? null,
+      last_mount_ts: mounts[mounts.length - 1]?.ts ?? null,
+    };
+    // Strict-mode fingerprint: mount → unmount → mount, tight window.
+    if (evts.length >= 3 &&
+        evts[0].phase === "mount" &&
+        evts[1].phase === "unmount" &&
+        evts[2].phase === "mount" &&
+        (evts[2].ts - evts[0].ts) < windowMs) {
+      doubleMountCount += 1;
+      doubleMounts.push({
+        component,
+        key: key || null,
+        mount1_ts: evts[0].ts,
+        unmount_ts: evts[1].ts,
+        mount2_ts: evts[2].ts,
+        gap_ms: Math.round(evts[2].ts - evts[0].ts),
+      });
+    }
+  }
+  return {
+    total_events: events.length,
+    instances: Object.keys(perComponent).length,
+    per_component: perComponent,
+    double_mounts: doubleMounts,
+    suspected_strict_mode: doubleMountCount > 0,
+  };
+}
+
 // One-time process warmup: hit the homepage a few times to compile Vite
 // modules and warm the CDN edge cache for hero assets. Failures here are
 // non-fatal — the retry loop handles genuine boot issues per viewport.
@@ -549,6 +606,18 @@ for (const key of selection) {
       result.domPreloads = domSnapshot.preloads;
       result.activePreload = domSnapshot.activePreload;
       timing.dom_snapshot_ms = Date.now() - domStart;
+
+      // ----- Mount tracker: detect StrictMode / double-mount patterns -----
+      // The page exposes `window.__heroMounts` when ?hero-debug=1 is set
+      // (see src/lib/hero-mount-tracker.ts). We correlate mount events
+      // with the film-covers fetch timeline so duplicate fetches caused by
+      // a component remount are unambiguous.
+      const mountEvents = await page.evaluate(() => {
+        return Array.isArray(window.__heroMounts) ? window.__heroMounts.slice() : [];
+      });
+      const mountAnalysis = analyzeMountEvents(mountEvents);
+      result.mountEvents = mountEvents;
+      result.mountAnalysis = mountAnalysis;
 
       // ----- Cache probe (reload keeps HTTP cache; verify LCP asset now served from cache) -----
       const cacheProbeStart = Date.now();
@@ -983,6 +1052,42 @@ for (const key of selection) {
   }
 
 
+  // ----- Mount / StrictMode correlation -----
+  // If the film-covers response count exceeds the unique-URL count, we have
+  // duplicate hits on the same asset. Correlate that with the mount tracker:
+  // when a hero component (Slide / HeroImageDebug / FeaturedSlider) shows a
+  // mount → unmount → mount fingerprint, we attribute the extras to a
+  // remount. In dev builds that fingerprint = React StrictMode. In prod it
+  // indicates a real remount source (Suspense retry, key change, parent
+  // remount).
+  const ma = attemptResult?.mountAnalysis || null;
+  const coverUrlSet = new Set(coverTransfers.map((t) => t.url));
+  const coverDuplicates = coverTransfers.length - coverUrlSet.size;
+  if (ma) {
+    if (ma.suspected_strict_mode) {
+      const offenders = ma.double_mounts
+        .map((d) => `${d.component}${d.key ? `[${d.key.slice(0, 8)}]` : ""}(+${d.gap_ms}ms)`)
+        .join(", ");
+      if (coverDuplicates > 0) {
+        fail(
+          `double-mount detected AND ${coverDuplicates} duplicate film-covers fetch(es) — likely cause: ${offenders}`,
+        );
+      } else {
+        pass(
+          `double-mount detected (${offenders}) but no duplicate film-covers fetches — dedup working`,
+        );
+      }
+    } else if (coverDuplicates > 0) {
+      // Duplicates without a mount fingerprint → attribution goes elsewhere
+      // (debug-panel HEAD probes, srcset resolution, etc.). Use the initiator
+      // fields on each transfer record to drill in.
+      pass(
+        `${coverDuplicates} duplicate film-covers fetch(es) NOT explained by remount — check initiator_url on transfers`,
+      );
+    } else {
+      pass(`no double-mount and no duplicate film-covers fetches (mounts=${ma.total_events})`);
+    }
+  }
 
   const sumBytes = (arr) =>
     arr.reduce((s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0), 0);
@@ -1024,6 +1129,8 @@ for (const key of selection) {
     },
     rendered_src: renderedSrc,
     cache_probe: attemptResult?.cacheProbe || null,
+    mount_events: attemptResult?.mountEvents || [],
+    mount_analysis: attemptResult?.mountAnalysis || null,
     beacon,
     checks,
     failures,
