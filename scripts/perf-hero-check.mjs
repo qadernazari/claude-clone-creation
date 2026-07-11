@@ -57,20 +57,69 @@ if (configPath) {
 }
 const vpCfg = (key) => fileConfig.viewports?.[key] || {};
 
+// ---------- CLI flag parsing ----------
+// Precedence for these knobs: CLI flag > env var > config default.
+// Supports both `--flag=value` and `--flag value`. Unknown flags are
+// ignored so callers can layer their own args on top.
+const CLI_FLAGS = (() => {
+  const out = {};
+  const argv = process.argv.slice(2);
+  for (let i = 0; i < argv.length; i++) {
+    const tok = argv[i];
+    if (!tok.startsWith("--")) continue;
+    const eq = tok.indexOf("=");
+    if (eq !== -1) {
+      out[tok.slice(2, eq)] = tok.slice(eq + 1);
+    } else {
+      const next = argv[i + 1];
+      if (next && !next.startsWith("--")) {
+        out[tok.slice(2)] = next;
+        i++;
+      } else {
+        out[tok.slice(2)] = "true";
+      }
+    }
+  }
+  return out;
+})();
+const cliNum = (name, envName, fallback) => {
+  const raw = CLI_FLAGS[name] ?? process.env[envName] ?? fallback;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) {
+    console.error(`Invalid --${name} / ${envName}: ${raw}`);
+    process.exit(2);
+  }
+  return n;
+};
+if (CLI_FLAGS.help || CLI_FLAGS.h) {
+  console.log(`Usage: node scripts/perf-hero-check.mjs [flags]
+
+Flags (CLI > env > default):
+  --max-attempts=<n>          MAX_ATTEMPTS (default 3)
+  --beacon-timeout-ms=<ms>    BEACON_TIMEOUT_MS (default 20000)
+  --goto-timeout-ms=<ms>      GOTO_TIMEOUT_MS (default 45000)
+  --retry-backoff-ms=<ms>     RETRY_BACKOFF_MS (default 1500, multiplied by attempt #)
+  --help                      show this message
+
+Other knobs remain env-only: BASE_URL, LCP_BUDGET_MS, VIEWPORTS, WARMUP, WARMUP_PASSES, PERF_HERO_CONFIG.
+`);
+  process.exit(0);
+}
+
 const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 const LCP_BUDGET_MS = Number(
   process.env.LCP_BUDGET_MS || fileConfig.lcp_budget_ms || 2000,
 );
-const BEACON_TIMEOUT_MS = Number(process.env.BEACON_TIMEOUT_MS || 20000);
-const GOTO_TIMEOUT_MS = Number(process.env.GOTO_TIMEOUT_MS || 45000);
-const MAX_ATTEMPTS = Number(process.env.MAX_ATTEMPTS || 3);
+const BEACON_TIMEOUT_MS = cliNum("beacon-timeout-ms", "BEACON_TIMEOUT_MS", 20000);
+const GOTO_TIMEOUT_MS = cliNum("goto-timeout-ms", "GOTO_TIMEOUT_MS", 45000);
+const MAX_ATTEMPTS = cliNum("max-attempts", "MAX_ATTEMPTS", 3);
 const WARMUP = process.env.WARMUP !== "0";
 // How many silent pre-flight passes to run against a fresh dev server before
 // the FIRST measured attempt of the FIRST viewport. Compiles Vite modules
 // and warms the storage-CDN edge cache for hero assets so cold-start doesn't
 // pollute the LCP measurement (especially at 390px and 768px).
 const WARMUP_PASSES = Number(process.env.WARMUP_PASSES || 2);
-const RETRY_BACKOFF_MS = Number(process.env.RETRY_BACKOFF_MS || 1500);
+const RETRY_BACKOFF_MS = cliNum("retry-backoff-ms", "RETRY_BACKOFF_MS", 1500);
 // Per-viewport LCP budgets. Env var > config file > default.
 // Tablet emulation on shared CI runners consistently lands 20–40% slower
 // than desktop, so its default gets headroom.
