@@ -82,13 +82,13 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       }}
       aria-roledescription="carousel"
     >
-      <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-6 md:mt-32 md:px-12">
-        <div className="relative min-h-[620px] sm:min-h-[680px] lg:min-h-[720px]">
+      <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-8 sm:px-6 md:mt-32 md:px-12 md:pb-12">
+        <div className="relative">
           {slides.map((film, i) => (
             <Slide key={film.id} film={film} active={i === index} eager={i === 0} />
           ))}
-
-          {/* Controls row anchored to the text column */}
+        </div>
+        <div className="mt-6 md:mt-8">
           <SliderControls
             count={slides.length}
             index={index}
@@ -116,8 +116,9 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center lg:justify-start">
-      <div className="pointer-events-auto flex items-center gap-6 lg:gap-8">
+    <div className="flex justify-center lg:justify-start">
+
+      <div className="flex items-center gap-6 lg:gap-8">
         <div className="flex items-center gap-2">
           <button
             type="button"
