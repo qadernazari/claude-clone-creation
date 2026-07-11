@@ -294,7 +294,7 @@ function FilmsAdminPage() {
 function AssetBadge({ label, present, url, kind, icon }: {
   label: string; present: boolean; url: string | null; kind: "image" | "video"; icon: React.ReactNode;
 }) {
-  const base = "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium ring-1";
+  const base = "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] leading-none font-medium ring-1 overflow-hidden";
   if (!present) {
     return (
       <span className={`${base} bg-muted/40 text-muted-foreground/60 ring-border/60`} title={`${label}: not set`}>
@@ -306,8 +306,8 @@ function AssetBadge({ label, present, url, kind, icon }: {
     return (
       <a href={url} target="_blank" rel="noreferrer" title={`${label}: view`}
         className={`${base} bg-emerald-500/10 text-emerald-400 ring-emerald-500/30 hover:bg-emerald-500/20`}>
-        <img src={url} alt="" className="h-3 w-3 rounded-sm object-cover" />
-        {label}
+        <img src={url} alt="" className="h-2.5 w-2.5 rounded-sm object-cover shrink-0" />
+        <span>{label}</span>
       </a>
     );
   }
