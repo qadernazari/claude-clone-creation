@@ -591,6 +591,66 @@ export type Database = {
           },
         ]
       }
+      hero_perf_logs: {
+        Row: {
+          country: string | null
+          created_at: string
+          decode_ms: number | null
+          downlink: number | null
+          dpr: number | null
+          effective_type: string | null
+          encoded_bytes: number | null
+          id: number
+          lcp_ms: number | null
+          lcp_size: number | null
+          protocol: string | null
+          resp_end_ms: number | null
+          transfer_bytes: number | null
+          ttfb_ms: number | null
+          ua_mobile: boolean | null
+          url: string | null
+          viewport_w: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          decode_ms?: number | null
+          downlink?: number | null
+          dpr?: number | null
+          effective_type?: string | null
+          encoded_bytes?: number | null
+          id?: number
+          lcp_ms?: number | null
+          lcp_size?: number | null
+          protocol?: string | null
+          resp_end_ms?: number | null
+          transfer_bytes?: number | null
+          ttfb_ms?: number | null
+          ua_mobile?: boolean | null
+          url?: string | null
+          viewport_w?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          decode_ms?: number | null
+          downlink?: number | null
+          dpr?: number | null
+          effective_type?: string | null
+          encoded_bytes?: number | null
+          id?: number
+          lcp_ms?: number | null
+          lcp_size?: number | null
+          protocol?: string | null
+          resp_end_ms?: number | null
+          transfer_bytes?: number | null
+          ttfb_ms?: number | null
+          ua_mobile?: boolean | null
+          url?: string | null
+          viewport_w?: number | null
+        }
+        Relationships: []
+      }
       ir_payment_requests: {
         Row: {
           amount_toman: number
