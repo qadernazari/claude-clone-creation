@@ -32,11 +32,66 @@ function b(v: unknown): boolean | null {
   return typeof v === "boolean" ? v : null;
 }
 
+// Per-IP token bucket. Isolate-local (Workers keep the module scope alive
+// across requests within one isolate) — under heavy multi-region traffic
+// each isolate enforces its own budget, so the effective ceiling is
+// PER_MIN * (isolates). Good enough to stop a single spamming client from
+// flooding worker logs; a proper global limiter would need a KV/DO backend.
+const PER_MIN = 30;
+const WINDOW_MS = 60_000;
+const MAX_TRACKED_IPS = 5000;
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+function clientKey(request: Request): string {
+  // Prefer Cloudflare/edge-injected client IP; fall back to XFF; else "anon".
+  const cf =
+    request.headers.get("cf-connecting-ip") ??
+    request.headers.get("x-real-ip") ??
+    null;
+  if (cf) return cf;
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0]!.trim();
+  return "anon";
+}
+
+function rateLimit(request: Request): { ok: boolean; retryAfter: number } {
+  const key = clientKey(request);
+  const now = Date.now();
+  const entry = ipHits.get(key);
+  if (!entry || entry.resetAt <= now) {
+    // Simple GC when the map grows unbounded (long-lived isolate).
+    if (ipHits.size >= MAX_TRACKED_IPS) {
+      for (const [k, v] of ipHits) {
+        if (v.resetAt <= now) ipHits.delete(k);
+        if (ipHits.size < MAX_TRACKED_IPS / 2) break;
+      }
+    }
+    ipHits.set(key, { count: 1, resetAt: now + WINDOW_MS });
+    return { ok: true, retryAfter: 0 };
+  }
+  entry.count += 1;
+  if (entry.count > PER_MIN) {
+    return { ok: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
+  }
+  return { ok: true, retryAfter: 0 };
+}
+
 export const Route = createFileRoute("/api/public/perf/hero")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
+          const limit = rateLimit(request);
+          if (!limit.ok) {
+            return new Response("rate limited", {
+              status: 429,
+              headers: {
+                "Retry-After": String(limit.retryAfter),
+                "Cache-Control": "no-store",
+              },
+            });
+          }
+
           const raw = await request.text();
           if (raw.length > 2048) {
             return new Response("payload too large", { status: 413 });
