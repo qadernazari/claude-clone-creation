@@ -150,11 +150,6 @@ function DeferredHomeRails() {
 }
 
 
-
-
-
-
-
 function HomePendingShell() {
   return (
     <div className="min-h-screen bg-bg-0 text-cream">
