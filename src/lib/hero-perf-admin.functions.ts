@@ -1,0 +1,85 @@
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
+
+const InputSchema = z.object({
+  hours: z.number().int().min(1).max(24 * 30).default(24),
+  effectiveType: z.string().max(16).optional(),
+  country: z.string().max(8).optional(),
+});
+
+export type HeroPerfRow = {
+  created_at: string;
+  lcp_ms: number | null;
+  decode_ms: number | null;
+  transfer_bytes: number | null;
+  effective_type: string | null;
+  country: string | null;
+  ua_mobile: boolean | null;
+  url: string | null;
+};
+
+export type HeroPerfResponse = {
+  rows: HeroPerfRow[];
+  effectiveTypes: string[];
+  countries: string[];
+  total: number;
+};
+
+export const getHeroPerfLogs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => InputSchema.parse(data))
+  .handler(async ({ data, context }): Promise<HeroPerfResponse> => {
+    const { supabase, userId } = context;
+
+    // Verify admin caller.
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - data.hours * 3600_000).toISOString();
+
+    let q = supabaseAdmin
+      .from("hero_perf_logs")
+      .select("created_at, lcp_ms, decode_ms, transfer_bytes, effective_type, country, ua_mobile, url")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(5000);
+
+    if (data.effectiveType && data.effectiveType !== "all") {
+      q = q.eq("effective_type", data.effectiveType);
+    }
+    if (data.country && data.country !== "all") {
+      q = q.eq("country", data.country);
+    }
+
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    // Distinct facets over the same window (ignoring filters, so the dropdown
+    // options don't collapse to a single value once a filter is applied).
+    const { data: facets } = await supabaseAdmin
+      .from("hero_perf_logs")
+      .select("effective_type, country")
+      .gte("created_at", since)
+      .limit(5000);
+
+    const effectiveTypes = Array.from(
+      new Set((facets ?? []).map((r) => r.effective_type).filter(Boolean) as string[])
+    ).sort();
+    const countries = Array.from(
+      new Set((facets ?? []).map((r) => r.country).filter(Boolean) as string[])
+    ).sort();
+
+    return {
+      rows: (rows ?? []) as HeroPerfRow[],
+      effectiveTypes,
+      countries,
+      total: rows?.length ?? 0,
+    };
+  });
