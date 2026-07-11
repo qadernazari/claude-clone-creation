@@ -367,13 +367,23 @@ for (const key of selection) {
     const artifactBase = `${key}-attempt${attempt}`;
     const harPath = joinPath(FAILURE_DIR, `${artifactBase}.har`);
     const screenshotPath = joinPath(FAILURE_DIR, `${artifactBase}.png`);
+    const tracePath = joinPath(FAILURE_DIR, `${artifactBase}.trace.zip`);
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: vp.deviceScaleFactor,
       userAgent: vp.userAgent,
       recordHar: { path: harPath, mode: "full", content: "embed" },
     });
+    // Always start a Playwright trace so we can post-mortem cache reuse,
+    // request initiators, and response bodies for any attempt where the
+    // film-covers request count exceeds 1. Discarded on clean attempts.
+    await context.tracing.start({
+      screenshots: true,
+      snapshots: true,
+      sources: true,
+    });
     const page = await context.newPage();
+
 
     // Install a document-start observer that records every mutation to
     // `<link rel="preload" as="image">` nodes in <head>. We use this to
