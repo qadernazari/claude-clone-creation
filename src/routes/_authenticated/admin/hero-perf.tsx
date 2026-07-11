@@ -1110,7 +1110,7 @@ function PerfReportsList() {
         <div>
           <h2 className="font-medium">Perf-hero reports</h2>
           <p className="text-xs text-muted-foreground">
-            JSON + HTML uploads from <code>npm run perf:hero</code> (bucket <code>perf-reports</code>). Signed links expire in 30 min.
+            JSON + HTML uploads in bucket <code>perf-reports</code>. Signed links expire in 30 min.
           </p>
         </div>
         <button
@@ -1128,8 +1128,7 @@ function PerfReportsList() {
           <p className="text-sm text-destructive">Failed to load: {(error as Error).message}</p>
         ) : files.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No reports uploaded yet. Run <code>npm run perf:hero</code> with <code>SUPABASE_URL</code> and
-            <code> SUPABASE_SERVICE_ROLE_KEY</code> set to publish reports here.
+            No reports uploaded yet.
           </p>
         ) : (
           <ul className="divide-y divide-border text-sm">
@@ -1263,7 +1262,7 @@ function PerfRunsSummary() {
           <p className="text-sm text-destructive">Failed to load: {(error as Error).message}</p>
         ) : !data || data.totals.runs_considered === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No JSON reports uploaded yet. Run <code>npm run perf:hero</code> to publish one.
+            No JSON reports uploaded yet.
           </p>
         ) : (
           <>
