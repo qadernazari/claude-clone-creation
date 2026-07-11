@@ -844,7 +844,10 @@ for (const key of selection) {
         if (localBeacon.lcp_ms > budget) {
           softReasons.push(`lcp_ms ${localBeacon.lcp_ms} > budget ${budget}`);
         }
-        if (key === "mobile" && localBeacon.preload_cache_hit !== true) {
+        if (
+          REQUIRE_PRELOAD_CACHE_HIT[key] &&
+          localBeacon.preload_cache_hit !== true
+        ) {
           softReasons.push(
             `preload_cache_hit=${JSON.stringify(localBeacon.preload_cache_hit)} (expected true)`,
           );
