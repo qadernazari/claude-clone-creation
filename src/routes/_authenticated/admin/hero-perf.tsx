@@ -1110,7 +1110,7 @@ function PerfReportsList() {
         <div>
           <h2 className="font-medium">Perf-hero reports</h2>
           <p className="text-xs text-muted-foreground">
-            JSON + HTML uploads from <code>npm run perf:hero</code> (bucket <code>perf-reports</code>). Signed links expire in 30 min.
+            JSON + HTML uploads in bucket <code>perf-reports</code>. Signed links expire in 30 min.
           </p>
         </div>
         <button
