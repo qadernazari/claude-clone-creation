@@ -286,6 +286,17 @@ function SlideImageFrame({
                   "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)",
               }}
             />
+            {active && controls ? (
+              <>
+                <div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-20 bg-gradient-to-t from-black/75 via-black/35 to-transparent md:h-28"
+                  aria-hidden
+                />
+                <div className="absolute bottom-0 left-0 right-0 z-30 flex justify-center pb-3 md:pb-4">
+                  {controls}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
 
