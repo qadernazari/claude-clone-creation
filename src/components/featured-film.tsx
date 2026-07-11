@@ -216,12 +216,32 @@ function SlideImageFrame({
   eager: boolean;
   controls?: ReactNode;
   swipeHandlers?: {
-    onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
-    onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => void;
-    onPointerCancel: (e: React.PointerEvent<HTMLDivElement>) => void;
+    onPointerDown: (e: PointerEvent) => void;
+    onPointerUp: (e: PointerEvent) => void;
+    onPointerCancel: (e: PointerEvent) => void;
   };
 }) {
   const [loaded, setLoaded] = useState(false);
+  const frameRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!frameRef.current || !swipeHandlers || !active) return;
+    const el = frameRef.current;
+    const onPointerDown = (e: PointerEvent) => swipeHandlers.onPointerDown(e);
+    const onPointerUp = (e: PointerEvent) => swipeHandlers.onPointerUp(e);
+    const onPointerCancel = (e: PointerEvent) => swipeHandlers.onPointerCancel(e);
+    const onPointerLeave = (e: PointerEvent) => swipeHandlers.onPointerCancel(e);
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("pointercancel", onPointerCancel);
+    el.addEventListener("pointerleave", onPointerLeave);
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointerup", onPointerUp);
+      el.removeEventListener("pointercancel", onPointerCancel);
+      el.removeEventListener("pointerleave", onPointerLeave);
+    };
+  }, [active, swipeHandlers]);
 
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const landscapeImage = film.thumbnail_url || film.cover_url;
