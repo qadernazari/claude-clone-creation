@@ -383,6 +383,7 @@ for (const key of selection) {
         // Warm on every attempt: retries fire precisely when the previous
         // attempt was slow, so re-warming the module graph and CDN edge is
         // the whole point.
+        const warmupStart = Date.now();
         try {
           await page.goto(`${BASE_URL}/?warmup=1&attempt=${attempt}`, {
             waitUntil: "domcontentloaded",
@@ -390,25 +391,44 @@ for (const key of selection) {
           });
           await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
         } catch (err) {
-          console.log(`    · warmup skipped: ${err instanceof Error ? err.message : err}`);
+          timing.warmup_error = err instanceof Error ? err.message : String(err);
+          console.log(`    · warmup skipped: ${timing.warmup_error}`);
         }
+        timing.warmup_ms = Date.now() - warmupStart;
       }
 
+      timing.nav_start_ms = Date.now() - attemptStart;
+      const navStart = Date.now();
       await page.goto(`${BASE_URL}/?hero-debug=1`, {
         waitUntil: "domcontentloaded",
         timeout: GOTO_TIMEOUT_MS,
       });
+      timing.nav_ms = Date.now() - navStart;
+      const idleStart = Date.now();
       try {
         await page.waitForLoadState("networkidle", { timeout: GOTO_TIMEOUT_MS });
       } catch {
         // dev-server HMR keeps network alive; beacon race below is authoritative.
       }
-      await Promise.race([
-        beaconPromise,
-        new Promise((_, r) =>
-          setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
-        ),
-      ]);
+      timing.networkidle_ms = Date.now() - idleStart;
+
+      timing.beacon_wait_start_ms = Date.now() - attemptStart;
+      const beaconStart = Date.now();
+      try {
+        await Promise.race([
+          beaconPromise,
+          new Promise((_, r) =>
+            setTimeout(() => r(new Error(`beacon timeout after ${BEACON_TIMEOUT_MS}ms`)), BEACON_TIMEOUT_MS),
+          ),
+        ]);
+        beaconWait.reason = beaconWait.resolved ? "resolved" : "unknown";
+      } catch (err) {
+        beaconWait.timed_out = true;
+        beaconWait.reason = "timeout";
+        throw err;
+      } finally {
+        beaconWait.elapsed_ms = Date.now() - beaconStart;
+      }
       await sleep(250);
 
       const domSnapshot = await page.evaluate(() => {
