@@ -11,7 +11,10 @@ export function NewReleaseRow() {
   const { data } = useSuspenseQuery(homeRailsQueryOptions);
   const newReleases = useMemo(() => (data.films ?? []).slice(0, 12), [data.films]);
 
+  useEffect(() => { logMount("NewReleaseRow"); }, []);
+
   if (newReleases.length === 0) return null;
+
 
   return (
     <Rail
