@@ -393,6 +393,21 @@ for (const key of selection) {
       fail(`hero LCP ${beacon.lcp_ms}ms exceeds budget ${LCP_BUDGET_MS}ms`);
     }
 
+    // Mobile (390px) must serve the LCP hero from the preload cache.
+    // CI fails if `preload_cache_hit` is anything other than strictly `true`.
+    if (key === "mobile") {
+      const hit = beacon?.preload_cache_hit;
+      if (hit === true) {
+        pass("preload_cache_hit=true on 390px viewport");
+      } else {
+        fail(
+          `preload_cache_hit must be true on 390px viewport (got ${
+            hit === null || hit === undefined ? "null" : JSON.stringify(hit)
+          })`,
+        );
+      }
+    }
+
     const uniqueExpected = new Set(
       expectTransfers.map((t) => t.url.split("?")[0]),
     ).size;
