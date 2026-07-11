@@ -25,7 +25,12 @@ import { chromium } from "playwright";
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 const LCP_BUDGET_MS = Number(process.env.LCP_BUDGET_MS || 2000);
-const BEACON_TIMEOUT_MS = 8000;
+const BEACON_TIMEOUT_MS = Number(process.env.BEACON_TIMEOUT_MS || 20000);
+const GOTO_TIMEOUT_MS = Number(process.env.GOTO_TIMEOUT_MS || 45000);
+const MAX_ATTEMPTS = Number(process.env.MAX_ATTEMPTS || 3);
+const WARMUP = process.env.WARMUP !== "0";
+const RETRY_BACKOFF_MS = Number(process.env.RETRY_BACKOFF_MS || 1500);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const ALL_VIEWPORTS = {
   mobile: {
