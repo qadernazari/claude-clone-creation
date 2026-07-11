@@ -223,7 +223,8 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   height={1200}
                   className={`absolute inset-0 block h-full w-full lg:hidden ${fitClass} ${active ? "cine-img-in" : ""}`}
                   loading={eager ? "eager" : "lazy"}
-                  decoding="async"
+                  decoding={eager ? "sync" : "async"}
+                  {...(eager ? { fetchPriority: "high" as const } : {})}
                   sizes="(max-width: 1023px) 90vw, 0px"
                 />
               ) : null}
@@ -236,7 +237,8 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   height={1080}
                   className={`absolute inset-0 hidden h-full w-full lg:block ${fitClass} ${active ? "cine-img-in" : ""}`}
                   loading={eager ? "eager" : "lazy"}
-                  decoding="async"
+                  decoding={eager ? "sync" : "async"}
+                  {...(eager ? { fetchPriority: "high" as const } : {})}
                   sizes="(min-width: 1024px) 1200px, 0px"
                 />
               ) : null}
