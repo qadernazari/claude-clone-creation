@@ -102,6 +102,24 @@ function vpBucketOf(w: number | null | undefined): VpKey | null {
   return null;
 }
 
+type EnvKey = "production" | "preview" | "local" | "unknown";
+
+function environmentOf(url: string | null | undefined): EnvKey {
+  if (!url) return "unknown";
+  let host = "";
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return "unknown";
+  }
+  if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".local")) return "local";
+  if (host === "ir.show" || host === "www.ir.show") return "production";
+  if (host === "claude-clone-creation.lovable.app") return "production";
+  if (host.includes("id-preview") || host.endsWith("-dev.lovable.app") || host.includes("lovable-project.com")) return "preview";
+  if (host.endsWith(".lovable.app")) return "production";
+  return "unknown";
+}
+
 function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   // Choose a bucket size that yields ~30-60 buckets.
   const totalMs = hours * 3600_000;
