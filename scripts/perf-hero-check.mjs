@@ -329,17 +329,54 @@ for (const key of selection) {
       }
     });
 
+    const attemptStart = Date.now();
+    const timing = {
+      attempt_start: new Date(attemptStart).toISOString(),
+      warmup_ms: null,
+      warmup_error: null,
+      nav_start_ms: null,       // ms since attemptStart when page.goto(?hero-debug) starts
+      nav_ms: null,             // duration of page.goto until domcontentloaded
+      networkidle_ms: null,     // duration from nav end until networkidle (or timeout)
+      beacon_wait_start_ms: null,
+      beacon_wait_ms: null,
+      dom_snapshot_ms: null,
+      cache_probe_ms: null,
+      total_ms: null,
+    };
+    const beaconWait = {
+      resolved: false,           // did the /api/public/perf/hero request fire?
+      reason: null,              // "resolved" | "timeout" | "nav_error" | "unknown"
+      timed_out: false,
+      timeout_ms: BEACON_TIMEOUT_MS,
+      elapsed_ms: null,          // wall-clock spent in the race
+      resolved_at_ms: null,      // ms since attemptStart when the beacon POST fired
+      first_seen_at_ms: null,    // same as resolved_at_ms; kept for symmetry
+    };
     const result = {
       ok: false,
       reason: "",
       thumb: localThumb,
       cover: localCover,
       beacon: null,
+      lastBeacon: null,   // populated even when the attempt fails (may be null, partial, or malformed)
       renderedSrc: null,
       cacheProbe: null,
       domPreloads: [],
       activePreload: null,
       attempt,
+      timing,
+      beaconWait,
+    };
+    // Record when the beacon request fires (from within the page.on("request") hook above,
+    // which mutates `localBeacon`). We piggyback on `beaconResolve` by wrapping it.
+    const originalBeaconResolve = beaconResolve;
+    beaconResolve = () => {
+      if (beaconWait.first_seen_at_ms == null) {
+        beaconWait.first_seen_at_ms = Date.now() - attemptStart;
+        beaconWait.resolved_at_ms = beaconWait.first_seen_at_ms;
+        beaconWait.resolved = true;
+      }
+      originalBeaconResolve();
     };
     try {
       if (WARMUP) {
