@@ -341,17 +341,52 @@ const ALL_VIEWPORTS = {
   },
 };
 
-// Apply per-viewport preload gate overrides (env var > config file > default).
+// Preload orientation → bucket mapping. Defaults reflect the app's current
+// storage layout (portrait posters live in `film-covers`, landscape stills in
+// `film-thumbnails`), but a config file can rename or add buckets without
+// touching this script. Config precedence for buckets:
+//   env var > config file (viewports.<key>.expect_bucket / forbid_bucket)
+//     > config file (viewports.<key>.preload_orientation → preload_buckets map)
+//     > script default.
+const DEFAULT_PRELOAD_BUCKETS = { portrait: "film-covers", landscape: "film-thumbnails" };
+const PRELOAD_BUCKETS = {
+  ...DEFAULT_PRELOAD_BUCKETS,
+  ...(fileConfig.preload_buckets || {}),
+};
+const bucketForOrientation = (o) => (o ? PRELOAD_BUCKETS[o] : undefined);
+const opposite = { portrait: "landscape", landscape: "portrait" };
+
 for (const key of Object.keys(ALL_VIEWPORTS)) {
   const cfg = vpCfg(key);
   const envUp = key.toUpperCase();
-  const expect = process.env[`EXPECT_BUCKET_${envUp}`] || cfg.expect_bucket;
-  const forbid = process.env[`FORBID_BUCKET_${envUp}`] || cfg.forbid_bucket;
+  const orientation = cfg.preload_orientation; // "portrait" | "landscape"
+  if (orientation && !(orientation in PRELOAD_BUCKETS)) {
+    console.error(
+      `viewports.${key}.preload_orientation="${orientation}" is not in preload_buckets ` +
+        `(known: ${Object.keys(PRELOAD_BUCKETS).join(", ")})`,
+    );
+    process.exit(2);
+  }
+  const expect =
+    process.env[`EXPECT_BUCKET_${envUp}`] ||
+    cfg.expect_bucket ||
+    bucketForOrientation(orientation);
+  const forbid =
+    process.env[`FORBID_BUCKET_${envUp}`] ||
+    cfg.forbid_bucket ||
+    bucketForOrientation(opposite[orientation]);
   const selector = process.env[`HERO_SELECTOR_${envUp}`] || cfg.hero_img_selector;
   if (expect) ALL_VIEWPORTS[key].expectBucket = expect;
   if (forbid) ALL_VIEWPORTS[key].forbidBucket = forbid;
   if (selector) ALL_VIEWPORTS[key].heroImgSelector = selector;
+  ALL_VIEWPORTS[key].preloadOrientation =
+    orientation ||
+    (Object.entries(PRELOAD_BUCKETS).find(
+      ([, b]) => b === ALL_VIEWPORTS[key].expectBucket,
+    ) || [])[0] ||
+    null;
 }
+
 
 const selection = (process.env.VIEWPORTS || "mobile,tablet,laptop,desktop")
   .split(",")
