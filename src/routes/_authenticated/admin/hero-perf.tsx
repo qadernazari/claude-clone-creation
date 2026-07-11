@@ -387,6 +387,7 @@ function HeroPerfPage() {
         </div>
       </div>
 
+      <PerfRunsSummary />
       <PerfReportsList />
 
 
