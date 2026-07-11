@@ -431,8 +431,13 @@ for (const key of selection) {
       }
       await sleep(250);
 
+      const domStart = Date.now();
       const domSnapshot = await page.evaluate(() => {
         const imgs = Array.from(document.querySelectorAll("main img"));
+        const visible = imgs.find((i) => {
+          const r = i.getBoundingClientRect();
+          return r.width > 200 && r.height > 200;
+        });
         const visible = imgs.find((i) => {
           const r = i.getBoundingClientRect();
           return r.width > 200 && r.height > 200;
