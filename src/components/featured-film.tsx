@@ -225,7 +225,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   loading={eager ? "eager" : "lazy"}
                   decoding={eager ? "sync" : "async"}
                   {...(eager ? { fetchPriority: "high" as const } : {})}
-                  sizes="(max-width: 1023px) 90vw, 0px"
+                  sizes="(max-width: 768px) 90vw, (max-width: 1023px) 380px, 1px"
                 />
               ) : null}
               {landscapeImage ? (
@@ -239,7 +239,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   loading={eager ? "eager" : "lazy"}
                   decoding={eager ? "sync" : "async"}
                   {...(eager ? { fetchPriority: "high" as const } : {})}
-                  sizes="(min-width: 1024px) 1200px, 0px"
+                  sizes="(min-width: 1200px) 1200px, (min-width: 1024px) 80vw, 1px"
                 />
               ) : null}
               <div
