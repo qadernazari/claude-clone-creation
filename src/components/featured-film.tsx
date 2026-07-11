@@ -191,11 +191,12 @@ const POS_CLASS: Record<string, string> = {
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   return (
     <div
-      className={`flex flex-col gap-5 pb-5 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] lg:gap-6 ${
+      className={`flex flex-col gap-5 pb-5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] lg:gap-6 ${
         active
-          ? "relative z-10 scale-100 opacity-100"
-          : "pointer-events-none absolute inset-0 z-0 scale-[0.98] opacity-0"
+          ? "relative z-10 opacity-100"
+          : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
+      style={{ transform: active ? "translateX(0) scale(1)" : "translateX(-2%) scale(0.98)" }}
       aria-hidden={!active}
     >
       <SlideImageFrame film={film} active={active} eager={eager} />
