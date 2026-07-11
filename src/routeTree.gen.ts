@@ -62,6 +62,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicPerfHeroRouteImport } from './routes/api/public/perf/hero'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicIrPaymentsCallbackRouteImport } from './routes/api/public/ir-payments/callback'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
@@ -351,6 +352,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPerfHeroRoute = ApiPublicPerfHeroRouteImport.update({
+  id: '/api/public/perf/hero',
+  path: '/api/public/perf/hero',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/ir-payments/callback': typeof ApiPublicIrPaymentsCallbackRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/perf/hero': typeof ApiPublicPerfHeroRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -491,6 +498,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/ir-payments/callback': typeof ApiPublicIrPaymentsCallbackRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/perf/hero': typeof ApiPublicPerfHeroRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -552,6 +560,7 @@ export interface FileRoutesById {
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/ir-payments/callback': typeof ApiPublicIrPaymentsCallbackRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/perf/hero': typeof ApiPublicPerfHeroRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -613,6 +622,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trial-reminders'
     | '/api/public/ir-payments/callback'
     | '/api/public/payments/webhook'
+    | '/api/public/perf/hero'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -671,6 +681,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trial-reminders'
     | '/api/public/ir-payments/callback'
     | '/api/public/payments/webhook'
+    | '/api/public/perf/hero'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -731,6 +742,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trial-reminders'
     | '/api/public/ir-payments/callback'
     | '/api/public/payments/webhook'
+    | '/api/public/perf/hero'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -765,6 +777,7 @@ export interface RootRouteChildren {
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicIrPaymentsCallbackRoute: typeof ApiPublicIrPaymentsCallbackRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicPerfHeroRoute: typeof ApiPublicPerfHeroRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1145,6 +1158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/perf/hero': {
+      id: '/api/public/perf/hero'
+      path: '/api/public/perf/hero'
+      fullPath: '/api/public/perf/hero'
+      preLoaderRoute: typeof ApiPublicPerfHeroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -1302,6 +1322,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicIrPaymentsCallbackRoute: ApiPublicIrPaymentsCallbackRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicPerfHeroRoute: ApiPublicPerfHeroRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
