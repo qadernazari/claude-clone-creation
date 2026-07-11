@@ -324,7 +324,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
   const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
   return (
-    <div className="flex flex-col gap-5 lg:gap-6">
+    <div className="flex flex-col gap-4 lg:gap-5">
       <div className="flex flex-wrap items-center gap-3">
         <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
           {locale === "fa" ? "اختصاصی" : "Original"}
@@ -335,7 +335,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
         </span>
       </div>
 
-      <h2 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-4xl lg:text-5xl xl:text-6xl">
+      <h2 className="font-display text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright sm:text-3xl lg:text-4xl">
         {title}
       </h2>
 
@@ -354,7 +354,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
       </div>
 
       {synopsis ? (
-        <p className="max-w-3xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
+        <p className="max-w-xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
           {synopsis}
         </p>
       ) : null}
