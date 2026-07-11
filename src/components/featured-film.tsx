@@ -54,11 +54,11 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   }, [index, paused, next]);
 
   const startX = useRef<number | null>(null);
-  const onPointerDown = (e: React.PointerEvent) => {
+  const onPointerDown = (e: PointerEvent) => {
     startX.current = e.clientX;
     setPaused(true);
   };
-  const onPointerUp = (e: React.PointerEvent) => {
+  const onPointerUp = (e: PointerEvent) => {
     if (startX.current == null) return;
     const dx = e.clientX - startX.current;
     startX.current = null;
