@@ -84,6 +84,26 @@ const PER_VIEWPORT_BUDGET_MS = {
   laptop: budgetFor("laptop", LCP_BUDGET_MS),
   desktop: budgetFor("desktop", LCP_BUDGET_MS),
 };
+
+// Per-viewport transfer_bytes budgets (bytes downloaded from the LCP asset
+// bucket on initial load). Env var > config file > default. The forbidden
+// bucket is already asserted to zero elsewhere, so this is effectively the
+// hero image transfer ceiling.
+const transferBudgetFor = (key, fallback) =>
+  Number(
+    process.env[`TRANSFER_BUDGET_BYTES_${key.toUpperCase()}`] ||
+      vpCfg(key).transfer_budget_bytes ||
+      fallback,
+  );
+const DEFAULT_TRANSFER_BUDGET_BYTES = Number(
+  process.env.TRANSFER_BUDGET_BYTES || fileConfig.transfer_budget_bytes || 500_000,
+);
+const PER_VIEWPORT_TRANSFER_BUDGET_BYTES = {
+  mobile: transferBudgetFor("mobile", 250_000),
+  tablet: transferBudgetFor("tablet", 350_000),
+  laptop: transferBudgetFor("laptop", 400_000),
+  desktop: transferBudgetFor("desktop", DEFAULT_TRANSFER_BUDGET_BYTES),
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // One-time process warmup: hit the homepage a few times to compile Vite
@@ -535,6 +555,32 @@ for (const key of selection) {
       fail(`hero LCP ${beacon.lcp_ms}ms exceeds budget ${vpBudget}ms`);
     }
 
+    // Per-viewport transfer_bytes budget. Sum bytes across expectTransfers
+    // for the initial page load only (cache probe reload is excluded).
+    const vpTransferBudget = PER_VIEWPORT_TRANSFER_BUDGET_BYTES[key] ?? DEFAULT_TRANSFER_BUDGET_BYTES;
+    const initialExpectForBudget = expectTransfers.slice(
+      0,
+      expectTransfers.length -
+        (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+        (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
+    );
+    const initialTransferBytes = initialExpectForBudget.reduce(
+      (s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0),
+      0,
+    );
+    if (initialTransferBytes === 0) {
+      // Nothing measured — skip to avoid false pass. Warn only.
+      pass(`no ${vp.expectBucket} bytes recorded (budget ${vpTransferBudget})`);
+    } else if (initialTransferBytes <= vpTransferBudget) {
+      pass(
+        `${vp.expectBucket} transfer ${initialTransferBytes} B <= budget ${vpTransferBudget} B`,
+      );
+    } else {
+      fail(
+        `${vp.expectBucket} transfer ${initialTransferBytes} B exceeds budget ${vpTransferBudget} B`,
+      );
+    }
+
     // Mobile (390px) must serve the LCP hero from the preload cache.
     // CI fails if `preload_cache_hit` is anything other than strictly `true`.
     if (key === "mobile") {
@@ -722,6 +768,17 @@ for (const key of selection) {
   const sumBytes = (arr) =>
     arr.reduce((s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0), 0);
 
+  const expectTransfersForBudget =
+    vp.expectBucket === "film-thumbnails" ? thumbTransfers : coverTransfers;
+  const initialExpectSlice = expectTransfersForBudget.slice(
+    0,
+    expectTransfersForBudget.length -
+      (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+      (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
+  );
+  const transferBytesInitial = sumBytes(initialExpectSlice);
+  const transferBudget = PER_VIEWPORT_TRANSFER_BUDGET_BYTES[key] ?? DEFAULT_TRANSFER_BUDGET_BYTES;
+
   reportRuns.push({
     viewport_key: key,
     viewport_label: vp.label,
@@ -738,6 +795,10 @@ for (const key of selection) {
       sumBytes(thumbTransfers) + sumBytes(coverTransfers),
     transfer_bytes_thumbnails: sumBytes(thumbTransfers),
     transfer_bytes_covers: sumBytes(coverTransfers),
+    transfer_bytes_initial: transferBytesInitial,
+    transfer_budget_bytes: transferBudget,
+    transfer_over_budget:
+      transferBytesInitial > 0 && transferBytesInitial > transferBudget,
     transfers: {
       "film-thumbnails": thumbTransfers,
       "film-covers": coverTransfers,
@@ -763,6 +824,7 @@ const report = {
   base_url: BASE_URL,
   lcp_budget_ms: LCP_BUDGET_MS,
   lcp_budget_ms_per_viewport: PER_VIEWPORT_BUDGET_MS,
+  transfer_budget_bytes_per_viewport: PER_VIEWPORT_TRANSFER_BUDGET_BYTES,
   viewports_selected: selection,
   overall_passed: totalFailures.length === 0,
   summary: {
@@ -834,7 +896,12 @@ const runCards = reportRuns
             <span><strong>LCP:</strong> ${r.lcp_ms ?? "—"} ms (budget ${
               r.lcp_budget_ms
             })</span>
-            <span><strong>Transfer:</strong> ${fmtBytes(
+            <span class="${r.transfer_over_budget ? "over-budget" : ""}"><strong>Transfer (initial ${esc(
+              r.expect_bucket,
+            )}):</strong> ${fmtBytes(r.transfer_bytes_initial)} / ${fmtBytes(
+              r.transfer_budget_bytes,
+            )}${r.transfer_over_budget ? " ⚠️ over budget" : ""}</span>
+            <span><strong>Transfer (total):</strong> ${fmtBytes(
               r.transfer_bytes_total,
             )} (thumbs ${fmtBytes(
               r.transfer_bytes_thumbnails,
@@ -891,6 +958,19 @@ const html = `<!doctype html>
   table.summary-table td.pass, table.summary-table td.match { color: #1a7f37; font-weight: 600; }
   table.summary-table td.fail, table.summary-table td.mismatch { color: #cf222e; font-weight: 600; }
   table.summary-table td.over-budget { color: #cf222e; }
+  .stats span.over-budget { color: #cf222e; font-weight: 600; }
+  table.budget-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: .9rem; }
+  table.budget-table th, table.budget-table td { padding: .5rem .75rem; border-bottom: 1px solid #eee; vertical-align: middle; text-align: left; }
+  table.budget-table th { background: #f4f4f7; }
+  .bar-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .bar-track { position: relative; height: 10px; background: #eef0f3; border-radius: 5px; overflow: hidden; display: flex; }
+  .bar { height: 100%; border-radius: 5px 0 0 5px; }
+  .bar.ok { background: #2ea043; }
+  .bar.over { background: #d1242f; }
+  .bar-overflow { height: 100%; background: repeating-linear-gradient(45deg, #d1242f, #d1242f 4px, #a01822 4px, #a01822 8px); }
+  .bar.none { color: #999; padding: 0 .5em; }
+  .bar-label { font-size: .8rem; color: #555; font-family: ui-monospace, Menlo, monospace; }
+  .bar-label.over-budget { color: #cf222e; }
   table.summary-table code { font-size: .8em; }
 </style></head><body>
 <h1>Hero performance report</h1>
@@ -955,6 +1035,38 @@ ${(() => {
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
+})()}
+${(() => {
+  // Per-viewport budget chart: two side-by-side bars per viewport
+  // (LCP vs budget, transfer_bytes vs budget). Bar width scales relative to
+  // the budget so 100% == exactly at budget; anything past that is red.
+  if (reportRuns.length === 0) return "";
+  const bar = (actual, budget, unit) => {
+    if (actual == null || !budget) {
+      return `<div class="bar-wrap"><div class="bar none">—</div><div class="bar-label">— / ${budget ?? "—"} ${unit}</div></div>`;
+    }
+    const pct = Math.min(150, Math.round((actual / budget) * 100));
+    const over = actual > budget;
+    const label = unit === "B"
+      ? `${fmtBytes(actual)} / ${fmtBytes(budget)}`
+      : `${actual} / ${budget} ${unit}`;
+    return `<div class="bar-wrap">
+      <div class="bar-track"><div class="bar ${over ? "over" : "ok"}" style="width:${Math.min(100, pct)}%"></div>${over ? `<div class="bar-overflow" style="width:${Math.min(50, pct - 100)}%"></div>` : ""}</div>
+      <div class="bar-label ${over ? "over-budget" : ""}">${label}${over ? ` <strong>(${pct}%)</strong>` : ` (${pct}%)`}</div>
+    </div>`;
+  };
+  const rows = reportRuns.map((r) => `
+    <tr>
+      <td>${esc(r.viewport_label)}</td>
+      <td>${bar(r.lcp_ms, r.lcp_budget_ms, "ms")}</td>
+      <td>${bar(r.transfer_bytes_initial || null, r.transfer_budget_bytes, "B")}</td>
+    </tr>
+  `).join("");
+  return `<h2 style="margin-top:2rem">Per-viewport budgets</h2>
+    <table class="budget-table">
+      <thead><tr><th>Viewport</th><th>LCP vs budget</th><th>Initial transfer vs budget</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 })()}
 ${runCards}
 </body></html>`;
