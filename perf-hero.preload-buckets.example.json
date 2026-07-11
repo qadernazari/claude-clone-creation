@@ -1,0 +1,13 @@
+{
+  "$comment": "Standalone example: expected landscape vs portrait preload behavior per viewport. Copy to perf-hero.config.json (or point PERF_HERO_CONFIG at it) to move viewports between buckets without editing scripts/perf-hero-check.mjs. `preload_buckets` maps orientation → Supabase storage bucket name; `viewports.<key>.preload_orientation` picks which one that viewport must download (expect) and which must stay silent (forbid). Explicit `expect_bucket`/`forbid_bucket` still win over the orientation shorthand; env vars EXPECT_BUCKET_<VP>/FORBID_BUCKET_<VP> still win over the config file.",
+  "preload_buckets": {
+    "portrait": "film-covers",
+    "landscape": "film-thumbnails"
+  },
+  "viewports": {
+    "mobile": { "preload_orientation": "portrait" },
+    "tablet": { "preload_orientation": "landscape" },
+    "laptop": { "preload_orientation": "landscape" },
+    "desktop": { "preload_orientation": "landscape" }
+  }
+}
