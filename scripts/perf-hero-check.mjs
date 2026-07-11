@@ -259,12 +259,16 @@ for (const key of selection) {
       attempt,
     };
     try {
-      if (attempt === 1 && WARMUP) {
+      if (WARMUP) {
+        // Warm on every attempt: retries fire precisely when the previous
+        // attempt was slow, so re-warming the module graph and CDN edge is
+        // the whole point.
         try {
-          await page.goto(`${BASE_URL}/?warmup=1`, {
+          await page.goto(`${BASE_URL}/?warmup=1&attempt=${attempt}`, {
             waitUntil: "domcontentloaded",
             timeout: GOTO_TIMEOUT_MS,
           });
+          await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
         } catch (err) {
           console.log(`    · warmup skipped: ${err instanceof Error ? err.message : err}`);
         }
