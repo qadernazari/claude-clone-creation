@@ -209,11 +209,17 @@ function SlideImageFrame({
   active,
   eager,
   controls,
+  swipeHandlers,
 }: {
   film: HomeFeaturedFilm;
   active: boolean;
   eager: boolean;
   controls?: ReactNode;
+  swipeHandlers?: {
+    onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+    onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => void;
+    onPointerCancel: (e: React.PointerEvent<HTMLDivElement>) => void;
+  };
 }) {
   const [loaded, setLoaded] = useState(false);
 
