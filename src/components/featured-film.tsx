@@ -5,9 +5,6 @@ import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
-import { HeroImageDebug, useHeroDebugEnabled } from "./hero-image-debug";
-import { HeroPerfDebug } from "./hero-perf-debug";
-import { useHeroMountTracker } from "@/lib/hero-mount-tracker";
 
 const AUTOPLAY_MS = 6500;
 
@@ -31,7 +28,7 @@ function HeroShell({ children, extra }: { children: React.ReactNode; extra?: Rea
 }
 
 function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
-  useHeroMountTracker("FeaturedSlider");
+  
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -168,7 +165,7 @@ const POS_CLASS: Record<string, string> = {
 };
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
-  useHeroMountTracker("Slide", film.id);
+  
   const { locale, num, year, t } = useLocale();
   // Mobile uses the portrait cover (2:3); desktop uses the landscape thumbnail (16:9).
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
@@ -180,27 +177,6 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   ]
     .filter(Boolean)
     .join(", ");
-  useEffect(() => {
-    if (!eager) return;
-    let cancelled = false;
-    // Match the SSR preload media queries in src/routes/index.tsx so
-    // preload_url reflects what the browser actually fetched for this cycle.
-    const isMobile =
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(max-width: 767px)").matches;
-    const preloadUrl = isMobile ? portraitImage : landscapeImage;
-    const correlationId =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    void import("@/lib/hero-perf").then((m) => {
-      if (!cancelled) m.measureHeroLCP({ correlationId, preloadUrl });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [eager, portraitImage, landscapeImage]);
   const fallbackBg =
     film.poster_gradient ||
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
@@ -215,16 +191,6 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
   const posClass = POS_CLASS[film.cover_position || "center"] || "object-center";
   const fitClass = isContain ? "object-contain object-center" : `object-cover ${posClass}`;
 
-  const debugEnabled = useHeroDebugEnabled();
-  const debugCandidates = [
-    { name: "portrait (rendered)", url: portraitImage },
-    { name: "mobile_cover_url", url: film.mobile_cover_url },
-    { name: "cover_url", url: film.cover_url },
-    { name: "landscape (rendered)", url: landscapeImage },
-    { name: "thumbnail 1280", url: film.thumbnail_url_1280 },
-    { name: "thumbnail 1920", url: film.thumbnail_url },
-    { name: "thumbnail 2400", url: film.thumbnail_url_2400 },
-  ];
 
   return (
     <div
@@ -350,12 +316,6 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           <WatchlistCta slug={film.slug} locale={locale} />
         </div>
       </div>
-      {debugEnabled && active ? (
-        <>
-          <HeroImageDebug candidates={debugCandidates} />
-          <HeroPerfDebug />
-        </>
-      ) : null}
     </div>
   );
 }
