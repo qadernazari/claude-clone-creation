@@ -255,26 +255,41 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
       if (!rows.length) return [];
       const cache = makeRenderCache();
       return Promise.all(
-        rows.map(async (raw) => {
-          const [cover, thumbnail, thumbnail1280, thumbnail2400, thumbnailMobile, mobile] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, raw.cover_url as string | null, 800, 75),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1920, 90),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 88),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 2400, 90),
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 800, 75),
+        rows.map(async (raw, idx) => {
+          // Only slide[0] is the LCP candidate — full render fan-out.
+          // Slides 2..N: cheaper render (skip 1920/2400 desktop variant, skip cover_url).
+          if (idx === 0) {
+            const [thumbnail1280, thumbnail, mobile] = await Promise.all([
+              renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 88),
+              renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1920, 90),
+              renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 75, 1200, "cover"),
+            ]);
+            return {
+              ...raw,
+              cover_url: null,
+              thumbnail_url: thumbnail,
+              thumbnail_url_1280: thumbnail1280,
+              thumbnail_url_2400: null,
+              thumbnail_url_mobile: null,
+              mobile_cover_url: mobile,
+            } as HomeFeaturedFilm;
+          }
+          const [thumbnail1280, mobile] = await Promise.all([
+            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 85),
             renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 75, 1200, "cover"),
           ]);
           return {
             ...raw,
-            cover_url: cover,
-            thumbnail_url: thumbnail,
+            cover_url: null,
+            thumbnail_url: thumbnail1280,
             thumbnail_url_1280: thumbnail1280,
-            thumbnail_url_2400: thumbnail2400,
-            thumbnail_url_mobile: thumbnailMobile,
+            thumbnail_url_2400: null,
+            thumbnail_url_mobile: null,
             mobile_cover_url: mobile,
           } as HomeFeaturedFilm;
         }),
       );
+
     } catch (error) {
       console.error("getHomeFeaturedSlides failed:", error);
       return [];
