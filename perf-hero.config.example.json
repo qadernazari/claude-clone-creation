@@ -11,26 +11,23 @@
     "mobile": {
       "lcp_budget_ms": 1800,
       "transfer_budget_bytes": 250000,
-      "expect_bucket": "film-covers",
-      "forbid_bucket": "film-thumbnails"
+      "preload_orientation": "portrait"
     },
     "tablet": {
       "lcp_budget_ms": 2800,
       "transfer_budget_bytes": 350000,
-      "expect_bucket": "film-thumbnails",
-      "forbid_bucket": "film-covers"
+      "preload_orientation": "landscape"
     },
     "laptop": {
       "lcp_budget_ms": 1600,
       "transfer_budget_bytes": 400000,
-      "expect_bucket": "film-thumbnails",
-      "forbid_bucket": "film-covers"
+      "preload_orientation": "landscape"
     },
     "desktop": {
       "lcp_budget_ms": 1400,
       "transfer_budget_bytes": 500000,
-      "expect_bucket": "film-thumbnails",
-      "forbid_bucket": "film-covers"
+      "preload_orientation": "landscape"
     }
   }
 }
+
