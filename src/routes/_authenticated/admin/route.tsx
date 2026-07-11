@@ -75,7 +75,7 @@ const NAV: ReadonlyArray<NavItem> = [
   { to: "/admin/users", label: "Members", icon: Users },
   { to: "/admin/homepage", label: "Site content", icon: Globe },
   { to: "/admin/regen-thumbnails", label: "Regen thumbnails", icon: RefreshCw },
-  { to: "/admin/hero-perf", label: "Hero perf", icon: Activity },
+  
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
