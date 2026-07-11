@@ -337,6 +337,8 @@ for (const key of selection) {
     forbid_bucket: vp.forbidBucket,
     started_at: new Date(runStart).toISOString(),
     duration_ms: Date.now() - runStart,
+    attempts: attemptsMeta,
+    attempts_used: attemptsMeta.length,
     lcp_ms: beacon?.lcp_ms ?? null,
     lcp_budget_ms: LCP_BUDGET_MS,
     transfer_bytes_total:
