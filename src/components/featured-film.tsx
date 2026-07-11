@@ -220,7 +220,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
               className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
               style={{ background: fallbackBg }}
             >
-              {(portraitImage || landscapeImage) ? (
+              {(portraitImage || landscapeImage) && (eager || active) ? (
                 <picture>
                   {landscapeImage ? (
                     <source
