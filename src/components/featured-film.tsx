@@ -222,7 +222,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
             className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl backdrop-blur-sm transition-transform duration-500 group-hover:scale-[1.01] lg:rounded-[2rem] lg:p-3"
           >
             <div
-              className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] lg:aspect-video lg:rounded-[1.4rem]"
+              className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
               style={{ background: fallbackBg }}
             >
               {portraitImage ? (
@@ -231,7 +231,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   alt={title}
                   width={800}
                   height={1200}
-                  className={`absolute inset-0 block h-full w-full lg:hidden ${fitClass} ${active ? "cine-img-in" : ""}`}
+                  className={`absolute inset-0 block h-full w-full md:hidden ${fitClass} ${active ? "cine-img-in" : ""}`}
                   loading={eager ? "eager" : "lazy"}
                   decoding={eager ? "sync" : "async"}
                   {...(eager ? { fetchPriority: "high" as const } : {})}
@@ -245,11 +245,10 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   alt={title}
                   width={1920}
                   height={1080}
-                  className={`absolute inset-0 hidden h-full w-full lg:block ${fitClass} ${active ? "cine-img-in" : ""}`}
-                  loading={eager ? "eager" : "lazy"}
-                  decoding={eager ? "sync" : "async"}
-                  {...(eager ? { fetchPriority: "high" as const } : {})}
-                  sizes="(min-width: 1200px) 1200px, (min-width: 1024px) 80vw, 1px"
+                  className={`absolute inset-0 hidden h-full w-full md:block ${fitClass} ${active ? "cine-img-in" : ""}`}
+                  loading="lazy"
+                  decoding="async"
+                  sizes="(min-width: 1200px) 1200px, (min-width: 768px) 80vw, 1px"
                 />
               ) : null}
               <div
