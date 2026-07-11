@@ -270,8 +270,11 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
       const cache = makeRenderCache();
       return Promise.all(
         rows.map(async (raw, idx) => {
-          // Only slide[0] is the LCP candidate — full render fan-out.
-          // Slides 2..N: cheaper render (skip 1920/2400 desktop variant, skip cover_url).
+          // Only slide[0] is the LCP candidate — do the render transforms.
+          // Slides 1..N: skip signing entirely and return the raw signed
+          // object URL. Massively cuts loader TTFB on mobile (each
+          // storage.createSignedUrl is a round trip). Full resized URLs
+          // are generated lazily client-side when the user swipes.
           if (idx === 0) {
             const [thumbnail1280, thumbnail, mobile] = await Promise.all([
               renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 88),
@@ -288,21 +291,18 @@ export const getHomeFeaturedSlides = createServerFn({ method: "GET" }).handler(
               mobile_cover_url: mobile,
             } as HomeFeaturedFilm;
           }
-          const [thumbnail1280, mobile] = await Promise.all([
-            renderResizedUrl(supabaseAdmin, cache, raw.thumbnail_url as string | null, 1280, 85),
-            renderResizedUrl(supabaseAdmin, cache, raw.mobile_cover_url as string | null, 800, 75, 1200, "cover"),
-          ]);
           return {
             ...raw,
             cover_url: null,
-            thumbnail_url: thumbnail1280,
-            thumbnail_url_1280: thumbnail1280,
+            thumbnail_url: (raw.thumbnail_url as string | null) ?? null,
+            thumbnail_url_1280: (raw.thumbnail_url as string | null) ?? null,
             thumbnail_url_2400: null,
             thumbnail_url_mobile: null,
-            mobile_cover_url: mobile,
+            mobile_cover_url: (raw.mobile_cover_url as string | null) ?? null,
           } as HomeFeaturedFilm;
         }),
       );
+
 
     } catch (error) {
       console.error("getHomeFeaturedSlides failed:", error);

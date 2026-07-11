@@ -208,16 +208,17 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       {/* Framed image — 2:3 on mobile, 16:9 on desktop */}
       <div className="relative flex justify-center">
         <div className="group relative w-full max-w-[380px] lg:max-w-none">
-          {/* Ambient amber glow */}
+          {/* Ambient amber glow — desktop only; blur(100px) is a mobile perf killer */}
           <div
-            className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]"
+            className="pointer-events-none absolute -inset-10 hidden rounded-full bg-amber/10 opacity-60 blur-[100px] md:block"
             aria-hidden
           />
 
-          {/* The frame */}
+          {/* The frame — drop backdrop-blur on mobile to avoid compositor stalls */}
           <div
-            className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl backdrop-blur-sm transition-transform duration-500 group-hover:scale-[1.01] lg:rounded-[2rem] lg:p-3"
+            className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-3"
           >
+
             <div
               className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
               style={{ background: fallbackBg }}
