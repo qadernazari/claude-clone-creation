@@ -423,7 +423,81 @@ for (const key of selection) {
     } else {
       fail(`rendered hero src is NOT in ${vp.expectBucket}: ${renderedSrc.slice(0, 120)}…`);
     }
+
+    // ----- Exact-source triangulation: beacon.url === beacon.preload_url === renderedSrc === (single expectTransfer URL) -----
+    const initialExpect = expectTransfers.slice(
+      0,
+      // Exclude reload-phase transfers from the exact-source check (probe adds ≥1 event).
+      expectTransfers.length - (attemptResult?.cacheProbe?.reloadCoverTransfers || 0) -
+        (attemptResult?.cacheProbe?.reloadThumbTransfers || 0),
+    );
+    const initialUrls = new Set(initialExpect.map((t) => t.url));
+    if (renderedSrc && beacon?.url && beacon?.preload_url) {
+      const allMatch =
+        renderedSrc === beacon.url &&
+        beacon.url === beacon.preload_url &&
+        initialUrls.size === 1 &&
+        initialUrls.has(renderedSrc);
+      if (allMatch) {
+        pass(
+          `exact ${vp.expectBucket} source triangulated ` +
+            `(rendered = beacon.url = preload_url = network URL)`,
+        );
+      } else {
+        fail(
+          "exact source mismatch — " +
+            `rendered=${renderedSrc?.slice(-60)} beacon.url=${beacon.url?.slice(-60)} ` +
+            `preload=${beacon.preload_url?.slice(-60)} network=[${[...initialUrls].map((u) => u.slice(-60)).join(" | ")}]`,
+        );
+      }
+    }
+
+    // Exact request count on initial load: exactly ONE HTTP response for the LCP URL.
+    const initialCountForLcp = initialExpect.filter(
+      (t) => renderedSrc && t.url === renderedSrc,
+    ).length;
+    if (renderedSrc) {
+      if (initialCountForLcp === 1) {
+        pass(`exactly 1 network request for LCP ${vp.expectBucket} URL on initial load`);
+      } else {
+        fail(
+          `expected exactly 1 network request for LCP URL, got ${initialCountForLcp} ` +
+            `(preload should be reused by <img>, not double-fetched)`,
+        );
+      }
+    }
+
+    // ----- Cache probe assertion (reload) -----
+    const cp = attemptResult?.cacheProbe;
+    if (!cp) {
+      fail("cache probe did not run (missing LCP url)");
+    } else {
+      const forbidReloadCount =
+        vp.forbidBucket === "film-thumbnails"
+          ? cp.reloadThumbTransfers
+          : cp.reloadCoverTransfers;
+      if (forbidReloadCount === 0) {
+        pass(`reload: no ${vp.forbidBucket} transfers (gate still held after reload)`);
+      } else {
+        fail(
+          `reload: ${forbidReloadCount} ${vp.forbidBucket} transfer(s) leaked after reload`,
+        );
+      }
+      if (cp.cacheHit) {
+        const which = Object.entries(cp.signals)
+          .filter(([, v]) => v)
+          .map(([k]) => k)
+          .join("+");
+        pass(`LCP image served from cache on reload (${which})`);
+      } else {
+        fail(
+          `LCP image NOT served from cache on reload — signals=${JSON.stringify(cp.signals)} ` +
+            `perfEntry=${JSON.stringify(cp.perfEntry)}`,
+        );
+      }
+    }
   }
+
 
 
   const sumBytes = (arr) =>
