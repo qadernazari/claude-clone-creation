@@ -54,11 +54,11 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   }, [index, paused, next]);
 
   const startX = useRef<number | null>(null);
-  const onPointerDown = (e: React.PointerEvent) => {
+  const onPointerDown = (e: PointerEvent) => {
     startX.current = e.clientX;
     setPaused(true);
   };
-  const onPointerUp = (e: React.PointerEvent) => {
+  const onPointerUp = (e: PointerEvent) => {
     if (startX.current == null) return;
     const dx = e.clientX - startX.current;
     startX.current = null;
@@ -74,12 +74,6 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       className="relative isolate overflow-hidden bg-bg-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerCancel={() => {
-        startX.current = null;
-        setPaused(false);
-      }}
       aria-roledescription="carousel"
     >
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
@@ -90,6 +84,14 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
               film={film}
               active={i === index}
               eager={i === 0}
+              swipeHandlers={{
+                onPointerDown,
+                onPointerUp,
+                onPointerCancel: () => {
+                  startX.current = null;
+                  setPaused(false);
+                },
+              }}
               controls={
                 <SliderControls
                   count={slides.length}
@@ -207,13 +209,39 @@ function SlideImageFrame({
   active,
   eager,
   controls,
+  swipeHandlers,
 }: {
   film: HomeFeaturedFilm;
   active: boolean;
   eager: boolean;
   controls?: ReactNode;
+  swipeHandlers?: {
+    onPointerDown: (e: PointerEvent) => void;
+    onPointerUp: (e: PointerEvent) => void;
+    onPointerCancel: (e: PointerEvent) => void;
+  };
 }) {
   const [loaded, setLoaded] = useState(false);
+  const frameRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!frameRef.current || !swipeHandlers || !active) return;
+    const el = frameRef.current;
+    const onPointerDown = (e: PointerEvent) => swipeHandlers.onPointerDown(e);
+    const onPointerUp = (e: PointerEvent) => swipeHandlers.onPointerUp(e);
+    const onPointerCancel = (e: PointerEvent) => swipeHandlers.onPointerCancel(e);
+    const onPointerLeave = (e: PointerEvent) => swipeHandlers.onPointerCancel(e);
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("pointercancel", onPointerCancel);
+    el.addEventListener("pointerleave", onPointerLeave);
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointerup", onPointerUp);
+      el.removeEventListener("pointercancel", onPointerCancel);
+      el.removeEventListener("pointerleave", onPointerLeave);
+    };
+  }, [active, swipeHandlers]);
 
   const portraitImage = film.mobile_cover_url || film.cover_url || film.thumbnail_url;
   const landscapeImage = film.thumbnail_url || film.cover_url;
@@ -251,7 +279,8 @@ function SlideImageFrame({
         {/* The frame — drop backdrop-blur on mobile to avoid compositor stalls */}
         <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-3">
           <div
-            className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
+            ref={frameRef}
+            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
             style={{ background: fallbackBg }}
           >
             {/* Shimmer skeleton — visible until the image loads */}
@@ -280,6 +309,7 @@ function SlideImageFrame({
                   decoding={eager ? "sync" : "async"}
                   fetchPriority={eager ? "high" : undefined}
                   sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
+                  draggable={false}
                   onLoad={() => setLoaded(true)}
                   onError={() => setLoaded(true)}
                 />
