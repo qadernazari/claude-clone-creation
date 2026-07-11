@@ -370,7 +370,7 @@ function SlideImageFrame({
           </div>
         </div>
         {active && controls ? (
-          <div className="mt-4 flex justify-center md:hidden">{controls}</div>
+          <div className="mt-6 flex justify-center md:hidden">{controls}</div>
         ) : null}
 
         {/* Corner accents */}
