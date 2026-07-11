@@ -1,33 +1,42 @@
-Move the featured-film slider controls from below the text column onto the bottom of the framed film image.
+Plan: Cinematic desktop hero with info overlaid on the film frame
 
-### Current state
-- `src/components/featured-film.tsx` renders `SliderControls` inside `FeaturedSlider` after the text column, in normal document flow.
-- The selected element (line ~119-120) is the text column wrapper, sitting between the framed image and the controls.
+Current state
+- `src/components/featured-film.tsx` renders the film image on top, then a full text column below it on all breakpoints (title, badges, director/year, synopsis, Watch Now / More info / Watchlist).
+- The selected elements in the preview are the title, "Original / Featured Film" badges, and "Watch Now" button in that lower text column.
 
-### Changes
-1. **Relocate controls**  
-   Move `<SliderControls />` from `FeaturedSlider` into the `Slide` component, positioned absolutely at the bottom center of the framed image container.
+Proposed change
+On desktop, move only the essential info onto the film image itself and remove the separate text column. Keep the mobile layout stacked for readability.
 
-2. **Add a legibility scrim**  
-   Place a subtle bottom-to-transparent gradient behind the controls so dots/arrows remain visible over light film stills.
+Design rationale
+Yes — this will look cleaner and more cinematic. Filimo-style homepages keep the hero poster as the focal point and put only the title + primary CTA on it; the rest of the metadata (director, year, synopsis, more info) lives on the film detail page. This reduces vertical clutter and makes the homepage feel faster.
 
-3. **Preserve sizing and hit areas**  
-   Keep the existing 44×44 arrow buttons and enlarged dot hit targets. Ensure the controls do not overlap important poster artwork (position at the bottom 12-16px of the frame).
+Implementation
 
-4. **Adjust vertical spacing**  
-   Reduce the gap between the framed image and the text column now that controls no longer sit between them. Keep the existing `mt-24 md:mt-32` hero top offset.
+1. Desktop overlay
+   - Add a bottom-to-top gradient scrim inside the film frame (from black/80 at the bottom to transparent).
+   - Position the title and "Watch Now" button in the bottom-left corner of the frame, above the scrim.
+   - Keep the "Original" / "Featured Film" badges small and place them top-left of the frame.
+   - Keep the slider controls at the bottom center of the frame as already planned.
 
-5. **Responsive behavior**  
-   - Mobile (2:3 poster): controls sit at the bottom of the portrait frame.  
-   - Desktop (16:9): controls sit at the bottom of the landscape frame.  
-   - Controls remain centered horizontally on both.
+2. Remove the desktop text column
+   - Hide the entire `SlideDetails` block below the image on `md` and up.
+   - Keep `SlideDetails` exactly as-is for mobile (`max-md:`).
 
-6. **Verify no overlap with rails**  
-   Because controls now live inside the hero section boundary, confirm they no longer collide with the "آثار تازه" rail below.
+3. Preserve mobile layout
+   - Mobile keeps the current stacked layout: image → title → badges → synopsis → buttons.
+   - Slider controls stay below the image on mobile to avoid covering the 2:3 poster.
 
-### Files to edit
+4. Accessibility & performance
+   - Ensure overlay text has 4.5:1 contrast against the scrim.
+   - Keep the hero image eager/sync/high fetchPriority.
+   - Avoid new absolute-positioned elements causing CLS by sizing the frame with the existing aspect-ratio container.
+
+Files to edit
 - `src/components/featured-film.tsx`
 
-### Out of scope
-- No changes to autoplay timing, swipe logic, or film data.
-- No changes to the admin dashboard or other routes.
+Out of scope
+- No changes to film detail page (`films.$slug.tsx`) — that already shows the full info.
+- No changes to slider autoplay, swipe logic, or film data.
+
+Next step
+Approve this plan and I will implement the overlay layout.
