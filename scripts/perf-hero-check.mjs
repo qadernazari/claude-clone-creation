@@ -1035,6 +1035,22 @@ const html = `<!doctype html>
   — ${report.summary.passed}/${report.summary.runs} viewports passed
   (${report.summary.failed} failed).
 </div>
+${failureArtifacts.length ? `<h2 style="margin-top:2rem">Failure artifacts</h2>
+<p class="dim" style="margin-top:-.5rem">HAR + screenshot saved for every attempt that failed to capture the beacon or the LCP budget. Directory: <code>${esc(FAILURE_DIR)}</code></p>
+<table class="summary-table">
+  <thead><tr><th>Viewport</th><th>Attempt</th><th>Reason</th><th>Beacon</th><th>LCP</th><th>HAR</th><th>Screenshot</th></tr></thead>
+  <tbody>
+    ${failureArtifacts.map((a) => `<tr>
+      <td>${esc(a.viewport_label)}</td>
+      <td>${a.attempt}</td>
+      <td>${esc(a.reason || "—")}</td>
+      <td>${a.beacon_captured ? "captured" : "<strong>missing</strong>"}</td>
+      <td>${a.lcp_captured ? "captured" : "<strong>missing</strong>"}</td>
+      <td><a href="file://${esc(a.har_path)}"><code>${esc(a.har_path.split("/").pop())}</code></a></td>
+      <td><a href="file://${esc(a.screenshot_path)}"><code>${esc(a.screenshot_path.split("/").pop())}</code></a></td>
+    </tr>`).join("")}
+  </tbody>
+</table>` : ""}
 ${(() => {
   const pathOf = (u) => {
     if (!u) return null;
