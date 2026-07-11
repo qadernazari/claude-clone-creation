@@ -1209,6 +1209,33 @@ for (const key of selection) {
           `active preload href != rendered hero src — preload=${preloadHrefPath?.slice(-90)} rendered=${renderedPathForPreload?.slice(-90)}`,
         );
       }
+      // Enforce bucket placement: the media-matching preload MUST point into
+      // the viewport's expected bucket (portrait/landscape as configured).
+      if (activePreload.href.includes(vp.expectBucket)) {
+        pass(`active preload href is in ${vp.expectBucket} (expected bucket)`);
+      } else {
+        fail(
+          `active preload href is NOT in ${vp.expectBucket}: ${activePreload.href.slice(-120)}`,
+        );
+      }
+      // Enforce that no preload tag (matching or not) points at the forbidden
+      // bucket — a stray non-matching tag still costs bytes on some clients.
+      const forbidPreloadHits = domPreloads.filter((p) =>
+        p.href.includes(vp.forbidBucket),
+      );
+      if (forbidPreloadHits.length === 0) {
+        pass(`no preload tag references forbidden bucket ${vp.forbidBucket}`);
+      } else {
+        fail(
+          `${forbidPreloadHits.length} preload tag(s) reference forbidden bucket ${vp.forbidBucket}: ${forbidPreloadHits
+            .map(
+              (p) =>
+                `${p.media || "no-media"}${p.matches ? " [ACTIVE]" : ""}→${pathOf(p.href)?.slice(-40)}`,
+            )
+            .join(" | ")}`,
+        );
+      }
+
       // Also verify no OTHER preload tag matches (would double-preload).
       const matchingCount = domPreloads.filter((p) => p.matches).length;
       if (matchingCount === 1) {
