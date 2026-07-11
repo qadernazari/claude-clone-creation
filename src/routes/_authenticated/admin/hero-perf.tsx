@@ -405,6 +405,12 @@ function HeroPerfPage() {
         </div>
       ) : null}
 
+      {correlationId ? (
+        <BeaconDetail correlationId={correlationId} rows={rows} loading={isFetching} />
+      ) : null}
+
+
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <StatCard title="LCP" p50={stats.lcp.p50} p75={stats.lcp.p75} p95={stats.lcp.p95} unit=" ms" />
         <StatCard title="Decode" p50={stats.dec.p50} p75={stats.dec.p75} p95={stats.dec.p95} unit=" ms" />
