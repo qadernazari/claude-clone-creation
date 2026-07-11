@@ -896,7 +896,12 @@ const runCards = reportRuns
             <span><strong>LCP:</strong> ${r.lcp_ms ?? "—"} ms (budget ${
               r.lcp_budget_ms
             })</span>
-            <span><strong>Transfer:</strong> ${fmtBytes(
+            <span class="${r.transfer_over_budget ? "over-budget" : ""}"><strong>Transfer (initial ${esc(
+              r.expect_bucket,
+            )}):</strong> ${fmtBytes(r.transfer_bytes_initial)} / ${fmtBytes(
+              r.transfer_budget_bytes,
+            )}${r.transfer_over_budget ? " ⚠️ over budget" : ""}</span>
+            <span><strong>Transfer (total):</strong> ${fmtBytes(
               r.transfer_bytes_total,
             )} (thumbs ${fmtBytes(
               r.transfer_bytes_thumbnails,
