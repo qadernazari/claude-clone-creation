@@ -255,11 +255,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+  const { queryClient, initialRegion } = Route.useRouteContext();
+  const region = initialRegion?.region ?? "iran";
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <LocaleProvider>
+        <LocaleProvider initialRegion={region}>
           <PageOverlayProvider>
             <AuthInvalidator />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -276,6 +277,7 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
 
 /**
  * Mounts the Iran mirror banner well after the first screen is stable.
