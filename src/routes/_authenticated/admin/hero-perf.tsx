@@ -27,7 +27,15 @@ function fmt(n: number | null, unit: string, digits = 0) {
   return `${n.toLocaleString(undefined, { maximumFractionDigits: digits })}${unit}`;
 }
 
-type BucketAgg = { t: number; label: string; lcp: number[]; decode: number[]; bytes: number[] };
+type BucketAgg = {
+  t: number;
+  label: string;
+  lcp: number[];
+  decode: number[];
+  bytes: number[];
+  cacheHits: number;
+  cacheTotal: number;
+};
 
 function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   // Choose a bucket size that yields ~30-60 buckets.
@@ -38,7 +46,7 @@ function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   const start = now - totalMs;
   const buckets = new Map<number, BucketAgg>();
   for (let t = Math.floor(start / bucketMs) * bucketMs; t <= now; t += bucketMs) {
-    buckets.set(t, { t, label: "", lcp: [], decode: [], bytes: [] });
+    buckets.set(t, { t, label: "", lcp: [], decode: [], bytes: [], cacheHits: 0, cacheTotal: 0 });
   }
   for (const r of rows) {
     const t = new Date(r.created_at).getTime();
@@ -48,6 +56,10 @@ function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
     if (r.lcp_ms != null) b.lcp.push(r.lcp_ms);
     if (r.decode_ms != null) b.decode.push(r.decode_ms);
     if (r.transfer_bytes != null) b.bytes.push(r.transfer_bytes);
+    if (r.preload_cache_hit != null) {
+      b.cacheTotal += 1;
+      if (r.preload_cache_hit) b.cacheHits += 1;
+    }
   }
   const out = Array.from(buckets.values()).sort((a, b) => a.t - b.t);
   const showDate = hours > 24;
@@ -172,6 +184,9 @@ function HeroPerfPage() {
     const lcp = rows.map((r) => r.lcp_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
     const dec = rows.map((r) => r.decode_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
     const bytes = rows.map((r) => r.transfer_bytes).filter((v): v is number => v != null).sort((a, b) => a - b);
+    const cacheKnown = rows.filter((r) => r.preload_cache_hit != null);
+    const cacheHits = cacheKnown.filter((r) => r.preload_cache_hit === true).length;
+    const cacheRate = cacheKnown.length ? (cacheHits / cacheKnown.length) * 100 : null;
     return {
       lcp: { p50: percentile(lcp, 50), p75: percentile(lcp, 75), p95: percentile(lcp, 95) },
       dec: { p50: percentile(dec, 50), p75: percentile(dec, 75), p95: percentile(dec, 95) },
@@ -180,6 +195,9 @@ function HeroPerfPage() {
         p75: percentile(bytes, 75),
         p95: percentile(bytes, 95),
       },
+      cacheRate,
+      cacheHits,
+      cacheTotal: cacheKnown.length,
     };
   }, [rows]);
 
@@ -257,7 +275,7 @@ function HeroPerfPage() {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <StatCard title="LCP" p50={stats.lcp.p50} p75={stats.lcp.p75} p95={stats.lcp.p95} unit=" ms" />
         <StatCard title="Decode" p50={stats.dec.p50} p75={stats.dec.p75} p95={stats.dec.p95} unit=" ms" />
         <StatCard
@@ -268,6 +286,17 @@ function HeroPerfPage() {
           unit=" KB"
           digits={1}
         />
+        <div className="rounded-md border border-border bg-card p-4">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+            Preload cache hit
+          </div>
+          <div className="text-2xl font-semibold tabular-nums">
+            {stats.cacheRate == null ? "—" : `${stats.cacheRate.toFixed(1)}%`}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {stats.cacheHits}/{stats.cacheTotal} samples
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -276,13 +305,6 @@ function HeroPerfPage() {
           data={buckets}
           getY={(b) => percentile(b.lcp.slice().sort((a, b) => a - b), 75)}
           color="#60a5fa"
-          unit=" ms"
-        />
-        <ChartSection
-          title="Decode time (p75, ms)"
-          data={buckets}
-          getY={(b) => percentile(b.decode.slice().sort((a, b) => a - b), 75)}
-          color="#f59e0b"
           unit=" ms"
         />
         <ChartSection
@@ -296,6 +318,21 @@ function HeroPerfPage() {
           unit=" KB"
           format={(v) => v.toFixed(1)}
         />
+        <ChartSection
+          title="Preload cache hit (%)"
+          data={buckets}
+          getY={(b) => (b.cacheTotal ? (b.cacheHits / b.cacheTotal) * 100 : null)}
+          color="#a78bfa"
+          unit="%"
+          format={(v) => v.toFixed(0)}
+        />
+        <ChartSection
+          title="Decode time (p75, ms)"
+          data={buckets}
+          getY={(b) => percentile(b.decode.slice().sort((a, b) => a - b), 75)}
+          color="#f59e0b"
+          unit=" ms"
+        />
       </div>
 
       <div className="rounded-md border border-border bg-card">
@@ -306,11 +343,13 @@ function HeroPerfPage() {
               <tr className="text-left">
                 <th className="px-3 py-2">Time</th>
                 <th className="px-3 py-2">LCP</th>
-                <th className="px-3 py-2">Decode</th>
                 <th className="px-3 py-2">Bytes</th>
+                <th className="px-3 py-2">Cache</th>
+                <th className="px-3 py-2">VP</th>
                 <th className="px-3 py-2">Type</th>
                 <th className="px-3 py-2">Country</th>
                 <th className="px-3 py-2">Mobile</th>
+                <th className="px-3 py-2">Correlation</th>
                 <th className="px-3 py-2">URL</th>
               </tr>
             </thead>
@@ -319,19 +358,46 @@ function HeroPerfPage() {
                 <tr key={i} className="border-t border-border/60">
                   <td className="px-3 py-1.5 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="px-3 py-1.5 tabular-nums">{fmt(r.lcp_ms, " ms")}</td>
-                  <td className="px-3 py-1.5 tabular-nums">{fmt(r.decode_ms, " ms")}</td>
                   <td className="px-3 py-1.5 tabular-nums">
                     {r.transfer_bytes == null ? "—" : `${(r.transfer_bytes / 1024).toFixed(1)} KB`}
                   </td>
+                  <td className="px-3 py-1.5">
+                    {r.preload_cache_hit == null ? (
+                      "—"
+                    ) : r.preload_cache_hit ? (
+                      <span className="text-emerald-500">hit</span>
+                    ) : (
+                      <span className="text-amber-500">miss</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-1.5 tabular-nums">{r.viewport_w ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.effective_type ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.country ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.ua_mobile == null ? "—" : r.ua_mobile ? "yes" : "no"}</td>
-                  <td className="px-3 py-1.5 max-w-[280px] truncate text-muted-foreground">{r.url ?? "—"}</td>
+                  <td className="px-3 py-1.5 font-mono">
+                    {r.correlation_id ? (
+                      <button
+                        type="button"
+                        title={`${r.correlation_id} — click to copy`}
+                        onClick={() => {
+                          if (typeof navigator !== "undefined" && navigator.clipboard) {
+                            void navigator.clipboard.writeText(r.correlation_id ?? "");
+                          }
+                        }}
+                        className="hover:text-foreground text-muted-foreground"
+                      >
+                        {r.correlation_id.slice(0, 8)}
+                      </button>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td className="px-3 py-1.5 max-w-[240px] truncate text-muted-foreground">{r.url ?? "—"}</td>
                 </tr>
               ))}
               {rows.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">
+                  <td colSpan={10} className="px-3 py-6 text-center text-muted-foreground">
                     No samples in this window.
                   </td>
                 </tr>
