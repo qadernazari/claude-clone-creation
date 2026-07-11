@@ -1,8 +1,10 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useLocale } from "../lib/i18n";
 import { homeRailsQueryOptions } from "../lib/home.functions";
 import { Rail } from "./film-rail";
+import { logMount } from "@/lib/perf-log";
+
 
 export function NewReleaseRow() {
   const { locale, year } = useLocale();
