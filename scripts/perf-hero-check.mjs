@@ -795,7 +795,18 @@ for (const key of selection) {
           softReasons.push(
             `preload_cache_hit=${JSON.stringify(localBeacon.preload_cache_hit)} (expected true)`,
           );
+        if (!result.preloadAssertion.ok) {
+          // Hard-fail: duplicated / re-added preload tags aren't a warmup
+          // artifact and won't self-heal on retry.
+          const v = result.preloadAssertion.violations
+            .map(
+              (r) =>
+                `${r.href} initial=${r.initial} added=${r.added} removed=${r.removed}`,
+            )
+            .join(" | ");
+          softReasons.push(`preload film-covers mutated: ${v}`);
         }
+
         if (softReasons.length && attempt < MAX_ATTEMPTS) {
           result.ok = false;
           result.reason = `soft-flake: ${softReasons.join("; ")}`;
