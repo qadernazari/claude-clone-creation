@@ -114,7 +114,7 @@ export function HeroImageDebug({ candidates }: { candidates: Candidate[] }) {
           transferSize: formatBytes(r.transferSize),
           encodedBodySize: formatBytes(r.encodedBodySize),
           durationMs: r.durationMs,
-        }),
+        })),
       );
       console.groupEnd();
     };
