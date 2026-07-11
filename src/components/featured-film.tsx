@@ -74,12 +74,6 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       className="relative isolate overflow-hidden bg-bg-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerCancel={() => {
-        startX.current = null;
-        setPaused(false);
-      }}
       aria-roledescription="carousel"
     >
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
@@ -90,6 +84,14 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
               film={film}
               active={i === index}
               eager={i === 0}
+              swipeHandlers={{
+                onPointerDown,
+                onPointerUp,
+                onPointerCancel: () => {
+                  startX.current = null;
+                  setPaused(false);
+                },
+              }}
               controls={
                 <SliderControls
                   count={slides.length}
