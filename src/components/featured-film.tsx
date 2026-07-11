@@ -244,9 +244,11 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
                   width={1920}
                   height={1080}
                   className={`absolute inset-0 hidden h-full w-full md:block ${fitClass} ${active ? "cine-img-in" : ""}`}
-                  loading="lazy"
-                  decoding="async"
+                  loading={eager ? "eager" : "lazy"}
+                  decoding={eager ? "sync" : "async"}
+                  fetchPriority={eager ? "high" : undefined}
                   sizes="(min-width: 1200px) 1200px, (min-width: 768px) 80vw, 1px"
+
                 />
               ) : null}
               <div
