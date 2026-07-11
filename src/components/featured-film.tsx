@@ -5,6 +5,7 @@ import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
+import { HeroImageDebug, useHeroDebugEnabled } from "./hero-image-debug";
 
 const AUTOPLAY_MS = 6500;
 
