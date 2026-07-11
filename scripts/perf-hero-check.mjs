@@ -1048,19 +1048,61 @@ for (const key of selection) {
 
     // The LCP hero must be served from the preload cache on viewports where
     // REQUIRE_PRELOAD_CACHE_HIT[key] is true (default: mobile only). CI fails
-    // if `preload_cache_hit` is anything other than strictly `true`.
+    // if `preload_cache_hit` is anything other than strictly `true` — including
+    // when the beacon didn't emit the field at all.
     if (REQUIRE_PRELOAD_CACHE_HIT[key]) {
-      const hit = beacon?.preload_cache_hit;
+      // Fields we rely on for the preload-cache-hit assertion. If any are
+      // missing (undefined OR key absent), it usually means the beacon
+      // payload was cut short or an older client shipped without the
+      // preload-instrumentation patch — surface that explicitly instead of
+      // silently coercing to "false".
+      const REQUIRED_BEACON_FIELDS = [
+        "preload_cache_hit",
+        "preload_url",
+        "lcp_url",
+        "delivery_type",
+      ];
+      const beaconObj = beacon && typeof beacon === "object" ? beacon : {};
+      const missingFields = REQUIRED_BEACON_FIELDS.filter((f) => {
+        const v = beaconObj[f];
+        return v === undefined || v === null || !(f in beaconObj);
+      });
+      const hit = beaconObj.preload_cache_hit;
+      const hitMissing =
+        !("preload_cache_hit" in beaconObj) || hit === undefined || hit === null;
+
+      // Attach a structured record to the per-viewport result so the JSON
+      // report, HTML report, and CI extraction can reference exactly what
+      // was absent — no need to diff beacon payloads by hand.
+      result.preloadCacheHitAssertion = {
+        required: true,
+        ok: hit === true,
+        observed: hitMissing ? null : hit,
+        status: hit === true ? "hit" : hitMissing ? "missing" : "false",
+        missing_beacon_fields: missingFields,
+        beacon_present: beacon != null,
+      };
+
       if (hit === true) {
         pass(`preload_cache_hit=true on ${vp.label} viewport`);
+      } else if (hitMissing) {
+        // Distinct failure mode from an explicit `false` — the run didn't
+        // even produce the signal we assert on.
+        const missingList = missingFields.length
+          ? ` missing beacon fields: [${missingFields.join(", ")}]`
+          : "";
+        fail(
+          `preload_cache_hit missing from beacon on ${vp.label} viewport (beacon ${
+            beacon == null ? "not received" : "received but field absent"
+          });${missingList}`,
+        );
       } else {
         fail(
-          `preload_cache_hit must be true on ${vp.label} viewport (got ${
-            hit === null || hit === undefined ? "null" : JSON.stringify(hit)
-          })`,
+          `preload_cache_hit must be true on ${vp.label} viewport (got ${JSON.stringify(hit)})`,
         );
       }
     }
+
 
     const uniqueExpected = new Set(
       expectTransfers.map((t) => t.url.split("?")[0]),
