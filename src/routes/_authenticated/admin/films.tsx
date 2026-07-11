@@ -518,6 +518,38 @@ function FilmEditorModal({
                 maxBytes={25 * 1024 * 1024}
               />
 
+              {/* Live hero preview — shows how the framed hero will render */}
+              {(d.thumbnail_url || d.cover_url) && (
+                <div className="rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Hero preview
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Desktop 16:9 */}
+                    <div>
+                      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">Desktop · 16:9</div>
+                      <div className="relative rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg">
+                        <div
+                          className="relative aspect-video overflow-hidden rounded-xl bg-black"
+                          style={{ backgroundImage: (d.thumbnail_url || d.cover_url) ? `url(${d.thumbnail_url || d.cover_url})` : undefined, backgroundSize: (d.cover_fit || "cover") === "contain" ? "contain" : "cover", backgroundPosition: d.cover_position || "center", backgroundRepeat: "no-repeat" }}
+                        />
+                      </div>
+                    </div>
+                    {/* Mobile 2:3 */}
+                    <div>
+                      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">Mobile · 2:3</div>
+                      <div className="relative mx-auto max-w-[160px] rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg">
+                        <div
+                          className="relative aspect-[2/3] overflow-hidden rounded-xl bg-black"
+                          style={{ backgroundImage: (d.cover_url || d.thumbnail_url) ? `url(${d.cover_url || d.thumbnail_url})` : undefined, backgroundSize: (d.cover_fit || "cover") === "contain" ? "contain" : "cover", backgroundPosition: d.cover_position || "center", backgroundRepeat: "no-repeat" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
               {/* Cover display style */}
               <div className="space-y-2 pt-2">
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
