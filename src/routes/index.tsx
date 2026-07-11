@@ -90,17 +90,23 @@ function DeferredHomeRails() {
   const queryClient = useQueryClient();
 
   // Mount rails right after hydration so there's no big empty gap under the
-  // hero. Prefetch chunks + data on idle so the render is instant.
+  // hero. On idle: warm the JS chunks AND prefetch the shared rails query so
+  // New Release and Walking Tour can hydrate instantly — no chunk fetch, no
+  // query wait when their <Suspense> boundaries mount.
   useEffect(() => {
-    prefetchRails(queryClient);
-    const w = window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number };
-    const run = () => setShow(true);
-    if (w.requestIdleCallback) {
-      w.requestIdleCallback(run, { timeout: 800 });
-    } else {
-      setTimeout(run, 200);
-    }
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    const idle = (cb: () => void, timeout: number) => {
+      if (w.requestIdleCallback) w.requestIdleCallback(cb, { timeout });
+      else setTimeout(cb, Math.min(timeout, 200));
+    };
+    idle(() => {
+      prefetchRails(queryClient);
+      setShow(true);
+    }, 800);
   }, [queryClient]);
+
 
   if (!show) {
     return <RailsSkeleton />;
