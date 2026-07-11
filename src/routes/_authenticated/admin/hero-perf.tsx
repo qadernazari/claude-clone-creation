@@ -269,6 +269,32 @@ function HeroPerfPage() {
             ))}
           </select>
         </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Preload cache</label>
+          <select
+            value={preloadCacheHit}
+            onChange={(e) => setPreloadCacheHit(e.target.value as CacheFilter)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All</option>
+            <option value="hit">Hit</option>
+            <option value="miss">Miss</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Delivery type</label>
+          <select
+            value={deliveryType}
+            onChange={(e) => setDeliveryType(e.target.value)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All</option>
+            {(data?.deliveryTypes ?? []).map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
         <div className="ml-auto text-xs text-muted-foreground">
           {isLoading ? "Loading…" : `${data?.total ?? 0} samples`}
         </div>
