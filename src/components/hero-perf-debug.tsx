@@ -58,6 +58,20 @@ export function HeroPerfDebug() {
             <span className="text-cream/90">{formatBytes(last.payload.transfer_bytes)}</span>
             <span>encoded</span>
             <span className="text-cream/90">{formatBytes(last.payload.encoded_bytes)}</span>
+            <span>cache hit</span>
+            <span className={last.payload.preload_cache_hit ? "text-amber" : "text-cream/90"}>
+              {last.payload.preload_cache_hit == null
+                ? "—"
+                : last.payload.preload_cache_hit
+                  ? "yes"
+                  : "no"}
+            </span>
+            <span>delivery</span>
+            <span className="text-cream/90">{last.payload.delivery_type ?? "—"}</span>
+            <span>initiator</span>
+            <span className="text-cream/90">{last.payload.resource_initiator ?? "—"}</span>
+            <span>entries</span>
+            <span className="text-cream/90">{last.payload.resource_count ?? "—"}</span>
             <span>viewport</span>
             <span className="text-cream/90">{last.payload.viewport_w}px</span>
             <span>decode</span>

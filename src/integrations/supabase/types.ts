@@ -597,6 +597,7 @@ export type Database = {
           country: string | null
           created_at: string
           decode_ms: number | null
+          delivery_type: string | null
           downlink: number | null
           dpr: number | null
           effective_type: string | null
@@ -604,8 +605,11 @@ export type Database = {
           id: number
           lcp_ms: number | null
           lcp_size: number | null
+          preload_cache_hit: boolean | null
           preload_url: string | null
           protocol: string | null
+          resource_count: number | null
+          resource_initiator: string | null
           resp_end_ms: number | null
           transfer_bytes: number | null
           ttfb_ms: number | null
@@ -618,6 +622,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           decode_ms?: number | null
+          delivery_type?: string | null
           downlink?: number | null
           dpr?: number | null
           effective_type?: string | null
@@ -625,8 +630,11 @@ export type Database = {
           id?: number
           lcp_ms?: number | null
           lcp_size?: number | null
+          preload_cache_hit?: boolean | null
           preload_url?: string | null
           protocol?: string | null
+          resource_count?: number | null
+          resource_initiator?: string | null
           resp_end_ms?: number | null
           transfer_bytes?: number | null
           ttfb_ms?: number | null
@@ -639,6 +647,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           decode_ms?: number | null
+          delivery_type?: string | null
           downlink?: number | null
           dpr?: number | null
           effective_type?: string | null
@@ -646,8 +655,11 @@ export type Database = {
           id?: number
           lcp_ms?: number | null
           lcp_size?: number | null
+          preload_cache_hit?: boolean | null
           preload_url?: string | null
           protocol?: string | null
+          resource_count?: number | null
+          resource_initiator?: string | null
           resp_end_ms?: number | null
           transfer_bytes?: number | null
           ttfb_ms?: number | null

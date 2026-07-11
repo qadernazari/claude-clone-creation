@@ -26,6 +26,10 @@ export type PerfPayload = {
   effective_type: string | null;
   downlink: number | null;
   ua_mobile: boolean;
+  delivery_type: string | null;
+  preload_cache_hit: boolean | null;
+  resource_initiator: string | null;
+  resource_count: number | null;
 };
 
 export type MeasureHeroLCPOptions = {
@@ -106,6 +110,22 @@ export function measureHeroLCP(
         (e): e is PerformanceResourceTiming => e.entryType === "resource",
       );
 
+    // Enumerate all resource entries for this URL — used to detect double
+    // fetches and to distinguish preload-only entries from the render fetch.
+    const allEntries = performance
+      .getEntriesByName(url)
+      .filter((e): e is PerformanceResourceTiming => e.entryType === "resource");
+    // deliveryType is Chromium-only, may be "cache", "navigational-prefetch", or "".
+    const deliveryType =
+      (res as PerformanceResourceTiming & { deliveryType?: string })
+        ?.deliveryType ?? null;
+    // Cache hit: no bytes on the wire, but the resource still delivered a body.
+    // Covers memory cache, disk cache, and preload cache reuse.
+    const preloadCacheHit = res
+      ? res.transferSize === 0 &&
+        ((res.encodedBodySize ?? 0) > 0 || (res.decodedBodySize ?? 0) > 0)
+      : null;
+
     const nav = navigator as Navigator & {
       connection?: { effectiveType?: string; downlink?: number };
     };
@@ -129,6 +149,10 @@ export function measureHeroLCP(
       effective_type: conn?.effectiveType ?? null,
       downlink: conn?.downlink ?? null,
       ua_mobile: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent),
+      delivery_type: deliveryType || (preloadCacheHit ? "cache" : null),
+      preload_cache_hit: preloadCacheHit,
+      resource_initiator: res?.initiatorType ?? null,
+      resource_count: allEntries.length || null,
     });
 
     const send = (payload: PerfPayload) => {
