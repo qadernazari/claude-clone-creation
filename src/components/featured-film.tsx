@@ -280,7 +280,7 @@ function SlideImageFrame({
         />
 
         {/* The frame — drop backdrop-blur on mobile to avoid compositor stalls */}
-        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-3">
+        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-3 shadow-2xl transition-transform duration-500 group-hover:scale-[1.01] md:backdrop-blur-sm lg:rounded-[2rem] lg:p-4">
           <div
             ref={frameRef}
             className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1.25rem] md:aspect-video md:rounded-[1.4rem]"
