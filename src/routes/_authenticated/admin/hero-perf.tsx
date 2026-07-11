@@ -596,13 +596,14 @@ function HeroPerfPage() {
                     {r.correlation_id ? (
                       <button
                         type="button"
-                        title={`${r.correlation_id} — click to copy`}
+                        title={`${r.correlation_id} — click to filter`}
                         onClick={() => {
-                          if (typeof navigator !== "undefined" && navigator.clipboard) {
-                            void navigator.clipboard.writeText(r.correlation_id ?? "");
-                          }
+                          const id = r.correlation_id ?? "";
+                          setCorrelationInput(id);
+                          setCorrelationId(id);
+                          if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="hover:text-foreground text-muted-foreground"
+                        className="hover:text-foreground text-muted-foreground underline decoration-dotted"
                       >
                         {r.correlation_id.slice(0, 8)}
                       </button>
