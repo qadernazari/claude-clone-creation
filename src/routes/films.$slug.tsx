@@ -925,7 +925,7 @@ function FilmPage() {
           {film.category !== "walking-tour" && (
             <div>
               <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زبان" : "Language"}</dt>
-              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "فارسی" : "Persian (Farsi)"}</dd>
+              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{languageLabel(film.language, locale)}</dd>
             </div>
           )}
           {film.has_subtitles && (
