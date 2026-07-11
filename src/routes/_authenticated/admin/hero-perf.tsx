@@ -14,7 +14,58 @@ const RANGES = [
   { label: "24h", hours: 24 },
   { label: "7d", hours: 24 * 7 },
   { label: "30d", hours: 24 * 30 },
+] as const;
+
+const CSV_COLUMNS: (keyof HeroPerfRow)[] = [
+  "created_at",
+  "correlation_id",
+  "lcp_ms",
+  "lcp_size",
+  "ttfb_ms",
+  "resp_end_ms",
+  "decode_ms",
+  "transfer_bytes",
+  "encoded_bytes",
+  "protocol",
+  "preload_cache_hit",
+  "preload_url",
+  "delivery_type",
+  "resource_initiator",
+  "resource_count",
+  "viewport_w",
+  "dpr",
+  "effective_type",
+  "downlink",
+  "country",
+  "ua_mobile",
+  "url",
 ];
+
+function csvEscape(v: unknown): string {
+  if (v == null) return "";
+  const s = typeof v === "string" ? v : typeof v === "boolean" ? (v ? "true" : "false") : String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function exportRowsToCsv(rows: HeroPerfRow[], hours: number) {
+  if (!rows.length) return;
+  const header = CSV_COLUMNS.join(",");
+  const body = rows
+    .map((r) => CSV_COLUMNS.map((c) => csvEscape(r[c])).join(","))
+    .join("\n");
+  const csv = `${header}\n${body}\n`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  a.href = url;
+  a.download = `hero-perf-${hours}h-${stamp}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 
 function percentile(sorted: number[], p: number): number | null {
   if (!sorted.length) return null;
