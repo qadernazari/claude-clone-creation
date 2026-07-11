@@ -6,6 +6,7 @@ import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/ho
 import { useCurrentUser } from "@/hooks/use-subscription";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
 import { HeroImageDebug, useHeroDebugEnabled } from "./hero-image-debug";
+import { HeroPerfDebug } from "./hero-perf-debug";
 
 const AUTOPLAY_MS = 6500;
 
@@ -335,10 +336,16 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           <WatchlistCta slug={film.slug} locale={locale} />
         </div>
       </div>
-      {debugEnabled && active ? <HeroImageDebug candidates={debugCandidates} /> : null}
+      {debugEnabled && active ? (
+        <>
+          <HeroImageDebug candidates={debugCandidates} />
+          <HeroPerfDebug />
+        </>
+      ) : null}
     </div>
   );
 }
+
 
 function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
   const ready = useDeferredMount();
