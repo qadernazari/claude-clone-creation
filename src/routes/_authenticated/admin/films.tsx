@@ -518,31 +518,41 @@ function FilmEditorModal({
                 maxBytes={25 * 1024 * 1024}
               />
 
-              {/* Live hero preview — shows how the framed hero will render */}
+              {/* Live hero preview — mirrors the exact framed hero on /films/:slug */}
               {(d.thumbnail_url || d.cover_url) && (
-                <div className="rounded-xl border border-border bg-muted/20 p-4">
-                  <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Hero preview
+                <div className="rounded-xl border border-border bg-[#0b0b0d] p-5">
+                  <div className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Hero preview — matches film page exactly
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Desktop 16:9 */}
                     <div>
-                      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">Desktop · 16:9</div>
-                      <div className="relative rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg">
-                        <div
-                          className="relative aspect-video overflow-hidden rounded-xl bg-black"
-                          style={{ backgroundImage: (d.thumbnail_url || d.cover_url) ? `url(${d.thumbnail_url || d.cover_url})` : undefined, backgroundSize: (d.cover_fit || "cover") === "contain" ? "contain" : "cover", backgroundPosition: d.cover_position || "center", backgroundRepeat: "no-repeat" }}
-                        />
+                      <div className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Desktop · 16:9</div>
+                      <div className="relative isolate p-4">
+                        <div className="pointer-events-none absolute -inset-6 rounded-full bg-amber/10 opacity-60 blur-[60px]" aria-hidden />
+                        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl backdrop-blur-sm">
+                          <div
+                            className="relative aspect-video overflow-hidden rounded-[1.25rem] bg-black"
+                            style={{ backgroundImage: (d.thumbnail_url || d.cover_url) ? `url(${d.thumbnail_url || d.cover_url})` : undefined, backgroundSize: (d.cover_fit || "cover") === "contain" ? "contain" : "cover", backgroundPosition: d.cover_position || "center", backgroundRepeat: "no-repeat" }}
+                          />
+                        </div>
+                        <div className="pointer-events-none absolute -right-1 -top-1 h-10 w-10 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30" aria-hidden />
+                        <div className="pointer-events-none absolute -bottom-1 -left-1 h-10 w-10 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30" aria-hidden />
                       </div>
                     </div>
                     {/* Mobile 2:3 */}
                     <div>
-                      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">Mobile · 2:3</div>
-                      <div className="relative mx-auto max-w-[160px] rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg">
-                        <div
-                          className="relative aspect-[2/3] overflow-hidden rounded-xl bg-black"
-                          style={{ backgroundImage: (d.cover_url || d.thumbnail_url) ? `url(${d.cover_url || d.thumbnail_url})` : undefined, backgroundSize: (d.cover_fit || "cover") === "contain" ? "contain" : "cover", backgroundPosition: d.cover_position || "center", backgroundRepeat: "no-repeat" }}
-                        />
+                      <div className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Mobile · 2:3</div>
+                      <div className="relative isolate mx-auto max-w-[200px] p-4">
+                        <div className="pointer-events-none absolute -inset-6 rounded-full bg-amber/10 opacity-60 blur-[60px]" aria-hidden />
+                        <div className="relative z-10 rounded-[1.75rem] border border-cream/10 bg-cream/5 p-2.5 shadow-2xl backdrop-blur-sm">
+                          <div
+                            className="relative aspect-[2/3] overflow-hidden rounded-[1.25rem] bg-black"
+                            style={{ backgroundImage: (d.cover_url || d.thumbnail_url) ? `url(${d.cover_url || d.thumbnail_url})` : undefined, backgroundSize: (d.cover_fit || "cover") === "contain" ? "contain" : "cover", backgroundPosition: d.cover_position || "center", backgroundRepeat: "no-repeat" }}
+                          />
+                        </div>
+                        <div className="pointer-events-none absolute -right-1 -top-1 h-10 w-10 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30" aria-hidden />
+                        <div className="pointer-events-none absolute -bottom-1 -left-1 h-10 w-10 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30" aria-hidden />
                       </div>
                     </div>
                   </div>
