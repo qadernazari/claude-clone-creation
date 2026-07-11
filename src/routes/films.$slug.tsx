@@ -914,10 +914,12 @@ function FilmPage() {
             <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "کشور" : "Country"}</dt>
             <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "ایران" : "Iran"}</dd>
           </div>
-          <div>
-            <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زبان" : "Language"}</dt>
-            <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "فارسی" : "Persian (Farsi)"}</dd>
-          </div>
+          {film.category !== "walking-tour" && (
+            <div>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زبان" : "Language"}</dt>
+              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "فارسی" : "Persian (Farsi)"}</dd>
+            </div>
+          )}
           {film.has_subtitles && (
             <div>
               <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زیرنویس" : "Subtitles"}</dt>
