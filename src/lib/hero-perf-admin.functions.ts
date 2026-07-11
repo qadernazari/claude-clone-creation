@@ -10,9 +10,12 @@ const InputSchema = z.object({
 
 export type HeroPerfRow = {
   created_at: string;
+  correlation_id: string | null;
   lcp_ms: number | null;
   decode_ms: number | null;
   transfer_bytes: number | null;
+  preload_cache_hit: boolean | null;
+  viewport_w: number | null;
   effective_type: string | null;
   country: string | null;
   ua_mobile: boolean | null;
@@ -46,7 +49,9 @@ export const getHeroPerfLogs = createServerFn({ method: "POST" })
 
     let q = supabaseAdmin
       .from("hero_perf_logs")
-      .select("created_at, lcp_ms, decode_ms, transfer_bytes, effective_type, country, ua_mobile, url")
+      .select(
+        "created_at, correlation_id, lcp_ms, decode_ms, transfer_bytes, preload_cache_hit, viewport_w, effective_type, country, ua_mobile, url",
+      )
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(5000);
