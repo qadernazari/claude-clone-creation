@@ -710,6 +710,7 @@ const report = {
   generated_at: new Date().toISOString(),
   base_url: BASE_URL,
   lcp_budget_ms: LCP_BUDGET_MS,
+  lcp_budget_ms_per_viewport: PER_VIEWPORT_BUDGET_MS,
   viewports_selected: selection,
   overall_passed: totalFailures.length === 0,
   summary: {
