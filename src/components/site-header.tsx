@@ -101,7 +101,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     if (!open) return;
     const html = document.documentElement;
     const body = document.body;
-    const scrollY = window.scrollY || html.scrollTop || 0;
     const previousHtml = {
       overflow: html.style.overflow,
       overscrollBehavior: html.style.overscrollBehavior,
@@ -109,11 +108,6 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     };
     const previousBody = {
       overflow: body.style.overflow,
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
