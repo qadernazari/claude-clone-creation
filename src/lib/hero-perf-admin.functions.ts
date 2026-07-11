@@ -8,6 +8,7 @@ const InputSchema = z.object({
   country: z.string().max(8).optional(),
   preloadCacheHit: z.enum(["all", "hit", "miss", "unknown"]).default("all"),
   deliveryType: z.string().max(32).optional(),
+  correlationId: z.string().trim().max(64).optional(),
 });
 
 export type HeroPerfRow = {
