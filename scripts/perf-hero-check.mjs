@@ -438,10 +438,6 @@ for (const key of selection) {
           const r = i.getBoundingClientRect();
           return r.width > 200 && r.height > 200;
         });
-        const visible = imgs.find((i) => {
-          const r = i.getBoundingClientRect();
-          return r.width > 200 && r.height > 200;
-        });
         const rendered =
           visible instanceof HTMLImageElement
             ? visible.currentSrc || visible.src
