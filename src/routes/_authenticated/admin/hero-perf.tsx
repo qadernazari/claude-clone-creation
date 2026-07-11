@@ -567,6 +567,7 @@ function HeroPerfPage() {
                 <th className="px-3 py-2">Mobile</th>
                 <th className="px-3 py-2">Correlation</th>
                 <th className="px-3 py-2">URL</th>
+                <th className="px-3 py-2"></th>
               </tr>
             </thead>
             <tbody>
