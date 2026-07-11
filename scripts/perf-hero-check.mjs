@@ -448,6 +448,9 @@ for (const key of selection) {
     const harPath = joinPath(FAILURE_DIR, `${artifactBase}.har`);
     const screenshotPath = joinPath(FAILURE_DIR, `${artifactBase}.png`);
     const tracePath = joinPath(FAILURE_DIR, `${artifactBase}.trace.zip`);
+    const beaconJsonPath = joinPath(FAILURE_DIR, `${artifactBase}.beacon.json`);
+    const htmlSnapshotPath = joinPath(FAILURE_DIR, `${artifactBase}.rendered.html`);
+
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: vp.deviceScaleFactor,
