@@ -1364,6 +1364,9 @@ for (const key of selection) {
     viewport: { width: vp.width, height: vp.height, dpr: vp.deviceScaleFactor },
     expect_bucket: vp.expectBucket,
     forbid_bucket: vp.forbidBucket,
+    preload_orientation: vp.preloadOrientation,
+    preload_buckets: PRELOAD_BUCKETS,
+
     started_at: new Date(runStart).toISOString(),
     duration_ms: Date.now() - runStart,
     attempts: attemptsMeta,
