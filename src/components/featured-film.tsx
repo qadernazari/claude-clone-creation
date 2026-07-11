@@ -374,8 +374,8 @@ function SlideImageFrame({
         ) : null}
 
         {/* Corner accents */}
-        <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-3 -left-3 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
+        <div className="pointer-events-none absolute -right-4 -top-4 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-5 lg:-top-5 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
+        <div className="pointer-events-none absolute -bottom-4 -left-4 h-12 w-12 rounded-bl-[1.25rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-5 lg:-left-5 lg:h-16 lg:w-16 lg:rounded-bl-[1.5rem]" aria-hidden />
       </div>
     </div>
   );
