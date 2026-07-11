@@ -795,6 +795,8 @@ for (const key of selection) {
           softReasons.push(
             `preload_cache_hit=${JSON.stringify(localBeacon.preload_cache_hit)} (expected true)`,
           );
+        }
+
         if (!result.preloadAssertion.ok) {
           // Hard-fail: duplicated / re-added preload tags aren't a warmup
           // artifact and won't self-heal on retry.
