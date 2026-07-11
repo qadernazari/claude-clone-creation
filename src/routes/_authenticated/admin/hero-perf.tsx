@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { getHeroPerfLogs, listPerfReports, type HeroPerfRow, type PerfReportFile } from "@/lib/hero-perf-admin.functions";
+import { getHeroPerfLogs, listPerfReports, getPerfReportsSummary, type HeroPerfRow, type PerfReportFile, type PerfSummaryResponse } from "@/lib/hero-perf-admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/hero-perf")({
   component: HeroPerfPage,
@@ -387,6 +387,7 @@ function HeroPerfPage() {
         </div>
       </div>
 
+      <PerfRunsSummary />
       <PerfReportsList />
 
 
@@ -1160,6 +1161,214 @@ function PerfReportsList() {
               </li>
             ))}
           </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function fmtWhen(iso: string | null): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? iso : d.toLocaleString();
+}
+
+function copyText(text: string) {
+  try {
+    void navigator.clipboard?.writeText(text);
+  } catch {
+    /* ignore */
+  }
+}
+
+function buildSummaryMarkdown(s: PerfSummaryResponse): string {
+  const lines: string[] = [];
+  lines.push(`# perf:hero — latest runs summary`);
+  lines.push("");
+  lines.push(
+    `- Runs considered: **${s.totals.runs_considered}**  ·  Viewports: **${s.totals.passed_viewports} passed / ${s.totals.failed_viewports} failed** (of ${s.totals.total_viewports})`,
+  );
+  if (s.latest) {
+    lines.push(
+      `- Latest run: ${fmtWhen(s.latest.generated_at)} — **${s.latest.passed ? "PASS" : "FAIL"}** (${s.latest.passed_runs}/${s.latest.runs} viewports)`,
+    );
+  }
+  lines.push("");
+  lines.push(`## Latest run viewports`);
+  if (!s.latest) {
+    lines.push(`_No runs found._`);
+  } else {
+    lines.push(`| Viewport | Status | LCP (ms) | Budget | Over budget | correlation_id |`);
+    lines.push(`|---|---|---|---|---|---|`);
+    for (const v of s.latest.viewports) {
+      lines.push(
+        `| ${v.viewport_label} | ${v.passed ? "✅" : "❌"} | ${v.lcp_ms ?? "—"} | ${v.budget_ms ?? "—"} | ${v.over_budget_ms ?? "—"} | ${v.correlation_id ?? "—"} |`,
+      );
+    }
+  }
+  lines.push("");
+  lines.push(`## Top regressions (last ${s.totals.runs_considered} runs)`);
+  if (s.top_regressions.length === 0) {
+    lines.push(`_None — all viewports passing._`);
+  } else {
+    lines.push(`| When | Viewport | LCP | Budget | Over | correlation_id |`);
+    lines.push(`|---|---|---|---|---|---|`);
+    for (const r of s.top_regressions) {
+      lines.push(
+        `| ${fmtWhen(r.generated_at)} | ${r.viewport_label} | ${r.lcp_ms ?? "—"} | ${r.budget_ms ?? "—"} | ${r.over_budget_ms || "—"} | ${r.correlation_id ?? "—"} |`,
+      );
+    }
+  }
+  return lines.join("\n");
+}
+
+function PerfRunsSummary() {
+  const fetchFn = useServerFn(getPerfReportsSummary);
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
+    queryKey: ["admin", "perf-reports-summary"],
+    queryFn: () => fetchFn({ data: { runs: 10 } }),
+    staleTime: 60_000,
+  });
+
+  return (
+    <section className="rounded-md border border-border bg-card">
+      <header className="flex items-center justify-between p-3 border-b border-border gap-2">
+        <div>
+          <h2 className="font-medium">perf:hero — latest runs summary</h2>
+          <p className="text-xs text-muted-foreground">
+            Aggregated pass/fail across the most recent uploaded JSON reports, plus the biggest LCP regressions.
+          </p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button
+            onClick={() => data && copyText(buildSummaryMarkdown(data))}
+            disabled={!data}
+            className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent disabled:opacity-50"
+          >
+            Copy markdown
+          </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="text-xs rounded-md border border-border px-2.5 py-1.5 hover:bg-accent"
+          >
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
+      </header>
+      <div className="p-3 space-y-4">
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading summary…</p>
+        ) : error ? (
+          <p className="text-sm text-destructive">Failed to load: {(error as Error).message}</p>
+        ) : !data || data.totals.runs_considered === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No JSON reports uploaded yet. Run <code>npm run perf:hero</code> to publish one.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              <div className="rounded border border-border p-2">
+                <div className="text-xs text-muted-foreground">Runs considered</div>
+                <div className="text-lg font-semibold">{data.totals.runs_considered}</div>
+              </div>
+              <div className="rounded border border-border p-2">
+                <div className="text-xs text-muted-foreground">Viewports passed</div>
+                <div className="text-lg font-semibold text-emerald-600">
+                  {data.totals.passed_viewports}
+                </div>
+              </div>
+              <div className="rounded border border-border p-2">
+                <div className="text-xs text-muted-foreground">Viewports failed</div>
+                <div className={`text-lg font-semibold ${data.totals.failed_viewports ? "text-destructive" : ""}`}>
+                  {data.totals.failed_viewports}
+                </div>
+              </div>
+              <div className="rounded border border-border p-2">
+                <div className="text-xs text-muted-foreground">Latest run</div>
+                <div className={`text-lg font-semibold ${data.latest?.passed ? "text-emerald-600" : "text-destructive"}`}>
+                  {data.latest ? (data.latest.passed ? "PASS" : "FAIL") : "—"}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {fmtWhen(data.latest?.generated_at ?? null)}
+                </div>
+              </div>
+            </div>
+
+            {data.latest && (
+              <div>
+                <div className="text-xs font-medium mb-1">Latest run viewports</div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="text-left text-muted-foreground">
+                      <tr>
+                        <th className="py-1 pr-3">Viewport</th>
+                        <th className="py-1 pr-3">Status</th>
+                        <th className="py-1 pr-3">LCP</th>
+                        <th className="py-1 pr-3">Budget</th>
+                        <th className="py-1 pr-3">Over</th>
+                        <th className="py-1 pr-3">correlation_id</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.latest.viewports.map((v) => (
+                        <tr key={`${data.latest!.path}-${v.viewport_label}`} className="border-t border-border">
+                          <td className="py-1 pr-3">{v.viewport_label}</td>
+                          <td className={`py-1 pr-3 ${v.passed ? "text-emerald-600" : "text-destructive"}`}>
+                            {v.passed ? "PASS" : "FAIL"}
+                          </td>
+                          <td className="py-1 pr-3">{v.lcp_ms ?? "—"}</td>
+                          <td className="py-1 pr-3">{v.budget_ms ?? "—"}</td>
+                          <td className="py-1 pr-3">{v.over_budget_ms ?? "—"}</td>
+                          <td className="py-1 pr-3 font-mono truncate max-w-[220px]" title={v.correlation_id ?? undefined}>
+                            {v.correlation_id ?? "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <div className="text-xs font-medium mb-1">Top regressions</div>
+              {data.top_regressions.length === 0 ? (
+                <p className="text-xs text-muted-foreground">None — all viewports passing across the window.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="text-left text-muted-foreground">
+                      <tr>
+                        <th className="py-1 pr-3">When</th>
+                        <th className="py-1 pr-3">Viewport</th>
+                        <th className="py-1 pr-3">LCP</th>
+                        <th className="py-1 pr-3">Budget</th>
+                        <th className="py-1 pr-3">Over</th>
+                        <th className="py-1 pr-3">correlation_id</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.top_regressions.map((r, i) => (
+                        <tr key={`${r.path}-${r.viewport_label}-${i}`} className="border-t border-border">
+                          <td className="py-1 pr-3">{fmtWhen(r.generated_at)}</td>
+                          <td className="py-1 pr-3">{r.viewport_label}</td>
+                          <td className="py-1 pr-3">{r.lcp_ms ?? "—"}</td>
+                          <td className="py-1 pr-3">{r.budget_ms ?? "—"}</td>
+                          <td className={`py-1 pr-3 ${r.over_budget_ms ? "text-destructive" : ""}`}>
+                            {r.over_budget_ms || "—"}
+                          </td>
+                          <td className="py-1 pr-3 font-mono truncate max-w-[220px]" title={r.correlation_id ?? undefined}>
+                            {r.correlation_id ?? "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </section>
