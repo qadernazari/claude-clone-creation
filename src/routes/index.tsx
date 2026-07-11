@@ -219,6 +219,9 @@ export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     const { setHomepageCacheHeaders } = await import("@/lib/cache-headers");
     setHomepageCacheHeaders();
+    // Kick off the rails query in parallel with SSR — non-blocking so it
+    // doesn't delay HTML, but ready by the time the client hydrates.
+    void context.queryClient.prefetchQuery(homeRailsQueryOptions);
     try {
       const slides = await context.queryClient.ensureQueryData(homeFeaturedSlidesQueryOptions);
       const featured = slides[0] ?? null;
@@ -232,6 +235,7 @@ export const Route = createFileRoute("/")({
       return null;
     }
   },
+
   head: ({ loaderData }) => ({
     meta: [
       { title: "ir.show — Home of Iranian cinema" },
