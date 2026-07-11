@@ -343,11 +343,13 @@ function HeroPerfPage() {
               <tr className="text-left">
                 <th className="px-3 py-2">Time</th>
                 <th className="px-3 py-2">LCP</th>
-                <th className="px-3 py-2">Decode</th>
                 <th className="px-3 py-2">Bytes</th>
+                <th className="px-3 py-2">Cache</th>
+                <th className="px-3 py-2">VP</th>
                 <th className="px-3 py-2">Type</th>
                 <th className="px-3 py-2">Country</th>
                 <th className="px-3 py-2">Mobile</th>
+                <th className="px-3 py-2">Correlation</th>
                 <th className="px-3 py-2">URL</th>
               </tr>
             </thead>
@@ -356,19 +358,46 @@ function HeroPerfPage() {
                 <tr key={i} className="border-t border-border/60">
                   <td className="px-3 py-1.5 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="px-3 py-1.5 tabular-nums">{fmt(r.lcp_ms, " ms")}</td>
-                  <td className="px-3 py-1.5 tabular-nums">{fmt(r.decode_ms, " ms")}</td>
                   <td className="px-3 py-1.5 tabular-nums">
                     {r.transfer_bytes == null ? "—" : `${(r.transfer_bytes / 1024).toFixed(1)} KB`}
                   </td>
+                  <td className="px-3 py-1.5">
+                    {r.preload_cache_hit == null ? (
+                      "—"
+                    ) : r.preload_cache_hit ? (
+                      <span className="text-emerald-500">hit</span>
+                    ) : (
+                      <span className="text-amber-500">miss</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-1.5 tabular-nums">{r.viewport_w ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.effective_type ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.country ?? "—"}</td>
                   <td className="px-3 py-1.5">{r.ua_mobile == null ? "—" : r.ua_mobile ? "yes" : "no"}</td>
-                  <td className="px-3 py-1.5 max-w-[280px] truncate text-muted-foreground">{r.url ?? "—"}</td>
+                  <td className="px-3 py-1.5 font-mono">
+                    {r.correlation_id ? (
+                      <button
+                        type="button"
+                        title={`${r.correlation_id} — click to copy`}
+                        onClick={() => {
+                          if (typeof navigator !== "undefined" && navigator.clipboard) {
+                            void navigator.clipboard.writeText(r.correlation_id ?? "");
+                          }
+                        }}
+                        className="hover:text-foreground text-muted-foreground"
+                      >
+                        {r.correlation_id.slice(0, 8)}
+                      </button>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td className="px-3 py-1.5 max-w-[240px] truncate text-muted-foreground">{r.url ?? "—"}</td>
                 </tr>
               ))}
               {rows.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">
+                  <td colSpan={10} className="px-3 py-6 text-center text-muted-foreground">
                     No samples in this window.
                   </td>
                 </tr>
