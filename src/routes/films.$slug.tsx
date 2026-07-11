@@ -26,13 +26,21 @@ import { relatedFilmsQueryOptions } from "@/lib/related-films.functions";
 const FilmCheckout = lazy(() => import("@/components/film-checkout").then((m) => ({ default: m.FilmCheckout })));
 // Membership purchases happen on the dedicated /membership page.
 
-
+const LANGUAGE_NAMES: Record<string, { en: string; fa: string }> = {
+  fa: { en: "Persian (Farsi)", fa: "فارسی" },
+  en: { en: "English", fa: "انگلیسی" },
+  ar: { en: "Arabic", fa: "عربی" },
+};
+function languageLabel(code: string | null | undefined, locale: "en" | "fa") {
+  if (!code) return locale === "fa" ? "فارسی" : "Persian (Farsi)";
+  return LANGUAGE_NAMES[code]?.[locale] ?? code.toUpperCase();
+}
 
 export const Route = createFileRoute("/films/$slug")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("films")
-      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
+      .select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, language, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
       .eq("slug", params.slug)
       .eq("visibility", "published")
       .maybeSingle();
@@ -113,7 +121,7 @@ export const Route = createFileRoute("/films/$slug")({
             ...(f.cover_url ? { image: f.cover_url } : {}),
             ...(f.synopsis_en ? { description: f.synopsis_en } : {}),
             ...(isoDuration ? { duration: isoDuration } : {}),
-            inLanguage: "fa",
+            ...(f.category !== "walking-tour" ? { inLanguage: f.language || "fa" } : {}),
             countryOfOrigin: { "@type": "Country", name: "Iran" },
             ...(f.category ? { genre: f.category } : {}),
             url,
@@ -917,7 +925,7 @@ function FilmPage() {
           {film.category !== "walking-tour" && (
             <div>
               <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زبان" : "Language"}</dt>
-              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "فارسی" : "Persian (Farsi)"}</dd>
+              <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{languageLabel(film.language, locale)}</dd>
             </div>
           )}
           {film.has_subtitles && (

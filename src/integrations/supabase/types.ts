@@ -473,6 +473,7 @@ export type Database = {
           has_subtitles: boolean
           id: string
           is_premium: boolean
+          language: string | null
           mobile_cover_url: string | null
           parent_film_id: string | null
           poster_gradient: string | null
@@ -513,6 +514,7 @@ export type Database = {
           has_subtitles?: boolean
           id?: string
           is_premium?: boolean
+          language?: string | null
           mobile_cover_url?: string | null
           parent_film_id?: string | null
           poster_gradient?: string | null
@@ -553,6 +555,7 @@ export type Database = {
           has_subtitles?: boolean
           id?: string
           is_premium?: boolean
+          language?: string | null
           mobile_cover_url?: string | null
           parent_film_id?: string | null
           poster_gradient?: string | null

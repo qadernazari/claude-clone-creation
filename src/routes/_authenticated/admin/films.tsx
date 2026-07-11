@@ -25,6 +25,7 @@ type Film = {
   synopsis_en: string | null;
   synopsis_fa: string | null;
   category: string | null;
+  language: string | null;
   year: number | null;
   duration_min: number | null;
   price_cents: number;
@@ -72,7 +73,7 @@ const GRADIENTS = [
 
 const EMPTY: FilmDraft = {
   slug: "", title_en: "", title_fa: "", director_en: "", director_fa: "",
-  synopsis_en: "", synopsis_fa: "", category: "", year: null, duration_min: null,
+  synopsis_en: "", synopsis_fa: "", category: "", language: "fa", year: null, duration_min: null,
   price_cents: 0, price_toman: 0, ticket_hours: 48, access_mode: "inherit",
   access_type: "membership", is_premium: false,
   visibility: "draft", sort_order: 0, cover_url: "", thumbnail_url: "", mobile_cover_url: "", cover_fit: "cover", cover_position: "center", poster_gradient: GRADIENTS[0],
@@ -82,7 +83,7 @@ const EMPTY: FilmDraft = {
 
 async function listFilms(): Promise<Film[]> {
   const { data, error } = await supabase
-    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
+    .from("films").select("id, slug, title_en, title_fa, synopsis_en, synopsis_fa, director_en, director_fa, category, language, year, duration_min, price_cents, price_toman, ticket_hours, access_mode, access_type, is_premium, poster_gradient, cover_url, thumbnail_url, mobile_cover_url, cover_fit, cover_position, preview_url, visibility, sort_order, age_rating, has_4k, has_captions, has_subtitles, film_type, parent_film_id, season_number, episode_number, created_at, updated_at")
     .order("sort_order").order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data as Film[]) ?? [];
@@ -406,6 +407,7 @@ function FilmEditorModal({
         synopsis_en: d.synopsis_en?.trim() || null,
         synopsis_fa: d.synopsis_fa?.trim() || null,
         category: d.category || null,
+        language: d.category === "walking-tour" ? null : (d.language?.trim() || "fa"),
         year: d.year ?? null,
         duration_min: d.duration_min ?? null,
         price_cents: Number(d.price_cents) || 0,
@@ -685,6 +687,17 @@ function FilmEditorModal({
                   {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </label>
+              {d.category !== "walking-tour" && (
+                <label className="block">
+                  <span className="block text-xs font-medium text-muted-foreground mb-1.5">Language</span>
+                  <select value={d.language ?? "fa"} onChange={(e) => set("language", e.target.value)} className={inp}>
+                    <option value="fa">Persian (Farsi)</option>
+                    <option value="en">English</option>
+                    <option value="ar">Arabic</option>
+                    <option value="other">Other</option>
+                  </select>
+                </label>
+              )}
               <label className="block">
                 <span className="block text-xs font-medium text-muted-foreground mb-1.5">Year</span>
                 <input type="number" value={d.year ?? ""} onChange={(e) => set("year", e.target.value ? Number(e.target.value) : null)} className={inp} placeholder="2025" />
