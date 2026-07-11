@@ -23,8 +23,42 @@
  */
 import { chromium } from "playwright";
 
+// ---------- Optional config file ----------
+// Load a JSON config from PERF_HERO_CONFIG (or ./perf-hero.config.json if it
+// exists) so budgets and preload gate expectations can be tuned without
+// editing this script. Env vars still win over config-file values so CI can
+// override on a per-job basis. Shape:
+//   {
+//     "lcp_budget_ms": 2000,
+//     "viewports": {
+//       "desktop": {
+//         "lcp_budget_ms": 1500,
+//         "expect_bucket": "film-thumbnails",
+//         "forbid_bucket": "film-covers"
+//       }
+//     }
+//   }
+const { readFileSync, existsSync } = await import("node:fs");
+const configPath =
+  process.env.PERF_HERO_CONFIG ||
+  (existsSync("perf-hero.config.json") ? "perf-hero.config.json" : null);
+let fileConfig = { lcp_budget_ms: null, viewports: {} };
+if (configPath) {
+  try {
+    fileConfig = JSON.parse(readFileSync(configPath, "utf8"));
+    fileConfig.viewports = fileConfig.viewports || {};
+    console.log(`Loaded perf-hero config from ${configPath}`);
+  } catch (err) {
+    console.error(`Failed to read config at ${configPath}: ${err instanceof Error ? err.message : err}`);
+    process.exit(2);
+  }
+}
+const vpCfg = (key) => fileConfig.viewports?.[key] || {};
+
 const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
-const LCP_BUDGET_MS = Number(process.env.LCP_BUDGET_MS || 2000);
+const LCP_BUDGET_MS = Number(
+  process.env.LCP_BUDGET_MS || fileConfig.lcp_budget_ms || 2000,
+);
 const BEACON_TIMEOUT_MS = Number(process.env.BEACON_TIMEOUT_MS || 20000);
 const GOTO_TIMEOUT_MS = Number(process.env.GOTO_TIMEOUT_MS || 45000);
 const MAX_ATTEMPTS = Number(process.env.MAX_ATTEMPTS || 3);
@@ -35,14 +69,20 @@ const WARMUP = process.env.WARMUP !== "0";
 // pollute the LCP measurement (especially at 390px and 768px).
 const WARMUP_PASSES = Number(process.env.WARMUP_PASSES || 2);
 const RETRY_BACKOFF_MS = Number(process.env.RETRY_BACKOFF_MS || 1500);
-// Per-viewport LCP budgets. Tablet-sized emulation on a shared CI runner
-// consistently lands ~20-40% slower than desktop, so give it headroom
-// instead of retrying to hide a real regression.
+// Per-viewport LCP budgets. Env var > config file > default.
+// Tablet emulation on shared CI runners consistently lands 20–40% slower
+// than desktop, so its default gets headroom.
+const budgetFor = (key, fallback) =>
+  Number(
+    process.env[`LCP_BUDGET_MS_${key.toUpperCase()}`] ||
+      vpCfg(key).lcp_budget_ms ||
+      fallback,
+  );
 const PER_VIEWPORT_BUDGET_MS = {
-  mobile: Number(process.env.LCP_BUDGET_MS_MOBILE || LCP_BUDGET_MS),
-  tablet: Number(process.env.LCP_BUDGET_MS_TABLET || Math.max(LCP_BUDGET_MS, 3000)),
-  laptop: Number(process.env.LCP_BUDGET_MS_LAPTOP || LCP_BUDGET_MS),
-  desktop: Number(process.env.LCP_BUDGET_MS_DESKTOP || LCP_BUDGET_MS),
+  mobile: budgetFor("mobile", LCP_BUDGET_MS),
+  tablet: budgetFor("tablet", Math.max(LCP_BUDGET_MS, 3000)),
+  laptop: budgetFor("laptop", LCP_BUDGET_MS),
+  desktop: budgetFor("desktop", LCP_BUDGET_MS),
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -129,6 +169,18 @@ const ALL_VIEWPORTS = {
     heroImgSelector: 'main img[class*="hidden md:block"], main img.hidden.md\\:block',
   },
 };
+
+// Apply per-viewport preload gate overrides (env var > config file > default).
+for (const key of Object.keys(ALL_VIEWPORTS)) {
+  const cfg = vpCfg(key);
+  const envUp = key.toUpperCase();
+  const expect = process.env[`EXPECT_BUCKET_${envUp}`] || cfg.expect_bucket;
+  const forbid = process.env[`FORBID_BUCKET_${envUp}`] || cfg.forbid_bucket;
+  const selector = process.env[`HERO_SELECTOR_${envUp}`] || cfg.hero_img_selector;
+  if (expect) ALL_VIEWPORTS[key].expectBucket = expect;
+  if (forbid) ALL_VIEWPORTS[key].forbidBucket = forbid;
+  if (selector) ALL_VIEWPORTS[key].heroImgSelector = selector;
+}
 
 const selection = (process.env.VIEWPORTS || "mobile,tablet,laptop,desktop")
   .split(",")
