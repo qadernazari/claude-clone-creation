@@ -170,6 +170,18 @@ const ALL_VIEWPORTS = {
   },
 };
 
+// Apply per-viewport preload gate overrides (env var > config file > default).
+for (const key of Object.keys(ALL_VIEWPORTS)) {
+  const cfg = vpCfg(key);
+  const envUp = key.toUpperCase();
+  const expect = process.env[`EXPECT_BUCKET_${envUp}`] || cfg.expect_bucket;
+  const forbid = process.env[`FORBID_BUCKET_${envUp}`] || cfg.forbid_bucket;
+  const selector = process.env[`HERO_SELECTOR_${envUp}`] || cfg.hero_img_selector;
+  if (expect) ALL_VIEWPORTS[key].expectBucket = expect;
+  if (forbid) ALL_VIEWPORTS[key].forbidBucket = forbid;
+  if (selector) ALL_VIEWPORTS[key].heroImgSelector = selector;
+}
+
 const selection = (process.env.VIEWPORTS || "mobile,tablet,laptop,desktop")
   .split(",")
   .map((s) => s.trim())
