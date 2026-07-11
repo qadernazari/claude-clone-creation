@@ -102,6 +102,24 @@ function vpBucketOf(w: number | null | undefined): VpKey | null {
   return null;
 }
 
+type EnvKey = "production" | "preview" | "local" | "unknown";
+
+function environmentOf(url: string | null | undefined): EnvKey {
+  if (!url) return "unknown";
+  let host = "";
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return "unknown";
+  }
+  if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".local")) return "local";
+  if (host === "ir.show" || host === "www.ir.show") return "production";
+  if (host === "claude-clone-creation.lovable.app") return "production";
+  if (host.includes("id-preview") || host.endsWith("-dev.lovable.app") || host.includes("lovable-project.com")) return "preview";
+  if (host.endsWith(".lovable.app")) return "production";
+  return "unknown";
+}
+
 function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   // Choose a bucket size that yields ~30-60 buckets.
   const totalMs = hours * 3600_000;
@@ -243,6 +261,10 @@ function HeroPerfPage() {
   const [correlationInput, setCorrelationInput] = useState<string>("");
   const [correlationId, setCorrelationId] = useState<string>("");
   const [drawerRow, setDrawerRow] = useState<HeroPerfRow | null>(null);
+  const [dateFrom, setDateFrom] = useState<string>(""); // YYYY-MM-DD local
+  const [dateTo, setDateTo] = useState<string>("");
+  const [viewportBucket, setViewportBucket] = useState<"all" | VpKey>("all");
+  const [environment, setEnvironment] = useState<"all" | "production" | "preview" | "local" | "unknown">("all");
 
   const fetchFn = useServerFn(getHeroPerfLogs);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -251,7 +273,22 @@ function HeroPerfPage() {
       fetchFn({ data: { hours, effectiveType, country, preloadCacheHit, deliveryType, correlationId: correlationId || undefined } }),
   });
 
-  const rows = data?.rows ?? [];
+  const allRows = data?.rows ?? [];
+
+  const rows = useMemo(() => {
+    const fromMs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
+    const toMs = dateTo ? new Date(`${dateTo}T23:59:59.999`).getTime() : null;
+    return allRows.filter((r) => {
+      if (fromMs != null || toMs != null) {
+        const t = new Date(r.created_at).getTime();
+        if (fromMs != null && t < fromMs) return false;
+        if (toMs != null && t > toMs) return false;
+      }
+      if (viewportBucket !== "all" && vpBucketOf(r.viewport_w) !== viewportBucket) return false;
+      if (environment !== "all" && environmentOf(r.url) !== environment) return false;
+      return true;
+    });
+  }, [allRows, dateFrom, dateTo, viewportBucket, environment]);
 
   const stats = useMemo(() => {
     const lcp = rows.map((r) => r.lcp_ms).filter((v): v is number => v != null).sort((a, b) => a - b);
@@ -368,6 +405,51 @@ function HeroPerfPage() {
           </div>
         </div>
         <div>
+          <label className="text-xs text-muted-foreground block mb-1">From</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">To</label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Viewport</label>
+          <select
+            value={viewportBucket}
+            onChange={(e) => setViewportBucket(e.target.value as "all" | VpKey)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All widths</option>
+            {VP_BUCKETS.map((vp) => (
+              <option key={vp.key} value={vp.key}>{vp.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1">Environment</label>
+          <select
+            value={environment}
+            onChange={(e) => setEnvironment(e.target.value as typeof environment)}
+            className="text-sm rounded-md border border-border bg-background px-2 py-1.5"
+          >
+            <option value="all">All</option>
+            <option value="production">Production</option>
+            <option value="preview">Preview</option>
+            <option value="local">Local</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
           <label className="text-xs text-muted-foreground block mb-1">Effective type</label>
           <select
             value={effectiveType}
@@ -457,7 +539,11 @@ function HeroPerfPage() {
           </form>
         </div>
         <div className="ml-auto text-xs text-muted-foreground">
-          {isLoading ? "Loading…" : `${data?.total ?? 0} samples`}
+          {isLoading
+            ? "Loading…"
+            : rows.length === allRows.length
+              ? `${allRows.length} samples`
+              : `${rows.length} of ${allRows.length} samples`}
         </div>
       </div>
 
