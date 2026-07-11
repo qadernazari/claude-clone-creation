@@ -1046,15 +1046,16 @@ for (const key of selection) {
       );
     }
 
-    // Mobile (390px) must serve the LCP hero from the preload cache.
-    // CI fails if `preload_cache_hit` is anything other than strictly `true`.
-    if (key === "mobile") {
+    // The LCP hero must be served from the preload cache on viewports where
+    // REQUIRE_PRELOAD_CACHE_HIT[key] is true (default: mobile only). CI fails
+    // if `preload_cache_hit` is anything other than strictly `true`.
+    if (REQUIRE_PRELOAD_CACHE_HIT[key]) {
       const hit = beacon?.preload_cache_hit;
       if (hit === true) {
-        pass("preload_cache_hit=true on 390px viewport");
+        pass(`preload_cache_hit=true on ${vp.label} viewport`);
       } else {
         fail(
-          `preload_cache_hit must be true on 390px viewport (got ${
+          `preload_cache_hit must be true on ${vp.label} viewport (got ${
             hit === null || hit === undefined ? "null" : JSON.stringify(hit)
           })`,
         );
