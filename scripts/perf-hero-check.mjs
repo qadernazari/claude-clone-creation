@@ -375,6 +375,53 @@ for (const key of selection) {
     });
     const page = await context.newPage();
 
+    // Install a document-start observer that records every mutation to
+    // `<link rel="preload" as="image">` nodes in <head>. We use this to
+    // assert that the film-covers preload is created ONCE by the SSR
+    // response and never re-added / removed / duplicated by client code.
+    // Runs before any app JS so hydration is fully covered.
+    await page.addInitScript(() => {
+      window.__preloadMutations = [];
+      const record = (op, node) => {
+        if (!(node instanceof HTMLLinkElement)) return;
+        if (node.rel !== "preload") return;
+        if (node.getAttribute("as") !== "image") return;
+        window.__preloadMutations.push({
+          op, // "initial" | "added" | "removed" | "attr"
+          href: node.href || node.getAttribute("href") || null,
+          media: node.getAttribute("media"),
+          imagesrcset: node.getAttribute("imagesrcset"),
+          ts: performance.now(),
+        });
+      };
+      const start = () => {
+        // Seed with any preload links already in the HTML (SSR emitted).
+        document
+          .querySelectorAll('link[rel="preload"][as="image"]')
+          .forEach((n) => record("initial", n));
+        const obs = new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            if (m.type === "childList") {
+              m.addedNodes.forEach((n) => record("added", n));
+              m.removedNodes.forEach((n) => record("removed", n));
+            } else if (m.type === "attributes" && m.target instanceof HTMLLinkElement) {
+              record("attr", m.target);
+            }
+          }
+        });
+        obs.observe(document.head, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["href", "rel", "as", "media", "imagesrcset"],
+        });
+      };
+      if (document.head) start();
+      else document.addEventListener("DOMContentLoaded", start, { once: true });
+    });
+
+
+
     // CDP session gives us `fromDiskCache` / `fromMemoryCache` / `fromPrefetchCache`
     // flags that Playwright's response events don't expose.
     const cdp = await context.newCDPSession(page);
