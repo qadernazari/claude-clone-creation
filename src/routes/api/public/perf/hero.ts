@@ -141,6 +141,8 @@ export const Route = createFileRoute("/api/public/perf/hero")({
               v === null ? null : Math.round(v);
             await supabaseAdmin.from("hero_perf_logs").insert({
               url: line.url,
+              correlation_id: line.correlation_id,
+              preload_url: line.preload_url,
               lcp_ms: toInt(line.lcp_ms),
               lcp_size: toInt(line.lcp_size),
               ttfb_ms: toInt(line.ttfb_ms),
