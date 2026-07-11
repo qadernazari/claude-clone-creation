@@ -38,10 +38,10 @@ const Email = ({
   return (
     <Html lang="en" dir="ltr">
       <Head />
-      <Preview>
-        Hero performance alert — {count} {label} in the last {windowMinutes} min
-      </Preview>
+      <Preview>{`Hero performance alert — ${count} ${label} in the last ${windowMinutes} min`}</Preview>
       <Body style={main}>
+        <Container style={container}>
+          <Heading style={brand}>{SITE_NAME} · Perf alert</Heading>
         <Container style={container}>
           <Heading style={brand}>{SITE_NAME} · Perf alert</Heading>
           <Heading style={h1}>Hero LCP / cache-hit alert</Heading>
