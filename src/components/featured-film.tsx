@@ -329,13 +329,16 @@ function SlideImageFrame({
                   className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:h-32"
                   aria-hidden
                 />
-                <div className="absolute bottom-5 left-0 right-0 z-30 flex justify-center md:bottom-6">
+                <div className="absolute bottom-5 left-0 right-0 z-30 hidden justify-center md:bottom-6 md:flex">
                   {controls}
                 </div>
               </>
             ) : null}
           </div>
         </div>
+        {active && controls ? (
+          <div className="mt-4 flex justify-center md:hidden">{controls}</div>
+        ) : null}
 
         {/* Corner accents */}
         <div className="pointer-events-none absolute -right-3 -top-3 h-12 w-12 rounded-tr-[1.25rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-16 lg:w-16 lg:rounded-tr-[1.5rem]" aria-hidden />
