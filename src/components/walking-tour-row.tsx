@@ -22,7 +22,10 @@ export function WalkingTourRow() {
     return { films: wtFilms, title: catTitle };
   }, [data.films, data.categories, locale, t]);
 
+  useEffect(() => { logMount("WalkingTourRow"); }, []);
+
   if (films.length === 0) return null;
+
 
   return (
     <LazyRail
