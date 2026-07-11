@@ -105,6 +105,93 @@ jobs:
             kill "$(cat perf-reports/dev.pid)" 2>/dev/null || true
           fi
 
+      - name: Summarize 390px assertions
+        if: always() && steps.perf.outcome != 'skipped' && steps.perf.outcome != 'cancelled'
+        env:
+          PERF_OUTCOME: ${{ steps.perf.outcome }}
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+          const dir = process.env.REPORT_DIR;
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+          const write = (s) => fs.appendFileSync(summaryPath, s + "\n");
+          const annotate = (level, msg, file) => {
+            const props = file ? `file=${file}` : "";
+            // ::error / ::warning workflow commands surface as PR annotations.
+            console.log(`::${level} ${props}::${msg}`);
+          };
+
+          const jsons = fs.existsSync(dir)
+            ? fs.readdirSync(dir)
+                .filter(f => /^perf-hero-.*\.json$/.test(f))
+                .map(f => ({ f, m: fs.statSync(path.join(dir, f)).mtimeMs }))
+                .sort((a, b) => b.m - a.m)
+            : [];
+          if (!jsons.length) {
+            write("## Hero perf — 390px");
+            write("");
+            write("_No perf-hero report found (dev server or Playwright likely failed to start)._");
+            annotate("error", "perf:hero produced no report file", ".github/workflows/perf-hero.yml");
+            process.exit(0);
+          }
+          const jsonPath = path.join(dir, jsons[0].f);
+          const report = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+          const mobile = (report.results || []).find(r =>
+            r.viewport_key === "mobile" ||
+            /390/.test(r.viewport_label || "") ||
+            r.viewport_width === 390,
+          );
+
+          write("## Hero perf — 390px (mobile)");
+          write("");
+          if (!mobile) {
+            write("_390px viewport was not exercised in this run._");
+            annotate("warning", "390px viewport missing from perf-hero results");
+            process.exit(0);
+          }
+
+          const budget = mobile.lcp_budget_ms ?? report.lcp_budget_ms ?? null;
+          // Pick the last attempt's beacon as authoritative; fall back to any.
+          const attempts = mobile.attempts || [];
+          const last = attempts[attempts.length - 1] || {};
+          const beacon = last.beacon || last.lastBeacon || {};
+          const lcp = typeof beacon.lcp_ms === "number" ? beacon.lcp_ms : null;
+          const cacheHit = beacon.preload_cache_hit;
+
+          const lcpOk = lcp != null && budget != null && lcp <= budget;
+          const cacheOk = cacheHit === true;
+
+          const lcpIcon = lcp == null ? "❓" : lcpOk ? "✅" : "❌";
+          const cacheIcon = cacheHit == null ? "❓" : cacheOk ? "✅" : "❌";
+
+          write("| Assertion | Status | Observed | Budget / Expected |");
+          write("| --- | --- | --- | --- |");
+          write(`| LCP | ${lcpIcon} | ${lcp == null ? "n/a" : lcp + " ms"} | ${budget == null ? "n/a" : "≤ " + budget + " ms"} |`);
+          write(`| preload_cache_hit | ${cacheIcon} | \`${JSON.stringify(cacheHit)}\` | \`true\` |`);
+          write("");
+          write(`Attempts: ${attempts.length} · Result: **${mobile.ok ? "pass" : "fail"}**${mobile.reason ? " — " + mobile.reason : ""}`);
+          write("");
+          write(`Report: \`${path.basename(jsonPath)}\` (uploaded as workflow artifact)`);
+
+          // PR annotations — only when a specific assertion actually failed,
+          // so we don't spam the diff on green runs.
+          if (lcp != null && budget != null && !lcpOk) {
+            annotate("error", `390px LCP ${lcp}ms exceeds budget ${budget}ms`, "src/components/featured-film.tsx");
+          }
+          if (cacheHit !== undefined && !cacheOk) {
+            annotate(
+              "error",
+              `390px preload_cache_hit=${JSON.stringify(cacheHit)} (expected true) — hero LCP image was not served from the SSR preload`,
+              "src/routes/index.tsx",
+            );
+          }
+          if (lcp == null) {
+            annotate("warning", "390px beacon did not report lcp_ms — see failure artifacts");
+          }
+          NODE
+
+
       - name: Extract 390px (mobile) failure slice
         if: failure() && steps.perf.outcome == 'failure'
         run: |
