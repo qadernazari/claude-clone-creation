@@ -126,30 +126,28 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="flex justify-center">
-      <div className="flex items-center gap-6 lg:gap-8">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onPrev}
-            aria-label="Previous"
-            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/50 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright hover:shadow-amber/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 active:bg-amber/20 rtl:rotate-180"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={onNext}
-            aria-label="Next"
-            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/50 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright hover:shadow-amber/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 active:bg-amber/20 rtl:rotate-180"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </div>
+    <>
+      <button
+        type="button"
+        onClick={onPrev}
+        aria-label="Previous"
+        className="absolute bottom-3 left-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/60 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 md:bottom-4 md:left-4"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        onClick={onNext}
+        aria-label="Next"
+        className="absolute bottom-3 right-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/60 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 md:bottom-4 md:right-4"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+      <div className="mt-4 flex justify-center">
         <div className="flex items-center gap-2">
           {Array.from({ length: count }).map((_, i) => (
             <button
@@ -157,22 +155,22 @@ function SliderControls({
               type="button"
               onClick={() => onGo(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`flex h-8 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-cream/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-90 ${
-                i === index ? "w-14" : "w-8"
+              className={`flex h-7 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-cream/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-90 ${
+                i === index ? "w-12" : "w-7"
               }`}
             >
               <span
-                className={`block h-2 rounded-full transition-all duration-500 ${
+                className={`block h-1.5 rounded-full transition-all duration-500 ${
                   i === index
-                    ? "w-11 bg-amber shadow-[0_0_10px_rgba(251,191,36,0.45)] hover:bg-amber-bright hover:shadow-[0_0_14px_rgba(251,191,36,0.6)]"
-                    : "w-4 bg-cream/40 hover:w-5 hover:bg-cream/70"
+                    ? "w-9 bg-amber shadow-[0_0_8px_rgba(251,191,36,0.45)] hover:bg-amber-bright hover:shadow-[0_0_12px_rgba(251,191,36,0.6)]"
+                    : "w-3 bg-cream/40 hover:w-4 hover:bg-cream/70"
                 }`}
               />
             </button>
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
