@@ -1262,7 +1262,7 @@ function PerfRunsSummary() {
           <p className="text-sm text-destructive">Failed to load: {(error as Error).message}</p>
         ) : !data || data.totals.runs_considered === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No JSON reports uploaded yet. Run <code>npm run perf:hero</code> to publish one.
+            No JSON reports uploaded yet.
           </p>
         ) : (
           <>
