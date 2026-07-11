@@ -1,28 +1,33 @@
-Redesign the homepage featured-film hero in `src/components/featured-film.tsx`.
+Move the featured-film slider controls from below the text column onto the bottom of the framed film image.
 
-Goals
-- Place the text column (badges, title, metadata, synopsis, buttons) on the left side of the film cover.
-- Place the framed film cover/poster on the right side.
-- Keep the two-line metadata (director · year · duration) directly beneath the title.
-- Keep the layout fixed LTR (text left / cover right) regardless of Persian/English locale.
-- Preserve the existing mobile behavior: stacked cover-above-text.
-- Keep slider controls visible and usable; keep them overlaid at the bottom of the film frame.
+### Current state
+- `src/components/featured-film.tsx` renders `SliderControls` inside `FeaturedSlider` after the text column, in normal document flow.
+- The selected element (line ~119-120) is the text column wrapper, sitting between the framed image and the controls.
 
-Implementation
-1. Refactor the `FeaturedSlider` shell from a vertical stack into a responsive two-column grid:
-   - Mobile: single column, cover first, text second.
-   - Tablet/desktop: `grid-cols-2`, text column left, cover column right.
-2. Move `SlideImageFrame` into the right grid column and `SlideDetails` into the left grid column.
-3. Inside `SlideDetails`, reorder so the metadata line sits immediately below the `<h2>` title.
-4. Constrain the cover frame width on desktop so it does not dominate; keep the amber corner accents and bottom scrim with slider controls.
-5. Use Tailwind logical utilities or explicit `order-*`/`text-left` classes to force LTR visual order in both locales.
-6. Verify the single-slide fallback (`Slide`) and `FeaturedFilmFallback` follow the same two-column pattern.
+### Changes
+1. **Relocate controls**  
+   Move `<SliderControls />` from `FeaturedSlider` into the `Slide` component, positioned absolutely at the bottom center of the framed image container.
 
-Out of scope
-- No changes to data fetching, autoplay timing, or slider logic.
-- No new dependencies.
-- No changes to the film rail cards or other pages.
+2. **Add a legibility scrim**  
+   Place a subtle bottom-to-transparent gradient behind the controls so dots/arrows remain visible over light film stills.
 
-Verification
-- TypeScript check passes.
-- Mobile and desktop screenshots show text-left/cover-right layout with metadata under title.
+3. **Preserve sizing and hit areas**  
+   Keep the existing 44×44 arrow buttons and enlarged dot hit targets. Ensure the controls do not overlap important poster artwork (position at the bottom 12-16px of the frame).
+
+4. **Adjust vertical spacing**  
+   Reduce the gap between the framed image and the text column now that controls no longer sit between them. Keep the existing `mt-24 md:mt-32` hero top offset.
+
+5. **Responsive behavior**  
+   - Mobile (2:3 poster): controls sit at the bottom of the portrait frame.  
+   - Desktop (16:9): controls sit at the bottom of the landscape frame.  
+   - Controls remain centered horizontally on both.
+
+6. **Verify no overlap with rails**  
+   Because controls now live inside the hero section boundary, confirm they no longer collide with the "آثار تازه" rail below.
+
+### Files to edit
+- `src/components/featured-film.tsx`
+
+### Out of scope
+- No changes to autoplay timing, swipe logic, or film data.
+- No changes to the admin dashboard or other routes.

@@ -30,7 +30,7 @@ function HeroShell({ children, extra }: { children: React.ReactNode; extra?: Rea
 }
 
 function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
-  const { locale } = useLocale();
+  
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -83,29 +83,27 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       aria-roledescription="carousel"
     >
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-6 sm:px-6 md:mt-32 md:px-12 md:pb-10">
-        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8 lg:gap-12" dir="ltr">
-          <div className="order-2 flex flex-col justify-center md:order-1" dir={locale === "fa" ? "rtl" : "ltr"}>
-            <SlideDetails film={slides[index]} />
-          </div>
-          <div className="order-1 md:order-2">
-            <div className="relative">
-              {slides.map((film, i) => (
-                <SlideImageFrame
-                  key={film.id}
-                  film={film}
-                  active={i === index}
-                  eager={i === 0}
+        <div className="relative">
+          {slides.map((film, i) => (
+            <SlideImageFrame
+              key={film.id}
+              film={film}
+              active={i === index}
+              eager={i === 0}
+              controls={
+                <SliderControls
+                  count={slides.length}
+                  index={index}
+                  onPrev={prev}
+                  onNext={next}
+                  onGo={go}
                 />
-              ))}
-              <SliderControls
-                count={slides.length}
-                index={index}
-                onPrev={prev}
-                onNext={next}
-                onGo={go}
-              />
-            </div>
-          </div>
+              }
+            />
+          ))}
+        </div>
+        <div className="mt-5 md:mt-6">
+          <SlideDetails film={slides[index]} />
         </div>
       </div>
     </section>
@@ -126,28 +124,30 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <>
-      <button
-        type="button"
-        onClick={onPrev}
-        aria-label="Previous"
-        className="absolute bottom-3 left-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/60 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 md:bottom-4 md:left-4"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-      </button>
-      <button
-        type="button"
-        onClick={onNext}
-        aria-label="Next"
-        className="absolute bottom-3 right-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/60 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 md:bottom-4 md:right-4"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
-      </button>
-      <div className="mt-4 flex justify-center">
+    <div className="flex justify-center">
+      <div className="flex items-center gap-6 lg:gap-8">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onPrev}
+            aria-label="Previous"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/50 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright hover:shadow-amber/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 active:bg-amber/20 rtl:rotate-180"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={onNext}
+            aria-label="Next"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-cream/15 bg-bg-1/50 text-cream/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-amber/50 hover:bg-amber/15 hover:text-amber-bright hover:shadow-amber/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-95 active:bg-amber/20 rtl:rotate-180"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           {Array.from({ length: count }).map((_, i) => (
             <button
@@ -155,22 +155,22 @@ function SliderControls({
               type="button"
               onClick={() => onGo(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`flex h-7 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-cream/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-90 ${
-                i === index ? "w-12" : "w-7"
+              className={`flex h-8 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:bg-cream/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-90 ${
+                i === index ? "w-14" : "w-8"
               }`}
             >
               <span
-                className={`block h-1.5 rounded-full transition-all duration-500 ${
+                className={`block h-2 rounded-full transition-all duration-500 ${
                   i === index
-                    ? "w-9 bg-amber shadow-[0_0_8px_rgba(251,191,36,0.45)] hover:bg-amber-bright hover:shadow-[0_0_12px_rgba(251,191,36,0.6)]"
-                    : "w-3 bg-cream/40 hover:w-4 hover:bg-cream/70"
+                    ? "w-11 bg-amber shadow-[0_0_10px_rgba(251,191,36,0.45)] hover:bg-amber-bright hover:shadow-[0_0_14px_rgba(251,191,36,0.6)]"
+                    : "w-4 bg-cream/40 hover:w-5 hover:bg-cream/70"
                 }`}
               />
             </button>
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -183,23 +183,17 @@ const POS_CLASS: Record<string, string> = {
 };
 
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
-  const { locale } = useLocale();
   return (
     <div
-      className={`grid grid-cols-1 items-center gap-5 transition-opacity duration-700 ease-out md:grid-cols-2 md:gap-8 lg:gap-10 ${
+      className={`flex flex-col gap-5 pb-5 transition-opacity duration-700 ease-out lg:gap-6 ${
         active
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
-      dir="ltr"
       aria-hidden={!active}
     >
-      <div className="order-2 flex flex-col justify-center md:order-1" dir={locale === "fa" ? "rtl" : "ltr"}>
-        <SlideDetails film={film} />
-      </div>
-      <div className="order-1 md:order-2">
-        <SlideImageFrame film={film} active={active} eager={eager} />
-      </div>
+      <SlideImageFrame film={film} active={active} eager={eager} />
+      <SlideDetails film={film} />
     </div>
   );
 }
@@ -236,14 +230,14 @@ function SlideImageFrame({
 
   return (
     <div
-      className={`flex justify-center transition-opacity duration-700 ease-out md:justify-end ${
+      className={`flex justify-center transition-opacity duration-700 ease-out ${
         active
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
       }`}
       aria-hidden={!active}
     >
-      <div className="group relative w-full max-w-[380px] md:max-w-[420px] lg:max-w-[480px]">
+      <div className="group relative w-full max-w-[380px] lg:max-w-none">
         {/* Ambient amber glow — desktop only; blur(100px) is a mobile perf killer */}
         <div
           className="pointer-events-none absolute -inset-10 hidden rounded-full bg-amber/10 opacity-60 blur-[100px] md:block"
@@ -326,7 +320,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
   const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
   return (
-    <div className="flex flex-col gap-4 lg:gap-5">
+    <div className="flex flex-col gap-5 lg:gap-6">
       <div className="flex flex-wrap items-center gap-3">
         <span className="inline-flex items-center rounded bg-amber px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
           {locale === "fa" ? "اختصاصی" : "Original"}
@@ -337,7 +331,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
         </span>
       </div>
 
-      <h2 className="font-display text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright sm:text-3xl lg:text-4xl">
+      <h2 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-4xl lg:text-5xl xl:text-6xl">
         {title}
       </h2>
 
@@ -356,7 +350,7 @@ function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
       </div>
 
       {synopsis ? (
-        <p className="max-w-xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
+        <p className="max-w-3xl text-[15px] leading-relaxed text-cream/70 line-clamp-3 md:text-base">
           {synopsis}
         </p>
       ) : null}
@@ -414,24 +408,24 @@ function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-6 md:mt-32 md:px-12">
-        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-8 lg:gap-10" dir="ltr">
-          <div className="order-2 flex flex-col gap-4 md:order-1">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="order-2 flex flex-col gap-6 lg:order-1">
             <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber">
               Original Iranian Cinema
             </span>
-            <h2 className="font-display text-2xl font-bold leading-[1.1] tracking-tight text-cream-bright sm:text-3xl lg:text-4xl">
+            <h2 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-5xl lg:text-6xl">
               ir.show
             </h2>
             <p className="max-w-lg text-[15px] leading-relaxed text-cream/70">
               A premium streaming home for Iranian films, documentaries, and curated stories.
             </p>
           </div>
-          <div className="order-1 flex justify-center md:order-2 md:justify-end">
-            <div className="relative w-full max-w-[380px] md:max-w-[420px] lg:max-w-[480px]">
+          <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
+            <div className="relative w-full max-w-[420px]">
               <div className="pointer-events-none absolute -inset-10 rounded-full bg-amber/10 opacity-60 blur-[100px]" />
               <div className="relative z-10 rounded-[2rem] border border-cream/10 bg-cream/5 p-3 shadow-2xl backdrop-blur-sm">
                 <div
-                  className="aspect-[2/3] rounded-[1.4rem] md:aspect-video"
+                  className="aspect-[2/3] rounded-[1.4rem] lg:aspect-video"
                   style={{
                     background:
                       "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
