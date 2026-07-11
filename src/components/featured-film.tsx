@@ -289,6 +289,7 @@ function SlideImageFrame({
                   decoding={eager ? "sync" : "async"}
                   fetchPriority={eager ? "high" : undefined}
                   sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
+                  draggable={false}
                   onLoad={() => setLoaded(true)}
                   onError={() => setLoaded(true)}
                 />
