@@ -27,7 +27,15 @@ function fmt(n: number | null, unit: string, digits = 0) {
   return `${n.toLocaleString(undefined, { maximumFractionDigits: digits })}${unit}`;
 }
 
-type BucketAgg = { t: number; label: string; lcp: number[]; decode: number[]; bytes: number[] };
+type BucketAgg = {
+  t: number;
+  label: string;
+  lcp: number[];
+  decode: number[];
+  bytes: number[];
+  cacheHits: number;
+  cacheTotal: number;
+};
 
 function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   // Choose a bucket size that yields ~30-60 buckets.
@@ -38,7 +46,7 @@ function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
   const start = now - totalMs;
   const buckets = new Map<number, BucketAgg>();
   for (let t = Math.floor(start / bucketMs) * bucketMs; t <= now; t += bucketMs) {
-    buckets.set(t, { t, label: "", lcp: [], decode: [], bytes: [] });
+    buckets.set(t, { t, label: "", lcp: [], decode: [], bytes: [], cacheHits: 0, cacheTotal: 0 });
   }
   for (const r of rows) {
     const t = new Date(r.created_at).getTime();
@@ -48,6 +56,10 @@ function bucketize(rows: HeroPerfRow[], hours: number): BucketAgg[] {
     if (r.lcp_ms != null) b.lcp.push(r.lcp_ms);
     if (r.decode_ms != null) b.decode.push(r.decode_ms);
     if (r.transfer_bytes != null) b.bytes.push(r.transfer_bytes);
+    if (r.preload_cache_hit != null) {
+      b.cacheTotal += 1;
+      if (r.preload_cache_hit) b.cacheHits += 1;
+    }
   }
   const out = Array.from(buckets.values()).sort((a, b) => a.t - b.t);
   const showDate = hours > 24;
