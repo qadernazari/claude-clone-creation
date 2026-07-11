@@ -105,6 +105,96 @@ jobs:
             kill "$(cat perf-reports/dev.pid)" 2>/dev/null || true
           fi
 
+      - name: Extract 390px (mobile) failure slice
+        if: failure() && steps.perf.outcome == 'failure'
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+          const dir = process.env.REPORT_DIR;
+          // Latest perf-hero-*.json in the report dir.
+          const jsons = fs.readdirSync(dir)
+            .filter(f => /^perf-hero-.*\.json$/.test(f))
+            .map(f => ({ f, m: fs.statSync(path.join(dir, f)).mtimeMs }))
+            .sort((a, b) => b.m - a.m);
+          if (!jsons.length) { console.log("no perf-hero JSON found"); process.exit(0); }
+          const jsonPath = path.join(dir, jsons[0].f);
+          const htmlPath = jsonPath.replace(/\.json$/, ".html");
+          const report = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+
+          const results = Array.isArray(report.results) ? report.results : [];
+          const mobile = results.find(r =>
+            r.viewport_key === "mobile" ||
+            /390/.test(r.viewport_label || "") ||
+            r.viewport_width === 390
+          );
+          if (!mobile) { console.log("no mobile/390px result in report"); process.exit(0); }
+          if (mobile.ok) { console.log("mobile passed; nothing to extract"); process.exit(0); }
+
+          const failed = (mobile.attempts || []).filter(a => !a.ok);
+          const slice = {
+            source_report: path.basename(jsonPath),
+            generated_at: report.generated_at || null,
+            base_url: report.base_url || null,
+            viewport: {
+              key: mobile.viewport_key,
+              label: mobile.viewport_label,
+              width: mobile.viewport_width,
+              height: mobile.viewport_height,
+            },
+            budgets: {
+              lcp_ms: mobile.lcp_budget_ms,
+              transfer_bytes: mobile.transfer_budget_bytes,
+            },
+            summary: {
+              ok: mobile.ok,
+              reason: mobile.reason,
+              attempts_total: (mobile.attempts || []).length,
+              attempts_failed: failed.length,
+            },
+            failed_attempts: failed.map(a => ({
+              attempt: a.attempt,
+              ok: a.ok,
+              reason: a.reason,
+              beacon: a.beacon,
+              last_beacon: a.lastBeacon,
+              beacon_wait: a.beaconWait,
+              timing: a.timing,
+              rendered_src: a.renderedSrc,
+              active_preload: a.activePreload,
+              dom_preloads: a.domPreloads,
+              preload_assertion: a.preloadAssertion,
+              cache_probe: a.cacheProbe,
+              cover_transfers: a.transfers?.["film-covers"] || [],
+              thumb_transfers: a.transfers?.["film-thumbnails"] || [],
+              har_path: a.harPath,
+              trace_path: a.tracePath,
+              screenshot_path: a.screenshotPath,
+            })),
+          };
+
+          const outJson = path.join(dir, "mobile-390-failure.json");
+          fs.writeFileSync(outJson, JSON.stringify(slice, null, 2));
+          console.log("wrote", outJson);
+          if (fs.existsSync(htmlPath)) {
+            fs.copyFileSync(htmlPath, path.join(dir, "mobile-390-failure.html"));
+            console.log("copied companion HTML");
+          }
+
+          // Stage referenced failure artifacts (HAR, trace, PNG) into a
+          // predictable subdir so the upload glob catches them even if the
+          // paths in the JSON are absolute.
+          const stageDir = path.join(dir, "mobile-390-artifacts");
+          fs.mkdirSync(stageDir, { recursive: true });
+          for (const a of failed) {
+            for (const p of [a.harPath, a.tracePath, a.screenshotPath]) {
+              if (p && fs.existsSync(p)) {
+                fs.copyFileSync(p, path.join(stageDir, path.basename(p)));
+              }
+            }
+          }
+          NODE
+
       - name: Upload perf reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -114,3 +204,16 @@ jobs:
             perf-reports/**
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Upload 390px failure slice
+        if: failure() && steps.perf.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-hero-mobile-390-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            perf-reports/mobile-390-failure.json
+            perf-reports/mobile-390-failure.html
+            perf-reports/mobile-390-artifacts/**
+          if-no-files-found: warn
+          retention-days: 30
+
