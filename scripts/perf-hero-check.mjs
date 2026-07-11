@@ -1052,6 +1052,42 @@ for (const key of selection) {
   }
 
 
+  // ----- Mount / StrictMode correlation -----
+  // If the film-covers response count exceeds the unique-URL count, we have
+  // duplicate hits on the same asset. Correlate that with the mount tracker:
+  // when a hero component (Slide / HeroImageDebug / FeaturedSlider) shows a
+  // mount → unmount → mount fingerprint, we attribute the extras to a
+  // remount. In dev builds that fingerprint = React StrictMode. In prod it
+  // indicates a real remount source (Suspense retry, key change, parent
+  // remount).
+  const ma = attemptResult?.mountAnalysis || null;
+  const coverUrlSet = new Set(coverTransfers.map((t) => t.url));
+  const coverDuplicates = coverTransfers.length - coverUrlSet.size;
+  if (ma) {
+    if (ma.suspected_strict_mode) {
+      const offenders = ma.double_mounts
+        .map((d) => `${d.component}${d.key ? `[${d.key.slice(0, 8)}]` : ""}(+${d.gap_ms}ms)`)
+        .join(", ");
+      if (coverDuplicates > 0) {
+        fail(
+          `double-mount detected AND ${coverDuplicates} duplicate film-covers fetch(es) — likely cause: ${offenders}`,
+        );
+      } else {
+        pass(
+          `double-mount detected (${offenders}) but no duplicate film-covers fetches — dedup working`,
+        );
+      }
+    } else if (coverDuplicates > 0) {
+      // Duplicates without a mount fingerprint → attribution goes elsewhere
+      // (debug-panel HEAD probes, srcset resolution, etc.). Use the initiator
+      // fields on each transfer record to drill in.
+      pass(
+        `${coverDuplicates} duplicate film-covers fetch(es) NOT explained by remount — check initiator_url on transfers`,
+      );
+    } else {
+      pass(`no double-mount and no duplicate film-covers fetches (mounts=${ma.total_events})`);
+    }
+  }
 
   const sumBytes = (arr) =>
     arr.reduce((s, t) => s + (typeof t.bytes === "number" ? t.bytes : 0), 0);
