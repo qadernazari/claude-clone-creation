@@ -121,7 +121,7 @@ export const Route = createFileRoute("/films/$slug")({
             ...(f.cover_url ? { image: f.cover_url } : {}),
             ...(f.synopsis_en ? { description: f.synopsis_en } : {}),
             ...(isoDuration ? { duration: isoDuration } : {}),
-            inLanguage: "fa",
+            ...(f.category !== "walking-tour" ? { inLanguage: f.language || "fa" } : {}),
             countryOfOrigin: { "@type": "Country", name: "Iran" },
             ...(f.category ? { genre: f.category } : {}),
             url,
