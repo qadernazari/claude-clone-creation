@@ -42,8 +42,6 @@ const Email = ({
       <Body style={main}>
         <Container style={container}>
           <Heading style={brand}>{SITE_NAME} · Perf alert</Heading>
-        <Container style={container}>
-          <Heading style={brand}>{SITE_NAME} · Perf alert</Heading>
           <Heading style={h1}>Hero LCP / cache-hit alert</Heading>
           <Text style={meta}>
             {count} viewport {label} in the last {windowMinutes} minutes.
