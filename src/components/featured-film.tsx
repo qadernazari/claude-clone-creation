@@ -126,7 +126,7 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 rounded-full border border-cream/10 bg-black/50 px-3.5 py-2 shadow-xl backdrop-blur-md md:px-4 md:py-2.5">
+    <div className="flex items-center justify-center gap-3 rounded-full border border-cream/10 bg-black/50 px-4 py-2.5 shadow-xl backdrop-blur-md md:gap-4 md:px-5 md:py-3">
       <button
         type="button"
         onClick={onPrev}
@@ -138,7 +138,7 @@ function SliderControls({
         </svg>
       </button>
 
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-center gap-3 px-1 md:gap-4">
         {Array.from({ length: count }).map((_, i) => {
           const active = i === index;
           return (
