@@ -834,6 +834,12 @@ const html = `<!doctype html>
   table { border-collapse: collapse; width: 100%; margin-top: .5rem; font-size: .85rem; }
   th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
   code { font-family: ui-monospace, Menlo, monospace; font-size: .85em; word-break: break-all; }
+  table.summary-table { margin: 0 0 1.5rem; font-size: .9rem; }
+  table.summary-table th { background: #f4f4f7; }
+  table.summary-table td.pass, table.summary-table td.match { color: #1a7f37; font-weight: 600; }
+  table.summary-table td.fail, table.summary-table td.mismatch { color: #cf222e; font-weight: 600; }
+  table.summary-table td.over-budget { color: #cf222e; }
+  table.summary-table code { font-size: .8em; }
 </style></head><body>
 <h1>Hero performance report</h1>
 <div class="meta">
@@ -844,6 +850,60 @@ const html = `<!doctype html>
   — ${report.summary.passed}/${report.summary.runs} viewports passed
   (${report.summary.failed} failed).
 </div>
+${(() => {
+  const pathOf = (u) => {
+    if (!u) return null;
+    try { const p = new URL(u); return p.origin + p.pathname; }
+    catch { return String(u).split("?")[0]; }
+  };
+  const rows = reportRuns.map((r) => {
+    const preloadUrl = r.beacon?.preload_url ?? null;
+    const renderedSrc = r.rendered_src ?? null;
+    const preloadPath = pathOf(preloadUrl);
+    const renderedPath = pathOf(renderedSrc);
+    const bothPresent = !!(preloadUrl && renderedSrc);
+    const match = bothPresent && preloadPath === renderedPath;
+    const matchLabel = !bothPresent
+      ? "—"
+      : match ? "match" : "mismatch";
+    const matchClass = !bothPresent ? "" : match ? "match" : "mismatch";
+    const budget = r.lcp_budget_ms;
+    const lcp = r.lcp_ms;
+    const overBudget = typeof lcp === "number" && lcp > budget;
+    const lcpCell = lcp == null
+      ? "—"
+      : `${lcp} ms / ${budget}`;
+    const corr = r.beacon?.correlation_id ?? null;
+    const corrCell = r.passed
+      ? corr ? `<code>${esc(corr)}</code>` : "—"
+      : corr
+        ? `<code><strong>${esc(corr)}</strong></code>`
+        : `<em>no beacon</em>`;
+    const preloadCell = preloadUrl
+      ? `<code title="${esc(preloadUrl)}">${esc((preloadPath || preloadUrl).slice(-70))}</code>`
+      : "—";
+    const renderedCell = renderedSrc
+      ? `<code title="${esc(renderedSrc)}">${esc((renderedPath || renderedSrc).slice(-70))}</code>`
+      : "—";
+    return `<tr>
+      <td>${esc(r.viewport_label)}</td>
+      <td class="${r.passed ? "pass" : "fail"}">${r.passed ? "PASS" : "FAIL"}</td>
+      <td class="${overBudget ? "over-budget" : ""}">${lcpCell}</td>
+      <td class="${matchClass}">${matchLabel}</td>
+      <td>${preloadCell}</td>
+      <td>${renderedCell}</td>
+      <td>${corrCell}</td>
+    </tr>`;
+  }).join("");
+  return `<table class="summary-table">
+    <thead><tr>
+      <th>Viewport</th><th>Status</th><th>LCP / budget (ms)</th>
+      <th>Preload vs rendered</th><th>preload_url</th>
+      <th>rendered &lt;img&gt; src</th><th>correlation_id</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+})()}
 ${runCards}
 </body></html>`;
 
