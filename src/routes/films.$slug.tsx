@@ -627,12 +627,22 @@ function FilmPage() {
                   style={posterStyle}
                 >
                   {isContain && heroArt ? (
-                    <img
-                      src={heroDesktop || heroArtDesktop || heroMobile || heroArtMobile || ""}
-                      alt=""
-                      aria-hidden
-                      className="absolute inset-0 h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none"
-                    />
+                    <>
+                      <img
+                        src={heroMobile || heroArtMobile || ""}
+                        alt=""
+                        aria-hidden
+                        loading="lazy"
+                        className="absolute inset-0 block h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none lg:hidden"
+                      />
+                      <img
+                        src={heroDesktop || heroArtDesktop || ""}
+                        alt=""
+                        aria-hidden
+                        loading="lazy"
+                        className="absolute inset-0 hidden h-full w-full object-cover blur-2xl scale-110 opacity-40 select-none lg:block"
+                      />
+                    </>
                   ) : null}
                   {heroArtMobile ? (
                     <img
