@@ -887,6 +887,10 @@ const report = {
 const jsonPath = path.join(REPORT_DIR, `perf-hero-${REPORT_STAMP}.json`);
 const htmlPath = path.join(REPORT_DIR, `perf-hero-${REPORT_STAMP}.html`);
 await fs.writeFile(jsonPath, JSON.stringify(report, null, 2));
+if (failureArtifacts.length === 0) {
+  // Nothing failed — remove the empty failures dir to keep the report tidy.
+  await fs.rm(FAILURE_DIR, { recursive: true, force: true }).catch(() => {});
+}
 
 const esc = (s) =>
   String(s ?? "")
