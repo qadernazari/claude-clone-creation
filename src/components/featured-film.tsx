@@ -336,6 +336,7 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
           <WatchlistCta slug={film.slug} locale={locale} />
         </div>
       </div>
+      {debugEnabled && active ? <HeroImageDebug candidates={debugCandidates} /> : null}
     </div>
   );
 }
