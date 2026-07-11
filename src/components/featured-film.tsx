@@ -352,7 +352,7 @@ function SlideImageFrame({
             />
 
             {active ? (
-              <>
+              <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
                 {/* Top badges */}
                 <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
                   <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
@@ -387,7 +387,7 @@ function SlideImageFrame({
                     <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
                   </Link>
                 </div>
-              </>
+              </div>
             ) : null}
           </div>
         </div>
