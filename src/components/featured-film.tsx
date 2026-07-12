@@ -386,7 +386,7 @@ function SlideImageFrame({
                 </div>
 
                 {/* Mobile bottom-edge glass "Watch Now" */}
-                <div className="pointer-events-auto absolute bottom-4 right-4 z-30 md:hidden">
+                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2 md:hidden">
                   <Link
                     to="/films/$slug"
                     params={{ slug: film.slug }}

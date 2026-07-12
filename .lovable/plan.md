@@ -1,6 +1,11 @@
-Refine the featured-film hero for mobile only.
+Move the mobile "تماشای فیلم" button in `src/components/featured-film.tsx` from the bottom-right corner to a centered bottom pill so it no longer overlaps the film cover art.
 
-1. In `src/components/featured-film.tsx`, add a glass-style "More info" (`اطلاعات بیشتر`) button anchored to the bottom edge of the hero frame on mobile, mirroring the desktop glass-control aesthetic.
-2. Hide the heavy mobile `SlideDetails` block (title, synopsis, metadata) that currently sits below the frame. The only remaining action for the slide on mobile will be the in-frame "More info" button.
-3. Keep the existing desktop layout untouched: title/CTA bottom-right, controls bottom-left, all inside the frame.
-4. Verify the button is reachable, readable, and does not overlap slide dots/controls on small screens.
+Changes:
+- Replace the absolute `bottom-4 right-4` mobile button container with a centered pill anchored to the bottom edge of the frame (`left-1/2 -translate-x-1/2 bottom-4`).
+- Keep the compact glass styling (border, semi-transparent background, backdrop blur) and the play icon.
+- Preserve the existing `aria-label`, `focus-visible` ring, hover/active states, and the Link to `/films/$slug`.
+- Leave the desktop layout unchanged.
+
+Verification:
+- Run build and typecheck.
+- Capture a mobile viewport screenshot of the homepage hero to confirm the button is centered and no longer covers the poster.
