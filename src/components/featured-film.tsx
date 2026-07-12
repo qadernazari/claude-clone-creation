@@ -274,7 +274,7 @@ function SlideImageFrame({
         <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] md:rounded-[2rem]">
           <div
             ref={frameRef}
-            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1rem] bg-bg-0 md:aspect-[21/9] md:rounded-[1.75rem]"
+            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1rem] bg-bg-0 md:aspect-video md:rounded-[1.75rem]"
             style={{ background: fallbackBg }}
           >
             {/* Shimmer skeleton */}
