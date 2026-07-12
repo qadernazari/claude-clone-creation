@@ -3,8 +3,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
-import { useCurrentUser } from "@/hooks/use-subscription";
-import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
 const AUTOPLAY_MS = 6500;
 
