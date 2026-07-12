@@ -394,7 +394,7 @@ function SlideImageFrame({
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
                       <path d="M8 5v14l11-7z" />
                     </svg>
-                    <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                    <span>{locale === "fa" ? "تماشا" : "Watch Now"}</span>
                   </Link>
                 </div>
               </>
