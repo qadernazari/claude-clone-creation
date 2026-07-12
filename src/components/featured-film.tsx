@@ -384,14 +384,17 @@ function SlideImageFrame({
                   </div>
                 </div>
 
-                {/* Mobile bottom-edge glass "More info" */}
+                {/* Mobile bottom-edge glass "Watch Now" */}
                 <div className="pointer-events-auto absolute bottom-4 right-4 z-30 md:hidden">
                   <Link
                     to="/films/$slug"
                     params={{ slug: film.slug }}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-cream/15 bg-bg-0/40 px-4 py-2.5 text-[12px] font-semibold text-cream-bright shadow-lg backdrop-blur-xl transition-colors duration-200 hover:border-cream/25 hover:bg-bg-0/55 active:scale-[0.98]"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-4 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 active:scale-[0.98]"
                   >
-                    {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
                   </Link>
                 </div>
               </>
