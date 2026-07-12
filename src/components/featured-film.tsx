@@ -388,7 +388,7 @@ function SlideImageFrame({
                   <Link
                     {...watchHref}
                     onKeyDown={handleWatchKeyDown}
-                    aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch ${title}`}
+                    aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
                     className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:min-h-12 md:px-6 md:py-3 md:text-[13px]"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
