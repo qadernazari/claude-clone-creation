@@ -50,7 +50,7 @@ function RailSkeleton({
 }) {
   const aspectClass = aspect === "video" ? "aspect-video" : "aspect-[2/3]";
   return (
-    <section className="mx-auto w-full max-w-7xl px-5 sm:px-6 md:px-12" aria-hidden>
+    <section className="mx-auto w-full max-w-[110rem] px-5 sm:px-6 md:px-8 lg:px-6" aria-hidden>
       <div
         className="mb-4 h-6 rounded-md bg-cream/8 md:mb-5 md:h-7"
         style={{ width: headingWidth }}
