@@ -139,24 +139,20 @@ export function Rail({
       )}
       <div
         ref={ref}
-        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 sm:-mx-6 sm:px-6 md:-mx-8 md:snap-mandatory md:gap-6 md:px-8 md:pt-3 lg:-mx-6 lg:px-6"
+        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 sm:-mx-6 sm:px-6 md:-mx-8 md:snap-mandatory md:gap-5 md:px-8 md:pt-3 lg:-mx-6 lg:px-6"
         style={{
           scrollPaddingLeft: "1.25rem",
           WebkitOverflowScrolling: "touch" as never,
-          maskImage:
-            "linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 56px), transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 56px), transparent 100%)",
         }}
       >
         {films.map((f) => (
           <PosterCard key={f.id} film={f} locale={locale} year={year} />
         ))}
-        <div className="w-2 shrink-0 md:w-4" aria-hidden />
       </div>
     </section>
   );
 }
+
 
 /* ---------- Skeleton mirroring Rail dimensions ---------- */
 export function RailSkeleton({ title }: { title?: string }) {
