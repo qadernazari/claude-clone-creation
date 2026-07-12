@@ -100,7 +100,7 @@ export function Rail({
 
   return (
     <section
-      className="relative mx-auto max-w-[1400px] px-5 md:px-12 [content-visibility:auto] [contain-intrinsic-size:1px_520px]"
+      className="relative mx-auto w-full max-w-[110rem] px-5 sm:px-6 md:px-8 lg:px-6 [content-visibility:auto] [contain-intrinsic-size:1px_520px]"
     >
       <div className="mb-5 flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3 md:gap-4">
@@ -139,7 +139,7 @@ export function Rail({
       )}
       <div
         ref={ref}
-        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12 md:pt-3"
+        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 sm:-mx-6 sm:px-6 md:-mx-8 md:snap-mandatory md:gap-6 md:px-8 md:pt-3 lg:-mx-6 lg:px-6"
         style={{
           scrollPaddingLeft: "1.25rem",
           WebkitOverflowScrolling: "touch" as never,
@@ -162,7 +162,7 @@ export function Rail({
 export function RailSkeleton({ title }: { title?: string }) {
   return (
     <section
-      className="relative mx-auto max-w-[1400px] px-5 md:px-12"
+      className="relative mx-auto w-full max-w-[110rem] px-5 sm:px-6 md:px-8 lg:px-6"
       style={{ containIntrinsicSize: "1px 520px" }}
       aria-hidden
     >
@@ -176,7 +176,7 @@ export function RailSkeleton({ title }: { title?: string }) {
           <div className="h-5 w-40 rounded bg-cream/10 md:h-6 md:w-52" />
         )}
       </div>
-      <div className="-mx-5 flex gap-3 overflow-hidden px-5 pt-2 pb-2 md:-mx-12 md:gap-6 md:px-12 md:pt-3">
+      <div className="-mx-5 flex gap-3 overflow-hidden px-5 pt-2 pb-2 sm:-mx-6 sm:px-6 md:-mx-8 md:gap-6 md:px-8 md:pt-3 lg:-mx-6 lg:px-6">
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
