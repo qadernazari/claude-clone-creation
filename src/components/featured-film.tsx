@@ -366,36 +366,23 @@ function SlideImageFrame({
                     </div>
                   ) : null}
 
-                  {/* Title + CTA */}
+                  {/* Title */}
                   <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[30rem] lg:gap-5">
                     <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
                       {title}
                     </h2>
-                    <div className="w-full text-center">
-                      <Link
-                        to="/films/$slug"
-                        params={{ slug: film.slug }}
-                        aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
-                        className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                        <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
-                      </Link>
-                    </div>
                   </div>
                 </div>
 
-                {/* Mobile bottom-edge glass "Watch Now" */}
-                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2 md:hidden">
+                {/* Bottom-edge glass "Watch Now" */}
+                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2">
                   <Link
                     to="/films/$slug"
                     params={{ slug: film.slug }}
                     aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-4 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:min-h-12 md:px-6 md:py-3 md:text-[13px]"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                     <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
