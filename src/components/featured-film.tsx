@@ -309,29 +309,37 @@ function SlideImageFrame({
             />
 
             {(portraitImage || landscapeImage) && (eager || active) ? (
-              <picture>
-                {landscapeImage ? (
-                  <source
-                    media="(min-width: 768px)"
-                    srcSet={landscapeSrcSet || landscapeImage}
-                    sizes="(min-width: 1200px) 1200px, 80vw"
+              <Link
+                {...watchHref}
+                aria-label={locale === "fa" ? `مشاهده جزئیات ${title}` : `View details for ${title}`}
+                className="absolute inset-0 z-0 block cursor-pointer no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0"
+                draggable={false}
+                onKeyDown={handleWatchKeyDown}
+              >
+                <picture className="block h-full w-full">
+                  {landscapeImage ? (
+                    <source
+                      media="(min-width: 768px)"
+                      srcSet={landscapeSrcSet || landscapeImage}
+                      sizes="(min-width: 1200px) 1200px, 80vw"
+                    />
+                  ) : null}
+                  <img
+                    src={portraitImage || landscapeImage!}
+                    alt={film.title_fa || film.title_en}
+                    width={1920}
+                    height={1080}
+                    className={`cine-img absolute inset-0 block h-full w-full ${fitClass}`}
+                    loading={eager ? "eager" : "lazy"}
+                    decoding={eager ? "sync" : "async"}
+                    fetchPriority={eager ? "high" : undefined}
+                    sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
+                    draggable={false}
+                    onLoad={() => setLoaded(true)}
+                    onError={() => setLoaded(true)}
                   />
-                ) : null}
-                <img
-                  src={portraitImage || landscapeImage!}
-                  alt={film.title_fa || film.title_en}
-                  width={1920}
-                  height={1080}
-                  className={`cine-img absolute inset-0 block h-full w-full ${fitClass}`}
-                  loading={eager ? "eager" : "lazy"}
-                  decoding={eager ? "sync" : "async"}
-                  fetchPriority={eager ? "high" : undefined}
-                  sizes="(max-width: 767px) 90vw, (min-width: 1200px) 1200px, 80vw"
-                  draggable={false}
-                  onLoad={() => setLoaded(true)}
-                  onError={() => setLoaded(true)}
-                />
-              </picture>
+                </picture>
+              </Link>
             ) : null}
 
             {/* Cinematic overlays */}
