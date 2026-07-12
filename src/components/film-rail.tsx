@@ -162,7 +162,7 @@ export function Rail({
 export function RailSkeleton({ title }: { title?: string }) {
   return (
     <section
-      className="relative mx-auto max-w-[1400px] px-5 md:px-12"
+      className="relative mx-auto w-full max-w-[110rem] px-5 sm:px-6 md:px-8 lg:px-6"
       style={{ containIntrinsicSize: "1px 520px" }}
       aria-hidden
     >
