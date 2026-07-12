@@ -1,65 +1,70 @@
-Redesign the featured-film hero in `src/components/featured-film.tsx` to fix the title/button overlap and move to a cleaner, more rectangular cinematic frame.
+Rebuild the featured film hero in `src/components/featured-film.tsx` around the selected "Cinematic Depth Console" direction, keeping all existing data, routing, i18n, RTL, accessibility, and mobile behavior intact.
 
-Goals
-- Long Persian (or English) titles must never overlap the Watch Now button.
-- Desktop frame should feel rectangular/cinematic (small radius, 21:9 letterbox).
-- Mobile stays touch-friendly and keeps the current minimal text + centered button.
-- Keep all accessibility: Persian/English aria-labels, focus-visible rings, keyboard activation.
+## Desktop layout (md+)
 
-Proposed layout
+- 21:9 letterbox frame with softer radius (`rounded-[2rem]`), thin `border-cream/10`, deep drop shadow.
+- Background image stack unchanged (picture/source/img with existing srcSet, cover_fit, cover_position, Link wrapper).
+- Layered gradients for hierarchy: bottom-up dark, left-side dark, and a subtle amber radial glow anchored bottom-right. Two soft blurred amber orbs (top-left small, bottom-right larger) sit behind the frame edges for depth.
+- Top-right badge stack (RTL-aware):
+  - Row 1: small amber pulsing dot + "Original / اختصاصی" in amber, all-caps, tracked.
+  - Row 2: glass pill "Featured Film / ویژه تماشا".
+- Bottom overlay (no full-width bar): two-column flex, `items-end`, `justify-between`.
+  - Right column (RTL start): large title (`text-4xl md:text-6xl` — scaled down from prototype to fit long Persian titles safely), constrained `max-w-xl`, plus a short meta line under it (year · category · runtime) using existing film fields. `line-clamp-2` on title with `min-w-0` guarantees it cannot push into the console.
+  - Left column: single "glass console" pill containing, in order (LTR visual): slider dot indicators, prev/next arrows, divider, amber "تماشا / Watch Now" CTA with an inset dark play chip. This replaces both the floating controls pill and the bottom bar CTA.
+- Slider dots: active dot is a wider amber capsule with amber glow, inactive dots are 1.5px white/20 circles — visually calmer than current equal-size dots.
+- Subtle group-hover: slight image scale (1.03) and title lift (-translate-y-1) for cinematic feel; respects `prefers-reduced-motion` via existing transition classes only.
 
-Desktop
-- Frame: `aspect-[21/9]` with small rounded corners (`rounded-xl` / `rounded-2xl` max), thin `border-cream/10`, subtle shadow. Remove the large decorative corner brackets that fight the rectangular look, or replace them with a single thin amber rule if you still want an accent.
-- Top-right: keep the "Original / Featured Film" badges.
-- Bottom-left: keep the compact slider-control pill, but raise it slightly so it sits above the new bottom bar.
-- Bottom bar: a full-width glass strip across the bottom of the frame.
-  - Right side (RTL-aware): film title, `line-clamp-2` or `truncate`, constrained width so it never reaches the button.
-  - Left side: amber "تماشا / Watch Now" button.
-  - Built as a two-column grid with `min-w-0` on the title cell so long text truncates cleanly.
+## Mobile layout (< md)
 
-Mobile
-- Keep the portrait frame (`aspect-[2/3]`) but reduce corner radius to match the new rectangular language.
-- Keep the centered bottom pill button inside the frame.
-- Hide the long title overlay inside the frame; rely on the rail cards and film page for the title, consistent with the previous mobile direction.
+Unchanged behavior, minor polish only:
+- Keep 2:3 portrait frame and centered bottom `تماشا` glass pill.
+- Match new frame radius (`rounded-[1.25rem]`).
+- Slider controls stay in the existing stacked block below the frame.
+- No large title overlay on mobile (matches current decision).
 
-Implementation steps
+## Token discipline
 
-1. Refactor `src/components/featured-film.tsx`
-   - Replace the large `rounded-[1.75rem]` / `rounded-[2.5rem]` frame with `rounded-xl md:rounded-2xl` and `aspect-[2/3] md:aspect-[21/9]`.
-   - Remove or simplify the corner-bracket accents.
-   - Replace the absolute-positioned title block and centered button with a single glass bottom bar.
-   - Use a responsive grid for the bottom bar:
-     `grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4` with RTL-safe margins.
-   - Apply `line-clamp-2` to the title so it never grows into the button.
-   - Keep the slider-control pill bottom-left, but add `bottom-20` (or equivalent) spacing above the bottom bar.
-   - Preserve the existing `Link` + `useNavigate` keyboard behavior and dynamic `aria-label`.
+Map prototype hex values to existing semantic tokens:
+- `#050505` → `bg-0`
+- `#c9a84c` → `amber`
+- `#fcfaf2` / `#f5f5f0` → `cream-bright` / `cream`
+- Glass surfaces → `bg-cream/5`, `border-cream/10`, `backdrop-blur-2xl`
+- No new colors added to `src/styles.css`.
+- No Google Fonts `<link>` from the prototype — keep IranSansX / project display font already loaded in `__root.tsx`.
 
-2. Polish tokens
-   - Use existing tokens: `bg-bg-0/60`, `border-cream/10`, `backdrop-blur-xl`, `text-cream-bright`, `text-amber`, etc.
-   - No new color tokens needed unless we add a thin `border-amber/20` keyline; if so, add it to the existing semantic set in `src/styles.css`.
+## Accessibility & behavior preserved
 
-3. Verify
-   - Run build and typecheck.
-   - Capture desktop and mobile Playwright screenshots, including a slide with a long title, to confirm no overlap.
-   - Test keyboard focus and click navigation on the Watch Now button.
+- Whole image remains a `Link` to `/films/$slug` with dynamic Persian/English `aria-label`.
+- CTA is a `Link` with `aria-label`, Space/Enter keyboard activation via existing `handleWatchKeyDown`, and `focus-visible` ring.
+- Prev/Next/dot buttons keep current aria-labels and RTL rotation.
+- Autoplay, pause on hover, and pointer-swipe handlers all retained.
+- `fetchPriority`, `decoding`, `loading`, and picture `srcSet` for LCP unchanged.
 
-Technical notes
-- The title and button currently share the bottom edge of the frame with absolute positioning. The fix is to put them in the same flow container (the glass bottom bar) so the layout engine guarantees separation.
-- `min-w-0` on the title cell is required so Persian text wraps/truncates instead of pushing the button out of the frame.
-- The frame aspect ratio and border radius changes are purely presentational; no data or backend changes are needed.
+## Files touched
+
+- `src/components/featured-film.tsx` — refactor `SlideImageFrame` and `FeaturedFilmFallback`; `SliderControls` gets a compact "console" variant (smaller dots, capsule active state) but keeps the same props.
+- No changes to `src/lib/home.functions.ts`, `src/routes/index.tsx`, `src/styles.css`, or data layer.
+
+## Verification
+
+- Build + typecheck.
+- Playwright: desktop screenshot at 1440×900 (English + Persian) confirming badges, title, and console positions; a slide with a long Persian title to confirm no overlap; mobile 390×844 screenshot confirming pill placement.
+- Keyboard test: Tab reaches image link → prev → dots → next → Watch; Space on Watch navigates.
 
 ````text
-Desktop hero after change:
-┌─────────────────────────────────────────────────────────────┐
-│                                    [Original] [Featured]    │
-│                                                             │
-│                                                             │
-│                       cover image                           │
-│                                                             │
-│                                                             │
-│  [←  ●  ●  ●  →]                                            │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  مسجد شیخ لطف‌الله و منارجنبان        [▶ تماشا]      │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+Desktop after change:
+
+┌──────────────────────────────────────────────────────────────┐
+│                                              ● ORIGINAL      │
+│                                              [ ویژه تماشا ]  │
+│                                                              │
+│                                                              │
+│                    cover image (21:9)                        │
+│                                                              │
+│                                            حمام فین          │
+│                                            روایتی ناگفته…    │
+│  ┌────────────────────────────────┐                          │
+│  │ ‹ · ●── · · ›  │  [▶ تماشا]    │                          │
+│  └────────────────────────────────┘                          │
+└──────────────────────────────────────────────────────────────┘
 ````

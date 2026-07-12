@@ -13,7 +13,7 @@ export function FeaturedFilm() {
   if (slides.length === 1) {
     return (
       <HeroShell>
-        <Slide film={slides[0]} active eager />
+        <SlideImageFrame film={slides[0]} active eager />
       </HeroShell>
     );
   }
@@ -116,27 +116,24 @@ function SliderControls({
   onPrev,
   onNext,
   onGo,
+  compact = false,
 }: {
   count: number;
   index: number;
   onPrev: () => void;
   onNext: () => void;
   onGo: (i: number) => void;
+  compact?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-cream/10 bg-bg-0/50 px-3 py-2 shadow-2xl backdrop-blur-xl">
-      <button
-        type="button"
-        onClick={onPrev}
-        aria-label="Previous"
-        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-cream/70 transition-all duration-200 hover:bg-cream/10 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-      </button>
-
-      <div className="flex items-center gap-2 px-1">
+    <div
+      className={
+        compact
+          ? "flex items-center gap-3"
+          : "flex items-center gap-3 rounded-2xl border border-cream/10 bg-bg-0/50 px-3 py-2 shadow-2xl backdrop-blur-xl"
+      }
+    >
+      <div className="flex items-center gap-1.5 px-1">
         {Array.from({ length: count }).map((_, i) => {
           const active = i === index;
           return (
@@ -146,15 +143,13 @@ function SliderControls({
               onClick={() => onGo(i)}
               aria-label={`Go to slide ${i + 1}`}
               aria-current={active ? "true" : undefined}
-              className={`flex cursor-pointer items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-90 ${
-                active ? "h-6 w-6" : "h-5 w-5 hover:bg-cream/10"
-              }`}
+              className="flex cursor-pointer items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 rounded-full"
             >
               <span
                 className={`block rounded-full transition-all duration-300 ${
                   active
-                    ? "h-2.5 w-2.5 bg-amber shadow-[0_0_0_4px_rgba(201,168,76,0.25)]"
-                    : "h-1.5 w-1.5 bg-cream/30 hover:h-2 hover:w-2 hover:bg-cream/60"
+                    ? "h-1.5 w-7 bg-amber shadow-[0_0_10px_rgba(201,168,76,0.55)]"
+                    : "h-1.5 w-1.5 bg-cream/25 hover:bg-cream/50"
                 }`}
               />
             </button>
@@ -162,16 +157,28 @@ function SliderControls({
         })}
       </div>
 
-      <button
-        type="button"
-        onClick={onNext}
-        aria-label="Next"
-        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-cream/70 transition-all duration-200 hover:bg-cream/10 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={onPrev}
+          aria-label="Previous"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          aria-label="Next"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
@@ -183,22 +190,6 @@ const POS_CLASS: Record<string, string> = {
   left: "object-left",
   right: "object-right",
 };
-
-function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
-  return (
-    <div
-      className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        active
-          ? "relative z-10 opacity-100"
-          : "pointer-events-none absolute inset-0 z-0 opacity-0"
-      }`}
-      style={{ transform: active ? "translateX(0) scale(1)" : "translateX(-2%) scale(0.98)" }}
-      aria-hidden={!active}
-    >
-      <SlideImageFrame film={film} active={active} eager={eager} />
-    </div>
-  );
-}
 
 function SlideImageFrame({
   film,
@@ -277,17 +268,21 @@ function SlideImageFrame({
       aria-hidden={!active}
     >
       <div className="group relative w-full">
-        {/* Soft ambient amber glow — desktop only */}
+        {/* Ambient depth orbs — desktop only */}
         <div
-          className="pointer-events-none absolute -inset-10 hidden rounded-full bg-amber/10 opacity-60 blur-[100px] md:block"
+          className="pointer-events-none absolute -left-10 -top-10 hidden h-40 w-40 rounded-full bg-amber/5 blur-[80px] md:block"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-14 -right-10 hidden h-72 w-72 rounded-full bg-amber/10 blur-[110px] md:block"
           aria-hidden
         />
 
         {/* Frame */}
-        <div className="relative z-10 overflow-hidden rounded-xl border border-cream/10 bg-cream/5 shadow-2xl md:rounded-2xl">
+        <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] md:rounded-[2rem]">
           <div
             ref={frameRef}
-            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-lg bg-bg-0 md:aspect-[21/9] md:rounded-xl"
+            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1rem] bg-bg-0 md:aspect-[21/9] md:rounded-[1.75rem]"
             style={{ background: fallbackBg }}
           >
             {/* Shimmer skeleton */}
@@ -319,7 +314,7 @@ function SlideImageFrame({
                     alt={film.title_fa || film.title_en}
                     width={1920}
                     height={1080}
-                    className={`cine-img absolute inset-0 block h-full w-full ${fitClass}`}
+                    className={`cine-img absolute inset-0 block h-full w-full transition-transform duration-1000 ease-out md:group-hover:scale-[1.03] ${fitClass}`}
                     loading={eager ? "eager" : "lazy"}
                     decoding={eager ? "sync" : "async"}
                     fetchPriority={eager ? "high" : undefined}
@@ -332,69 +327,88 @@ function SlideImageFrame({
               </Link>
             ) : null}
 
-            {/* Cinematic overlays */}
+            {/* Layered cinematic gradients */}
             <div
               className="pointer-events-none absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, transparent 40%, rgba(13,13,13,0.65) 100%)",
+                  "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, transparent 35%, rgba(5,5,5,0.85) 100%)",
               }}
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute inset-0 hidden bg-gradient-to-l from-bg-0/30 via-transparent to-transparent md:block"
+              className="pointer-events-none absolute inset-0 hidden md:block"
+              style={{
+                background:
+                  "linear-gradient(270deg, rgba(5,5,5,0.55) 0%, transparent 45%)",
+              }}
               aria-hidden
             />
-
-            {/* Inner subtle frame */}
             <div
-              className="pointer-events-none absolute inset-2 rounded-md border border-cream/5 md:inset-3 md:rounded-lg"
+              className="pointer-events-none absolute inset-0 hidden md:block"
+              style={{
+                background:
+                  "radial-gradient(circle at 85% 90%, rgba(201,168,76,0.12) 0%, transparent 55%)",
+              }}
               aria-hidden
             />
 
             {active ? (
               <>
-                {/* Top badges */}
+                {/* Top-right badge stack (RTL start) */}
                 <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-                  <div className="pointer-events-auto absolute right-5 top-5 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
-                    <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
-                      {locale === "fa" ? "اختصاصی" : "Original"}
-                    </span>
-                    <span className="h-px w-8 bg-cream/20" />
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
-                      {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-                    </span>
+                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-col items-end gap-2.5 lg:right-10 lg:top-10">
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber">
+                        {locale === "fa" ? "اختصاصی" : "Original"}
+                      </span>
+                    </div>
+                    <div className="rounded-full border border-cream/10 bg-cream/[0.08] px-3.5 py-1.5 backdrop-blur-xl">
+                      <span className="text-[11px] font-bold tracking-wide text-cream/90">
+                        {locale === "fa" ? "ویژه تماشا" : "Featured Film"}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Slider controls — desktop, raised above bottom bar */}
-                {controls ? (
-                  <div className="pointer-events-auto absolute bottom-[4.5rem] left-5 z-30 hidden md:block lg:bottom-[5.5rem] lg:left-8">
-                    {controls}
-                  </div>
-                ) : null}
+                {/* Bottom overlay: title + console */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 hidden md:block">
+                  <div className="flex items-end justify-between gap-6 p-6 lg:p-10">
+                    {/* Console (visual left / LTR flow) */}
+                    <div className="pointer-events-auto order-1 flex items-center gap-3 rounded-2xl border border-cream/10 bg-cream/[0.04] p-2 shadow-2xl backdrop-blur-2xl transition-colors hover:bg-cream/[0.07]">
+                      {controls ? (
+                        <div className="flex items-center gap-2 border-e border-cream/10 pe-3 ps-2 rtl:border-e-0 rtl:border-s rtl:border-cream/10 rtl:pe-2 rtl:ps-3">
+                          {controls}
+                        </div>
+                      ) : null}
+                      <Link
+                        {...watchHref}
+                        onKeyDown={handleWatchKeyDown}
+                        aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
+                        className="group/btn inline-flex shrink-0 items-center gap-3 rounded-xl bg-amber px-5 py-2.5 font-bold text-ink shadow-lg shadow-amber/20 transition-all duration-200 hover:bg-amber/90 hover:shadow-[0_0_28px_rgba(201,168,76,0.35)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.97]"
+                      >
+                        <span className="text-sm leading-none">
+                          {locale === "fa" ? "تماشا" : "Watch Now"}
+                        </span>
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-ink/10 transition-transform group-hover/btn:scale-110">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </span>
+                      </Link>
+                    </div>
 
-                {/* Bottom info bar — desktop only */}
-                <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 hidden md:grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-cream/10 bg-bg-0/60 px-5 py-3 backdrop-blur-xl lg:px-8 lg:py-4">
-                  <div className="min-w-0">
-                    <h2 className="line-clamp-2 font-display text-lg font-bold leading-snug text-cream-bright sm:text-xl lg:text-2xl">
-                      {title}
-                    </h2>
+                    {/* Title block (visual right / RTL start) */}
+                    <div className="pointer-events-auto order-2 min-w-0 max-w-xl text-right transition-transform duration-500 md:group-hover:-translate-y-1">
+                      <h2 className="line-clamp-2 font-display text-3xl font-black leading-[1.1] text-cream-bright drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] lg:text-5xl xl:text-6xl">
+                        {title}
+                      </h2>
+                    </div>
                   </div>
-                  <Link
-                    {...watchHref}
-                    onKeyDown={handleWatchKeyDown}
-                    aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-amber/30 bg-amber/90 px-4 py-2 text-[12px] font-bold text-ink shadow-lg transition-all duration-200 hover:bg-amber hover:border-amber focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:px-5 md:py-2.5 md:text-[13px]"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <span>{locale === "fa" ? "تماشا" : "Watch Now"}</span>
-                  </Link>
                 </div>
 
-                {/* Mobile centered Watch Now pill */}
+                {/* Mobile centered Watch pill */}
                 <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2 md:hidden">
                   <Link
                     {...watchHref}
@@ -402,7 +416,7 @@ function SlideImageFrame({
                     aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
                     className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                     <span>{locale === "fa" ? "تماشا" : "Watch Now"}</span>
@@ -414,8 +428,13 @@ function SlideImageFrame({
         </div>
       </div>
 
+      {/* Mobile-only stacked controls below frame */}
       {active && controls ? (
-        <div className="mt-6 flex justify-center md:hidden">{controls}</div>
+        <div className="mt-6 flex justify-center md:hidden">
+          <div className="rounded-2xl border border-cream/10 bg-bg-0/50 px-3 py-2 shadow-2xl backdrop-blur-xl">
+            {controls}
+          </div>
+        </div>
       ) : null}
     </div>
   );
@@ -426,9 +445,9 @@ function FeaturedFilmFallback() {
     <section className="relative isolate overflow-hidden bg-bg-0">
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-12 sm:px-6 md:mt-32 md:px-12 md:pb-10">
         <div className="relative w-full">
-          <div className="relative z-10 overflow-hidden rounded-xl border border-cream/10 bg-cream/5 shadow-2xl md:rounded-2xl">
+          <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-2xl md:rounded-[2rem]">
             <div
-              className="aspect-[2/3] rounded-lg md:aspect-[21/9] md:rounded-xl"
+              className="aspect-[2/3] rounded-[1rem] md:aspect-[21/9] md:rounded-[1.75rem]"
               style={{
                 background:
                   "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
