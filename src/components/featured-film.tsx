@@ -348,42 +348,55 @@ function SlideImageFrame({
             />
 
             {active ? (
-              <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-                {/* Top badges */}
-                <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
-                  <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
-                    {locale === "fa" ? "اختصاصی" : "Original"}
-                  </span>
-                  <span className="h-px w-8 bg-cream/20" />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
-                    {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-                  </span>
+              <>
+                <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
+                  {/* Top badges */}
+                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
+                    <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
+                      {locale === "fa" ? "اختصاصی" : "Original"}
+                    </span>
+                    <span className="h-px w-8 bg-cream/20" />
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
+                      {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+                    </span>
+                  </div>
+
+                  {/* Controls */}
+                  {controls ? (
+                    <div className="pointer-events-auto absolute bottom-6 left-6 z-30 lg:bottom-8 lg:left-8">
+                      {controls}
+                    </div>
+                  ) : null}
+
+                  {/* Title + CTA */}
+                  <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[36rem] lg:gap-6">
+                    <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
+                      {title}
+                    </h2>
+                    <Link
+                      to="/films/$slug"
+                      params={{ slug: film.slug }}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                    </Link>
+                  </div>
                 </div>
 
-                {/* Controls */}
-                {controls ? (
-                  <div className="pointer-events-auto absolute bottom-6 left-6 z-30 lg:bottom-8 lg:left-8">
-                    {controls}
-                  </div>
-                ) : null}
-
-                {/* Title + CTA */}
-                <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[36rem] lg:gap-6">
-                  <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
-                    {title}
-                  </h2>
+                {/* Mobile bottom-edge glass "More info" */}
+                <div className="pointer-events-auto absolute bottom-4 right-4 z-30 md:hidden">
                   <Link
                     to="/films/$slug"
                     params={{ slug: film.slug }}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-cream/15 bg-bg-0/40 px-4 py-2.5 text-[12px] font-semibold text-cream-bright shadow-lg backdrop-blur-xl transition-colors duration-200 hover:border-cream/25 hover:bg-bg-0/55 active:scale-[0.98]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                    {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
                   </Link>
                 </div>
-              </div>
+              </>
             ) : null}
           </div>
         </div>
