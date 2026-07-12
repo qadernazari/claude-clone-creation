@@ -139,7 +139,7 @@ export function Rail({
       )}
       <div
         ref={ref}
-        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 md:-mx-12 md:snap-mandatory md:gap-6 md:px-12 md:pt-3"
+        className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto overflow-y-visible overscroll-x-contain px-5 pt-2 pb-2 sm:-mx-6 sm:px-6 md:-mx-8 md:snap-mandatory md:gap-6 md:px-8 md:pt-3 lg:-mx-6 lg:px-6"
         style={{
           scrollPaddingLeft: "1.25rem",
           WebkitOverflowScrolling: "touch" as never,
