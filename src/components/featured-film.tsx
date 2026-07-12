@@ -374,9 +374,10 @@ function SlideImageFrame({
                     <Link
                       to="/films/$slug"
                       params={{ slug: film.slug }}
-                      className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+                      aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                       <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
@@ -389,9 +390,10 @@ function SlideImageFrame({
                   <Link
                     to="/films/$slug"
                     params={{ slug: film.slug }}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-4 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 active:scale-[0.98]"
+                    aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-4 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                     <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
