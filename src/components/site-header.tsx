@@ -349,7 +349,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       >
         <div
           dir="ltr"
-          className={`mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 md:px-10 transition-[padding] duration-300 ${
+          className={`mx-auto flex w-full max-w-[110rem] items-center justify-between px-5 py-3 sm:px-6 md:px-8 lg:px-6 transition-[padding] duration-300 ${
             scrolled ? "md:py-3" : "md:py-5"
           }`}
         >
