@@ -386,11 +386,12 @@ function SlideImageFrame({
                     </div>
 
                     {/* Title block (visual right / RTL start) */}
-                    <div className="pointer-events-auto order-2 min-w-0 max-w-xl text-right transition-transform duration-500 md:group-hover:-translate-y-1">
-                      <h2 className="line-clamp-2 font-display text-3xl font-black leading-[1.1] text-cream-bright drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] lg:text-5xl xl:text-6xl">
+                    <div className="pointer-events-auto order-2 min-w-0 flex-1 text-right transition-transform duration-500 md:group-hover:-translate-y-1">
+                      <h2 className="line-clamp-2 break-words pb-1 font-display text-2xl font-black leading-[1.35] text-cream-bright drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] lg:text-3xl xl:text-4xl">
                         {title}
                       </h2>
                     </div>
+
                   </div>
                 </div>
 
