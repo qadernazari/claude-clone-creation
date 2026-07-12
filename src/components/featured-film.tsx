@@ -247,7 +247,7 @@ function SlideImageFrame({
     >
       <div className="group relative w-full">
         {/* Outer frame — split on desktop */}
-        <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/[0.03] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] md:h-[420px] md:rounded-[2rem] lg:h-[480px] xl:h-[520px]">
+        <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/[0.03] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] md:min-h-[480px] md:rounded-[2rem] lg:min-h-[560px] xl:min-h-[620px]">
           <div className="grid md:h-full md:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]" dir="ltr">
             {/* IMAGE COLUMN */}
             <div
@@ -348,23 +348,25 @@ function SlideImageFrame({
                 className="hidden h-full bg-linear-to-b from-bg-0/40 to-bg-0/80 md:flex md:flex-col md:justify-center md:px-8 md:py-10 lg:px-10 lg:py-12"
                 dir={locale === "fa" ? "rtl" : "ltr"}
               >
-                <div className="grid w-full grid-rows-[1.25rem_6.25rem_5.25rem_1.75rem_3rem] gap-4 lg:grid-rows-[1.25rem_6.75rem_5.5rem_1.75rem_3.25rem] lg:gap-5">
-                  <div className="flex h-5 items-center gap-2 overflow-hidden">
+                <div className="flex w-full flex-col gap-4 lg:gap-5">
+                  <div className="flex h-5 items-center gap-2">
                     <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
                     <span className="truncate text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
                       {locale === "fa" ? "اختصاصی" : "Original"}
                     </span>
                   </div>
 
-                  <h2 className="line-clamp-2 self-center overflow-hidden font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
+                  <h2 className="font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
                     {title}
                   </h2>
 
-                  <p className={`line-clamp-3 overflow-hidden text-sm leading-relaxed text-cream/70 lg:text-[15px] ${synopsis ? "" : "invisible"}`}>
-                    {synopsis || "—"}
-                  </p>
+                  {synopsis ? (
+                    <p className="text-sm leading-relaxed text-cream/70 lg:text-[15px]">
+                      {synopsis}
+                    </p>
+                  ) : null}
 
-                  <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1 overflow-hidden text-xs text-cream/60 lg:text-[13px]">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-cream/60 lg:text-[13px]">
                     {film.is_premium ? (
                       <span className="rounded-md bg-amber/15 px-2 py-0.5 text-[11px] font-bold text-amber">
                         +12
@@ -379,7 +381,7 @@ function SlideImageFrame({
                     ) : null}
                   </div>
 
-                  <div className="flex min-h-12 flex-wrap items-center gap-3 overflow-hidden">
+                  <div className="flex flex-wrap items-center gap-3">
                     <Link
                       {...watchHref}
                       onKeyDown={handleWatchKeyDown}
