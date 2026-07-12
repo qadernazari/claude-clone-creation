@@ -107,9 +107,6 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
             />
           ))}
         </div>
-        <div className="mt-8 md:hidden">
-          <SlideDetails film={slides[index]} />
-        </div>
       </div>
     </section>
   );
