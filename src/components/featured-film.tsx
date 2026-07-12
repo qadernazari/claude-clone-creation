@@ -219,8 +219,17 @@ function SlideImageFrame({
 }) {
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const { locale, t } = useLocale();
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
+
+  const watchHref = { to: "/films/$slug" as const, params: { slug: film.slug } };
+  const handleWatchKeyDown = (e: KeyboardEvent<HTMLAnchorElement>) => {
+    if (e.key === " " || e.key === "Spacebar" || e.code === "Space") {
+      e.preventDefault();
+      navigate(watchHref);
+    }
+  };
 
   useEffect(() => {
     if (!frameRef.current || !swipeHandlers || !active) return;
