@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode, type KeyboardEvent } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 
@@ -219,8 +219,17 @@ function SlideImageFrame({
 }) {
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const { locale, t } = useLocale();
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
+
+  const watchHref = { to: "/films/$slug" as const, params: { slug: film.slug } };
+  const handleWatchKeyDown = (e: KeyboardEvent<HTMLAnchorElement>) => {
+    if (e.key === " " || e.key === "Spacebar" || e.code === "Space") {
+      e.preventDefault();
+      navigate(watchHref);
+    }
+  };
 
   useEffect(() => {
     if (!frameRef.current || !swipeHandlers || !active) return;
@@ -377,10 +386,10 @@ function SlideImageFrame({
                 {/* Bottom-edge glass "Watch Now" */}
                 <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2">
                   <Link
-                    to="/films/$slug"
-                    params={{ slug: film.slug }}
-                    aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:min-h-12 md:px-6 md:py-3 md:text-[13px]"
+                    {...watchHref}
+                    onKeyDown={handleWatchKeyDown}
+                    aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch ${title}`}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:min-h-12 md:px-6 md:py-3 md:text-[13px]"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
                       <path d="M8 5v14l11-7z" />
