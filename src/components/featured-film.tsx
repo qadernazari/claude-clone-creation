@@ -4,7 +4,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
 
-const AUTOPLAY_MS = 6500;
+
 
 export function FeaturedFilm() {
   const { data: slides } = useSuspenseQuery(homeFeaturedSlidesQueryOptions);
@@ -33,8 +33,6 @@ function HeroShell({ children }: { children: React.ReactNode }) {
 
 function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const go = useCallback(
     (next: number) => {
@@ -46,18 +44,9 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   const next = useCallback(() => go(index + 1), [go, index]);
   const prev = useCallback(() => go(index - 1), [go, index]);
 
-  useEffect(() => {
-    if (paused) return;
-    timer.current = setTimeout(next, AUTOPLAY_MS);
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, [index, paused, next]);
-
   const startX = useRef<number | null>(null);
   const onPointerDown = (e: PointerEvent) => {
     startX.current = e.clientX;
-    setPaused(true);
   };
   const onPointerUp = (e: PointerEvent) => {
     if (startX.current == null) return;
@@ -67,14 +56,11 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       if (dx < 0) next();
       else prev();
     }
-    setPaused(false);
   };
 
   return (
     <section
       className="relative isolate overflow-hidden bg-bg-0"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
     >
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-12 sm:px-6 md:mt-32 md:px-12 md:pb-10">
