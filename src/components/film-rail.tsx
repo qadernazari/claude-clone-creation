@@ -176,7 +176,7 @@ export function RailSkeleton({ title }: { title?: string }) {
           <div className="h-5 w-40 rounded bg-cream/10 md:h-6 md:w-52" />
         )}
       </div>
-      <div className="-mx-5 flex gap-3 overflow-hidden px-5 pt-2 pb-2 md:-mx-12 md:gap-6 md:px-12 md:pt-3">
+      <div className="-mx-5 flex gap-3 overflow-hidden px-5 pt-2 pb-2 sm:-mx-6 sm:px-6 md:-mx-8 md:gap-6 md:px-8 md:pt-3 lg:-mx-6 lg:px-6">
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
