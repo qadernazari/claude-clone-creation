@@ -347,22 +347,16 @@ function SlideImageFrame({
 
             {active ? (
               <>
-                {/* Top-right badge stack (RTL start) */}
+                {/* Top-right badge (RTL start) */}
                 <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-col items-end gap-2.5 lg:right-10 lg:top-10">
-                    <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber">
-                        {locale === "fa" ? "اختصاصی" : "Original"}
-                      </span>
-                    </div>
-                    <div className="rounded-full border border-cream/10 bg-cream/[0.08] px-3.5 py-1.5 backdrop-blur-xl">
-                      <span className="text-[11px] font-bold tracking-wide text-cream/90">
-                        {locale === "fa" ? "ویژه تماشا" : "Featured Film"}
-                      </span>
-                    </div>
+                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex items-center gap-2 lg:right-10 lg:top-10">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
+                      {locale === "fa" ? "اختصاصی" : "Original"}
+                    </span>
                   </div>
                 </div>
+
 
                 {/* Bottom overlay: title + console */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 hidden md:block">
