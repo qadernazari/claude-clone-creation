@@ -116,23 +116,15 @@ function SliderControls({
   onPrev,
   onNext,
   onGo,
-  compact = false,
 }: {
   count: number;
   index: number;
   onPrev: () => void;
   onNext: () => void;
   onGo: (i: number) => void;
-  compact?: boolean;
 }) {
   return (
-    <div
-      className={
-        compact
-          ? "flex items-center gap-3"
-          : "flex items-center gap-3 rounded-2xl border border-cream/10 bg-bg-0/50 px-3 py-2 shadow-2xl backdrop-blur-xl"
-      }
-    >
+    <div className="flex items-center gap-3">
       <div className="flex items-center gap-1.5 px-1">
         {Array.from({ length: count }).map((_, i) => {
           const active = i === index;
