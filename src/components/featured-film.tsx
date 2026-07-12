@@ -371,7 +371,7 @@ function SlideImageFrame({
                     <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
                       {title}
                     </h2>
-                    <div className="flex w-full justify-center md:justify-end">
+                    <div className="flex w-full justify-center">
                       <Link
                         to="/films/$slug"
                         params={{ slug: film.slug }}
