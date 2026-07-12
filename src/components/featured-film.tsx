@@ -434,7 +434,7 @@ function FeaturedFilmFallback() {
         <div className="relative w-full">
           <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-2xl md:rounded-[2rem]">
             <div
-              className="aspect-[2/3] rounded-[1rem] md:aspect-[21/9] md:rounded-[1.75rem]"
+              className="aspect-[2/3] rounded-[1rem] md:aspect-video md:rounded-[1.75rem]"
               style={{
                 background:
                   "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
