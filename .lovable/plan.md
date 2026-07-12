@@ -1,28 +1,53 @@
-## Featured Film hero — cleanup & Persian polish
+# Featured Hero Redesign — Filimo-style Split Layout
 
-Scope: `src/components/featured-film.tsx` only. Presentation-only changes.
+Rework `src/components/featured-film.tsx` desktop layout to match the reference: cover image dominates the left, and all text/controls live in a right-side info column inside the same frame. Mobile keeps the current stacked layout.
 
-### 1. Remove the "Featured Film / ویژه تماشا" badge
-- Delete the pill under the top-right stack (the second badge). Keep only the small amber dot + `اختصاصی / Original` label.
+## Desktop layout (md+)
 
-### 2. Match frame to the uploaded cover's own aspect
-Right now the desktop frame is forced to `aspect-[21/9]`, which crops any cover that isn't 21:9 (this is what makes Persian titles look "cropped/cutted" against the bottom bar too).
-- Desktop: switch from fixed `aspect-[21/9]` to `aspect-video` (16:9) as default, which matches the 16:9 covers admin now enforces. Mobile stays `aspect-[2/3]` for the portrait cover.
-- When `cover_fit === "contain"`, let the image show fully (no crop) on top of the gradient background.
+```text
+┌────────────────────────────────────────────────────────────┐
+│                                        │  [Logo/Title]     │
+│                                        │                   │
+│         COVER IMAGE (16:9-ish,         │  Description      │
+│         fills left ~65-70%)            │  (2 lines)        │
+│                                        │                   │
+│                                        │  [+12] 1405 ♥78%  │
+│                                        │                   │
+│                                        │  ▶ ورود و پخش     │
+│                                        │  پیش‌نمایش         │
+│  ‹ ›                                   │                   │
+└────────────────────────────────────────────────────────────┘
+```
 
-### 3. Fix Persian text being cropped in the bottom overlay
-Causes: `line-clamp-2` + very large font (`text-5xl xl:text-6xl`) + tight `max-w-xl` + `leading-[1.1]` cut descenders of Persian glyphs (ی/ج/ح), and the title column collides with the console on medium widths.
-- Reduce title size to `text-2xl lg:text-3xl xl:text-4xl`.
-- Increase `leading` to `leading-[1.4]` for Persian (via `[lang="fa"]` selector already global) and add `pb-1` so descenders aren't clipped by `overflow-hidden` on the frame.
-- Widen title column: use a 2-col grid (`grid-cols-[auto_minmax(0,1fr)]`) so console gets `auto` and title gets the remaining space, guaranteeing no overlap at any width.
-- Keep `line-clamp-2` but add `break-words` to avoid long Persian words spilling.
-- Bump the top-right badge stack down slightly and reduce the `اختصاصی` label tracking (Persian doesn't need `0.22em` letter-spacing — it looks broken).
+- Container: rounded-2xl, subtle border, soft outer shadow — no amber glow orbs, no glass console.
+- RTL: image column on the right visually (since `dir="rtl"`), info column on the left — in the reference (Persian) image is on the left, info on the right; this matches natural RTL flow of a `flex` row with image first + info second.
+- Image: `aspect-video` object-cover, no scale-on-hover, no letterbox bars.
+- Info column: ~32–36% width, vertically centered content, right-aligned Persian text with breathing room.
+- Badges row: age rating pill (amber), season/episode count, heart + rating percent — small, muted.
+- Primary CTA: solid amber pill with play icon → `تماشا` (or `ورود و پخش`).
+- Secondary CTA: ghost/outline pill → `پیش‌نمایش` linking to film details.
+- Prev/next arrows: bottom-left corner of frame, small circular glass buttons; dots removed (or moved next to arrows as thin bar).
 
-### 4. Minor polish
-- Remove the now-single-badge wrapper's extra `flex-col gap-2.5` (no longer needed with one item).
-- Ensure the mobile "تماشا" pill uses the same amber background style as desktop for visual consistency (currently glass on mobile, solid amber on desktop) — keep glass on mobile per prior user choice, no change here unless requested.
+## What gets removed
 
-### Files
-- `src/components/featured-film.tsx` — edits to `SlideImageFrame` (badges block, frame aspect, bottom overlay title block) and `FeaturedFilmFallback` (aspect to match).
+- Bottom overlay bar with gradient
+- Floating glass "console"
+- Amber glow orbs / heavy shadows
+- "Original / اختصاصی" corner badge (info now sits in the column; keep only if it fits inline as a small tag)
 
-No backend, no other components touched.
+## Mobile (unchanged behavior)
+
+- Keep current 16:9 frame with centered bottom "تماشا" pill.
+- Slider arrows/dots below frame as-is.
+
+## Files touched
+
+- `src/components/featured-film.tsx` — layout rewrite (JSX + classes only; data plumbing untouched)
+- No CSS token changes; reuse existing amber/primary tokens.
+
+## Verification
+
+- Build + typecheck
+- Playwright screenshot at desktop (1280) and mobile (390) in Persian locale
+- Confirm long titles do not collide with CTAs (info column has its own width)
+- Confirm image is not cropped weirdly on wide viewports
