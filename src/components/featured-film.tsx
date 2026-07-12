@@ -426,11 +426,9 @@ function FeaturedFilmFallback() {
     <section className="relative isolate overflow-hidden bg-bg-0">
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 pb-12 sm:px-6 md:mt-32 md:px-12 md:pb-10">
         <div className="relative w-full">
-          <div className="pointer-events-none absolute -right-3 -top-3 z-20 h-20 w-20 rounded-tr-[2rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-28 lg:w-28 lg:rounded-tr-[2.5rem]" aria-hidden />
-          <div className="pointer-events-none absolute -bottom-3 -left-3 z-20 h-20 w-20 rounded-bl-[2rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-28 lg:w-28 lg:rounded-bl-[2.5rem]" aria-hidden />
-          <div className="relative z-10 overflow-hidden rounded-[1.75rem] border border-cream/10 bg-cream/5 shadow-2xl lg:rounded-[2.5rem]">
+          <div className="relative z-10 overflow-hidden rounded-xl border border-cream/10 bg-cream/5 shadow-2xl md:rounded-2xl">
             <div
-              className="aspect-[2/3] rounded-[1.25rem] md:aspect-[21/9] md:rounded-[2rem]"
+              className="aspect-[2/3] rounded-lg md:aspect-[21/9] md:rounded-xl"
               style={{
                 background:
                   "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
