@@ -31,10 +31,10 @@ export function SiteFooter() {
 
   return (
     <footer
-      className="border-t border-line px-5 pt-14 pb-10 sm:px-6 md:px-12 md:pt-16"
+      className="border-t border-line px-5 pt-14 pb-10 sm:px-6 md:px-8 lg:px-6 md:pt-16"
       style={{ paddingBottom: "max(3rem, env(safe-area-inset-bottom, 0px))" }}
     >
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto w-full max-w-[110rem]">
         <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:items-center">
           <div className="flex items-center gap-4">
             <Link to="/" onClick={handleHomeClick} aria-label="IRAN — home">
