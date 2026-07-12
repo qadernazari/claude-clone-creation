@@ -274,7 +274,7 @@ function SlideImageFrame({
         <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] md:rounded-[2rem]">
           <div
             ref={frameRef}
-            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1rem] bg-bg-0 md:aspect-[21/9] md:rounded-[1.75rem]"
+            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1rem] bg-bg-0 md:aspect-video md:rounded-[1.75rem]"
             style={{ background: fallbackBg }}
           >
             {/* Shimmer skeleton */}
@@ -347,22 +347,16 @@ function SlideImageFrame({
 
             {active ? (
               <>
-                {/* Top-right badge stack (RTL start) */}
+                {/* Top-right badge (RTL start) */}
                 <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-col items-end gap-2.5 lg:right-10 lg:top-10">
-                    <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber">
-                        {locale === "fa" ? "اختصاصی" : "Original"}
-                      </span>
-                    </div>
-                    <div className="rounded-full border border-cream/10 bg-cream/[0.08] px-3.5 py-1.5 backdrop-blur-xl">
-                      <span className="text-[11px] font-bold tracking-wide text-cream/90">
-                        {locale === "fa" ? "ویژه تماشا" : "Featured Film"}
-                      </span>
-                    </div>
+                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex items-center gap-2 lg:right-10 lg:top-10">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
+                      {locale === "fa" ? "اختصاصی" : "Original"}
+                    </span>
                   </div>
                 </div>
+
 
                 {/* Bottom overlay: title + console */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 hidden md:block">
@@ -392,11 +386,12 @@ function SlideImageFrame({
                     </div>
 
                     {/* Title block (visual right / RTL start) */}
-                    <div className="pointer-events-auto order-2 min-w-0 max-w-xl text-right transition-transform duration-500 md:group-hover:-translate-y-1">
-                      <h2 className="line-clamp-2 font-display text-3xl font-black leading-[1.1] text-cream-bright drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] lg:text-5xl xl:text-6xl">
+                    <div className="pointer-events-auto order-2 min-w-0 flex-1 text-right transition-transform duration-500 md:group-hover:-translate-y-1">
+                      <h2 className="line-clamp-2 break-words pb-1 font-display text-2xl font-black leading-[1.35] text-cream-bright drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] lg:text-3xl xl:text-4xl">
                         {title}
                       </h2>
                     </div>
+
                   </div>
                 </div>
 
@@ -439,7 +434,7 @@ function FeaturedFilmFallback() {
         <div className="relative w-full">
           <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-2xl md:rounded-[2rem]">
             <div
-              className="aspect-[2/3] rounded-[1rem] md:aspect-[21/9] md:rounded-[1.75rem]"
+              className="aspect-[2/3] rounded-[1rem] md:aspect-video md:rounded-[1.75rem]"
               style={{
                 background:
                   "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
