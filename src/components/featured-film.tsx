@@ -404,6 +404,12 @@ function SlideImageFrame({
                   </div>
                 </div>
               </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+
 
       {/* Mobile-only stacked controls below frame */}
       {active && controls ? (
