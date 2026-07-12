@@ -367,21 +367,23 @@ function SlideImageFrame({
                   ) : null}
 
                   {/* Title + CTA */}
-                  <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[36rem] lg:gap-6">
+                  <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[30rem] lg:gap-5">
                     <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
                       {title}
                     </h2>
-                    <Link
-                      to="/films/$slug"
-                      params={{ slug: film.slug }}
-                      aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
-                      className="inline-flex min-h-11 items-center gap-2 self-center rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
-                    </Link>
+                    <div className="flex w-full justify-center md:justify-end">
+                      <Link
+                        to="/films/$slug"
+                        params={{ slug: film.slug }}
+                        aria-label={locale === "fa" ? `تماشای فیلم ${title}` : `Watch Now: ${title}`}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
 
