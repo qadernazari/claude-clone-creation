@@ -3,8 +3,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
-import { useCurrentUser } from "@/hooks/use-subscription";
-import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
 const AUTOPLAY_MS = 6500;
 
@@ -107,9 +105,6 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
             />
           ))}
         </div>
-        <div className="mt-8 md:hidden">
-          <SlideDetails film={slides[index]} />
-        </div>
       </div>
     </section>
   );
@@ -192,7 +187,7 @@ const POS_CLASS: Record<string, string> = {
 function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolean; eager: boolean }) {
   return (
     <div
-      className={`flex flex-col gap-5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] lg:gap-6 ${
+      className={`transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         active
           ? "relative z-10 opacity-100"
           : "pointer-events-none absolute inset-0 z-0 opacity-0"
@@ -201,7 +196,6 @@ function Slide({ film, active, eager }: { film: HomeFeaturedFilm; active: boolea
       aria-hidden={!active}
     >
       <SlideImageFrame film={film} active={active} eager={eager} />
-      <SlideDetails film={film} />
     </div>
   );
 }
@@ -352,42 +346,55 @@ function SlideImageFrame({
             />
 
             {active ? (
-              <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-                {/* Top badges */}
-                <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
-                  <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
-                    {locale === "fa" ? "اختصاصی" : "Original"}
-                  </span>
-                  <span className="h-px w-8 bg-cream/20" />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
-                    {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-                  </span>
+              <>
+                <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
+                  {/* Top badges */}
+                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
+                    <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
+                      {locale === "fa" ? "اختصاصی" : "Original"}
+                    </span>
+                    <span className="h-px w-8 bg-cream/20" />
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
+                      {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
+                    </span>
+                  </div>
+
+                  {/* Controls */}
+                  {controls ? (
+                    <div className="pointer-events-auto absolute bottom-6 left-6 z-30 lg:bottom-8 lg:left-8">
+                      {controls}
+                    </div>
+                  ) : null}
+
+                  {/* Title + CTA */}
+                  <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[36rem] lg:gap-6">
+                    <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
+                      {title}
+                    </h2>
+                    <Link
+                      to="/films/$slug"
+                      params={{ slug: film.slug }}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                    </Link>
+                  </div>
                 </div>
 
-                {/* Controls */}
-                {controls ? (
-                  <div className="pointer-events-auto absolute bottom-6 left-6 z-30 lg:bottom-8 lg:left-8">
-                    {controls}
-                  </div>
-                ) : null}
-
-                {/* Title + CTA */}
-                <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[36rem] lg:gap-6">
-                  <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl line-clamp-2 sm:text-4xl lg:text-5xl">
-                    {title}
-                  </h2>
+                {/* Mobile bottom-edge glass "More info" */}
+                <div className="pointer-events-auto absolute bottom-4 right-4 z-30 md:hidden">
                   <Link
                     to="/films/$slug"
                     params={{ slug: film.slug }}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-6 py-3 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-cream/15 bg-bg-0/40 px-4 py-2.5 text-[12px] font-semibold text-cream-bright shadow-lg backdrop-blur-xl transition-colors duration-200 hover:border-cream/25 hover:bg-bg-0/55 active:scale-[0.98]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
+                    {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
                   </Link>
                 </div>
-              </div>
+              </>
             ) : null}
           </div>
         </div>
@@ -397,99 +404,6 @@ function SlideImageFrame({
         <div className="mt-6 flex justify-center md:hidden">{controls}</div>
       ) : null}
     </div>
-  );
-}
-
-function SlideDetails({ film }: { film: HomeFeaturedFilm }) {
-  const { locale, num, year, t } = useLocale();
-  const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
-  const director =
-    film.category === "walking-tour"
-      ? ""
-      : t({ en: film.director_en || "", fa: film.director_fa || film.director_en || "" });
-  const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
-
-  return (
-    <div className="flex flex-col gap-5 md:hidden">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
-          {locale === "fa" ? "اختصاصی" : "Original"}
-        </span>
-        <span className="h-px w-8 bg-cream/20" />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/55">
-          {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
-        </span>
-      </div>
-
-      <h2 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-cream-bright sm:text-4xl">
-        {title}
-      </h2>
-
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium uppercase tracking-[0.24em] text-cream/60">
-        {director && <span>{director}</span>}
-        {director && film.year ? <span className="text-amber/60">·</span> : null}
-        {film.year ? <span>{year(film.year)}</span> : null}
-        {film.duration_min ? (
-          <>
-            <span className="text-amber/60">·</span>
-            <span>
-              {num(film.duration_min)} {locale === "fa" ? "دقیقه" : "min"}
-            </span>
-          </>
-        ) : null}
-      </div>
-
-      {synopsis ? (
-        <p className="max-w-3xl text-[15px] leading-relaxed text-cream/70 line-clamp-3">
-          {synopsis}
-        </p>
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-3 pt-1">
-        <Link
-          to="/films/$slug"
-          params={{ slug: film.slug }}
-          className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-amber px-7 py-3.5 text-[13px] font-bold text-ink shadow-xl shadow-amber/20 transition-all duration-200 hover:bg-amber-bright hover:shadow-2xl hover:shadow-amber/30 active:scale-[0.98]"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          <span>{locale === "fa" ? "تماشای فیلم" : "Watch Now"}</span>
-        </Link>
-        <Link
-          to="/films/$slug"
-          params={{ slug: film.slug }}
-          className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-cream/15 bg-cream/5 px-7 py-3.5 text-[13px] font-semibold text-cream-bright backdrop-blur-md transition-colors duration-200 hover:border-cream/25 hover:bg-cream/10"
-        >
-          {locale === "fa" ? "اطلاعات بیشتر" : "More info"}
-        </Link>
-        <WatchlistCta slug={film.slug} locale={locale} />
-      </div>
-    </div>
-  );
-}
-
-function WatchlistCta({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
-  const ready = useDeferredMount();
-  if (!ready) return null;
-  return <WatchlistCtaReady slug={slug} locale={locale} />;
-}
-
-function WatchlistCtaReady({ slug, locale }: { slug: string; locale: "en" | "fa" }) {
-  const user = useCurrentUser();
-  if (!user) return null;
-  return (
-    <Link
-      to="/films/$slug"
-      params={{ slug }}
-      className="hidden min-h-11 items-center gap-2 rounded-2xl border border-cream/15 bg-cream/5 px-6 py-3.5 text-[13px] font-medium text-cream-bright transition-colors duration-200 hover:border-amber/40 hover:bg-amber/10 hover:text-amber-bright md:inline-flex"
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      {locale === "fa" ? "افزودن به فهرست" : "Add to Watchlist"}
-    </Link>
   );
 }
 
