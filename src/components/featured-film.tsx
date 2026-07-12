@@ -247,7 +247,7 @@ function SlideImageFrame({
     >
       <div className="group relative w-full">
         {/* Outer frame — split on desktop */}
-        <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/[0.03] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] md:h-[420px] md:rounded-[2rem] lg:h-[480px] xl:h-[520px]">
+        <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/[0.03] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] md:min-h-[480px] md:rounded-[2rem] lg:min-h-[560px] xl:min-h-[620px]">
           <div className="grid md:h-full md:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]" dir="ltr">
             {/* IMAGE COLUMN */}
             <div
