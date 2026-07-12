@@ -76,7 +76,6 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
                 onPointerUp,
                 onPointerCancel: () => {
                   startX.current = null;
-                  setPaused(false);
                 },
               }}
               controls={
