@@ -283,21 +283,11 @@ function SlideImageFrame({
           aria-hidden
         />
 
-        {/* Outer frame accents */}
-        <div
-          className="pointer-events-none absolute -right-3 -top-3 z-20 h-20 w-20 rounded-tr-[2rem] border-r-2 border-t-2 border-amber/30 lg:-right-4 lg:-top-4 lg:h-28 lg:w-28 lg:rounded-tr-[2.5rem]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -bottom-3 -left-3 z-20 h-20 w-20 rounded-bl-[2rem] border-b-2 border-l-2 border-amber/30 lg:-bottom-4 lg:-left-4 lg:h-28 lg:w-28 lg:rounded-bl-[2.5rem]"
-          aria-hidden
-        />
-
         {/* Frame */}
-        <div className="relative z-10 overflow-hidden rounded-[1.75rem] border border-cream/10 bg-cream/5 shadow-2xl lg:rounded-[2.5rem]">
+        <div className="relative z-10 overflow-hidden rounded-xl border border-cream/10 bg-cream/5 shadow-2xl md:rounded-2xl">
           <div
             ref={frameRef}
-            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-[1.25rem] md:aspect-[21/9] md:rounded-[2rem]"
+            className="relative aspect-[2/3] touch-pan-y overflow-hidden rounded-lg bg-bg-0 md:aspect-[21/9] md:rounded-xl"
             style={{ background: fallbackBg }}
           >
             {/* Shimmer skeleton */}
@@ -358,15 +348,15 @@ function SlideImageFrame({
 
             {/* Inner subtle frame */}
             <div
-              className="pointer-events-none absolute inset-3 rounded-[1.25rem] border border-cream/5 md:inset-4 md:rounded-[1.75rem]"
+              className="pointer-events-none absolute inset-2 rounded-md border border-cream/5 md:inset-3 md:rounded-lg"
               aria-hidden
             />
 
             {active ? (
               <>
+                {/* Top badges */}
                 <div className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-                  {/* Top badges */}
-                  <div className="pointer-events-auto absolute right-6 top-6 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
+                  <div className="pointer-events-auto absolute right-5 top-5 z-30 flex flex-wrap items-center gap-3 lg:right-8 lg:top-8">
                     <span className="inline-flex items-center rounded-full bg-amber px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-ink shadow-md shadow-amber/20">
                       {locale === "fa" ? "اختصاصی" : "Original"}
                     </span>
@@ -375,29 +365,42 @@ function SlideImageFrame({
                       {locale === "fa" ? "اثر برگزیده" : "Featured Film"}
                     </span>
                   </div>
+                </div>
 
-                  {/* Controls */}
-                  {controls ? (
-                    <div className="pointer-events-auto absolute bottom-6 left-6 z-30 lg:bottom-8 lg:left-8">
-                      {controls}
-                    </div>
-                  ) : null}
+                {/* Slider controls — desktop, raised above bottom bar */}
+                {controls ? (
+                  <div className="pointer-events-auto absolute bottom-[4.5rem] left-5 z-30 hidden md:block lg:bottom-[5.5rem] lg:left-8">
+                    {controls}
+                  </div>
+                ) : null}
 
-                  {/* Title */}
-                  <div className="pointer-events-auto absolute bottom-6 right-6 z-30 flex min-w-0 max-w-[20rem] flex-col items-end gap-4 text-right rtl:items-start sm:max-w-[26rem] lg:bottom-8 lg:right-8 lg:max-w-[36rem] lg:gap-5">
-                    <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-cream-bright drop-shadow-2xl sm:text-4xl lg:text-5xl">
+                {/* Bottom info bar — desktop only */}
+                <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 hidden md:grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-cream/10 bg-bg-0/60 px-5 py-3 backdrop-blur-xl lg:px-8 lg:py-4">
+                  <div className="min-w-0">
+                    <h2 className="line-clamp-2 font-display text-lg font-bold leading-snug text-cream-bright sm:text-xl lg:text-2xl">
                       {title}
                     </h2>
                   </div>
-                </div>
-
-                {/* Bottom-edge glass "Watch Now" */}
-                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2">
                   <Link
                     {...watchHref}
                     onKeyDown={handleWatchKeyDown}
                     aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:min-h-12 md:px-6 md:py-3 md:text-[13px]"
+                    className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-amber/30 bg-amber/90 px-4 py-2 text-[12px] font-bold text-ink shadow-lg transition-all duration-200 hover:bg-amber hover:border-amber focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98] md:px-5 md:py-2.5 md:text-[13px]"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <span>{locale === "fa" ? "تماشا" : "Watch Now"}</span>
+                  </Link>
+                </div>
+
+                {/* Mobile centered Watch Now pill */}
+                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2 md:hidden">
+                  <Link
+                    {...watchHref}
+                    onKeyDown={handleWatchKeyDown}
+                    aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="md:h-4 md:w-4">
                       <path d="M8 5v14l11-7z" />
