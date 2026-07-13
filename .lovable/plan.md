@@ -1,28 +1,29 @@
-## Extend Featured Film hero to fit all content
+## Remove synopsis from featured film hero panel
 
-The desktop info panel currently uses fixed heights (`md:h-[420px] lg:h-[480px] xl:h-[520px]`) plus tight grid rows and `line-clamp-2` / `line-clamp-3`, which clips long titles and synopses. I'll extend the frame and let content fully display.
+The selected paragraph is the film synopsis inside the desktop info panel of `src/components/featured-film.tsx`. Removing it will free vertical space so the film title can display fully without line-clamping.
 
-### Changes in `src/components/featured-film.tsx`
+### Changes
 
-1. **Grow the frame height** so the info column has room:
-   - `md:h-[480px] lg:h-[560px] xl:h-[620px]` (up from 420/480/520).
+1. **Remove the synopsis block** from the desktop info column in `src/components/featured-film.tsx`.
+   - Delete the `<p>` element that renders `synopsis` (currently `line-clamp-3`).
+   - Remove the `synopsis` variable if it is no longer used anywhere else in the component.
 
-2. **Remove clamping on title and synopsis** in the desktop info panel:
-   - Drop `line-clamp-2` on the `<h2>` title.
-   - Drop `line-clamp-3` on the synopsis `<p>`.
-   - Remove `overflow-hidden` on those two blocks.
+2. **Let the title expand**:
+   - Remove `line-clamp-2` and `overflow-hidden` from the `<h2>` title.
+   - Allow the title row to grow naturally so long film names are not cropped.
 
-3. **Replace fixed grid rows with a flexible flow** in the info column:
-   - Change `grid grid-rows-[1.25rem_6.25rem_5.25rem_1.75rem_3rem]` (and lg variant) to a simple `flex flex-col gap-4 lg:gap-5`.
-   - Each block (eyebrow, title, synopsis, meta, buttons) becomes an auto-height flex item — nothing gets cropped regardless of length.
+3. **Adjust the info column layout**:
+   - Replace the fixed 5-row grid (`grid-rows-[1.25rem_6.25rem_5.25rem_1.75rem_3rem]`) with a simpler flex or 4-row grid that fits eyebrow, title, meta, and buttons.
+   - Keep vertical centering and spacing consistent.
 
-4. **Keep image column aspect intact**: the image side already stretches to `md:h-full`, so the taller frame just gives it more vertical room while remaining 16:9-ish within the split. No change to `<picture>` markup.
+4. **Verify responsive behavior**:
+   - Desktop: title fully visible, no truncation; panel remains balanced.
+   - Mobile: no change needed — the synopsis is only shown in the desktop info column.
 
-5. **Fallback shell**: bump `FeaturedFilmFallback` container to match the new heights so skeleton doesn't jump.
+### Files to edit
+- `src/components/featured-film.tsx`
 
 ### Verification
-
-- Load `/` on desktop: full title (e.g. "Grand Bazaar of Isfahan"), full synopsis (all sentences), meta row, and both buttons all visible without truncation.
-- Switch slides: no layout shift; each slide's content fits in the taller panel.
-- Mobile layout unchanged (no fixed heights there).
-- Build + typecheck pass.
+- Load the homepage on desktop and cycle through featured films.
+- Confirm film titles are no longer truncated.
+- Confirm the info panel still aligns with the image frame and no layout shift occurs between slides.

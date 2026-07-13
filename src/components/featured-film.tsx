@@ -190,7 +190,6 @@ function SlideImageFrame({
   const navigate = useNavigate();
   const { locale, t } = useLocale();
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
-  const synopsis = t({ en: film.synopsis_en || "", fa: film.synopsis_fa || film.synopsis_en || "" });
 
   const watchHref = { to: "/films/$slug" as const, params: { slug: film.slug } };
   const handleWatchKeyDown = (e: KeyboardEvent<HTMLAnchorElement>) => {
@@ -348,7 +347,7 @@ function SlideImageFrame({
                 className="hidden h-full bg-linear-to-b from-bg-0/40 to-bg-0/80 md:flex md:flex-col md:justify-center md:px-8 md:py-10 lg:px-10 lg:py-12"
                 dir={locale === "fa" ? "rtl" : "ltr"}
               >
-                <div className="grid w-full grid-rows-[1.25rem_6.25rem_5.25rem_1.75rem_3rem] gap-4 lg:grid-rows-[1.25rem_6.75rem_5.5rem_1.75rem_3.25rem] lg:gap-5">
+                <div className="grid w-full grid-rows-[1.25rem_minmax(0,1fr)_1.75rem_3rem] gap-4 lg:gap-5">
                   <div className="flex h-5 items-center gap-2 overflow-hidden">
                     <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
                     <span className="truncate text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
@@ -356,13 +355,9 @@ function SlideImageFrame({
                     </span>
                   </div>
 
-                  <h2 className="line-clamp-2 self-center overflow-hidden font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
+                  <h2 className="self-center font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
                     {title}
                   </h2>
-
-                  <p className={`line-clamp-3 overflow-hidden text-sm leading-relaxed text-cream/70 lg:text-[15px] ${synopsis ? "" : "invisible"}`}>
-                    {synopsis || "—"}
-                  </p>
 
                   <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1 overflow-hidden text-xs text-cream/60 lg:text-[13px]">
                     {film.is_premium ? (
