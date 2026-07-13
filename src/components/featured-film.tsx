@@ -134,12 +134,12 @@ function SliderControls({
         })}
       </div>
 
-      <div className="flex items-center gap-1 rtl:flex-row-reverse">
+      <div className="flex items-center gap-1" dir="ltr">
         <button
           type="button"
           onClick={onPrev}
           aria-label="Previous"
-          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <polyline points="15 18 9 12 15 6" />
@@ -149,13 +149,14 @@ function SliderControls({
           type="button"
           onClick={onNext}
           aria-label="Next"
-          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95 rtl:rotate-180"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
       </div>
+
     </div>
   );
 }
