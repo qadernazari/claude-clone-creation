@@ -134,7 +134,7 @@ function SliderControls({
         })}
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 rtl:flex-row-reverse">
         <button
           type="button"
           onClick={onPrev}
