@@ -360,7 +360,7 @@ function SlideImageFrame({
                       alt={film.title_fa || film.title_en}
                       width={1920}
                       height={1080}
-                      className={`cine-img absolute inset-0 block h-full w-full object-cover object-center transition-transform duration-1000 ease-out md:object-[unset] md:${fitClass} md:group-hover:scale-[1.02]`}
+                      className={`cine-img absolute inset-0 block h-full w-full transition-transform duration-1000 ease-out md:group-hover:scale-[1.02] ${fitClass}`}
                       loading={eager ? "eager" : "lazy"}
                       decoding={eager ? "sync" : "async"}
                       fetchPriority={eager ? "high" : undefined}
