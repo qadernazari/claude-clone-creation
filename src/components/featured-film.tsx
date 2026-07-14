@@ -376,7 +376,7 @@ function SlideImageFrame({
                         +12
                       </span>
                     ) : null}
-                    {film.year ? <span>{film.year}</span> : null}
+                    {film.year ? <span>{year(film.year)}</span> : null}
                     {film.duration_min ? (
                       <>
                         <span className="text-cream/25">•</span>
