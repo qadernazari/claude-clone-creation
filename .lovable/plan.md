@@ -1,25 +1,26 @@
-# Plan
+## Fix: Remove black dead-space above the mobile hero — full-bleed image behind a transparent header
 
-## 1. Featured Film — remove mobile overlay text
-File: `src/components/featured-film.tsx`
-- Delete the mobile title overlay block inside `SlideImageFrame` (the "WALKING TOUR / اختصاصی" kicker + `<h2>` title centered at the bottom of the image on mobile).
-- Keep the image, dots, and Watch button below. Desktop info panel stays unchanged.
-- Reduce bottom gradient darkness on mobile since there's no text to protect (soften the `linear-gradient` to a very light fade so the photo reads cleaner).
+### Problem
+On mobile, the hero section has `mt-24` (96px) on `HeroShell`, which pushes the image below the transparent site header. Because the header is transparent on the homepage, that gap renders as a solid black bar — the "dead space" seen in the screenshot.
 
-## 2. Top Header — tighten spacing + simpler region switcher (mobile only)
-File: `src/components/site-header.tsx`
-- Reduce clutter on mobile:
-  - Tighten horizontal padding: `px-5` → `px-4` on mobile.
-  - Tighten gap between right-side icons on mobile: `gap-1.5` → `gap-1`.
-  - Shrink icon buttons on mobile only from `h-10 w-10` → `h-9 w-9` (keep desktop at 10).
-  - Reduce header vertical padding slightly on mobile.
-- Simpler region switcher (`RegionToggle` mobile trigger):
-  - Replace the bordered pill with a minimal ghost button: no border, no inset shadow, no background fill.
-  - Show a small globe icon + short label (`EN` / `فا`) instead of the full "Global" / "ایران" wordmark and chevron. Remove the chevron on mobile.
-  - Keep the bottom sheet unchanged when tapped.
-- Desktop layout (segmented Global/ایران control, nav, membership button) is untouched.
+### Change
 
-## Notes
-- No content or logic changes elsewhere.
-- Bottom tab bar is not touched (user asked for the top header).
-- Persian font cascade and RTL behavior preserved.
+**File: `src/components/featured-film.tsx`**
+
+1. `HeroShell` wrapper — remove the mobile top margin so the image starts at the very top of the viewport and flows behind the transparent header. Keep the desktop offset intact.
+   - Before: `mt-24 ... md:mt-32 ... pb-10`
+   - After: `mt-0 pt-0 md:mt-32 pb-10`
+
+2. `SlideImageFrame` mobile image column — add a subtle top gradient overlay to keep the header logo/icons legible against bright hero photos. Desktop unchanged.
+   - Add a mobile-only `<div>` with `linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.15) 25%, transparent 55%)` inside the image column.
+   - Adds ~130px of soft fade at the very top, so light-sky photos (as in the screenshot) don't wash out the header.
+
+### Result
+- No black rectangle above the hero — the sky/photo now extends up to the top edge.
+- Header icons remain readable via the soft top scrim.
+- Desktop layout unchanged (framed card with rounded corners stays as-is).
+- Non-hero pages still get the normal solid header (already handled by `hasHero` logic in `site-header.tsx`).
+
+### Notes
+- No changes to `site-header.tsx` — transparency-on-hero behavior is already correct.
+- No content, routing, or logic changes.

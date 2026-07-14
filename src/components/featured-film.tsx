@@ -26,7 +26,8 @@ export function FeaturedFilm() {
 function HeroShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+
 
         {children}
       </div>
@@ -358,7 +359,17 @@ function SlideImageFrame({
                 </Link>
               ) : null}
 
-              {/* Gradient — bottom fade for mobile pill readability; right fade on desktop to blend into info column */}
+              {/* Mobile: top scrim so the transparent header stays legible over the photo */}
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40 md:hidden"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.18) 30%, transparent 60%)",
+                }}
+                aria-hidden
+              />
+
+              {/* Desktop: right fade to blend image into info column */}
               <div
                 className="pointer-events-none absolute inset-0 hidden md:block"
                 style={{
@@ -367,6 +378,7 @@ function SlideImageFrame({
                 }}
                 aria-hidden
               />
+
 
               {/* Slider arrows — bottom-left of image, desktop only */}
               {active && controls ? (
