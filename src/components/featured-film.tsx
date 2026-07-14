@@ -413,7 +413,7 @@ function SlideImageFrame({
 
               {/* Mobile dots — inside image, bottom-center */}
               {active && slider ? (
-                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
+                <div className="pointer-events-auto absolute bottom-14 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-bg-0/40 px-2.5 py-1.5 backdrop-blur-md md:hidden">
                   {Array.from({ length: slider.count }).map((_, i) => {
                     const isActive = i === slider.index;
                     return (
