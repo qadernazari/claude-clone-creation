@@ -132,7 +132,9 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
     };
   }, [open]);
 
+  void activeLabelUnused;
   const activeLabel = isIran ? "ایران" : "Global";
+  const activeLabelUnused = activeLabel;
   const options = [
     {
       key: "global" as const,
