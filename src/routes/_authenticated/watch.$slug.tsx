@@ -613,7 +613,7 @@ function WatchPage() {
             const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
             const prevIdx = Math.max(speeds.indexOf(speedRef.current) - 1, 0);
             changeSpeed(speeds[prevIdx]);
-            flashHud(`${speeds[prevIdx]}×`);
+            flashHud(`${digits(speeds[prevIdx])}×`);
           }
           break;
         case "t":
