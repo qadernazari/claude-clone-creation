@@ -398,7 +398,7 @@ function SlideImageFrame({
                         </svg>
                       </span>
                       <span className="text-sm leading-none">
-                        {locale === "fa" ? "ورود و پخش" : "Watch Now"}
+                        {ctaLabel}
                       </span>
                     </Link>
                   </div>
