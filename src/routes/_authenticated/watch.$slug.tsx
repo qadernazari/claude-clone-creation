@@ -603,7 +603,7 @@ function WatchPage() {
             const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
             const nextIdx = Math.min(speeds.indexOf(speedRef.current) + 1, speeds.length - 1);
             changeSpeed(speeds[nextIdx]);
-            flashHud(`${speeds[nextIdx]}×`);
+            flashHud(`${digits(speeds[nextIdx])}×`);
           }
           break;
         case "<":
