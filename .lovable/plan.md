@@ -1,26 +1,18 @@
-Edit only `src/components/featured-film.tsx`.
+Only `src/components/featured-film.tsx`, desktop info panel (the `INFO COLUMN — desktop only` block).
 
-1. **Category-aware kicker label** (replaces hardcoded "Original / اختصاصی" at line 365):
-   ```
-   film.category === 'walking-tour'
-     ? (locale === 'fa' ? 'پیاده‌روی گردشگری' : 'Walking Tour')
-     : (locale === 'fa' ? 'اختصاصی' : 'Original')
-   ```
+1. **Stop title cropping.** Current `h-[6.5rem] lg:h-[7.5rem]` + `leading-[1.3]` can't hold 3 lines at `xl:text-[2.25rem]`.
+   - `<h2>`: change `leading-[1.3]` → `leading-[1.2]`, keep `line-clamp-3`.
+   - Title reserve wrapper: `h-[6.75rem] lg:h-[7.75rem] xl:h-[9rem]`.
 
-2. **Stabilize the desktop info panel** so title/meta/Watch button don't shift between slides:
-   - Drop `md:justify-center` on the info column wrapper.
-   - Replace `grid grid-rows-[1.25rem_minmax(0,1fr)_1.75rem_3rem]` with a top-aligned flex column using fixed height reserves:
-     - kicker row `h-5`
-     - title box `h-[6.5rem] lg:h-[7.5rem]` with `line-clamp-3` and `items-start` (1–3 line titles occupy identical vertical space)
-     - meta row `h-7`
-     - Watch button row `h-12`
-   - Add a top padding so the block sits at a consistent offset from the frame top.
-   Result: Watch button is pinned to the same Y coordinate on every slide.
+2. **Fill the empty space + keep Watch button stable.** Restructure the inner stack as a full-height flex column:
+   - Container: `flex h-full flex-col` (currently just `flex flex-col`).
+   - Order:
+     a. Kicker `h-5` (unchanged)
+     b. Title reserve (new heights above)
+     c. Meta row `h-7` (unchanged)
+     d. **Synopsis paragraph** — new: `mt-4 flex-1 overflow-hidden`, inside it a `<p className="line-clamp-4 text-sm lg:text-[15px] leading-[1.65] text-cream/70">` reading `t({ en: film.synopsis_en ?? '', fa: film.synopsis_fa ?? film.synopsis_en ?? '' })`. `flex-1` absorbs remaining panel height so the button is pushed to the bottom whether or not synopsis text exists.
+     e. Watch button row `mt-auto flex h-12 items-center` (was `mt-5 h-12`) — `mt-auto` pins it to the panel bottom.
 
-3. **Autoplay** in `FeaturedSlider`:
-   - `useEffect` starts a 5000ms interval that calls `next()`.
-   - Pause when: hovered (`onMouseEnter/Leave` on the section), off-screen (IntersectionObserver), or `prefers-reduced-motion: reduce`.
-   - Any manual interaction (arrow click, dot click, swipe) resets the timer via a `bumpTimer` ref so it doesn't immediately jump.
-   - Existing 700ms opacity cross-fade provides the smooth transition — no visual redesign.
+Result: three-line titles fit at every breakpoint, empty space fills with synopsis (or an invisible flex spacer when missing), and the Watch button lands at the same Y on every slide because the panel is fixed height and the button is anchored to its bottom.
 
-No other files, styles, or data-layer changes.
+No other files, no styles.css / data / i18n changes.
