@@ -393,7 +393,7 @@ function SlideImageFrame({
                 className="hidden h-full bg-linear-to-b from-bg-0/40 to-bg-0/80 md:flex md:flex-col md:px-8 md:pt-10 md:pb-8 lg:px-10 lg:pt-12 lg:pb-10"
                 dir={locale === "fa" ? "rtl" : "ltr"}
               >
-                <div className="flex w-full flex-col">
+                <div className="flex h-full w-full flex-col">
                   {/* Kicker — fixed height */}
                   <div className="flex h-5 items-center gap-2 overflow-hidden">
                     <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
@@ -404,9 +404,9 @@ function SlideImageFrame({
                     </span>
                   </div>
 
-                  {/* Title — fixed reserve, top-aligned, up to 3 lines */}
-                  <div className="mt-4 flex h-[6.5rem] items-start overflow-hidden lg:h-[7.5rem]">
-                    <h2 className="line-clamp-3 font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
+                  {/* Title — fixed reserve tuned to fit 3 lines at every breakpoint */}
+                  <div className="mt-4 flex h-[6.75rem] items-start overflow-hidden lg:h-[7.75rem] xl:h-[9rem]">
+                    <h2 className="line-clamp-3 font-display text-2xl font-black leading-[1.2] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
                       {title}
                     </h2>
                   </div>
@@ -427,8 +427,20 @@ function SlideImageFrame({
                     ) : null}
                   </div>
 
-                  {/* Watch button — fixed height, pinned Y across all slides */}
-                  <div className="mt-5 flex h-12 items-center">
+                  {/* Synopsis — fills remaining space so the button is pushed to the bottom */}
+                  <div className="mt-4 flex-1 overflow-hidden">
+                    {(film.synopsis_en || film.synopsis_fa) ? (
+                      <p className="line-clamp-4 text-sm leading-[1.65] text-cream/70 lg:text-[15px]">
+                        {t({
+                          en: film.synopsis_en ?? "",
+                          fa: film.synopsis_fa ?? film.synopsis_en ?? "",
+                        })}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {/* Watch button — pinned to panel bottom on every slide */}
+                  <div className="mt-auto flex h-12 items-center pt-4">
                     <Link
                       {...watchHref}
                       onKeyDown={handleWatchKeyDown}
@@ -442,6 +454,7 @@ function SlideImageFrame({
                     </Link>
                   </div>
                 </div>
+
               </div>
             ) : null}
 
