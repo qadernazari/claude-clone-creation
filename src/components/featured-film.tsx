@@ -26,7 +26,7 @@ export function FeaturedFilm() {
 function HeroShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         {children}
       </div>
     </section>
@@ -99,7 +99,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative">
           {slides.map((film, i) => (
             <SlideImageFrame
@@ -536,7 +536,7 @@ function SlideImageFrame({
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative w-full">
           <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-2xl md:rounded-[2rem]">
             <div
