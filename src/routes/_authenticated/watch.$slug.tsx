@@ -550,7 +550,7 @@ function WatchPage() {
         e.preventDefault();
         const pct = parseInt(e.key, 10) / 10;
         v.currentTime = v.duration * pct;
-        flashHud(`${pct * 100}%`);
+        flashHud(`${digits(pct * 100)}%`);
         return;
       }
       switch (e.key) {
