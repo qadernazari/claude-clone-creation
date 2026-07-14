@@ -529,16 +529,6 @@ function SlideImageFrame({
         </div>
       </div>
 
-
-
-      {/* Mobile-only stacked controls below frame */}
-      {active && controls ? (
-        <div className="mt-6 flex justify-center md:hidden">
-          <div className="rounded-2xl border border-cream/10 bg-bg-0/50 px-3 py-2 shadow-2xl backdrop-blur-xl">
-            {controls}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
