@@ -1053,7 +1053,7 @@ function WatchPage() {
                               onClick={() => changeSpeed(s)}
                               className={`flex w-full items-center justify-between rounded px-3 py-1.5 hover:bg-cream/10 ${speed === s ? "text-amber" : "text-cream/85"}`}
                             >
-                              <span>{s}×</span>
+                              <span>{digits(s)}×</span>
                               {speed === s && <span aria-hidden>✓</span>}
                             </button>
                           ))}
