@@ -191,7 +191,15 @@ function SlideImageFrame({
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { locale, t } = useLocale();
+  const { locale, t, year } = useLocale();
+  const { user, isMember, isTrialExpired } = useSubscription();
+  const ctaState = {
+    isAuthenticated: !!user,
+    isMember,
+    isMembershipEnded: isTrialExpired,
+  };
+  const ctaLabel = watchCtaLabel(locale, ctaState);
+  const ctaShort = watchCtaShort(locale, ctaState);
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
 
   const watchHref = { to: "/films/$slug" as const, params: { slug: film.slug } };
