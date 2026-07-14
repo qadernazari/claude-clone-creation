@@ -191,7 +191,7 @@ function SlideImageFrame({
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { locale, t, year } = useLocale();
+  const { locale, t, year, num } = useLocale();
   const { user, isMember, isTrialExpired } = useSubscription();
   const ctaState = {
     isAuthenticated: !!user,
@@ -380,7 +380,7 @@ function SlideImageFrame({
                     {film.duration_min ? (
                       <>
                         <span className="text-cream/25">•</span>
-                        <span>{film.duration_min}{locale === "fa" ? " دقیقه" : "m"}</span>
+                        <span>{num(film.duration_min)}{locale === "fa" ? " دقیقه" : "m"}</span>
                       </>
                     ) : null}
                   </div>
