@@ -268,9 +268,6 @@ function FilmPage() {
   const fa = locale === "fa";
   const { isMember, isLoading: isAuthLoading, user, hasUsedTrial } = useSubscription();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  
-  
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [synopsisOpen, setSynopsisOpen] = useState(false);
   const [stickyHeader, setStickyHeader] = useState(false);
@@ -304,20 +301,6 @@ function FilmPage() {
     return () => io.disconnect();
   }, []);
 
-  // Trap body scroll + ESC-to-close while the trailer modal is open
-  useEffect(() => {
-    if (!previewOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPreviewOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [previewOpen]);
 
 
   // Log a "view" event with geo / device / referrer captured server-side
@@ -440,7 +423,6 @@ function FilmPage() {
     back: fa ? "بازگشت" : "Back",
     contribSoon: fa ? "حمایت به‌زودی فعال می‌شود." : "Contributions coming soon.",
     tomanSoon: fa ? "پرداخت با تومان (زرین‌پال) به‌زودی." : "Toman checkout (ZarinPal) coming soon.",
-    playPreview: fa ? "پخش تیزر" : "Watch trailer",
     share: fa ? "اشتراک‌گذاری" : "Share",
     copied: fa ? "لینک کپی شد!" : "Link copied!",
     moreFromCat: fa ? "بیشتر از این دسته" : "More to explore",
@@ -850,19 +832,6 @@ function FilmPage() {
 
               <WatchlistButton filmId={film.id} variant="pill" />
 
-              {film.preview_url && (
-                <button
-                  type="button"
-                  onClick={() => setPreviewOpen(true)}
-                  className="inline-flex h-10 items-center gap-1.5 rounded-md border border-cream/25 bg-black/20 px-3.5 text-[12px] font-medium text-cream/85 backdrop-blur-sm transition-colors hover:border-cream/45 hover:bg-cream/8 hover:text-cream"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  {t.playPreview}
-                </button>
-              )}
-
               <button
                 type="button"
                 onClick={handleShare}
@@ -1112,53 +1081,6 @@ function FilmPage() {
         </Suspense>
       )}
 
-
-      {/* Preview / trailer lightbox */}
-      {/* Cinema trailer modal — true black, fade-in, ESC + body-scroll-lock above */}
-      {previewOpen && film.preview_url && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 p-4 trailer-modal-fade backdrop-blur-md"
-          onClick={() => setPreviewOpen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label={t.playPreview}
-        >
-          {/* Eyebrow label, top-left */}
-          <div
-            className={`pointer-events-none absolute top-6 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90 ${dir === "rtl" ? "right-6" : "left-6"}`}
-          >
-            {fa ? "تیزر" : "Trailer"}
-            <span className={`text-cream/40 ${dir === "rtl" ? "mr-2" : "ml-2"}`}>· {title}</span>
-          </div>
-          {/* Cinematic close button */}
-          <button
-            type="button"
-            onClick={() => setPreviewOpen(false)}
-            className={`absolute top-5 flex h-10 w-10 items-center justify-center rounded-md border border-cream/15 bg-black/40 text-cream/75 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-amber/40 hover:text-amber ${dir === "rtl" ? "left-5" : "right-5"}`}
-            aria-label={fa ? "بستن" : "Close"}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
-          <div
-            className="relative w-full max-w-5xl overflow-hidden rounded-2xl border border-cream/10 bg-black shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9),0_0_0_1px_rgba(201,168,76,0.08)] trailer-modal-rise"
-            onClick={(e) => e.stopPropagation()}
-            style={{ aspectRatio: "16 / 9" }}
-          >
-            <video
-              src={film.preview_url}
-              controls
-              autoPlay
-              playsInline
-              className="h-full w-full"
-            />
-          </div>
-          <p className={`pointer-events-none absolute bottom-5 text-[10px] uppercase tracking-[0.28em] text-cream/35 ${dir === "rtl" ? "right-6" : "left-6"}`}>
-            {fa ? "برای بستن کلیک کنید یا ESC را بزنید" : "Click outside or press ESC to close"}
-          </p>
-        </div>
-      )}
       {film.film_type === "series" && (
         <MountWhenNear rootMargin="400px" minHeight={320}>
           <Suspense fallback={null}>
