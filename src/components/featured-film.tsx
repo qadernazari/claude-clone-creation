@@ -391,12 +391,6 @@ function SlideImageFrame({
                         {locale === "fa" ? "ورود و پخش" : "Watch Now"}
                       </span>
                     </Link>
-                    <Link
-                      {...watchHref}
-                      className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.04] px-4 py-2.5 text-sm font-semibold text-cream/85 backdrop-blur-sm transition-all duration-200 hover:border-cream/25 hover:bg-cream/[0.08] hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70"
-                    >
-                      {locale === "fa" ? "پیش‌نمایش" : "Preview"}
-                    </Link>
                   </div>
                 </div>
               </div>
