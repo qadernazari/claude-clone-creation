@@ -107,7 +107,7 @@ export function SeriesEpisodes({ seriesId }: { seriesId: string }) {
                   {ep.thumbnail_url || ep.cover_url ? (
                     <img
                       src={ep.thumbnail_url ?? ep.cover_url ?? ""}
-                      alt=""
+                      alt={ep.title_en || ""}
                       loading="lazy"
                       className="cine-img h-full w-full object-cover"
                     />

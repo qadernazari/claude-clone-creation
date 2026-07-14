@@ -403,7 +403,7 @@ function BrowsePage() {
                         <source media="(min-width: 1024px)" srcSet={film.thumbnail_url || film.cover_url || undefined} />
                         <img
                           src={film.cover_url || film.thumbnail_url || undefined}
-                          alt=""
+                          alt={ftitle}
                           loading="lazy"
                           decoding="async"
                           fetchPriority="low"

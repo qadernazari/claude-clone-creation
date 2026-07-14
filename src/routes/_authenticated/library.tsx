@@ -279,7 +279,7 @@ function PosterThumb({ film, size = "md" }: { film: LibraryFilm; size?: "sm" | "
       {film.cover_url && (
         <img
           src={film.cover_url}
-          alt=""
+          alt={film.title_en || ""}
           loading="lazy"
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
@@ -386,7 +386,7 @@ function ContinueCard({
         {(film.thumbnail_url || film.cover_url) && (
           <img
             src={film.thumbnail_url || film.cover_url || ""}
-            alt=""
+            alt={fa ? (film.title_fa || film.title_en || "") : (film.title_en || "")}
             loading="lazy"
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
