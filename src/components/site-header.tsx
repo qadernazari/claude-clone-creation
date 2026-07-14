@@ -417,7 +417,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 <Link
                   to="/auth"
                   aria-label={fa ? "ورود" : "Sign in"}
-                  className="mobile-signin-trigger inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:hidden"
+                  className="mobile-signin-trigger inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:hidden"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <circle cx="12" cy="8" r="3.5" />
