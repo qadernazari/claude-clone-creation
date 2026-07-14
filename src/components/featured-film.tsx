@@ -101,7 +101,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-0 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
 
         <div className="relative">
           {slides.map((film, i) => (
@@ -518,7 +518,7 @@ function SlideImageFrame({
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-0 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative w-full">
           <div className="relative z-10 overflow-hidden md:rounded-[2rem] md:border md:border-cream/10 md:bg-cream/5 md:shadow-2xl">
             <div
