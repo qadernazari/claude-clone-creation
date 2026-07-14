@@ -22,7 +22,7 @@ function daysUntil(iso: string | null): number | null {
 }
 
 export function MembershipPanel() {
-  const { locale } = useLocale();
+  const { locale, num } = useLocale();
   const fa = locale === "fa";
   const { subscription: sub, trial, isMember, isTrialActive, isLoading, hasUsedTrial, isTrialExpired } = useSubscription();
   const openPortal = useServerFn(createMembershipPortalSession);
