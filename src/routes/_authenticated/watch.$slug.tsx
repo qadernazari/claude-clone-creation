@@ -215,9 +215,10 @@ function WatchPage() {
     const h = Math.floor(sec / 3600);
     const m = Math.floor((sec % 3600) / 60);
     const r = sec % 60;
-    return h > 0
+    const raw = h > 0
       ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`
       : `${m}:${String(r).padStart(2, "0")}`;
+    return digits(raw);
   };
 
   const onTimeUpdate = useCallback(() => {
