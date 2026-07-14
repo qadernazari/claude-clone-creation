@@ -393,8 +393,8 @@ function SlideImageFrame({
                 dir={locale === "fa" ? "rtl" : "ltr"}
               >
                 <div className="flex h-full w-full flex-col">
-                  {/* Kicker — fixed height */}
-                  <div className="flex h-5 items-center gap-2 overflow-hidden">
+                  {/* Kicker — compact, but not clipped */}
+                  <div className="flex min-h-5 items-center gap-2 overflow-visible pb-0.5">
                     <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
                     <span className="truncate text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
                       {film.category === "walking-tour"
@@ -403,15 +403,15 @@ function SlideImageFrame({
                     </span>
                   </div>
 
-                  {/* Title — fixed reserve tuned to fit 3 lines at every breakpoint */}
-                  <div className="mt-4 flex h-[6.75rem] items-start overflow-hidden lg:h-[7.75rem] xl:h-[9rem]">
-                    <h2 className="line-clamp-3 font-display text-2xl font-black leading-[1.2] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl xl:text-[2.25rem]">
+                  {/* Title — allow full glyph height and wrapping without cutting Persian descenders */}
+                  <div className="mt-4 flex min-h-[7.25rem] items-start overflow-visible pb-1 lg:min-h-[8.25rem] xl:min-h-[9.25rem]">
+                    <h2 className="max-w-full text-balance font-display text-2xl font-black leading-[1.38] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl lg:leading-[1.35] xl:text-[2.2rem] xl:leading-[1.32]">
                       {title}
                     </h2>
                   </div>
 
-                  {/* Meta — fixed height */}
-                  <div className="mt-4 flex h-7 flex-wrap items-center gap-x-3 gap-y-1 overflow-hidden text-xs text-cream/60 lg:text-[13px]">
+                  {/* Meta — enough vertical room for Persian numerals and labels */}
+                  <div className="mt-3 flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1 overflow-visible pb-0.5 text-xs leading-6 text-cream/60 lg:text-[13px]">
                     {film.is_premium ? (
                       <span className="rounded-md bg-amber/15 px-2 py-0.5 text-[11px] font-bold text-amber">
                         +{num(12)}
@@ -426,10 +426,10 @@ function SlideImageFrame({
                     ) : null}
                   </div>
 
-                  {/* Synopsis — fills remaining space so the button is pushed to the bottom */}
-                  <div className="mt-4 flex-1 overflow-hidden">
+                  {/* Synopsis — fills remaining space without cutting glyph bottoms */}
+                  <div className="mt-4 min-h-0 flex-1 overflow-hidden pb-1">
                     {(film.synopsis_en || film.synopsis_fa) ? (
-                      <p className="line-clamp-4 text-sm leading-[1.65] text-cream/70 lg:text-[15px]">
+                      <p className="line-clamp-4 text-sm leading-[1.85] text-cream/70 lg:text-[15px] lg:leading-[1.8]">
                         {t({
                           en: film.synopsis_en ?? "",
                           fa: film.synopsis_fa ?? film.synopsis_en ?? "",
@@ -439,7 +439,7 @@ function SlideImageFrame({
                   </div>
 
                   {/* Watch button — pinned to panel bottom on every slide */}
-                  <div className="mt-auto flex h-12 items-center pt-4">
+                  <div className="mt-auto flex min-h-12 items-center pt-4">
                     <Link
                       {...watchHref}
                       onKeyDown={handleWatchKeyDown}
@@ -449,7 +449,7 @@ function SlideImageFrame({
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M8 5v14l11-7z" />
                       </svg>
-                      <span className="leading-none tracking-wide">{ctaLabel}</span>
+                      <span className="leading-normal tracking-wide">{ctaLabel}</span>
                     </Link>
                   </div>
                 </div>
