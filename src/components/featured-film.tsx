@@ -26,7 +26,8 @@ export function FeaturedFilm() {
 function HeroShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-14 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+
         {children}
       </div>
     </section>
@@ -99,7 +100,8 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-14 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+
         <div className="relative">
           {slides.map((film, i) => (
             <SlideImageFrame
@@ -409,9 +411,9 @@ function SlideImageFrame({
                 </div>
               ) : null}
 
-              {/* Mobile dots — inside image, above Watch pill */}
+              {/* Mobile dots — inside image, bottom-center */}
               {active && slider ? (
-                <div className="pointer-events-auto absolute bottom-16 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
+                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
                   {Array.from({ length: slider.count }).map((_, i) => {
                     const isActive = i === slider.index;
                     return (
@@ -436,22 +438,6 @@ function SlideImageFrame({
                 </div>
               ) : null}
 
-              {/* Mobile centered Watch pill */}
-              {active ? (
-                <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2 md:hidden">
-                  <Link
-                    {...watchHref}
-                    onKeyDown={handleWatchKeyDown}
-                    aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/30 bg-bg-0/50 px-5 py-2.5 text-[12px] font-bold text-cream-bright shadow-lg backdrop-blur-xl transition-all duration-200 hover:border-amber/50 hover:bg-bg-0/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <span>{ctaShort}</span>
-                  </Link>
-                </div>
-              ) : null}
             </div>
 
             {/* INFO COLUMN — desktop only */}
@@ -527,7 +513,25 @@ function SlideImageFrame({
 
           </div>
         </div>
+
+        {/* Mobile Watch pill — overlaps the bottom edge of the hero card */}
+        {active ? (
+          <div className="pointer-events-auto absolute bottom-0 left-1/2 z-40 -translate-x-1/2 translate-y-1/2 md:hidden">
+            <Link
+              {...watchHref}
+              onKeyDown={handleWatchKeyDown}
+              aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/40 bg-bg-0/90 px-6 py-3 text-[13px] font-bold text-cream-bright shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)] backdrop-blur-xl transition-all duration-200 hover:border-amber/60 hover:bg-bg-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span>{ctaShort}</span>
+            </Link>
+          </div>
+        ) : null}
       </div>
+
 
     </div>
   );
