@@ -3,6 +3,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
+import { useSubscription } from "../hooks/use-subscription";
+import { watchCtaLabel, watchCtaShort } from "../lib/watch-cta";
 
 
 
@@ -189,7 +191,15 @@ function SlideImageFrame({
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { locale, t } = useLocale();
+  const { locale, t, year } = useLocale();
+  const { user, isMember, isTrialExpired } = useSubscription();
+  const ctaState = {
+    isAuthenticated: !!user,
+    isMember,
+    isMembershipEnded: isTrialExpired,
+  };
+  const ctaLabel = watchCtaLabel(locale, ctaState);
+  const ctaShort = watchCtaShort(locale, ctaState);
   const title = t({ en: film.title_en, fa: film.title_fa || film.title_en });
 
   const watchHref = { to: "/films/$slug" as const, params: { slug: film.slug } };
@@ -336,7 +346,7 @@ function SlideImageFrame({
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                       <path d="M8 5v14l11-7z" />
                     </svg>
-                    <span>{locale === "fa" ? "تماشا" : "Watch Now"}</span>
+                    <span>{ctaShort}</span>
                   </Link>
                 </div>
               ) : null}
@@ -366,7 +376,7 @@ function SlideImageFrame({
                         +12
                       </span>
                     ) : null}
-                    {film.year ? <span>{film.year}</span> : null}
+                    {film.year ? <span>{year(film.year)}</span> : null}
                     {film.duration_min ? (
                       <>
                         <span className="text-cream/25">•</span>
@@ -388,7 +398,7 @@ function SlideImageFrame({
                         </svg>
                       </span>
                       <span className="text-sm leading-none">
-                        {locale === "fa" ? "ورود و پخش" : "Watch Now"}
+                        {ctaLabel}
                       </span>
                     </Link>
                   </div>

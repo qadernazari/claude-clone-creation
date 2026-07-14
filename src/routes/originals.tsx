@@ -38,7 +38,7 @@ type FilmRow = {
 };
 
 function OriginalsPage() {
-  const { locale, dir } = useLocale();
+  const { locale, dir, year } = useLocale();
   const fa = locale === "fa";
 
   const { data: films = [] } = useQuery<FilmRow[]>({
@@ -118,7 +118,7 @@ function OriginalsPage() {
                       {displayTitle}
                     </p>
                     {film.year ? (
-                      <p className="mt-0.5 text-[11px] text-cream/55">{film.year}</p>
+                      <p className="mt-0.5 text-[11px] text-cream/55">{year(film.year)}</p>
                     ) : null}
                   </div>
                 </Link>
