@@ -390,18 +390,15 @@ function SlideImageFrame({
                       {...watchHref}
                       onKeyDown={handleWatchKeyDown}
                       aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-                      className="btn-cinematic group/btn inline-flex shrink-0 items-center gap-2.5 rounded-xl px-5 py-2.5 font-bold text-ink focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:translate-y-px active:scale-[0.98]"
+                      className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-amber px-6 py-3 text-base font-bold text-ink shadow-lg shadow-amber/25 transition hover:bg-amber-bright hover:shadow-amber/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
                     >
-                      <span className="relative z-[1] flex h-7 w-7 items-center justify-center rounded-full bg-ink/85 text-amber-bright shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.4)] transition-transform duration-200 group-hover/btn:scale-110 group-active/btn:scale-95">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden className="translate-x-[1px]">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </span>
-                      <span className="relative z-[1] text-sm leading-none tracking-wide">
-                        {ctaLabel}
-                      </span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <span className="leading-none tracking-wide">{ctaLabel}</span>
                     </Link>
                   </div>
+
                 </div>
               </div>
             ) : null}
