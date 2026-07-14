@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { useLocale } from "@/lib/i18n";
+import { useLocale, toPersianDigits } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getLibrary, toggleWatchlist, type LibraryFilm, type LibraryData } from "@/lib/library.functions";
