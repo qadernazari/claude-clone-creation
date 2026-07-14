@@ -358,7 +358,7 @@ function CouponsPage() {
                   <td className="px-4 py-3 font-mono text-xs">
                     {c.code}
                     {c.description && (
-                      <div className="mt-0.5 text-[11px] text-muted-foreground font-sans normal-case">
+                      <div className="mt-0.5 text-[11px] text-muted-foreground font-body normal-case">
                         {c.description}
                       </div>
                     )}
