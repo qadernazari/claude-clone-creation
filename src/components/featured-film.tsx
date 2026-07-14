@@ -314,7 +314,7 @@ function SlideImageFrame({
             {/* IMAGE COLUMN */}
             <div
               ref={frameRef}
-              className="relative aspect-[2/3] touch-pan-y overflow-hidden bg-bg-0 md:aspect-auto md:h-full"
+              className="relative aspect-[4/5] touch-pan-y overflow-hidden bg-bg-0 md:aspect-auto md:h-full"
               style={{ background: fallbackBg }}
             >
               {/* Shimmer skeleton */}
