@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 // cache both stylesheet and font files at our own origin.
 
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { verifyPersianFont } from "../lib/verify-persian-font";
 import { LocaleProvider, useLocale } from "../lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 // Toaster (sonner) is lazy-loaded — it pulls a non-trivial chunk and is
@@ -246,6 +247,9 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient, initialRegion } = Route.useRouteContext();
   const region = initialRegion?.region ?? "iran";
+  useEffect(() => {
+    verifyPersianFont();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
