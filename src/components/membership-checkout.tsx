@@ -62,7 +62,7 @@ export function MembershipCheckout({ returnUrl, onClose, plan: planId }: Members
 
   const planAmountToman = tomanPriceForPlan(plan);
   const monthsLabel = fa
-    ? plan.months === 1 ? "یک ماه" : `${plan.months} ماه`
+    ? plan.months === 1 ? "یک ماه" : `${num(plan.months)} ماه`
     : `${plan.months} ${plan.months === 1 ? "Month" : "Months"}`;
 
   if (isMember) {
