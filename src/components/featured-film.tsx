@@ -384,11 +384,11 @@ function SlideImageFrame({
               ) : null}
 
               {/* Mobile side arrows — overlay on image, always LTR so left=prev / right=next */}
-              {active && controls ? (
+              {active && slider ? (
                 <div className="pointer-events-none absolute inset-0 z-30 md:hidden" dir="ltr">
                   <button
                     type="button"
-                    onClick={controls.props.onPrev}
+                    onClick={slider.onPrev}
                     aria-label="Previous"
                     className="pointer-events-auto absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream/10 bg-bg-0/45 text-amber shadow-lg backdrop-blur-md transition-all active:scale-95"
                   >
@@ -398,7 +398,7 @@ function SlideImageFrame({
                   </button>
                   <button
                     type="button"
-                    onClick={controls.props.onNext}
+                    onClick={slider.onNext}
                     aria-label="Next"
                     className="pointer-events-auto absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream/10 bg-bg-0/45 text-amber shadow-lg backdrop-blur-md transition-all active:scale-95"
                   >
@@ -410,15 +410,15 @@ function SlideImageFrame({
               ) : null}
 
               {/* Mobile dots — inside image, above Watch pill */}
-              {active && controls ? (
+              {active && slider ? (
                 <div className="pointer-events-auto absolute bottom-16 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
-                  {Array.from({ length: controls.props.count }).map((_, i) => {
-                    const isActive = i === controls.props.index;
+                  {Array.from({ length: slider.count }).map((_, i) => {
+                    const isActive = i === slider.index;
                     return (
                       <button
                         key={i}
                         type="button"
-                        onClick={() => controls.props.onGo(i)}
+                        onClick={() => slider.onGo(i)}
                         aria-label={`Go to slide ${i + 1}`}
                         aria-current={isActive ? "true" : undefined}
                         className="flex cursor-pointer items-center justify-center rounded-full"
