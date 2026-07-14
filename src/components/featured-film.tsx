@@ -26,7 +26,7 @@ export function FeaturedFilm() {
 function HeroShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         {children}
       </div>
     </section>
@@ -99,7 +99,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative">
           {slides.map((film, i) => (
             <SlideImageFrame
@@ -113,6 +113,13 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
                 onPointerCancel: () => {
                   startX.current = null;
                 },
+              }}
+              slider={{
+                count: slides.length,
+                index,
+                onPrev: prev,
+                onNext: next,
+                onGo: go,
               }}
               controls={
                 <SliderControls
@@ -210,12 +217,20 @@ function SlideImageFrame({
   active,
   eager,
   controls,
+  slider,
   swipeHandlers,
 }: {
   film: HomeFeaturedFilm;
   active: boolean;
   eager: boolean;
   controls?: ReactNode;
+  slider?: {
+    count: number;
+    index: number;
+    onPrev: () => void;
+    onNext: () => void;
+    onGo: (i: number) => void;
+  };
   swipeHandlers?: {
     onPointerDown: (e: PointerEvent) => void;
     onPointerUp: (e: PointerEvent) => void;
@@ -368,6 +383,59 @@ function SlideImageFrame({
                 </div>
               ) : null}
 
+              {/* Mobile side arrows — overlay on image, always LTR so left=prev / right=next */}
+              {active && slider ? (
+                <div className="pointer-events-none absolute inset-0 z-30 md:hidden" dir="ltr">
+                  <button
+                    type="button"
+                    onClick={slider.onPrev}
+                    aria-label="Previous"
+                    className="pointer-events-auto absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream/10 bg-bg-0/45 text-amber shadow-lg backdrop-blur-md transition-all active:scale-95"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={slider.onNext}
+                    aria-label="Next"
+                    className="pointer-events-auto absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream/10 bg-bg-0/45 text-amber shadow-lg backdrop-blur-md transition-all active:scale-95"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Mobile dots — inside image, above Watch pill */}
+              {active && slider ? (
+                <div className="pointer-events-auto absolute bottom-16 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 md:hidden">
+                  {Array.from({ length: slider.count }).map((_, i) => {
+                    const isActive = i === slider.index;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => slider.onGo(i)}
+                        aria-label={`Go to slide ${i + 1}`}
+                        aria-current={isActive ? "true" : undefined}
+                        className="flex cursor-pointer items-center justify-center rounded-full"
+                      >
+                        <span
+                          className={`block rounded-full transition-all duration-300 ${
+                            isActive
+                              ? "h-1.5 w-6 bg-amber shadow-[0_0_10px_rgba(201,168,76,0.55)]"
+                              : "h-1.5 w-1.5 bg-cream/40"
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+
               {/* Mobile centered Watch pill */}
               {active ? (
                 <div className="pointer-events-auto absolute bottom-4 left-1/2 z-30 -translate-x-1/2 md:hidden">
@@ -461,16 +529,6 @@ function SlideImageFrame({
         </div>
       </div>
 
-
-
-      {/* Mobile-only stacked controls below frame */}
-      {active && controls ? (
-        <div className="mt-6 flex justify-center md:hidden">
-          <div className="rounded-2xl border border-cream/10 bg-bg-0/50 px-3 py-2 shadow-2xl backdrop-blur-xl">
-            {controls}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -478,7 +536,7 @@ function SlideImageFrame({
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative w-full">
           <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-2xl md:rounded-[2rem]">
             <div
