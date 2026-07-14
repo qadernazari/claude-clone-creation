@@ -219,7 +219,7 @@ export function FileUpload({
           {kind === "image" ? (
             <img
               src={value!}
-              alt=""
+              alt="Upload preview"
               className="h-20 w-14 rounded object-cover bg-muted"
               onLoad={(e) => {
                 const img = e.currentTarget;
