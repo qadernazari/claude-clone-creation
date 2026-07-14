@@ -171,7 +171,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
         <div className="mt-3 flex flex-wrap items-end gap-4 md:gap-6">
           <h2 className="font-display text-3xl font-medium leading-tight tracking-[-0.02em] text-cream-bright md:text-5xl">
             {agg && agg.review_count > 0
-              ? agg.avg_rating.toFixed(1)
+              ? digits(agg.avg_rating.toFixed(1))
               : fa
                 ? "هنوز نقدی نیست"
                 : "No reviews yet"}
