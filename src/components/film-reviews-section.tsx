@@ -102,7 +102,7 @@ function formatDate(iso: string, locale: string) {
 }
 
 export function FilmReviewsSection({ filmId }: { filmId: string }) {
-  const { locale } = useLocale();
+  const { locale, num, digits } = useLocale();
   const fa = locale === "fa";
   const qc = useQueryClient();
   const { data } = useQuery(filmReviewsQueryOptions(filmId));
