@@ -187,22 +187,14 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
-        style={{
-          WebkitAppearance: "none",
-          appearance: "none",
-          background: "rgba(var(--rgb-bg-0), 0.76)",
-          borderColor: "rgba(var(--rgb-cream), 0.28)",
-          color: "rgb(var(--rgb-cream))",
-          boxShadow: "inset 0 1px 0 rgba(var(--rgb-cream), 0.08), 0 8px 22px -18px rgba(0, 0, 0, 0.85)",
-        }}
+        className="region-mobile-trigger inline-flex h-9 shrink-0 items-center gap-1 rounded-md bg-transparent px-1.5 text-[12px] font-semibold text-cream/80 transition-colors hover:text-cream md:hidden"
       >
-        <RegionGlobeIcon size={15} className="region-trigger-icon" />
-        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
-          {activeLabel}
+        <RegionGlobeIcon size={16} className="region-trigger-icon" />
+        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none text-[11px] uppercase tracking-[0.12em]"} lang={isIran ? "fa" : "en"}>
+          {isIran ? "فا" : "EN"}
         </span>
-        <RegionChevronIcon />
       </button>
+
 
       {open && typeof document !== "undefined" && createPortal(
         <>
