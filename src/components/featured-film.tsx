@@ -191,7 +191,7 @@ function SlideImageFrame({
   const [loaded, setLoaded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { locale, t, year } = useLocale();
+  const { locale, t, year, num } = useLocale();
   const { user, isMember, isTrialExpired } = useSubscription();
   const ctaState = {
     isAuthenticated: !!user,
@@ -373,14 +373,14 @@ function SlideImageFrame({
                   <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1 overflow-hidden text-xs text-cream/60 lg:text-[13px]">
                     {film.is_premium ? (
                       <span className="rounded-md bg-amber/15 px-2 py-0.5 text-[11px] font-bold text-amber">
-                        +12
+                        +{num(12)}
                       </span>
                     ) : null}
                     {film.year ? <span>{year(film.year)}</span> : null}
                     {film.duration_min ? (
                       <>
                         <span className="text-cream/25">•</span>
-                        <span>{film.duration_min}{locale === "fa" ? " دقیقه" : "m"}</span>
+                        <span>{num(film.duration_min)}{locale === "fa" ? " دقیقه" : "m"}</span>
                       </>
                     ) : null}
                   </div>
