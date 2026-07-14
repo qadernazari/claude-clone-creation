@@ -359,7 +359,17 @@ function SlideImageFrame({
                 </Link>
               ) : null}
 
-              {/* Gradient — bottom fade for mobile pill readability; right fade on desktop to blend into info column */}
+              {/* Mobile: top scrim so the transparent header stays legible over the photo */}
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40 md:hidden"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.18) 30%, transparent 60%)",
+                }}
+                aria-hidden
+              />
+
+              {/* Desktop: right fade to blend image into info column */}
               <div
                 className="pointer-events-none absolute inset-0 hidden md:block"
                 style={{
@@ -368,6 +378,7 @@ function SlideImageFrame({
                 }}
                 aria-hidden
               />
+
 
               {/* Slider arrows — bottom-left of image, desktop only */}
               {active && controls ? (
