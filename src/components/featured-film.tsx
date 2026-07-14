@@ -217,12 +217,20 @@ function SlideImageFrame({
   active,
   eager,
   controls,
+  slider,
   swipeHandlers,
 }: {
   film: HomeFeaturedFilm;
   active: boolean;
   eager: boolean;
   controls?: ReactNode;
+  slider?: {
+    count: number;
+    index: number;
+    onPrev: () => void;
+    onNext: () => void;
+    onGo: (i: number) => void;
+  };
   swipeHandlers?: {
     onPointerDown: (e: PointerEvent) => void;
     onPointerUp: (e: PointerEvent) => void;
