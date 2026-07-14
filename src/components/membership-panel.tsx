@@ -197,7 +197,7 @@ export function MembershipPanel() {
   const planLabel =
     planMonths >= 1
       ? fa
-        ? `پلن ${planMonths} ماهه`
+        ? `پلن ${num(planMonths)} ماهه`
         : `${planMonths}-month plan`
       : null;
 
