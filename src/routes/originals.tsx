@@ -118,7 +118,7 @@ function OriginalsPage() {
                       {displayTitle}
                     </p>
                     {film.year ? (
-                      <p className="mt-0.5 text-[11px] text-cream/55">{film.year}</p>
+                      <p className="mt-0.5 text-[11px] text-cream/55">{year(film.year)}</p>
                     ) : null}
                   </div>
                 </Link>
