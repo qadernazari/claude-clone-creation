@@ -3,6 +3,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useLocale } from "../lib/i18n";
 import { homeFeaturedSlidesQueryOptions, type HomeFeaturedFilm } from "../lib/home.functions";
+import { useSubscription } from "../hooks/use-subscription";
+import { watchCtaLabel, watchCtaShort } from "../lib/watch-cta";
 
 
 
