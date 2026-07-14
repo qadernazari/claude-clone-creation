@@ -37,20 +37,19 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  const bumpRef = useRef(0);
 
   const go = useCallback(
     (next: number) => {
       const len = slides.length;
       setIndex(((next % len) + len) % len);
-      bumpRef.current += 1; // reset autoplay timer on manual interaction
     },
     [slides.length],
   );
   const next = useCallback(() => go(index + 1), [go, index]);
   const prev = useCallback(() => go(index - 1), [go, index]);
 
-  // Autoplay: 5s, pause on hover, off-screen, or prefers-reduced-motion
+  // Autoplay: 5s, pause on hover, off-screen, or prefers-reduced-motion.
+  // Depending on `index` resets the timer after every slide change (manual or auto).
   useEffect(() => {
     if (paused || slides.length < 2) return;
     if (typeof window !== "undefined") {
@@ -61,7 +60,8 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       setIndex((i) => (i + 1) % slides.length);
     }, 5000);
     return () => window.clearInterval(id);
-  }, [paused, slides.length, bumpRef.current]);
+  }, [paused, slides.length, index]);
+
 
   // Pause when off-screen
   useEffect(() => {
