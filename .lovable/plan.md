@@ -1,9 +1,20 @@
-# i18n audit — closed
+# Remove leftover Preview/trailer UI remnants
 
-The subagent audited `src/lib/i18n.tsx` and the full `src/` tree. Result:
+## Audit result
 
-- This project does **not** use a keyed translation dictionary. `useLocale().t` takes a bilingual object literal `t({ en, fa })` at each call site, so both languages ship inline wherever they are used.
-- Because there are no dictionary keys, there is **no such thing as an "unused key"** to remove. Lists A / B / C from the original audit brief are all N/A.
-- No file changes required.
+A full read-only sweep of `src/` found **no viewer-facing Preview or trailer strings** still rendering — no JSX text, button labels, aria-labels, tooltips, or Persian variants (`پیش‌نمایش`, `تیزر`, `تماشای تیزر`, …). No dead state, handlers, refs, or lightbox component imports remain either. The previous cleanup was thorough.
 
-Per the user's answer, closing the audit — no action to take.
+## The one leftover
+
+`src/routes/films.$slug.tsx:43` still selects `preview_url` from the film row, but nothing reads it anywhere in viewer code — it's a dead column left over from the removed trailer lightbox. Not a UI string, but the request was to remove leftover trailer UI remnants, and this is the last one.
+
+## Change
+
+- **`src/routes/films.$slug.tsx`** — remove `preview_url` from the `.select(...)` column list on the film detail query (line 43). No other code touches the field, so no follow-up edits are needed.
+
+Admin uploader code under `src/routes/_authenticated/admin/**` keeps its `preview_url` handling untouched — that's the storage side, not viewer UI. Email-template `<Preview>` components (react-email metadata, not user-visible) also stay.
+
+## Verification
+
+- `rg -n "preview_url|previewUrl" src` after the edit should return only admin routes and, if any, non-viewer files.
+- Typecheck via the normal build.
