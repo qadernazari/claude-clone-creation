@@ -26,7 +26,7 @@ export function FeaturedFilm() {
 function HeroShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-14 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
 
         {children}
       </div>
@@ -100,7 +100,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-14 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
 
         <div className="relative">
           {slides.map((film, i) => (
@@ -308,7 +308,7 @@ function SlideImageFrame({
     >
       <div className="group relative w-full">
         {/* Outer frame — split on desktop */}
-        <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/[0.03] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] md:h-[420px] md:rounded-[2rem] lg:h-[480px] xl:h-[520px]">
+        <div className="relative z-10 overflow-hidden md:h-[420px] md:rounded-[2rem] md:border md:border-cream/10 md:bg-cream/[0.03] md:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] lg:h-[480px] xl:h-[520px]">
           <div className="grid md:h-full md:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]" dir="ltr">
             {/* IMAGE COLUMN */}
             <div
@@ -385,56 +385,20 @@ function SlideImageFrame({
                 </div>
               ) : null}
 
-              {/* Mobile side arrows — overlay on image, always LTR so left=prev / right=next */}
-              {active && slider ? (
-                <div className="pointer-events-none absolute inset-0 z-30 md:hidden" dir="ltr">
-                  <button
-                    type="button"
-                    onClick={slider.onPrev}
-                    aria-label="Previous"
-                    className="pointer-events-auto absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream/10 bg-bg-0/45 text-amber shadow-lg backdrop-blur-md transition-all active:scale-95"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <polyline points="15 18 9 12 15 6" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={slider.onNext}
-                    aria-label="Next"
-                    className="pointer-events-auto absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream/10 bg-bg-0/45 text-amber shadow-lg backdrop-blur-md transition-all active:scale-95"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </button>
-                </div>
-              ) : null}
-
-              {/* Mobile dots — inside image, bottom-center */}
-              {active && slider ? (
-                <div className="pointer-events-auto absolute bottom-14 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-bg-0/40 px-2.5 py-1.5 backdrop-blur-md md:hidden">
-                  {Array.from({ length: slider.count }).map((_, i) => {
-                    const isActive = i === slider.index;
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => slider.onGo(i)}
-                        aria-label={`Go to slide ${i + 1}`}
-                        aria-current={isActive ? "true" : undefined}
-                        className="flex cursor-pointer items-center justify-center rounded-full"
-                      >
-                        <span
-                          className={`block rounded-full transition-all duration-300 ${
-                            isActive
-                              ? "h-1.5 w-6 bg-amber shadow-[0_0_10px_rgba(201,168,76,0.55)]"
-                              : "h-1.5 w-1.5 bg-cream/40"
-                          }`}
-                        />
-                      </button>
-                    );
-                  })}
+              {/* Mobile title overlay — centered at bottom of image */}
+              {active ? (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center justify-end pb-16 md:hidden">
+                  <div className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
+                      {film.category === "walking-tour"
+                        ? (locale === "fa" ? "پیاده‌روی گردشگری" : "Walking Tour")
+                        : (locale === "fa" ? "اختصاصی" : "Original")}
+                    </span>
+                  </div>
+                  <h2 className="mt-2 max-w-[90%] text-center font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                    {title}
+                  </h2>
                 </div>
               ) : null}
 
@@ -514,20 +478,46 @@ function SlideImageFrame({
           </div>
         </div>
 
-        {/* Mobile Watch pill — overlaps the bottom edge of the hero card */}
+        {/* Mobile CTA + dots — below the full-bleed hero image */}
         {active ? (
-          <div className="pointer-events-auto absolute bottom-0 left-1/2 z-40 -translate-x-1/2 translate-y-1/2 md:hidden">
+          <div className="pointer-events-auto z-40 mx-auto mt-5 w-full max-w-md px-5 md:hidden">
             <Link
               {...watchHref}
               onKeyDown={handleWatchKeyDown}
               aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-              className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/40 bg-bg-0/90 px-6 py-3 text-[13px] font-bold text-cream-bright shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)] backdrop-blur-xl transition-all duration-200 hover:border-amber/60 hover:bg-bg-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber px-6 py-3.5 text-sm font-bold text-ink transition hover:bg-amber-bright focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M8 5v14l11-7z" />
               </svg>
-              <span>{ctaShort}</span>
+              <span>{ctaLabel}</span>
             </Link>
+
+            {slider ? (
+              <div className="mt-4 flex items-center justify-center gap-1.5">
+                {Array.from({ length: slider.count }).map((_, i) => {
+                  const isActive = i === slider.index;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => slider.onGo(i)}
+                      aria-label={`Go to slide ${i + 1}`}
+                      aria-current={isActive ? "true" : undefined}
+                      className="flex cursor-pointer items-center justify-center rounded-full"
+                    >
+                      <span
+                        className={`block rounded-full transition-all duration-300 ${
+                          isActive
+                            ? "h-1.5 w-6 bg-amber shadow-[0_0_10px_rgba(201,168,76,0.55)]"
+                            : "h-1.5 w-1.5 bg-cream/40"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -540,11 +530,11 @@ function SlideImageFrame({
 function FeaturedFilmFallback() {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-6 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative w-full">
-          <div className="relative z-10 overflow-hidden rounded-[1.25rem] border border-cream/10 bg-cream/5 shadow-2xl md:rounded-[2rem]">
+          <div className="relative z-10 overflow-hidden md:rounded-[2rem] md:border md:border-cream/10 md:bg-cream/5 md:shadow-2xl">
             <div
-              className="aspect-[2/3] rounded-[1rem] md:aspect-video md:rounded-[1.75rem]"
+              className="aspect-[2/3] md:aspect-video md:rounded-[1.75rem]"
               style={{
                 background:
                   "radial-gradient(ellipse at 30% 70%, oklch(0.30 0.045 70 / 0.72), transparent 62%), linear-gradient(180deg, oklch(0.18 0 0), var(--bg-0))",
