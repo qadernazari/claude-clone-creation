@@ -77,6 +77,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
     return () => io.disconnect();
   }, []);
 
+  const { locale } = useLocale();
   const startX = useRef<number | null>(null);
   const onPointerDown = (e: PointerEvent) => {
     startX.current = e.clientX;
@@ -86,7 +87,10 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
     const dx = e.clientX - startX.current;
     startX.current = null;
     if (Math.abs(dx) > 50) {
-      if (dx < 0) next();
+      const isRtl = locale === "fa";
+      // LTR: swipe left (dx<0) → next. RTL: swipe right (dx>0) → next.
+      const goNext = isRtl ? dx > 0 : dx < 0;
+      if (goNext) next();
       else prev();
     }
   };
