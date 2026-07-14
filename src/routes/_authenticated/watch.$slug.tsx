@@ -1095,7 +1095,7 @@ function WatchPage() {
                       <path d="M13 4v16l7-5-7-5 7-3-7-3z" />
                     </svg>
                     <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em]">
-                      {seekRipple.side === "right" ? "+10s" : "−10s"}
+                      {digits(seekRipple.side === "right" ? "+10s" : "−10s")}
                     </div>
                   </div>
                 </div>
