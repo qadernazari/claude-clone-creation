@@ -29,7 +29,7 @@ interface MembershipCheckoutProps {
 }
 
 export function MembershipCheckout({ returnUrl, onClose, plan: planId }: MembershipCheckoutProps) {
-  const { locale } = useLocale();
+  const { locale, num } = useLocale();
   const fa = locale === "fa";
   const irMode = useIrMode();
   const { isMember } = useSubscription();
