@@ -1109,7 +1109,7 @@ function WatchPage() {
                     </p>
                     <p className="mt-2 font-display text-xl text-cream-bright">
                       {fa
-                        ? `از ${fmtTime(resumePrompt).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)])}؟`
+                        ? `از ${fmtTime(resumePrompt)}؟`
                         : `Resume from ${fmtTime(resumePrompt)}?`}
                     </p>
 
