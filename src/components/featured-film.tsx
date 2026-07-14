@@ -215,6 +215,15 @@ const POS_CLASS: Record<string, string> = {
   right: "object-right",
 };
 
+const MD_POS_CLASS: Record<string, string> = {
+  center: "md:object-center",
+  top: "md:object-top",
+  bottom: "md:object-bottom",
+  left: "md:object-left",
+  right: "md:object-right",
+};
+
+
 function SlideImageFrame({
   film,
   active,
@@ -295,8 +304,13 @@ function SlideImageFrame({
     "linear-gradient(135deg, oklch(0.32 0.05 60) 0%, oklch(0.45 0.10 75) 100%)";
 
   const isContain = film.cover_fit === "contain";
-  const posClass = POS_CLASS[film.cover_position || "center"] || "object-center";
-  const fitClass = isContain ? "object-contain object-center" : `object-cover ${posClass}`;
+  const mdPosClass = MD_POS_CLASS[film.cover_position || "center"] || "md:object-center";
+  // Mobile: always cover + centered so portrait crop of a 16:9 image stays balanced.
+  // Desktop: honor admin-configured cover_fit / cover_position.
+  const fitClass = isContain
+    ? "object-cover object-center md:object-contain md:object-center"
+    : `object-cover object-center md:object-cover ${mdPosClass}`;
+
 
   return (
     <div
@@ -314,7 +328,7 @@ function SlideImageFrame({
             {/* IMAGE COLUMN */}
             <div
               ref={frameRef}
-              className="relative aspect-[2/3] touch-pan-y overflow-hidden bg-bg-0 md:aspect-auto md:h-full"
+              className="relative aspect-[4/5] touch-pan-y overflow-hidden bg-bg-0 md:aspect-auto md:h-full"
               style={{ background: fallbackBg }}
             >
               {/* Shimmer skeleton */}
