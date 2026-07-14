@@ -180,7 +180,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
             <div className="mb-1 flex items-center gap-3">
               <StarRow value={agg.avg_rating} />
               <span className="text-sm text-cream/55">
-                {agg.review_count}{" "}
+                {num(agg.review_count)}{" "}
                 {fa
                   ? "نقد"
                   : agg.review_count === 1
