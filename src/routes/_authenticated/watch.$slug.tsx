@@ -533,12 +533,12 @@ function WatchPage() {
     if (!hasAccess || !videoUrl) return;
     const seekBy = (v: HTMLVideoElement, delta: number) => {
       v.currentTime = Math.min(v.duration || 0, Math.max(0, v.currentTime + delta));
-      flashHud(`${delta > 0 ? "+" : ""}${delta}s`);
+      flashHud(digits(`${delta > 0 ? "+" : ""}${delta}s`));
     };
     const bumpVolume = (v: HTMLVideoElement, delta: number) => {
       v.muted = false;
       v.volume = Math.min(1, Math.max(0, v.volume + delta));
-      flashHud(`${fa ? "صدا" : "Volume"} ${Math.round(v.volume * 100)}%`);
+      flashHud(`${fa ? "صدا" : "Volume"} ${digits(Math.round(v.volume * 100))}%`);
     };
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
