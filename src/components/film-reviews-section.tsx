@@ -255,7 +255,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                 />
                 <span className="text-xs text-cream/40">
                   {rating > 0
-                    ? `${rating} / 5`
+                    ? `${num(rating)} / ${num(5)}`
                     : fa
                       ? "امتیاز را انتخاب کن"
                       : "Pick a rating"}
