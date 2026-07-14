@@ -26,7 +26,8 @@ export function FeaturedFilm() {
 function HeroShell({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden bg-bg-0">
-      <div className="mx-auto mt-24 w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+      <div className="mx-auto w-full max-w-[110rem] px-0 pb-10 md:mt-32 md:px-8 lg:px-6 md:pb-10">
+
 
         {children}
       </div>
