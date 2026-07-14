@@ -385,14 +385,14 @@ function SlideImageFrame({
                     ) : null}
                   </div>
 
-                  <div className="flex min-h-12 flex-wrap items-center gap-3 overflow-hidden">
+                  <div className="flex min-h-14 flex-wrap items-center gap-3 overflow-hidden">
                     <Link
                       {...watchHref}
                       onKeyDown={handleWatchKeyDown}
                       aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-                      className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-amber px-6 py-3 text-base font-bold text-ink shadow-lg shadow-amber/25 transition hover:bg-amber-bright hover:shadow-amber/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
+                      className="inline-flex shrink-0 items-center gap-2.5 rounded-xl bg-amber px-9 py-4 text-lg font-bold text-ink transition hover:bg-amber-bright focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M8 5v14l11-7z" />
                       </svg>
                       <span className="leading-none tracking-wide">{ctaLabel}</span>
