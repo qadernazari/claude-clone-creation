@@ -77,7 +77,7 @@ function useCountdown(target: string | null | undefined) {
 
 function WatchPage() {
   const { film } = Route.useLoaderData();
-  const { locale, num, year, dir } = useLocale();
+  const { locale, num, year, dir, digits } = useLocale();
   const fa = locale === "fa";
   const videoRef = useRef<HTMLVideoElement>(null);
   const [theater, setTheater] = useState(true);
