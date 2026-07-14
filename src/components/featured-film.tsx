@@ -35,16 +35,45 @@ function HeroShell({ children }: { children: React.ReactNode }) {
 
 function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const bumpRef = useRef(0);
 
   const go = useCallback(
     (next: number) => {
       const len = slides.length;
       setIndex(((next % len) + len) % len);
+      bumpRef.current += 1; // reset autoplay timer on manual interaction
     },
     [slides.length],
   );
   const next = useCallback(() => go(index + 1), [go, index]);
   const prev = useCallback(() => go(index - 1), [go, index]);
+
+  // Autoplay: 5s, pause on hover, off-screen, or prefers-reduced-motion
+  useEffect(() => {
+    if (paused || slides.length < 2) return;
+    if (typeof window !== "undefined") {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (mq.matches) return;
+    }
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [paused, slides.length, bumpRef.current]);
+
+  // Pause when off-screen
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setPaused((p) => (entry.isIntersecting ? p && false : true)),
+      { threshold: 0.25 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const startX = useRef<number | null>(null);
   const onPointerDown = (e: PointerEvent) => {
@@ -62,8 +91,13 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
 
   return (
     <section
+      ref={sectionRef}
       className="relative isolate overflow-hidden bg-bg-0"
       aria-roledescription="carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
     >
       <div className="mx-auto mt-24 w-full max-w-[110rem] px-5 pb-12 sm:px-6 md:mt-32 md:px-8 lg:px-6 md:pb-10">
         <div className="relative">
@@ -96,6 +130,7 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
     </section>
   );
 }
+
 
 function SliderControls({
   count,
