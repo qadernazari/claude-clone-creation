@@ -342,15 +342,15 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       >
         <div
           dir="ltr"
-          className={`mx-auto flex w-full max-w-[110rem] items-center justify-between px-4 py-2.5 sm:px-6 md:px-8 lg:px-6 transition-[padding] duration-300 ${
+          className={`mx-auto flex w-full max-w-[110rem] flex-nowrap items-center justify-between gap-2 px-3 py-2 sm:gap-4 sm:px-6 sm:py-2.5 md:px-8 lg:px-6 transition-[padding] duration-300 ${
             scrolled ? "md:py-3" : "md:py-5"
           }`}
         >
-          <div className="flex items-center gap-10">
+          <div className="flex min-w-0 shrink items-center gap-4 lg:gap-10">
             <Link
               to="/"
               onClick={handleHomeClick}
-              className="inline-flex items-center transition-opacity hover:opacity-80"
+              className="inline-flex shrink-0 items-center transition-opacity hover:opacity-80"
               aria-label="IRAN — home"
             >
               <Logo size={28} />
@@ -364,7 +364,8 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </Link>
             </nav>
           </div>
-          <div className="flex min-w-0 items-center gap-1 sm:gap-3">
+          <div className="flex shrink-0 flex-nowrap items-center gap-1.5 sm:gap-3">
+
 
             <Link
               to="/browse"
