@@ -1037,7 +1037,7 @@ function WatchPage() {
                         aria-label={fa ? "سرعت پخش" : "Playback speed"}
                         className={`flex h-9 min-w-9 items-center justify-center rounded-md px-1.5 text-[11px] font-semibold transition-all hover:scale-110 ${speed !== 1 ? "text-amber" : "text-cream/85 hover:text-amber"}`}
                       >
-                        {speed}×
+                        {digits(speed)}×
                       </button>
                       {speedOpen && (
                         <div
