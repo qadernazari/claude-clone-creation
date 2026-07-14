@@ -908,7 +908,7 @@ function WatchPage() {
                         const v = videoRef.current;
                         if (!v) return;
                         v.currentTime = Math.max(0, v.currentTime - 10);
-                        flashHud("-10s");
+                        flashHud(digits("-10s"));
                       }}
                       aria-label={fa ? "۱۰ ثانیه به عقب" : "Skip back 10s"}
                       className="hidden h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
