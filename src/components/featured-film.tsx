@@ -373,7 +373,7 @@ function SlideImageFrame({
                   <div className="flex min-h-7 flex-wrap items-center gap-x-3 gap-y-1 overflow-hidden text-xs text-cream/60 lg:text-[13px]">
                     {film.is_premium ? (
                       <span className="rounded-md bg-amber/15 px-2 py-0.5 text-[11px] font-bold text-amber">
-                        +12
+                        +{num(12)}
                       </span>
                     ) : null}
                     {film.year ? <span>{year(film.year)}</span> : null}
