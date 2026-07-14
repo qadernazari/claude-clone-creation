@@ -67,7 +67,7 @@ def assert_en(family: str) -> str | None:
 
 
 SELECTORS = [
-    ("html", "html"),
+    ("body", "body"),
     ("h1", "h1"),
     ("p", "main p, article p, body p"),
     ("button", "button"),
