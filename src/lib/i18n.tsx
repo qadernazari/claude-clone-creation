@@ -149,7 +149,10 @@ export function LocaleProvider({
         return v;
       },
       num: (n) => numFmt.format(n),
-      year: (n) => yearFmt.format(n),
+      // For Persian locale, convert Gregorian year to Jalali (Iranian) year.
+      // For release-year display without a month, `jy = gy - 621` is the
+      // widely-used convention (e.g. 2024 → 1403, 2025 → 1404).
+      year: (n) => yearFmt.format(locale === "fa" ? n - 621 : n),
     };
   }, [locale, region, setLocale, setRegion]);
 
