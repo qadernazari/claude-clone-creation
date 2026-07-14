@@ -360,14 +360,6 @@ function SlideImageFrame({
 
               {/* Gradient — bottom fade for mobile pill readability; right fade on desktop to blend into info column */}
               <div
-                className="pointer-events-none absolute inset-0 md:hidden"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, transparent 35%, rgba(5,5,5,0.85) 100%)",
-                }}
-                aria-hidden
-              />
-              <div
                 className="pointer-events-none absolute inset-0 hidden md:block"
                 style={{
                   background:
@@ -385,22 +377,6 @@ function SlideImageFrame({
                 </div>
               ) : null}
 
-              {/* Mobile title overlay — centered at bottom of image */}
-              {active ? (
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center justify-end pb-16 md:hidden">
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-amber shadow-[0_0_8px_rgba(201,168,76,0.7)]" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber">
-                      {film.category === "walking-tour"
-                        ? (locale === "fa" ? "پیاده‌روی گردشگری" : "Walking Tour")
-                        : (locale === "fa" ? "اختصاصی" : "Original")}
-                    </span>
-                  </div>
-                  <h2 className="mt-2 max-w-[90%] text-center font-display text-2xl font-black leading-[1.3] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-                    {title}
-                  </h2>
-                </div>
-              ) : null}
 
             </div>
 

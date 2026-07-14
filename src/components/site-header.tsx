@@ -133,6 +133,7 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   }, [open]);
 
   const activeLabel = isIran ? "ایران" : "Global";
+  void activeLabel;
   const options = [
     {
       key: "global" as const,
@@ -187,22 +188,14 @@ function RegionToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={fa ? "انتخاب منطقه" : "Select region"}
-        className="region-mobile-trigger inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-cream/25 bg-cream/8 px-3 text-[12px] font-semibold text-cream transition-colors hover:bg-cream/12 md:hidden"
-        style={{
-          WebkitAppearance: "none",
-          appearance: "none",
-          background: "rgba(var(--rgb-bg-0), 0.76)",
-          borderColor: "rgba(var(--rgb-cream), 0.28)",
-          color: "rgb(var(--rgb-cream))",
-          boxShadow: "inset 0 1px 0 rgba(var(--rgb-cream), 0.08), 0 8px 22px -18px rgba(0, 0, 0, 0.85)",
-        }}
+        className="region-mobile-trigger inline-flex h-9 shrink-0 items-center gap-1 rounded-md bg-transparent px-1.5 text-[12px] font-semibold text-cream/80 transition-colors hover:text-cream md:hidden"
       >
-        <RegionGlobeIcon size={15} className="region-trigger-icon" />
-        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none"} lang={isIran ? "fa" : "en"}>
-          {activeLabel}
+        <RegionGlobeIcon size={16} className="region-trigger-icon" />
+        <span className={isIran ? "font-fa text-[13px] leading-none" : "leading-none text-[11px] uppercase tracking-[0.12em]"} lang={isIran ? "fa" : "en"}>
+          {isIran ? "فا" : "EN"}
         </span>
-        <RegionChevronIcon />
       </button>
+
 
       {open && typeof document !== "undefined" && createPortal(
         <>
@@ -349,7 +342,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
       >
         <div
           dir="ltr"
-          className={`mx-auto flex w-full max-w-[110rem] items-center justify-between px-5 py-3 sm:px-6 md:px-8 lg:px-6 transition-[padding] duration-300 ${
+          className={`mx-auto flex w-full max-w-[110rem] items-center justify-between px-4 py-2.5 sm:px-6 md:px-8 lg:px-6 transition-[padding] duration-300 ${
             scrolled ? "md:py-3" : "md:py-5"
           }`}
         >
@@ -371,11 +364,12 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
               </Link>
             </nav>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-3">
+
             <Link
               to="/browse"
               aria-label={fa ? "جست‌وجو" : "Search"}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cream/20 text-cream transition-all duration-200 hover:bg-cream/5 hover:border-cream/40 active:scale-95 md:h-10 md:w-10"
             >
               <svg
                 width="17"
@@ -423,7 +417,7 @@ export function SiteHeader({ current }: { current?: "home" | "browse" | "about" 
                 <Link
                   to="/auth"
                   aria-label={fa ? "ورود" : "Sign in"}
-                  className="mobile-signin-trigger inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:hidden"
+                  className="mobile-signin-trigger inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cream/20 bg-transparent text-cream transition-colors duration-200 hover:border-cream/40 hover:bg-cream/5 active:scale-95 md:hidden"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <circle cx="12" cy="8" r="3.5" />
