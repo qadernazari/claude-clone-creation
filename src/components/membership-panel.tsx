@@ -52,7 +52,7 @@ export function MembershipPanel() {
       ? "آخرین پرداخت انجام نشد. لطفاً روش پرداخت را به‌روز کنید."
       : "Your last payment failed. Update your payment method to keep access.",
     daysLeft: (n: number) =>
-      fa ? `${n} روز مانده` : `${n} day${n === 1 ? "" : "s"} left`,
+      fa ? `${num(n)} روز مانده` : `${n} day${n === 1 ? "" : "s"} left`,
   };
 
   const handlePortal = async () => {
