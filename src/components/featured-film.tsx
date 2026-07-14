@@ -513,7 +513,25 @@ function SlideImageFrame({
 
           </div>
         </div>
+
+        {/* Mobile Watch pill — overlaps the bottom edge of the hero card */}
+        {active ? (
+          <div className="pointer-events-auto absolute bottom-0 left-1/2 z-40 -translate-x-1/2 translate-y-1/2 md:hidden">
+            <Link
+              {...watchHref}
+              onKeyDown={handleWatchKeyDown}
+              aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-amber/40 bg-bg-0/90 px-6 py-3 text-[13px] font-bold text-cream-bright shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)] backdrop-blur-xl transition-all duration-200 hover:border-amber/60 hover:bg-bg-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.98]"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span>{ctaShort}</span>
+            </Link>
+          </div>
+        ) : null}
       </div>
+
 
     </div>
   );
