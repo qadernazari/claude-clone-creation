@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { useLocale } from "@/lib/i18n";
+import { useLocale, toPersianDigits } from "@/lib/i18n";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getLibrary, toggleWatchlist, type LibraryFilm, type LibraryData } from "@/lib/library.functions";
@@ -227,7 +227,7 @@ function LibraryPage() {
                       <div className="mt-1 text-[11px] text-cream/55">
                         {r.completed
                           ? fa ? "تماشا تمام شد" : "Completed"
-                          : `${Math.round((r.position_seconds / Math.max(1, (r.duration_seconds ?? (r.film.duration_min ?? 1) * 60))) * 100)}%`}
+                          : `${num(Math.round((r.position_seconds / Math.max(1, (r.duration_seconds ?? (r.film.duration_min ?? 1) * 60))) * 100))}%`}
                         {" · "}
                         {new Date(r.last_watched_at).toLocaleDateString(fa ? "fa-IR" : "en-US")}
                       </div>
@@ -539,5 +539,5 @@ function formatTime(seconds: number, fa: boolean): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   const str = h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
   if (!fa) return str;
-  return str.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+  return toPersianDigits(str);
 }

@@ -102,7 +102,7 @@ function formatDate(iso: string, locale: string) {
 }
 
 export function FilmReviewsSection({ filmId }: { filmId: string }) {
-  const { locale } = useLocale();
+  const { locale, num, digits } = useLocale();
   const fa = locale === "fa";
   const qc = useQueryClient();
   const { data } = useQuery(filmReviewsQueryOptions(filmId));
@@ -171,7 +171,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
         <div className="mt-3 flex flex-wrap items-end gap-4 md:gap-6">
           <h2 className="font-display text-3xl font-medium leading-tight tracking-[-0.02em] text-cream-bright md:text-5xl">
             {agg && agg.review_count > 0
-              ? agg.avg_rating.toFixed(1)
+              ? digits(agg.avg_rating.toFixed(1))
               : fa
                 ? "هنوز نقدی نیست"
                 : "No reviews yet"}
@@ -180,7 +180,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
             <div className="mb-1 flex items-center gap-3">
               <StarRow value={agg.avg_rating} />
               <span className="text-sm text-cream/55">
-                {agg.review_count}{" "}
+                {num(agg.review_count)}{" "}
                 {fa
                   ? "نقد"
                   : agg.review_count === 1
@@ -255,7 +255,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                 />
                 <span className="text-xs text-cream/40">
                   {rating > 0
-                    ? `${rating} / 5`
+                    ? `${num(rating)} / ${num(5)}`
                     : fa
                       ? "امتیاز را انتخاب کن"
                       : "Pick a rating"}
@@ -275,7 +275,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-cream/35">
-                  {body.length} / 2000
+                  {num(body.length)} / {num(2000)}
                 </span>
                 <div className="flex gap-2">
                   {editing && (

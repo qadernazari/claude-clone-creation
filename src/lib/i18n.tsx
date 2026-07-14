@@ -24,7 +24,15 @@ type LocaleContextValue = {
   num: (n: number) => string;
   /** Format a year (no thousands separators) with locale-appropriate digits. */
   year: (n: number) => string;
+  /** Convert any Latin digits inside a string to Persian glyphs when locale is fa; no-op for en. */
+  digits: (input: string | number) => string;
 };
+
+/** Standalone helper: map ASCII digits to Persian glyphs. */
+export function toPersianDigits(input: string | number): string {
+  const s = typeof input === "number" ? String(input) : input;
+  return s.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]!);
+}
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
@@ -153,6 +161,7 @@ export function LocaleProvider({
       // For release-year display without a month, `jy = gy - 621` is the
       // widely-used convention (e.g. 2024 → 1403, 2025 → 1404).
       year: (n) => yearFmt.format(locale === "fa" ? n - 621 : n),
+      digits: (input) => (locale === "fa" ? toPersianDigits(input) : String(input)),
     };
   }, [locale, region, setLocale, setRegion]);
 

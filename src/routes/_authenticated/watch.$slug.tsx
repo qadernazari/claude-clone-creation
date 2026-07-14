@@ -77,7 +77,7 @@ function useCountdown(target: string | null | undefined) {
 
 function WatchPage() {
   const { film } = Route.useLoaderData();
-  const { locale, num, year, dir } = useLocale();
+  const { locale, num, year, dir, digits } = useLocale();
   const fa = locale === "fa";
   const videoRef = useRef<HTMLVideoElement>(null);
   const [theater, setTheater] = useState(true);
@@ -215,9 +215,10 @@ function WatchPage() {
     const h = Math.floor(sec / 3600);
     const m = Math.floor((sec % 3600) / 60);
     const r = sec % 60;
-    return h > 0
+    const raw = h > 0
       ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`
       : `${m}:${String(r).padStart(2, "0")}`;
+    return digits(raw);
   };
 
   const onTimeUpdate = useCallback(() => {
@@ -532,12 +533,12 @@ function WatchPage() {
     if (!hasAccess || !videoUrl) return;
     const seekBy = (v: HTMLVideoElement, delta: number) => {
       v.currentTime = Math.min(v.duration || 0, Math.max(0, v.currentTime + delta));
-      flashHud(`${delta > 0 ? "+" : ""}${delta}s`);
+      flashHud(digits(`${delta > 0 ? "+" : ""}${delta}s`));
     };
     const bumpVolume = (v: HTMLVideoElement, delta: number) => {
       v.muted = false;
       v.volume = Math.min(1, Math.max(0, v.volume + delta));
-      flashHud(`${fa ? "صدا" : "Volume"} ${Math.round(v.volume * 100)}%`);
+      flashHud(`${fa ? "صدا" : "Volume"} ${digits(Math.round(v.volume * 100))}%`);
     };
     const handler = (e: KeyboardEvent) => {
       const v = videoRef.current;
@@ -549,7 +550,7 @@ function WatchPage() {
         e.preventDefault();
         const pct = parseInt(e.key, 10) / 10;
         v.currentTime = v.duration * pct;
-        flashHud(`${pct * 100}%`);
+        flashHud(`${digits(pct * 100)}%`);
         return;
       }
       switch (e.key) {
@@ -602,7 +603,7 @@ function WatchPage() {
             const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
             const nextIdx = Math.min(speeds.indexOf(speedRef.current) + 1, speeds.length - 1);
             changeSpeed(speeds[nextIdx]);
-            flashHud(`${speeds[nextIdx]}×`);
+            flashHud(`${digits(speeds[nextIdx])}×`);
           }
           break;
         case "<":
@@ -612,7 +613,7 @@ function WatchPage() {
             const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
             const prevIdx = Math.max(speeds.indexOf(speedRef.current) - 1, 0);
             changeSpeed(speeds[prevIdx]);
-            flashHud(`${speeds[prevIdx]}×`);
+            flashHud(`${digits(speeds[prevIdx])}×`);
           }
           break;
         case "t":
@@ -907,7 +908,7 @@ function WatchPage() {
                         const v = videoRef.current;
                         if (!v) return;
                         v.currentTime = Math.max(0, v.currentTime - 10);
-                        flashHud("-10s");
+                        flashHud(digits("-10s"));
                       }}
                       aria-label={fa ? "۱۰ ثانیه به عقب" : "Skip back 10s"}
                       className="hidden h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
@@ -926,7 +927,7 @@ function WatchPage() {
                         const v = videoRef.current;
                         if (!v) return;
                         v.currentTime = Math.min(v.duration || 0, v.currentTime + 10);
-                        flashHud("+10s");
+                        flashHud(digits("+10s"));
                       }}
                       aria-label={fa ? "۱۰ ثانیه به جلو" : "Skip forward 10s"}
                       className="hidden h-9 w-9 items-center justify-center rounded-md text-cream/85 transition-all hover:scale-110 hover:text-amber sm:flex"
@@ -1036,7 +1037,7 @@ function WatchPage() {
                         aria-label={fa ? "سرعت پخش" : "Playback speed"}
                         className={`flex h-9 min-w-9 items-center justify-center rounded-md px-1.5 text-[11px] font-semibold transition-all hover:scale-110 ${speed !== 1 ? "text-amber" : "text-cream/85 hover:text-amber"}`}
                       >
-                        {speed}×
+                        {digits(speed)}×
                       </button>
                       {speedOpen && (
                         <div
@@ -1052,7 +1053,7 @@ function WatchPage() {
                               onClick={() => changeSpeed(s)}
                               className={`flex w-full items-center justify-between rounded px-3 py-1.5 hover:bg-cream/10 ${speed === s ? "text-amber" : "text-cream/85"}`}
                             >
-                              <span>{s}×</span>
+                              <span>{digits(s)}×</span>
                               {speed === s && <span aria-hidden>✓</span>}
                             </button>
                           ))}
@@ -1094,7 +1095,7 @@ function WatchPage() {
                       <path d="M13 4v16l7-5-7-5 7-3-7-3z" />
                     </svg>
                     <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em]">
-                      {seekRipple.side === "right" ? "+10s" : "−10s"}
+                      {digits(seekRipple.side === "right" ? "+10s" : "−10s")}
                     </div>
                   </div>
                 </div>
@@ -1108,7 +1109,7 @@ function WatchPage() {
                     </p>
                     <p className="mt-2 font-display text-xl text-cream-bright">
                       {fa
-                        ? `از ${fmtTime(resumePrompt).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)])}؟`
+                        ? `از ${fmtTime(resumePrompt)}؟`
                         : `Resume from ${fmtTime(resumePrompt)}?`}
                     </p>
 

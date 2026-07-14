@@ -22,7 +22,7 @@ function daysUntil(iso: string | null): number | null {
 }
 
 export function MembershipPanel() {
-  const { locale } = useLocale();
+  const { locale, num } = useLocale();
   const fa = locale === "fa";
   const { subscription: sub, trial, isMember, isTrialActive, isLoading, hasUsedTrial, isTrialExpired } = useSubscription();
   const openPortal = useServerFn(createMembershipPortalSession);
@@ -52,7 +52,7 @@ export function MembershipPanel() {
       ? "آخرین پرداخت انجام نشد. لطفاً روش پرداخت را به‌روز کنید."
       : "Your last payment failed. Update your payment method to keep access.",
     daysLeft: (n: number) =>
-      fa ? `${n} روز مانده` : `${n} day${n === 1 ? "" : "s"} left`,
+      fa ? `${num(n)} روز مانده` : `${n} day${n === 1 ? "" : "s"} left`,
   };
 
   const handlePortal = async () => {
@@ -197,7 +197,7 @@ export function MembershipPanel() {
   const planLabel =
     planMonths >= 1
       ? fa
-        ? `پلن ${planMonths} ماهه`
+        ? `پلن ${num(planMonths)} ماهه`
         : `${planMonths}-month plan`
       : null;
 
