@@ -539,5 +539,5 @@ function formatTime(seconds: number, fa: boolean): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   const str = h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
   if (!fa) return str;
-  return str.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+  return toPersianDigits(str);
 }
