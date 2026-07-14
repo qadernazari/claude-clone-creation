@@ -38,7 +38,7 @@ type FilmRow = {
 };
 
 function OriginalsPage() {
-  const { locale, dir } = useLocale();
+  const { locale, dir, year } = useLocale();
   const fa = locale === "fa";
 
   const { data: films = [] } = useQuery<FilmRow[]>({
