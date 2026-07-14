@@ -275,7 +275,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-cream/35">
-                  {body.length} / 2000
+                  {num(body.length)} / {num(2000)}
                 </span>
                 <div className="flex gap-2">
                   {editing && (
