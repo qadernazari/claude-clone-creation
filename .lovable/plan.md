@@ -1,45 +1,39 @@
-# Persian digit formatting — fix remaining gaps
+## Goal
+Add a CI check that fails the build when inline `t({ en, fa })` calls are incomplete — missing `en`, missing `fa`, or empty string values — so translation gaps can't ship.
 
-Audit found the app is ~90% clean. `num()` and `year()` in `src/lib/i18n.tsx` are used consistently across rails, hero, film detail, library tabs, membership cards, watch countdowns, and continue-watching. Below are the concrete leaks where Latin digits still render in `fa`.
+## Approach
+Custom Node script + `package.json` script + CI step. No new runtime deps.
 
-## 1. Add a shared helper
+### 1. New script: `scripts/check-i18n.mjs`
+- Walk `src/**/*.{ts,tsx}` (skip `node_modules`, `routeTree.gen.ts`, `dist`, `.output`).
+- Parse each file with the TypeScript compiler API (already a transitive dep via Vite/tsgo) or a lightweight regex + AST fallback. Preference: TS compiler API for accuracy on JSX and template literals.
+- For every `CallExpression` where callee is `t` (identifier) and the first arg is an `ObjectLiteralExpression`, validate:
+  - Has both `en` and `fa` properties.
+  - Both values are string/template literals (not `undefined`, not empty string, not whitespace-only).
+  - No duplicate keys.
+- Collect violations as `{ file, line, col, reason }`.
+- Print a grouped report; exit `1` if any violations, else `0`.
+- Support `--fix-list` flag that just prints affected files (useful locally).
 
-In `src/lib/i18n.tsx`, add and export a small `toPersianDigits(input: string | number): string` that maps `0-9` → `۰-۹`. Use it in the watch player where we need to localize mixed strings (`"1:23 / 4:56"`, `"1.25×"`, `"+10s"`). Also expose it from the `useLocale()` return so components can grab it alongside `num`/`year`.
+### 2. Wire into `package.json`
+Add:
+```
+"check:i18n": "node scripts/check-i18n.mjs"
+```
+And chain it into the existing lint/typecheck script the CI already runs (or add to a combined `"ci": "npm run typecheck && npm run check:i18n && npm run build"` if there's no aggregate script).
 
-Also verify `num(4.5)` renders `۴٫۵` (Persian decimal separator). If it renders Latin `.`, switch decimal call sites to `Intl.NumberFormat("fa-IR", { minimumFractionDigits: 1 }).format(...)` or use `toPersianDigits(n.toFixed(1))` for the review avg.
+### 3. CI integration
+- If the project has a CI workflow file (`.github/workflows/*.yml` or similar), add a step running `npm run check:i18n` before `build`.
+- If no CI workflow exists yet, add a minimal `.github/workflows/ci.yml` that installs deps and runs `check:i18n` + `build` on push/PR.
+- Since Lovable's own build pipeline runs `npm run build`, optionally prepend the check to `build` script so it also fails Lovable deployments — will confirm before doing this since it slows every build.
 
-## 2. Watch player (`src/routes/_authenticated/watch.$slug.tsx`)
+### 4. Bootstrap: clean existing violations
+Run the script once during implementation, fix any incomplete `t({...})` sites found, then land the CI check green. If violations are extensive, list them and fix in the same PR.
 
-- Scrubber timecode at ~L981-987 (`fmtTime`): localize digits when `fa`.
-- Playback-speed badge/menu items at ~L1039, L1055: `{speed}×` → `fa ? toPersianDigits(String(speed)) : speed`.
-- HUD flashes at ~L535/540/552/605/615/910/929: wrap the numeric segments (`${delta}s`, `${vol}%`, `${pct*100}%`, `${speed}×`, `-10s/+10s`) with `toPersianDigits` when `fa`.
-- Seek ripple label at ~L1097: `"+10s" / "−10s"` → localized digits.
-- Replace the ad-hoc regex swap at L1111 with the shared helper.
+## Out of scope
+- No migration to key bundles.
+- No detection of hardcoded strings outside `t()` (separate concern — option C from clarifying question).
+- No runtime warnings; static check only.
 
-## 3. Library history progress (`src/routes/_authenticated/library.tsx`)
-
-L230 progress percent: wrap `Math.round(...)` in `num()`. Replace the manual regex swap in `formatTime` (L534-543) with the shared helper for consistency.
-
-## 4. Membership copy
-
-- `src/components/membership-panel.tsx` L54-55 (`daysLeft`) and L197-202 (`planLabel`): destructure `num` from `useLocale()` and use `num(n)` / `num(planMonths)` inside the `fa` template string.
-- `src/components/membership-checkout.tsx` L64-66 (`monthsLabel`): destructure `num` and use `` `${num(plan.months)} ماه` ``.
-
-## 5. Reviews (`src/components/film-reviews-section.tsx`)
-
-- L174 avg rating: `num(avg)` (after confirming decimal handling, otherwise `toPersianDigits(avg.toFixed(1))`).
-- L183 review count: `num(agg.review_count)`.
-- L258 star readout `${rating} / 5`: localize both numbers when `fa`.
-- L278 char counter `{body.length} / 2000`: localize when `fa`.
-
-## 6. Left as-is (documented)
-
-- USD price fallback on film detail (intentional — USD stays Latin).
-- `ir-pay-panel.tsx` already uses `toLocaleString("fa-IR")`; correct output, leave alone.
-- `film.age_rating` string badge on film detail: values may be codes like `PG-13`; we'll leave as-is unless product confirms it's numeric.
-- `h`/`m` unit letters in watch countdown: digit-formatting-only scope; unit localization is out of scope.
-
-## Verification
-
-- Grep after edits: no remaining `${\w+}` raw-number templates inside `fa` branches of `t(...)` or the files above.
-- Manual check in `fa` locale: play a film and confirm scrubber, speed, HUD, seek-ripple all show Persian digits; open a review; view library history; view membership card.
+## Open decision
+Should the check also run as part of `npm run build` (blocks Lovable deploys), or only in GitHub CI (blocks PRs only)? Default in this plan: **GitHub CI only**, to keep local/preview builds fast.
