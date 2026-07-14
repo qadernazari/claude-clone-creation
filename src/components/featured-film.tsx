@@ -114,6 +114,13 @@ function FeaturedSlider({ slides }: { slides: HomeFeaturedFilm[] }) {
                   startX.current = null;
                 },
               }}
+              slider={{
+                count: slides.length,
+                index,
+                onPrev: prev,
+                onNext: next,
+                onGo: go,
+              }}
               controls={
                 <SliderControls
                   count={slides.length}
