@@ -146,8 +146,19 @@ function SliderControls({
   onGo: (i: number) => void;
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1.5 px-1">
+    <div className="flex items-center gap-2" dir="ltr">
+      <button
+        type="button"
+        onClick={onPrev}
+        aria-label="Previous"
+        className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+
+      <div className="flex items-center justify-center gap-1.5 px-2">
         {Array.from({ length: count }).map((_, i) => {
           const active = i === index;
           return (
@@ -157,7 +168,7 @@ function SliderControls({
               onClick={() => onGo(i)}
               aria-label={`Go to slide ${i + 1}`}
               aria-current={active ? "true" : undefined}
-              className="flex cursor-pointer items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 rounded-full"
+              className="flex cursor-pointer items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70"
             >
               <span
                 className={`block rounded-full transition-all duration-300 ${
@@ -171,32 +182,20 @@ function SliderControls({
         })}
       </div>
 
-      <div className="flex items-center gap-1" dir="ltr">
-        <button
-          type="button"
-          onClick={onPrev}
-          aria-label="Previous"
-          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          aria-label="Next"
-          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
-
+      <button
+        type="button"
+        onClick={onNext}
+        aria-label="Next"
+        className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-cream/50 transition-all duration-200 hover:bg-cream/5 hover:text-cream-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/70 active:scale-95"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
     </div>
   );
 }
+
 
 const POS_CLASS: Record<string, string> = {
   center: "object-center",
