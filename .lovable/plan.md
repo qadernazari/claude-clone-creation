@@ -1,43 +1,45 @@
-# Mobile Featured Film — Match Your Sketch
+## Plan: Mobile hero redesign (Filimo-style)
 
-Your sketch shows two clear changes for the mobile hero (desktop stays exactly as it is today):
+### Goal
+Make the mobile homepage hero feel closer to the Filimo reference: full-bleed portrait image, a single wide centered CTA below it, and slide dots underneath the button. Keep the existing desktop split-panel layout untouched.
 
-1. **Arrows move onto the image** as left/right chevrons, vertically centered, floating over the poster.
-2. **Remove the pill below the image** (the arrows + dots bar under the frame).
+### Changes
 
-The Watch button stays where it is — centered near the bottom of the image.
+1. **Mobile hero container**
+   - Remove horizontal padding on mobile so the image touches the viewport edges (`px-0` below `md:`).
+   - Keep `max-w-[110rem]` and side padding from `md:` upward for desktop.
+   - Reduce bottom padding to a normal section gap since the button will sit below the image, not overlapping it.
 
-## Changes in `src/components/featured-film.tsx`
+2. **Mobile image frame**
+   - Drop the rounded border/frame and shadow on mobile (`md:` keeps them).
+   - Keep `aspect-[2/3]` portrait ratio.
+   - Keep the bottom gradient fade so any overlaid text remains readable.
+   - Remove mobile side arrows from inside the image (swipe still works).
+   - Remove mobile dots from inside the image.
 
-### 1. New mobile side-arrow controls
-Add two small circular chevron buttons absolutely positioned inside the image frame:
-- Left arrow: `absolute left-2 top-1/2 -translate-y-1/2`
-- Right arrow: `absolute right-2 top-1/2 -translate-y-1/2`
-- ~36×36px, rounded-full, `bg-bg-0/45 backdrop-blur-md border border-cream/10`, amber chevron icon, `active:scale-95`
-- Wrapped in `dir="ltr"` so left always = previous and right always = next in both English and Persian (consistent with the current desktop behavior)
-- Rendered only on mobile (`md:hidden`) and only on the active slide
-- `z-30` so they sit above the gradient but below the Watch pill's tap target
+3. **Mobile info / title**
+   - The current desktop-only info panel stays desktop-only.
+   - On mobile, render a compact title block centered over the lower part of the image (kicker + title only, no synopsis), matching the reference's centered logo/title feel.
 
-### 2. Keep dots, drop the pill
-- Remove the entire "Mobile-only stacked controls below frame" block at the bottom of `SlideImageFrame` (the `<div className="mt-6 flex justify-center md:hidden">…</div>` wrapper).
-- Render just the slide dots as a thin row absolutely positioned inside the image, above the Watch pill (e.g. `absolute bottom-16 left-1/2 -translate-x-1/2`), so the user still sees position/progress but there's no floating pill under the image.
-- Dots reuse the existing active/inactive styling from `SliderControls` (amber elongated bar for active, small cream dot for inactive).
+4. **Mobile CTA**
+   - Move the Watch button out of the image entirely.
+   - Render it as a wide, rounded pill centered below the image (`w-full max-w-md mx-auto`, `rounded-2xl`, `bg-amber`, `text-ink`).
+   - Use the existing dynamic label (`watchCtaLabel` / `watchCtaShort`) so it still says "Watch / Login & Watch / Buy subscription & Watch" correctly in both languages.
 
-### 3. Desktop untouched
-- The desktop arrow+dots pill at `bottom-4 left-4` inside the image stays exactly as it is.
-- The desktop info column stays exactly as it is.
-- The `SliderControls` component itself keeps working for desktop; only the mobile rendering path changes.
+5. **Mobile slide dots**
+   - Move dots to a centered row below the CTA.
+   - Keep the same active/inactive dot styling and click behavior.
+   - Hide dots when there is only one slide.
 
-### 4. Small cleanup
-- Because the pill below the frame goes away, tighten `pb-12 md:pb-10` on the hero container if it now leaves too much air under the image on mobile — likely reduce mobile bottom padding to `pb-6`.
+6. **Preserve behavior**
+   - Autoplay (5s), pause on hover/focus/off-screen, swipe gestures, and keyboard accessibility stay as-is.
+   - Desktop layout, controls, and info panel are not changed.
 
-## What this does not change
-- Autoplay (5s), pause on hover/off-screen, swipe gestures — unchanged.
-- Watch button label logic, Persian digits, category kicker — unchanged.
-- Desktop layout, sizes, and info panel — unchanged.
-- Image sources, gradients, aspect ratios — unchanged.
+### Verification
+- Build and typecheck pass.
+- Playwright mobile screenshot confirms: image full-bleed, wide button below, dots below button, no overlap, no cropping.
 
-## Verification
-- Run the app on mobile viewport (516×941) in both `fa` and `en`: left arrow always goes to previous slide, right to next.
-- Confirm the pill under the image is gone and dots sit inside the image above the Watch button.
-- Screenshot via Playwright at mobile width to confirm the layout matches the sketch.
+### Scope exclusion
+- No changes to desktop hero.
+- No changes to color palette, fonts, or rails.
+- No new dependencies.
