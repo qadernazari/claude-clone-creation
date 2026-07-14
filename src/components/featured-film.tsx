@@ -360,14 +360,6 @@ function SlideImageFrame({
 
               {/* Gradient — bottom fade for mobile pill readability; right fade on desktop to blend into info column */}
               <div
-                className="pointer-events-none absolute inset-0 md:hidden"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, transparent 35%, rgba(5,5,5,0.85) 100%)",
-                }}
-                aria-hidden
-              />
-              <div
                 className="pointer-events-none absolute inset-0 hidden md:block"
                 style={{
                   background:
