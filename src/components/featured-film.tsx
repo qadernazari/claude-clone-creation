@@ -215,6 +215,15 @@ const POS_CLASS: Record<string, string> = {
   right: "object-right",
 };
 
+const MD_POS_CLASS: Record<string, string> = {
+  center: "md:object-center",
+  top: "md:object-top",
+  bottom: "md:object-bottom",
+  left: "md:object-left",
+  right: "md:object-right",
+};
+
+
 function SlideImageFrame({
   film,
   active,
