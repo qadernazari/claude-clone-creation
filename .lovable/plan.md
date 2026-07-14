@@ -1,20 +1,45 @@
-# Remove leftover Preview/trailer UI remnants
+# Persian digit formatting — fix remaining gaps
 
-## Audit result
+Audit found the app is ~90% clean. `num()` and `year()` in `src/lib/i18n.tsx` are used consistently across rails, hero, film detail, library tabs, membership cards, watch countdowns, and continue-watching. Below are the concrete leaks where Latin digits still render in `fa`.
 
-A full read-only sweep of `src/` found **no viewer-facing Preview or trailer strings** still rendering — no JSX text, button labels, aria-labels, tooltips, or Persian variants (`پیش‌نمایش`, `تیزر`, `تماشای تیزر`, …). No dead state, handlers, refs, or lightbox component imports remain either. The previous cleanup was thorough.
+## 1. Add a shared helper
 
-## The one leftover
+In `src/lib/i18n.tsx`, add and export a small `toPersianDigits(input: string | number): string` that maps `0-9` → `۰-۹`. Use it in the watch player where we need to localize mixed strings (`"1:23 / 4:56"`, `"1.25×"`, `"+10s"`). Also expose it from the `useLocale()` return so components can grab it alongside `num`/`year`.
 
-`src/routes/films.$slug.tsx:43` still selects `preview_url` from the film row, but nothing reads it anywhere in viewer code — it's a dead column left over from the removed trailer lightbox. Not a UI string, but the request was to remove leftover trailer UI remnants, and this is the last one.
+Also verify `num(4.5)` renders `۴٫۵` (Persian decimal separator). If it renders Latin `.`, switch decimal call sites to `Intl.NumberFormat("fa-IR", { minimumFractionDigits: 1 }).format(...)` or use `toPersianDigits(n.toFixed(1))` for the review avg.
 
-## Change
+## 2. Watch player (`src/routes/_authenticated/watch.$slug.tsx`)
 
-- **`src/routes/films.$slug.tsx`** — remove `preview_url` from the `.select(...)` column list on the film detail query (line 43). No other code touches the field, so no follow-up edits are needed.
+- Scrubber timecode at ~L981-987 (`fmtTime`): localize digits when `fa`.
+- Playback-speed badge/menu items at ~L1039, L1055: `{speed}×` → `fa ? toPersianDigits(String(speed)) : speed`.
+- HUD flashes at ~L535/540/552/605/615/910/929: wrap the numeric segments (`${delta}s`, `${vol}%`, `${pct*100}%`, `${speed}×`, `-10s/+10s`) with `toPersianDigits` when `fa`.
+- Seek ripple label at ~L1097: `"+10s" / "−10s"` → localized digits.
+- Replace the ad-hoc regex swap at L1111 with the shared helper.
 
-Admin uploader code under `src/routes/_authenticated/admin/**` keeps its `preview_url` handling untouched — that's the storage side, not viewer UI. Email-template `<Preview>` components (react-email metadata, not user-visible) also stay.
+## 3. Library history progress (`src/routes/_authenticated/library.tsx`)
+
+L230 progress percent: wrap `Math.round(...)` in `num()`. Replace the manual regex swap in `formatTime` (L534-543) with the shared helper for consistency.
+
+## 4. Membership copy
+
+- `src/components/membership-panel.tsx` L54-55 (`daysLeft`) and L197-202 (`planLabel`): destructure `num` from `useLocale()` and use `num(n)` / `num(planMonths)` inside the `fa` template string.
+- `src/components/membership-checkout.tsx` L64-66 (`monthsLabel`): destructure `num` and use `` `${num(plan.months)} ماه` ``.
+
+## 5. Reviews (`src/components/film-reviews-section.tsx`)
+
+- L174 avg rating: `num(avg)` (after confirming decimal handling, otherwise `toPersianDigits(avg.toFixed(1))`).
+- L183 review count: `num(agg.review_count)`.
+- L258 star readout `${rating} / 5`: localize both numbers when `fa`.
+- L278 char counter `{body.length} / 2000`: localize when `fa`.
+
+## 6. Left as-is (documented)
+
+- USD price fallback on film detail (intentional — USD stays Latin).
+- `ir-pay-panel.tsx` already uses `toLocaleString("fa-IR")`; correct output, leave alone.
+- `film.age_rating` string badge on film detail: values may be codes like `PG-13`; we'll leave as-is unless product confirms it's numeric.
+- `h`/`m` unit letters in watch countdown: digit-formatting-only scope; unit localization is out of scope.
 
 ## Verification
 
-- `rg -n "preview_url|previewUrl" src` after the edit should return only admin routes and, if any, non-viewer files.
-- Typecheck via the normal build.
+- Grep after edits: no remaining `${\w+}` raw-number templates inside `fa` branches of `t(...)` or the files above.
+- Manual check in `fa` locale: play a film and confirm scrubber, speed, HUD, seek-ripple all show Persian digits; open a review; view library history; view membership card.
