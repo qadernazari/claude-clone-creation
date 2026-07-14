@@ -390,14 +390,14 @@ function SlideImageFrame({
                       {...watchHref}
                       onKeyDown={handleWatchKeyDown}
                       aria-label={locale === "fa" ? `تماشای ${title}` : `Watch ${title}`}
-                      className="group/btn inline-flex shrink-0 items-center gap-2.5 rounded-xl bg-amber px-5 py-2.5 font-bold text-ink shadow-lg shadow-amber/20 transition-all duration-200 hover:bg-amber/90 hover:shadow-[0_0_28px_rgba(201,168,76,0.35)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:scale-[0.97]"
+                      className="btn-cinematic group/btn inline-flex shrink-0 items-center gap-2.5 rounded-xl px-5 py-2.5 font-bold text-ink focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber focus-visible:ring-offset-4 focus-visible:ring-offset-bg-0 active:translate-y-px active:scale-[0.98]"
                     >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-ink/10 transition-transform group-hover/btn:scale-110">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <span className="relative z-[1] flex h-7 w-7 items-center justify-center rounded-full bg-ink/85 text-amber-bright shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.4)] transition-transform duration-200 group-hover/btn:scale-110 group-active/btn:scale-95">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden className="translate-x-[1px]">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </span>
-                      <span className="text-sm leading-none">
+                      <span className="relative z-[1] text-sm leading-none tracking-wide">
                         {ctaLabel}
                       </span>
                     </Link>
