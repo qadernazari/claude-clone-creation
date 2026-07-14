@@ -227,7 +227,7 @@ function LibraryPage() {
                       <div className="mt-1 text-[11px] text-cream/55">
                         {r.completed
                           ? fa ? "تماشا تمام شد" : "Completed"
-                          : `${Math.round((r.position_seconds / Math.max(1, (r.duration_seconds ?? (r.film.duration_min ?? 1) * 60))) * 100)}%`}
+                          : `${num(Math.round((r.position_seconds / Math.max(1, (r.duration_seconds ?? (r.film.duration_min ?? 1) * 60))) * 100))}%`}
                         {" · "}
                         {new Date(r.last_watched_at).toLocaleDateString(fa ? "fa-IR" : "en-US")}
                       </div>
