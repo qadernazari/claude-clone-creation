@@ -341,6 +341,10 @@ function Home() {
     <div className="min-h-screen bg-bg-0 text-cream">
       <SiteHeader current="home" />
       <main>
+        {/* Single, semantic H1 for the homepage — visually hidden so it doesn't
+            compete with the cinematic featured slider, but present for crawlers
+            and screen readers. */}
+        <h1 className="sr-only">IRAN — Original Iranian short films, streaming worldwide</h1>
         {/* 1. Cinematic hero = featured film */}
         <FeaturedFilm />
         <DeferredHomeRails />

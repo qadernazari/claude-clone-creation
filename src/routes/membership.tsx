@@ -39,7 +39,7 @@ export const Route = createFileRoute("/membership")({
       {
         name: "description",
         content:
-          "Pick a 1, 3, 6, or 12-month IRAN plan. Unlimited streaming of Iranian short films, HD, bilingual subtitles, no ads, no auto-renewal — save up to 50% on longer plans.",
+          "Pick a 1, 3, 6, or 12-month plan. Unlimited Iranian short films, HD, bilingual subtitles, no ads — save up to 50% on longer plans.",
       },
       { property: "og:title", content: "IRAN Membership — Unlimited Iranian cinema" },
       {

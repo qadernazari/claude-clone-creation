@@ -27,6 +27,7 @@ import { Route as R73778054DottxtRouteImport } from './routes/73778054[.]txt'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GuidesWatchIranianMoviesWithSubtitlesRouteImport } from './routes/guides.watch-iranian-movies-with-subtitles'
+import { Route as GuidesBestIranianMoviesRouteImport } from './routes/guides.best-iranian-movies'
 import { Route as FilmsSlugRouteImport } from './routes/films.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -159,6 +160,11 @@ const GuidesWatchIranianMoviesWithSubtitlesRoute =
     path: '/guides/watch-iranian-movies-with-subtitles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const GuidesBestIranianMoviesRoute = GuidesBestIranianMoviesRouteImport.update({
+  id: '/guides/best-iranian-movies',
+  path: '/guides/best-iranian-movies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FilmsSlugRoute = FilmsSlugRouteImport.update({
   id: '/films/$slug',
   path: '/films/$slug',
@@ -413,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/films/$slug': typeof FilmsSlugRoute
+  '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
@@ -472,6 +479,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/films/$slug': typeof FilmsSlugRoute
+  '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
@@ -534,6 +542,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/films/$slug': typeof FilmsSlugRoute
+  '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
@@ -596,6 +605,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/films/$slug'
+    | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
     | '/admin/analytics'
     | '/admin/appearance'
@@ -655,6 +665,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/films/$slug'
+    | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
     | '/admin/analytics'
     | '/admin/appearance'
@@ -716,6 +727,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/films/$slug'
+    | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/appearance'
@@ -774,6 +786,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FilmsSlugRoute: typeof FilmsSlugRoute
+  GuidesBestIranianMoviesRoute: typeof GuidesBestIranianMoviesRoute
   GuidesWatchIranianMoviesWithSubtitlesRoute: typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
@@ -912,6 +925,13 @@ declare module '@tanstack/react-router' {
       path: '/guides/watch-iranian-movies-with-subtitles'
       fullPath: '/guides/watch-iranian-movies-with-subtitles'
       preLoaderRoute: typeof GuidesWatchIranianMoviesWithSubtitlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/best-iranian-movies': {
+      id: '/guides/best-iranian-movies'
+      path: '/guides/best-iranian-movies'
+      fullPath: '/guides/best-iranian-movies'
+      preLoaderRoute: typeof GuidesBestIranianMoviesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/films/$slug': {
@@ -1319,6 +1339,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FilmsSlugRoute: FilmsSlugRoute,
+  GuidesBestIranianMoviesRoute: GuidesBestIranianMoviesRoute,
   GuidesWatchIranianMoviesWithSubtitlesRoute:
     GuidesWatchIranianMoviesWithSubtitlesRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,

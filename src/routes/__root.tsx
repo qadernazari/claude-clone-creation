@@ -141,23 +141,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0807" },
-      { title: "IRAN — Iranian short films, streaming worldwide" },
-      {
-        name: "description",
-        content:
-          "Stream original Iranian short films. Monthly membership with a 90-day free trial, plus Premium rentals. Bilingual, worldwide, no ads.",
-      },
       { name: "author", content: "IRAN" },
+      // Site-wide defaults only. Per-route title, description, and og:*
+      // tags live on each route's head() to avoid PostRest concatenation
+      // producing duplicate title/meta tags.
       { property: "og:site_name", content: "IRAN" },
-      { property: "og:title", content: "IRAN — Iranian short films, streaming worldwide" },
-      {
-        property: "og:description",
-        content: "Original Iranian short films, streaming worldwide. 90-day free trial, then membership or Premium rentals. Bilingual.",
-      },
-      { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "IRAN — Iranian short films, streaming worldwide" },
-      { name: "twitter:description", content: "Original Iranian short films, streaming worldwide. 90-day free trial, then membership or Premium rentals." },
       { name: "google-site-verification", content: "zoKuyFN67EFMHi4pIwq3FrqFrbDasxMAE2kVfYSTGks" },
       { name: "enamad", content: "52799420" },
     ],
