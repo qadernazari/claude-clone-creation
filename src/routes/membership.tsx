@@ -35,17 +35,17 @@ export const Route = createFileRoute("/membership")({
     const ogImage = loaderData?.ogImage || FALLBACK_OG;
     return {
     meta: [
-      { title: "Membership — IRAN" },
+      { title: "IRAN Membership — Unlimited Iranian cinema" },
       {
         name: "description",
         content:
-          "Choose your IRAN membership. 1, 3, 6, or 12 months — unlimited streaming, save up to 50%.",
+          "Pick a 1, 3, 6, or 12-month IRAN plan. Unlimited streaming of Iranian short films, HD, bilingual subtitles, no ads, no auto-renewal — save up to 50% on longer plans.",
       },
-      { property: "og:title", content: "Membership — IRAN" },
+      { property: "og:title", content: "IRAN Membership — Unlimited Iranian cinema" },
       {
         property: "og:description",
         content:
-          "Unlimited Iranian cinema. 1, 3, 6, or 12 month plans — no auto-renewal, cancel anytime.",
+          "1, 3, 6, or 12-month plans. Unlimited Iranian cinema, HD, bilingual subtitles, cancel anytime.",
       },
       { property: "og:url", content: "https://ir.show/membership" },
       { property: "og:site_name", content: "IRAN" },

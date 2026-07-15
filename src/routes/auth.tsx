@@ -18,9 +18,13 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Sign in to IRAN to watch original Iranian short films, save your library, and continue where you left off.",
+          "Sign in or create an IRAN account to stream Iranian short films, save your library, and pick up where you left off.",
       },
+      { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Sign in — IRAN" },
+      { property: "og:url", content: "https://ir.show/auth" },
     ],
+    links: [{ rel: "canonical", href: "https://ir.show/auth" }],
   }),
   component: AuthPage,
 });
