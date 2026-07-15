@@ -77,7 +77,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={fa ? "ایران در اینستاگرام" : "IRAN on Instagram"}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 transition-colors hover:text-cream"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/70 transition-colors hover:text-cream"
             >
               <Instagram size={16} aria-hidden />
             </a>
@@ -86,7 +86,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={fa ? "ایران در فیسبوک" : "IRAN on Facebook"}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 transition-colors hover:text-cream"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/70 transition-colors hover:text-cream"
             >
               <Facebook size={16} aria-hidden />
             </a>
@@ -95,7 +95,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={fa ? "ایران در یوتیوب" : "IRAN on YouTube"}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 transition-colors hover:text-cream"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/70 transition-colors hover:text-cream"
             >
               <Youtube size={16} aria-hidden />
             </a>
@@ -104,7 +104,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={fa ? "ایران در تیک‌تاک" : "IRAN on TikTok"}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 transition-colors hover:text-cream"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/70 transition-colors hover:text-cream"
             >
               <svg
                 width="16"

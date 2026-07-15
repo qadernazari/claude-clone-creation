@@ -67,7 +67,7 @@ function ContactPage() {
           </div>
 
           <div className="mt-16 border-t border-amber/15 pt-8">
-            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/45">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/70">
               {fa ? "ما را دنبال کنید" : "Follow along"}
             </p>
             <div className="flex items-center gap-2">

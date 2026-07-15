@@ -95,7 +95,7 @@ function LibraryPage() {
 
       <main className="mx-auto max-w-6xl px-5 pt-20 pb-20 md:px-6 md:pt-28">
         <header className="flex flex-col gap-1">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-cream/45">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-cream/70">
             {fa ? "حساب من" : "My account"}
           </p>
           <h1 className={`text-4xl md:text-5xl tracking-[-0.03em] text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>
@@ -509,7 +509,7 @@ function Empty({ title, cta }: { title: string; cta?: string }) {
           {cta}
         </Link>
       ) : (
-        <p className="mt-5 text-xs text-cream/45">
+        <p className="mt-5 text-xs text-cream/70">
           {fa ? "وقتی شروع به تماشا کنید اینجا ظاهر می‌شود." : "It'll appear here once you start watching."}
         </p>
       )}

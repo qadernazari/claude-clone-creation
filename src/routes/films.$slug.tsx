@@ -250,7 +250,7 @@ function PosterRail({
                   </div>
                   <div className={`mt-3 font-display text-[13px] font-medium tracking-[-0.01em] text-cream-bright truncate ${fa ? "font-vazir" : ""}`}>{rTitle}</div>
                   {rDirector && (
-                    <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/40 truncate">{rDirector}</div>
+                    <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cream/70 truncate">{rDirector}</div>
                   )}
                 </Link>
               </li>
@@ -551,7 +551,7 @@ function FilmPage() {
                 {title}
               </div>
               {director && (
-                <div className="truncate text-[11px] text-cream/45">
+                <div className="truncate text-[11px] text-cream/70">
                   {fa ? "کارگردان " : "Dir. "}{director}
                 </div>
               )}
@@ -696,7 +696,7 @@ function FilmPage() {
             {/* Meta row + quality badges */}
             <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-cream/75">
               {film.year && <span>{year(film.year)}</span>}
-              {film.year && film.duration_min ? <span className="text-cream/30">·</span> : null}
+              {film.year && film.duration_min ? <span className="text-cream/60">·</span> : null}
               {film.duration_min && (
                 <span>
                   {num(film.duration_min)} {fa ? "دقیقه" : "min"}
@@ -704,7 +704,7 @@ function FilmPage() {
               )}
               {director && (
                 <>
-                  <span className="text-cream/30">·</span>
+                  <span className="text-cream/60">·</span>
                   <span>
                     {fa ? "کارگردان " : "Dir. "}
                     <span className="text-cream-bright">{director}</span>
@@ -851,12 +851,12 @@ function FilmPage() {
             <p className="mt-5 text-[12px] tracking-wide text-cream/50">
               {accessNote}
               {activeTicket?.expires_at && (
-                <span className="ms-2 text-cream/35">
+                <span className="ms-2 text-cream/65">
                   · {new Date(activeTicket.expires_at).toLocaleString(fa ? "fa-IR" : "en-US", { dateStyle: "medium", timeStyle: "short" })}
                 </span>
               )}
             </p>
-            {tomanOnly && <p className="mt-1.5 text-[11px] text-cream/40">{t.tomanSoon}</p>}
+            {tomanOnly && <p className="mt-1.5 text-[11px] text-cream/70">{t.tomanSoon}</p>}
           </div>
         </div>
       </section>
@@ -871,47 +871,47 @@ function FilmPage() {
         <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 md:grid-cols-4">
           {film.year && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "سال" : "Year"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "سال" : "Year"}</dt>
               <dd className="mt-1 text-[14px] text-cream-bright">{year(film.year)}</dd>
             </div>
           )}
           {film.duration_min && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "مدت" : "Runtime"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "مدت" : "Runtime"}</dt>
               <dd className="mt-1 text-[14px] text-cream-bright">{num(film.duration_min)} {fa ? "دقیقه" : "min"}</dd>
             </div>
           )}
           {film.category && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "ژانر" : "Genre"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "ژانر" : "Genre"}</dt>
               <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? (categoryName?.name_fa || categoryName?.name_en || film.category) : (categoryName?.name_en || (film.category.charAt(0).toUpperCase() + film.category.slice(1)))}</dd>
             </div>
           )}
           <div>
-            <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "کشور" : "Country"}</dt>
+            <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "کشور" : "Country"}</dt>
             <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{fa ? "ایران" : "Iran"}</dd>
           </div>
           {film.category !== "walking-tour" && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زبان" : "Language"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "زبان" : "Language"}</dt>
               <dd className={`mt-1 text-[14px] text-cream-bright ${fa ? "font-vazir" : ""}`}>{languageLabel(film.language, locale)}</dd>
             </div>
           )}
           {film.has_subtitles && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "زیرنویس" : "Subtitles"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "زیرنویس" : "Subtitles"}</dt>
               <dd className="mt-1 text-[14px] text-cream-bright">{fa ? "انگلیسی" : "English"}</dd>
             </div>
           )}
           {film.age_rating && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "رده‌بندی" : "Rating"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "رده‌بندی" : "Rating"}</dt>
               <dd className="mt-1 text-[14px] text-cream-bright">{film.age_rating}</dd>
             </div>
           )}
           {(film.has_4k || film.has_captions) && (
             <div>
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/45">{fa ? "کیفیت" : "Quality"}</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-cream/70">{fa ? "کیفیت" : "Quality"}</dt>
               <dd className="mt-1 text-[14px] text-cream-bright">
                 {[film.has_4k && "4K", film.has_captions && "CC"].filter(Boolean).join(" · ")}
               </dd>
@@ -1038,7 +1038,7 @@ function FilmPage() {
               >
                 {t.becomeMember}
               </button>
-              <p className="mt-2 text-[11px] text-cream/40">
+              <p className="mt-2 text-[11px] text-cream/70">
                 {fa ? "از ماهی ۷٫۹۹ دلار · بدون تمدید خودکار" : "From $7.99 / month · No auto-renewal"}
               </p>
             </div>
@@ -1046,7 +1046,7 @@ function FilmPage() {
             {/* PPV card if available */}
             {hasPpv && (
               <div className="hairline rounded-2xl border bg-bg-1/40 p-6">
-                <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/45">
+                <span className="block text-[10px] uppercase tracking-[0.28em] text-cream/70">
                   {fa ? "خرید این فیلم" : "Rent this film"}
                 </span>
                 <h3 className={`mt-2 text-lg text-cream-bright ${fa ? "font-vazir" : "font-display"}`}>

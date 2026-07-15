@@ -173,7 +173,7 @@ export function WelcomeRegionModal() {
           <button
             type="button"
             onClick={dismiss}
-            className="mt-5 text-xs text-cream/40 transition-colors hover:text-cream/70"
+            className="mt-5 text-xs text-cream/70 transition-colors hover:text-cream/70"
           >
             Skip for now
           </button>

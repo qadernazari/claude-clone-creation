@@ -395,7 +395,7 @@ function PrivacyPage() {
         >
           {fa ? "سیاست حریم خصوصی" : "Privacy Policy"}
         </h1>
-        <p className="mt-2 mb-10 text-xs text-cream/45">
+        <p className="mt-2 mb-10 text-xs text-cream/70">
           {fa ? "آخرین به‌روزرسانی: ۲۷ ژوئن ۲۰۲۶" : "Last updated: June 27, 2026"}
         </p>
 

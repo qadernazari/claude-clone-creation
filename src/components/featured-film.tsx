@@ -444,7 +444,7 @@ function SlideImageFrame({
                     {film.year ? <span>{year(film.year)}</span> : null}
                     {film.duration_min ? (
                       <>
-                        <span className="text-cream/25">•</span>
+                        <span className="text-cream/60">•</span>
                         <span>{num(film.duration_min)}{locale === "fa" ? " دقیقه" : "m"}</span>
                       </>
                     ) : null}
