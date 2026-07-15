@@ -361,7 +361,7 @@ function SlideImageFrame({
                     ) : null}
                     <img
                       src={portraitImage || landscapeImage!}
-                      alt={film.title_fa || film.title_en}
+                      alt={`${film.title_fa || film.title_en} — featured film cover on IRAN`}
                       width={1920}
                       height={1080}
                       className={`cine-img absolute inset-0 block h-full w-full transition-transform duration-1000 ease-out md:group-hover:scale-[1.02] ${fitClass}`}

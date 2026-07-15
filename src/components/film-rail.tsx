@@ -37,7 +37,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
             <source media="(min-width: 1024px)" srcSet={railSrcSet || railImg || undefined} sizes="(min-width: 1024px) 340px, 300px" />
             <img
               src={mobileImg || railImg || undefined}
-              alt={ftitle}
+              alt={`${ftitle} — poster for the Iranian film on IRAN`}
               loading="lazy"
               decoding="async"
               fetchPriority="low"
