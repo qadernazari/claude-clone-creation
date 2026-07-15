@@ -26,6 +26,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as R73778054DottxtRouteImport } from './routes/73778054[.]txt'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GuidesWatchIranianMoviesWithSubtitlesRouteImport } from './routes/guides.watch-iranian-movies-with-subtitles'
 import { Route as FilmsSlugRouteImport } from './routes/films.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -152,6 +153,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesWatchIranianMoviesWithSubtitlesRoute =
+  GuidesWatchIranianMoviesWithSubtitlesRouteImport.update({
+    id: '/guides/watch-iranian-movies-with-subtitles',
+    path: '/guides/watch-iranian-movies-with-subtitles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FilmsSlugRoute = FilmsSlugRouteImport.update({
   id: '/films/$slug',
   path: '/films/$slug',
@@ -406,6 +413,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/films/$slug': typeof FilmsSlugRoute
+  '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -464,6 +472,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/films/$slug': typeof FilmsSlugRoute
+  '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -525,6 +534,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/films/$slug': typeof FilmsSlugRoute
+  '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/_authenticated/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -586,6 +596,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/films/$slug'
+    | '/guides/watch-iranian-movies-with-subtitles'
     | '/admin/analytics'
     | '/admin/appearance'
     | '/admin/banner'
@@ -644,6 +655,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/films/$slug'
+    | '/guides/watch-iranian-movies-with-subtitles'
     | '/admin/analytics'
     | '/admin/appearance'
     | '/admin/banner'
@@ -704,6 +716,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/films/$slug'
+    | '/guides/watch-iranian-movies-with-subtitles'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/appearance'
     | '/_authenticated/admin/banner'
@@ -761,6 +774,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FilmsSlugRoute: typeof FilmsSlugRoute
+  GuidesWatchIranianMoviesWithSubtitlesRoute: typeof GuidesWatchIranianMoviesWithSubtitlesRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicIrPaymentsCallbackRoute: typeof ApiPublicIrPaymentsCallbackRoute
@@ -891,6 +905,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/watch-iranian-movies-with-subtitles': {
+      id: '/guides/watch-iranian-movies-with-subtitles'
+      path: '/guides/watch-iranian-movies-with-subtitles'
+      fullPath: '/guides/watch-iranian-movies-with-subtitles'
+      preLoaderRoute: typeof GuidesWatchIranianMoviesWithSubtitlesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/films/$slug': {
@@ -1298,6 +1319,8 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FilmsSlugRoute: FilmsSlugRoute,
+  GuidesWatchIranianMoviesWithSubtitlesRoute:
+    GuidesWatchIranianMoviesWithSubtitlesRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicIrPaymentsCallbackRoute: ApiPublicIrPaymentsCallbackRoute,
