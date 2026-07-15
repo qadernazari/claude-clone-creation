@@ -193,7 +193,7 @@ function RootShell({ children }: { children: ReactNode }) {
   const dir = locale === "fa" ? "rtl" : "ltr";
 
   return (
-    <html lang={locale} dir={dir} data-region={region} suppressHydrationWarning>
+    <html lang={locale || "en"} dir={dir} data-region={region} suppressHydrationWarning>
       <head>
         {/*
           Inject the resolved region as a global so <LocaleProvider> can
