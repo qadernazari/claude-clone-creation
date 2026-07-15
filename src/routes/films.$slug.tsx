@@ -66,7 +66,9 @@ export const Route = createFileRoute("/films/$slug")({
     const f = loaderData?.film;
     if (!f) return {};
     const title = `${f.title_en} — IRAN`;
-    const desc = f.synopsis_en?.slice(0, 160) ?? "Original Iranian short film on IRAN.";
+    const desc =
+      f.synopsis_en?.slice(0, 160) ??
+      `Watch ${f.title_en}, an original Iranian ${f.category === "walking-tour" ? "walking tour" : "film"} streaming exclusively on IRAN with English and Persian subtitles.`;
     const url = `https://ir.show/films/${params.slug}`;
     const isoDuration = f.duration_min ? `PT${f.duration_min}M` : undefined;
     const ogImage = loaderData?.ogImage || f.thumbnail_url || f.cover_url;

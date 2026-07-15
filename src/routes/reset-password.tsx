@@ -5,12 +5,23 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/logo";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({
-    meta: [
-      { title: "Reset password — IRAN" },
-      { name: "description", content: "Set a new password for your IRAN account." },
-    ],
-  }),
+  head: () => {
+    const title = "Reset password — IRAN";
+    const description =
+      "Reset your IRAN account password securely and get back to streaming original Iranian films and series.";
+    const url = "https://ir.show/reset-password";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "website" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: ResetPasswordPage,
 });
 
