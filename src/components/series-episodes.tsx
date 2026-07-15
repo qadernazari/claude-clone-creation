@@ -112,7 +112,7 @@ export function SeriesEpisodes({ seriesId }: { seriesId: string }) {
                       className="cine-img h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-cream/30">
+                    <div className="flex h-full w-full items-center justify-center text-cream/60">
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M8 5v14l11-7z" />
                       </svg>
@@ -144,7 +144,7 @@ export function SeriesEpisodes({ seriesId }: { seriesId: string }) {
                     )}
                   </div>
                   {ep.duration_min && (
-                    <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-cream/45">
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.12em] text-cream/70">
                       {num(ep.duration_min)} {fa ? "دقیقه" : "min"}
                     </p>
                   )}

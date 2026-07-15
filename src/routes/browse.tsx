@@ -173,7 +173,7 @@ function BrowsePage() {
       <main className="mx-auto max-w-7xl px-5 pb-16 pt-24 sm:px-6 md:pb-28 md:pt-32">
 
         <header className="mb-4 max-w-3xl fade-up md:mb-14">
-          <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+          <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/70">
             {locale === "fa" ? "کاتالوگ" : "The Catalog"}
           </span>
           <h1 className="mt-3 font-display font-medium text-cream-bright text-[1.6rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl md:mt-5 md:text-6xl">
@@ -202,7 +202,7 @@ function BrowsePage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-cream/40 md:start-4"
+                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-cream/70 md:start-4"
                 aria-hidden
               >
                 <circle cx="11" cy="11" r="7" />
@@ -215,7 +215,7 @@ function BrowsePage() {
                 placeholder={
                   locale === "fa" ? "جست‌وجو…" : "Search films…"
                 }
-                className="w-full rounded-md border border-cream/10 bg-bg-1/70 ps-10 pe-4 py-2 text-[13px] text-cream placeholder:text-cream/35 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:ps-11 md:pe-5 md:py-2.5 md:text-sm"
+                className="w-full rounded-md border border-cream/10 bg-bg-1/70 ps-10 pe-4 py-2 text-[13px] text-cream placeholder:text-cream/65 transition-all focus:border-cream/30 focus:bg-bg-1 focus:outline-none md:ps-11 md:pe-5 md:py-2.5 md:text-sm"
               />
             </div>
             {/* Compact filter button (mobile only) */}
@@ -237,7 +237,7 @@ function BrowsePage() {
           </div>
           {/* Desktop-only sort dropdown */}
           <div className="hidden items-center gap-3 text-xs text-cream/55 md:flex">
-            <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+            <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-cream/70">
               {locale === "fa" ? "مرتب‌سازی" : "Sort"}
             </span>
             <select
@@ -285,7 +285,7 @@ function BrowsePage() {
           </div>
         ) : null}
 
-        <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-cream/40 md:mb-8">
+        <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-cream/70 md:mb-8">
           {`${num(filtered.length)} ${
             locale === "fa" ? "اثر" : filtered.length === 1 ? "film" : "films"
           }`}
@@ -304,7 +304,7 @@ function BrowsePage() {
             >
               <div className="mx-auto mt-1 mb-3 h-1 w-10 rounded-full bg-cream/20" aria-hidden />
               <div className="px-5 pb-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/40">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cream/70">
                   {locale === "fa" ? "مرتب‌سازی بر اساس" : "Sort by"}
                 </p>
               </div>
@@ -423,7 +423,7 @@ function BrowsePage() {
                     <h3 className="font-display text-[13px] font-medium leading-snug tracking-[-0.01em] text-cream-bright line-clamp-1 md:text-[14px]">
                       {ftitle}
                     </h3>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1 md:mt-1.5 md:text-[11px]">
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/70 line-clamp-1 md:mt-1.5 md:text-[11px]">
                       {director}
                       {director && film.year ? <> {" · "} {year(film.year)}</> : !director && film.year ? year(film.year) : null}
                     </p>

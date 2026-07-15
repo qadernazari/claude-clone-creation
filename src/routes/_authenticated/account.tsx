@@ -315,7 +315,7 @@ function AccountPage() {
             <button
               type="button"
               onClick={() => setPaymentNotice(null)}
-              className="text-cream/40 hover:text-cream"
+              className="text-cream/70 hover:text-cream"
               aria-label={fa ? "بستن" : "Dismiss"}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -401,7 +401,7 @@ function AccountPage() {
                   );
                 })}
               </div>
-              <p className="mt-2 text-[11px] text-cream/45">{tr.regionHint}</p>
+              <p className="mt-2 text-[11px] text-cream/70">{tr.regionHint}</p>
             </label>
             <div className="block">
               <span className="text-xs uppercase tracking-widest text-cream/55">{tr.member}</span>
@@ -699,7 +699,7 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
               <option key={r} value={r}>{r}</option>
             ))}
           </select>
-          <span className="mt-2 block text-[11px] text-cream/45">
+          <span className="mt-2 block text-[11px] text-cream/70">
             {fa
               ? "فیلم‌های بالاتر از این رده در فهرست مخفی می‌شوند."
               : "Films above this rating are hidden from browse."}
@@ -722,7 +722,7 @@ function ParentalControlsPanel({ profile }: { profile: ProfileLite }) {
             placeholder={hasPin ? (fa ? "تغییر پین (خالی = بدون تغییر)" : "Change PIN (blank = unchanged)") : (fa ? "اختیاری" : "Optional")}
             className="mt-2 w-full rounded-md border border-cream/15 bg-bg-0 px-3 py-2 text-cream outline-none focus:border-amber disabled:opacity-50"
           />
-          <span className="mt-2 block text-[11px] text-cream/45">
+          <span className="mt-2 block text-[11px] text-cream/70">
             {hasPin
               ? fa ? "پین تنظیم شده است. برای امنیت نمایش داده نمی‌شود." : "A PIN is set. It is not shown for security."
               : fa ? "هنوز پینی تنظیم نشده است." : "No PIN set yet."}

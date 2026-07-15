@@ -372,7 +372,7 @@ export function AuthMenu() {
                 ].join(" ")}
               >
                 <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-cream/70">
                     {fa ? "عضویت" : "Membership"}
                   </p>
                   <p
@@ -392,7 +392,7 @@ export function AuthMenu() {
                 </div>
                 <ChevronRight
                   size={16}
-                  className="text-cream/40 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  className="text-cream/70 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
                   aria-hidden
                 />
               </Link>
@@ -427,7 +427,7 @@ export function AuthMenu() {
                   <Globe2 size={17} strokeWidth={1.6} />
                 </span>
                 <span className="flex-1">{fa ? "منطقه جغرافیایی" : "Region"}</span>
-                <span className="text-[12px] font-semibold text-cream/45" lang={region === "iran" ? "fa" : "en"}>
+                <span className="text-[12px] font-semibold text-cream/70" lang={region === "iran" ? "fa" : "en"}>
                   {region === "iran" ? "ایران" : "Global"}
                 </span>
               </button>
@@ -459,7 +459,7 @@ export function AuthMenu() {
                 <span className="flex-1 truncate">{fa ? "خروج از سیستم" : "Sign out"}</span>
                 <ChevronRight
                   size={15}
-                  className="text-cream/30 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  className="text-cream/60 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
                   aria-hidden
                 />
               </button>
@@ -484,7 +484,7 @@ function Section({
 }) {
   return (
     <section className="px-3 pb-2">
-      <p className="px-3 pb-1.5 pt-2 text-[10px] uppercase tracking-[0.22em] text-cream/40">
+      <p className="px-3 pb-1.5 pt-2 text-[10px] uppercase tracking-[0.22em] text-cream/70">
         {title}
       </p>
       <div className="flex flex-col">{children}</div>
@@ -527,7 +527,7 @@ function Row({
       <span className="flex-1 truncate">{label}</span>
       <ChevronRight
         size={15}
-        className="text-cream/30 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+        className="text-cream/60 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
         aria-hidden
       />
     </Link>

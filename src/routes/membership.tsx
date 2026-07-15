@@ -206,7 +206,7 @@ function MembershipPage() {
         </section>
 
         {!isMember && (
-          <p className="mt-10 text-center text-xs text-cream/45">
+          <p className="mt-10 text-center text-xs text-cream/70">
             {fa ? (
               <>
                 با خرید عضویت، شما{" "}

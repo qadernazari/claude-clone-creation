@@ -231,7 +231,7 @@ function FilmAnalyticsPage() {
 
       {totallyEmpty ? (
         <div className="rounded-lg border border-border bg-card/40 p-12 text-center">
-          <BarChart3 className="mx-auto h-10 w-10 text-muted-foreground/40 mb-3" />
+          <BarChart3 className="mx-auto h-10 w-10 text-muted-foreground/70 mb-3" />
           <h3 className="font-medium mb-1">No analytics data available for this film yet.</h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
             Views, watch time, purchases and contributions will appear here once viewers start

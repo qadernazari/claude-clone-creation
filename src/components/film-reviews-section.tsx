@@ -165,7 +165,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
       className="mx-auto mt-12 max-w-4xl border-t border-cream/10 px-5 py-12 sm:px-6 md:mt-20 md:py-20"
     >
       <header className="mb-8 md:mb-12">
-        <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/40">
+        <span className="block text-[10px] font-medium uppercase tracking-[0.28em] text-cream/70">
           {fa ? "نقد و نظر" : "Ratings & Reviews"}
         </span>
         <div className="mt-3 flex flex-wrap items-end gap-4 md:gap-6">
@@ -213,7 +213,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <StarRow value={myReview.rating} />
-                <span className="text-xs text-cream/40">
+                <span className="text-xs text-cream/70">
                   {formatDate(myReview.created_at, locale)}
                 </span>
               </div>
@@ -253,7 +253,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                   disabled={submit.isPending}
                   fa={fa}
                 />
-                <span className="text-xs text-cream/40">
+                <span className="text-xs text-cream/70">
                   {rating > 0
                     ? `${num(rating)} / ${num(5)}`
                     : fa
@@ -271,10 +271,10 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                     ? "نظرت چیست؟ (اختیاری)"
                     : "Share your thoughts (optional)"
                 }
-                className="w-full resize-none rounded-xl border border-cream/10 bg-bg-0/50 px-4 py-3 text-sm text-cream placeholder:text-cream/35 focus:border-cream/30 focus:outline-none"
+                className="w-full resize-none rounded-xl border border-cream/10 bg-bg-0/50 px-4 py-3 text-sm text-cream placeholder:text-cream/65 focus:border-cream/30 focus:outline-none"
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[11px] text-cream/35">
+                <span className="text-[11px] text-cream/65">
                   {num(body.length)} / {num(2000)}
                 </span>
                 <div className="flex gap-2">
@@ -327,7 +327,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
 
       {/* Reviews list */}
       {otherReviews.length === 0 && !myReview ? (
-        <p className="text-sm text-cream/45">
+        <p className="text-sm text-cream/70">
           {fa
             ? "اولین نفری باش که این فیلم را نقد می‌کند."
             : "Be the first to review this film."}
@@ -349,7 +349,7 @@ export function FilmReviewsSection({ filmId }: { filmId: string }) {
                       {r.author_name ??
                         (fa ? "کاربر ناشناس" : "Anonymous viewer")}
                     </span>
-                    <span className="text-[11px] text-cream/40">
+                    <span className="text-[11px] text-cream/70">
                       {formatDate(r.created_at, locale)}
                     </span>
                   </div>

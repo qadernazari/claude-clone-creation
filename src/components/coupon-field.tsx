@@ -82,7 +82,7 @@ export function CouponField({ context, filmId, fa, applied, onApply }: CouponFie
             }
           }}
           placeholder={labels.placeholder}
-          className="flex-1 rounded-md border border-cream/20 bg-bg-0/60 px-3 py-2 text-sm font-mono uppercase placeholder:font-body placeholder:normal-case placeholder:text-cream/40 text-cream focus:border-amber/60 focus:outline-none"
+          className="flex-1 rounded-md border border-cream/20 bg-bg-0/60 px-3 py-2 text-sm font-mono uppercase placeholder:font-body placeholder:normal-case placeholder:text-cream/70 text-cream focus:border-amber/60 focus:outline-none"
         />
         <button
           type="button"

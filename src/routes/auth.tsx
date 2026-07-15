@@ -373,7 +373,7 @@ function AuthPage() {
                             type="button"
                             onClick={() => setShowPw((v) => !v)}
                             aria-label={showPw ? "Hide password" : "Show password"}
-                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/40 hover:text-cream/80 transition-colors"
+                            className="absolute top-1/2 -translate-y-1/2 right-3 rtl:right-auto rtl:left-3 inline-flex h-8 w-8 items-center justify-center rounded-md text-cream/70 hover:text-cream/80 transition-colors"
                           >
                             {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -438,7 +438,7 @@ function AuthPage() {
                 <div className="mt-3 text-center">
                   <Link
                     to="/reset-password"
-                    className="text-[12px] text-cream/40 hover:text-cream/70 transition-colors"
+                    className="text-[12px] text-cream/70 hover:text-cream/70 transition-colors"
                   >
                     {t.forgot}
                   </Link>
@@ -446,7 +446,7 @@ function AuthPage() {
               )}
 
 
-              <p className="mt-8 text-center text-[11px] leading-relaxed text-cream/30 px-4">
+              <p className="mt-8 text-center text-[11px] leading-relaxed text-cream/60 px-4">
                 {t.terms}
               </p>
             </>
@@ -577,7 +577,7 @@ function VerifyView({
                   "h-12 w-9 sm:h-14 sm:w-11 rounded-md border text-[18px] sm:text-[20px] font-semibold tabular-nums transition-all duration-150",
                   filled
                     ? "border-cream/60 bg-white/5 text-cream"
-                    : "border-cream/12 text-cream/40",
+                    : "border-cream/12 text-cream/70",
                   isActive ? "border-cream ring-2 ring-cream/20" : "",
                   verifying ? "opacity-60" : "",
                 ].join(" ")}
@@ -686,7 +686,7 @@ function FloatingInput({
         }`}
       >
         <span
-          className={`pointer-events-none absolute left-4 rtl:left-auto rtl:right-4 transition-all text-cream/40 ${
+          className={`pointer-events-none absolute left-4 rtl:left-auto rtl:right-4 transition-all text-cream/70 ${
             has
               ? "top-2 text-[11px] tracking-wide"
               : "top-1/2 -translate-y-1/2 text-[14px]"

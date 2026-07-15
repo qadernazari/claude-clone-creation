@@ -982,7 +982,7 @@ function WatchPage() {
                     <span className="tabular-nums tracking-wide text-cream-bright drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
                       {fmtTime(currentTime)}
                     </span>
-                    <span className="text-cream/40">/</span>
+                    <span className="text-cream/70">/</span>
                     <span className="tabular-nums tracking-wide text-cream/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
                       {fmtTime(duration)}
                     </span>
@@ -1104,7 +1104,7 @@ function WatchPage() {
               {resumePrompt !== null && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
                   <div className="rounded-xl border border-cream/15 bg-bg-0/90 p-6 max-w-sm text-center shadow-2xl">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-cream/70">
                       {fa ? "ادامه تماشا" : "Continue watching"}
                     </p>
                     <p className="mt-2 font-display text-xl text-cream-bright">
@@ -1156,7 +1156,7 @@ function WatchPage() {
 
           {countdown && (
             <div className="rounded-lg border border-cream/10 bg-cream/3 px-4 py-3 text-xs text-cream/70 sm:hidden">
-              <div className="uppercase tracking-widest text-[10px] text-cream/45">{t.accessRemaining}</div>
+              <div className="uppercase tracking-widest text-[10px] text-cream/70">{t.accessRemaining}</div>
               <div className="mt-0.5 text-cream-bright">{num(countdown.h)}h {num(countdown.m)}m</div>
             </div>
           )}
@@ -1166,7 +1166,7 @@ function WatchPage() {
         <div className="mt-7 grid gap-8 px-5 pb-10 md:mt-8 md:grid-cols-3 md:px-0 md:pb-0">
           {synopsis && (
             <section className="md:col-span-2">
-              <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.aboutFilm}</h2>
+              <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/70">{t.aboutFilm}</h2>
               <p className={`mt-3 text-sm leading-relaxed text-cream/80 ${fa ? "font-vazir" : ""}`}>
                 {synopsis}
               </p>
@@ -1174,7 +1174,7 @@ function WatchPage() {
           )}
 
           <section className={synopsis ? "hidden md:block" : "hidden md:block md:col-span-3"}>
-            <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/45">{t.shortcuts}</h2>
+            <h2 className="text-[10px] uppercase tracking-[0.2em] text-cream/70">{t.shortcuts}</h2>
             <dl className="mt-3 grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-cream/70">
               {[
                 { k: "Space / K", v: fa ? "پخش/مکث" : "Play / Pause" },

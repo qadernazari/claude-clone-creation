@@ -56,7 +56,7 @@ function PosterCard({ film, locale, year }: { film: Film; locale: string; year: 
         <h3 className="font-display text-[13px] font-medium leading-snug tracking-[-0.01em] text-cream-bright transition-colors line-clamp-1 md:text-[14px]">
           {ftitle}
         </h3>
-        <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/40 line-clamp-1 md:mt-1.5 md:text-[11px]">
+        <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-cream/70 line-clamp-1 md:mt-1.5 md:text-[11px]">
           {director}
           {director && film.year ? <> {" · "} {year(film.year)}</> : !director && film.year ? year(film.year) : null}
         </p>
@@ -135,7 +135,7 @@ export function Rail({
         </div>
       </div>
       {subtitle && (
-        <p className="mb-4 -mt-2 text-[13px] text-cream/45">{subtitle}</p>
+        <p className="mb-4 -mt-2 text-[13px] text-cream/70">{subtitle}</p>
       )}
       <div
         ref={ref}

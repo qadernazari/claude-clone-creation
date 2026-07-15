@@ -162,7 +162,7 @@ export function ContinueWatching() {
                   {title}
                 </h3>
                 {remaining !== null && (
-                  <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-cream/40">
+                  <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-cream/70">
                     {fa
                       ? `${num(remaining)} دقیقه مانده`
                       : `${num(remaining)} min left`}
