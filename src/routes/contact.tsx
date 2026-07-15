@@ -7,14 +7,16 @@ import { SiteFooter } from "@/components/site-footer";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — IRAN" },
+      { title: "Contact IRAN — Support, partnerships & press" },
       {
         name: "description",
-        content: "Get in touch with IRAN. Questions, bug reports, partnerships, or just a hello.",
+        content:
+          "Reach the IRAN team for support, filmmaker submissions, partnerships, press inquiries, or general questions about our streaming platform.",
       },
-      { property: "og:title", content: "Contact — IRAN" },
-      { property: "og:description", content: "Get in touch with IRAN." },
+      { property: "og:title", content: "Contact IRAN — Support, partnerships & press" },
+      { property: "og:description", content: "Reach the IRAN team for support, submissions, and partnerships." },
       { property: "og:url", content: "https://ir.show/contact" },
+      { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "https://ir.show/contact" }],
   }),
