@@ -429,9 +429,9 @@ function SlideImageFrame({
 
                   {/* Title — allow full glyph height and wrapping without cutting Persian descenders */}
                   <div className="mt-4 flex min-h-[7.25rem] items-start overflow-visible pb-1 lg:min-h-[8.25rem] xl:min-h-[9.25rem]">
-                    <h1 className="max-w-full text-balance font-display text-2xl font-black leading-[1.38] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl lg:leading-[1.35] xl:text-[2.2rem] xl:leading-[1.32]">
+                    <h2 className="max-w-full text-balance font-display text-2xl font-black leading-[1.38] text-cream-bright drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] lg:text-3xl lg:leading-[1.35] xl:text-[2.2rem] xl:leading-[1.32]">
                       {title}
-                    </h1>
+                    </h2>
                   </div>
 
                   {/* Meta — enough vertical room for Persian numerals and labels */}

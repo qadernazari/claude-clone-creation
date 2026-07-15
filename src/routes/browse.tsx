@@ -212,6 +212,7 @@ function BrowsePage() {
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                aria-label={locale === "fa" ? "جست‌وجوی فیلم‌ها" : "Search films"}
                 placeholder={
                   locale === "fa" ? "جست‌وجو…" : "Search films…"
                 }
@@ -359,9 +360,9 @@ function BrowsePage() {
             <span className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-amber/90">
               {locale === "fa" ? "جست‌وجو" : "Search"}
             </span>
-            <h3 className={`font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl ${locale === "fa" ? "font-vazir" : ""}`}>
+            <h2 className={`font-display text-xl font-medium tracking-[-0.01em] text-cream-bright md:text-2xl ${locale === "fa" ? "font-vazir" : ""}`}>
               {locale === "fa" ? "چیزی پیدا نشد" : "No films match"}
-            </h3>
+            </h2>
             <div className="mx-auto mt-5 h-px w-12 bg-amber/40" aria-hidden />
             <p className="mt-5 text-sm leading-relaxed text-cream/55">
               {locale === "fa"

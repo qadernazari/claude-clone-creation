@@ -21,6 +21,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/originals", changefreq: "weekly", priority: "0.8" },
           { path: "/membership", changefreq: "weekly", priority: "0.8" },
           { path: "/guides/watch-iranian-movies-with-subtitles", changefreq: "monthly", priority: "0.7" },
+          { path: "/guides/best-iranian-movies", changefreq: "monthly", priority: "0.7" },
           { path: "/about", changefreq: "monthly", priority: "0.6" },
           { path: "/help", changefreq: "monthly", priority: "0.5" },
           { path: "/contact", changefreq: "monthly", priority: "0.5" },
