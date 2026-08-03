@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminBannerRouteImport } from './routes/_authenticated/admin/banner'
 import { Route as AuthenticatedAdminAppearanceRouteImport } from './routes/_authenticated/admin/appearance'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -336,6 +337,11 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -421,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/films/$slug': typeof FilmsSlugRoute
   '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -481,6 +488,7 @@ export interface FileRoutesByTo {
   '/films/$slug': typeof FilmsSlugRoute
   '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -544,6 +552,7 @@ export interface FileRoutesById {
   '/films/$slug': typeof FilmsSlugRoute
   '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/_authenticated/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -607,6 +616,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
+    | '/.lovable/oauth/consent'
     | '/admin/analytics'
     | '/admin/appearance'
     | '/admin/banner'
@@ -667,6 +677,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
+    | '/.lovable/oauth/consent'
     | '/admin/analytics'
     | '/admin/appearance'
     | '/admin/banner'
@@ -729,6 +740,7 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/appearance'
     | '/_authenticated/admin/banner'
@@ -788,6 +800,7 @@ export interface RootRouteChildren {
   FilmsSlugRoute: typeof FilmsSlugRoute
   GuidesBestIranianMoviesRoute: typeof GuidesBestIranianMoviesRoute
   GuidesWatchIranianMoviesWithSubtitlesRoute: typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicIrPaymentsCallbackRoute: typeof ApiPublicIrPaymentsCallbackRoute
@@ -1151,6 +1164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1342,6 +1362,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuidesBestIranianMoviesRoute: GuidesBestIranianMoviesRoute,
   GuidesWatchIranianMoviesWithSubtitlesRoute:
     GuidesWatchIranianMoviesWithSubtitlesRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicIrPaymentsCallbackRoute: ApiPublicIrPaymentsCallbackRoute,
