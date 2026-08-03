@@ -209,8 +209,13 @@ function AuthPage() {
           email: email.trim(),
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}${
+              redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+                ? redirectTo
+                : "/"
+            }`,
           },
+
         });
         if (error) throw error;
         if (data.user && data.user.identities && data.user.identities.length === 0) {
@@ -231,7 +236,9 @@ function AuthPage() {
       email: email.trim(),
       options: {
         shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}${
+          redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//") ? redirectTo : "/"
+        }`,
       },
     });
     if (error) throw error;

@@ -18,6 +18,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OriginalsRouteImport } from './routes/originals'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BrowseRouteImport } from './routes/browse'
@@ -34,6 +35,8 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -59,6 +62,8 @@ import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminBannerRouteImport } from './routes/_authenticated/admin/banner'
 import { Route as AuthenticatedAdminAppearanceRouteImport } from './routes/_authenticated/admin/appearance'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -113,6 +118,11 @@ const NotFoundRoute = NotFoundRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpRoute = HelpRouteImport.update({
@@ -195,6 +205,18 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -336,6 +358,17 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -403,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/not-found': typeof NotFoundRoute
   '/originals': typeof OriginalsRoute
@@ -413,6 +447,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/account': typeof AuthenticatedAccountRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
@@ -421,6 +457,8 @@ export interface FileRoutesByFullPath {
   '/films/$slug': typeof FilmsSlugRoute
   '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -464,6 +502,7 @@ export interface FileRoutesByTo {
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/not-found': typeof NotFoundRoute
   '/originals': typeof OriginalsRoute
@@ -473,6 +512,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/account': typeof AuthenticatedAccountRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
@@ -481,6 +522,8 @@ export interface FileRoutesByTo {
   '/films/$slug': typeof FilmsSlugRoute
   '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -526,6 +569,7 @@ export interface FileRoutesById {
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/not-found': typeof NotFoundRoute
   '/originals': typeof OriginalsRoute
@@ -536,6 +580,8 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
@@ -544,6 +590,8 @@ export interface FileRoutesById {
   '/films/$slug': typeof FilmsSlugRoute
   '/guides/best-iranian-movies': typeof GuidesBestIranianMoviesRoute
   '/guides/watch-iranian-movies-with-subtitles': typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/_authenticated/admin/banner': typeof AuthenticatedAdminBannerRoute
@@ -589,6 +637,7 @@ export interface FileRouteTypes {
     | '/browse'
     | '/contact'
     | '/help'
+    | '/mcp'
     | '/membership'
     | '/not-found'
     | '/originals'
@@ -599,6 +648,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/account'
     | '/library'
     | '/my-tickets'
@@ -607,6 +658,8 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/analytics'
     | '/admin/appearance'
     | '/admin/banner'
@@ -650,6 +703,7 @@ export interface FileRouteTypes {
     | '/browse'
     | '/contact'
     | '/help'
+    | '/mcp'
     | '/membership'
     | '/not-found'
     | '/originals'
@@ -659,6 +713,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/account'
     | '/library'
     | '/my-tickets'
@@ -667,6 +723,8 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/admin/analytics'
     | '/admin/appearance'
     | '/admin/banner'
@@ -711,6 +769,7 @@ export interface FileRouteTypes {
     | '/browse'
     | '/contact'
     | '/help'
+    | '/mcp'
     | '/membership'
     | '/not-found'
     | '/originals'
@@ -721,6 +780,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/_authenticated/admin'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/account'
     | '/_authenticated/library'
     | '/_authenticated/my-tickets'
@@ -729,6 +790,8 @@ export interface FileRouteTypes {
     | '/films/$slug'
     | '/guides/best-iranian-movies'
     | '/guides/watch-iranian-movies-with-subtitles'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/appearance'
     | '/_authenticated/admin/banner'
@@ -774,6 +837,7 @@ export interface RootRouteChildren {
   BrowseRoute: typeof BrowseRoute
   ContactRoute: typeof ContactRoute
   HelpRoute: typeof HelpRoute
+  McpRoute: typeof McpRoute
   MembershipRoute: typeof MembershipRoute
   NotFoundRoute: typeof NotFoundRoute
   OriginalsRoute: typeof OriginalsRoute
@@ -783,11 +847,15 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FilmsSlugRoute: typeof FilmsSlugRoute
   GuidesBestIranianMoviesRoute: typeof GuidesBestIranianMoviesRoute
   GuidesWatchIranianMoviesWithSubtitlesRoute: typeof GuidesWatchIranianMoviesWithSubtitlesRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicIrPaymentsCallbackRoute: typeof ApiPublicIrPaymentsCallbackRoute
@@ -862,6 +930,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help': {
@@ -975,6 +1050,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/account'
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -1150,6 +1239,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/analytics'
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -1327,6 +1430,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseRoute: BrowseRoute,
   ContactRoute: ContactRoute,
   HelpRoute: HelpRoute,
+  McpRoute: McpRoute,
   MembershipRoute: MembershipRoute,
   NotFoundRoute: NotFoundRoute,
   OriginalsRoute: OriginalsRoute,
@@ -1336,12 +1440,17 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FilmsSlugRoute: FilmsSlugRoute,
   GuidesBestIranianMoviesRoute: GuidesBestIranianMoviesRoute,
   GuidesWatchIranianMoviesWithSubtitlesRoute:
     GuidesWatchIranianMoviesWithSubtitlesRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicIrPaymentsCallbackRoute: ApiPublicIrPaymentsCallbackRoute,
@@ -1355,3 +1464,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
