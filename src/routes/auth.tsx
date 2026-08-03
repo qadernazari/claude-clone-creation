@@ -236,7 +236,9 @@ function AuthPage() {
       email: email.trim(),
       options: {
         shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}${
+          redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//") ? redirectTo : "/"
+        }`,
       },
     });
     if (error) throw error;
